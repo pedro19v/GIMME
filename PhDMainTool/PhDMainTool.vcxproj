@@ -20,10 +20,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Headers\ContentProfile.h" />
+    <ClInclude Include="Headers\Manager.h" />
     <ClInclude Include="Headers\User\User.h" />
     <ClInclude Include="Headers\User\UserParameter.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Sources\Manager.cpp" />
     <ClCompile Include="Sources\PhDMainTool.cpp" />
     <ClCompile Include="Sources\User\User.cpp" />
     <ClCompile Include="Sources\User\UserParameter.cpp" />

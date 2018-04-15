@@ -14,7 +14,7 @@ private:
 public:
 	UserParameter(float minScaleValue, float maxScaleValue, std::string name, float value);
 	UserParameter(float minScaleValue, float maxScaleValue, std::string name);
-	UserParameter(float minScaleValue, float maxScaleValue);
+	UserParameter();
 
 	std::vector<float> getScale();
 

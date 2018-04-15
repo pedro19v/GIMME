@@ -16,19 +16,26 @@ UserParameter::UserParameter(float minScaleValue, float maxScaleValue, std::stri
 	this->maxScaleValue = maxScaleValue;
 
 	this->name = name;
+	this->value = 0;
 
 }
 
-UserParameter::UserParameter(float minScaleValue, float maxScaleValue)
+UserParameter::UserParameter()
 {
-	this->minScaleValue = minScaleValue;
-	this->maxScaleValue = maxScaleValue;
+	this->minScaleValue = 0;
+	this->maxScaleValue = 0;
+
+	this->name = "unnamed parameter";
+	this->value = 0;
 }
 
 
 std::vector<float> UserParameter::getScale()
 {
-	return std::vector<float>(minScaleValue, maxScaleValue);
+	std::vector<float> scale = std::vector<float>(2);
+	scale[0] = minScaleValue;
+	scale[0] = maxScaleValue;
+	return scale;
 }
 std::string UserParameter::getName()
 {

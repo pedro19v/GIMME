@@ -1,10 +1,6 @@
 #pragma once
-static struct ContentProfile {
-	static float individualExplorationPercentage;
-	static float cooperationPercentage;
-	static float competitionPercentage;
+struct ContentProfile {
+	float individualExplorationPercentage = 0.0f;
+	float cooperationPercentage = 0.0f;
+	float competitionPercentage = 0.0f;
 };
-
-float ContentProfile::individualExplorationPercentage = 0.0f;
-float ContentProfile::cooperationPercentage = 0.0f;
-float ContentProfile::competitionPercentage = 0.0f;
