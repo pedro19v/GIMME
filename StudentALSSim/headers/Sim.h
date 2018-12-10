@@ -54,6 +54,13 @@ public:
 		return rand() / (double)RAND_MAX;
 	}
 
+	void setPreference(double preference) {
+		this->preference = preference;
+	}
+	void setAbility(double preference) {
+		this->ability = ability;
+	}
+
 	double getPreference() {
 		return this->preference;
 	}
