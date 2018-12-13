@@ -1,44 +1,49 @@
 #include "../headers/Adaptation.h"
 
-Adaptation::Adaptation(std::vector<Student> students, int numberOfConfigChoices, int maxNumberOfStudentsPerGroup) {
+Adaptation::Adaptation(int numberOfConfigChoices, int maxNumberOfStudentsPerGroup) {
 	this->numberOfConfigChoices = numberOfConfigChoices;
 	this->maxNumberOfStudentsPerGroup = maxNumberOfStudentsPerGroup;
-
-	this->students = students;
 }
 
-std::vector<AdaptationMechanic> Adaptation::iterate()
+std::vector<AdaptationMechanic> Adaptation::iterate(std::vector<Student*> students)
 {
 	std::vector<AdaptationMechanic> mechanics = std::vector<AdaptationMechanic>();
 
-	AdaptationConfiguration adaptedConfig = divideStudents(this->students);
+	AdaptationConfiguration adaptedConfig = divideStudents(students);
 	std::vector<AdaptationGroup> groups = adaptedConfig.groups;
 	int groupsSize = groups.size();
 	for (int i = 0; i < groupsSize; i++) {
-		LearningProfile currGroupProfile = groups[i].profile;
+		Utilities::LearningProfile currGroupProfile = groups[i].profile;
 		mechanics.push_back(generateMechanic(currGroupProfile));
 	}
 	return mechanics;
 }
 
-AdaptationConfiguration Adaptation::divideStudents(std::vector<Student> students) {
+AdaptationConfiguration Adaptation::divideStudents(std::vector<Student*> students) {
 
 	AdaptationConfiguration bestConfig = AdaptationConfiguration();
 	double currMaxFitness = 0.0;
 
 	//generate several random groups, calculate their fitness and select best one
 	for (int j = 0; j < this->numberOfConfigChoices; j++) {
-		std::vector<Student> studentsWithoutGroup = std::vector<Student>(students);
+		std::vector<Student*> studentsWithoutGroup = std::vector<Student*>(students);
 		AdaptationConfiguration newConfig = AdaptationConfiguration();
 
 		while (!studentsWithoutGroup.empty()) {
 			AdaptationGroup currGroup = AdaptationGroup();
 			currGroup.fitness = 0;
 
+			double learningProfileTotal = 1.0;
 			//generate learning profile
-			currGroup.profile.K_cl = (double)rand() / (double)(RAND_MAX);
-			currGroup.profile.K_cp = (double)rand() / (double)(RAND_MAX);
-			currGroup.profile.K_i = (double)rand() / (double)(RAND_MAX);
+			double newRand = Utilities::randBetween(0,1);
+			learningProfileTotal -= newRand;
+			currGroup.profile.K_cl = newRand;
+
+			newRand = Utilities::randBetween(newRand, 1);
+			learningProfileTotal -= newRand;
+			currGroup.profile.K_cp = newRand;
+
+			currGroup.profile.K_i = learningProfileTotal;
 
 
 			//append students
@@ -56,10 +61,11 @@ AdaptationConfiguration Adaptation::divideStudents(std::vector<Student> students
 				if (studentsWithoutGroupSize > 1) {
 					currStudentIndex = rand() % (studentsWithoutGroupSize - 1);
 				}
-				Student currStudent = studentsWithoutGroup[currStudentIndex];
+				Student* currStudent = studentsWithoutGroup[currStudentIndex];
 				currGroup.students.push_back(currStudent);
+				currStudent->setCurrProfile(currGroup.profile);
 
-				double currStudentFitness = currStudent.fitness(currGroup.profile);
+				double currStudentFitness = currStudent->fitness(currGroup.profile);
 				currGroup.fitness += currStudentFitness / currGroupSize;
 
 				studentsWithoutGroup.erase(studentsWithoutGroup.begin() + currStudentIndex);
@@ -81,6 +87,6 @@ AdaptationConfiguration Adaptation::divideStudents(std::vector<Student> students
 	}
 }
 
-AdaptationMechanic Adaptation::generateMechanic(LearningProfile bestConfigProfile) {
+AdaptationMechanic Adaptation::generateMechanic(Utilities::LearningProfile bestConfigProfile) {
 	return AdaptationMechanic { "chest" };
 }

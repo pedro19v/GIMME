@@ -1,13 +1,15 @@
 #include <algorithm>
 #include <numeric>
-#include "Sim.h"
+#include "Student.h"
+#include "Globals.h"
+#include "Utilities.h"
 
 #include "time.h"
 
 struct AdaptationGroup {
 public:
-	LearningProfile profile;
-	std::vector<Student> students;
+	Utilities::LearningProfile profile;
+	std::vector<Student*> students;
 
 	double fitness;
 };
@@ -28,12 +30,11 @@ class Adaptation {
 private:
 	int numberOfConfigChoices;
 	int maxNumberOfStudentsPerGroup;
-	std::vector<Student> students;
 
-	AdaptationConfiguration divideStudents(std::vector<Student> students);
-	AdaptationMechanic generateMechanic(LearningProfile bestConfigProfile);
+	AdaptationConfiguration divideStudents(std::vector<Student*> students);
+	AdaptationMechanic generateMechanic(Utilities::LearningProfile bestConfigProfile);
 public:
-	Adaptation(std::vector<Student> students, int numberOfConfigChoices, int maxNumberOfStudentsPerGroup);
-	std::vector<AdaptationMechanic> iterate();
+	Adaptation(int numberOfConfigChoices, int maxNumberOfStudentsPerGroup);
+	std::vector<AdaptationMechanic> iterate(std::vector<Student*> students);
 
 };
