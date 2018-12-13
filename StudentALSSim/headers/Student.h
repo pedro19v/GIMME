@@ -1,7 +1,17 @@
 #pragma once
+#include <algorithm> 
+
 #include "Utilities.h"
 
 class Student {
+public:
+	struct StudentModel {
+		Utilities::LearningProfile currProfile;
+		double preference; // on vs off task percentage
+		double ability; // score percentage
+	};
+
+
 private:
 	int id;
 	std::string name;
@@ -11,17 +21,14 @@ private:
 	double learningRate;
 
 	//Adaptation part
-	Utilities::LearningProfile currProfile;
-
-	double preference; // on vs off task percentage
-	double ability; // score percentage
-
-	std::vector<Utilities::LearningProfile> pastLearningProfiles;
+	std::vector<StudentModel> pastModels;
 	int amountOfStoredProfiles;
+
+	StudentModel myModel;
+	
 
 public:
 	Student(int id, std::string name);
-	double fitness(Utilities::LearningProfile profile);
 
 	void setPreference(double preference);
 	double getPreference();
@@ -29,8 +36,9 @@ public:
 	void setAbility(double preference);
 	double getAbility();
 
+	std::vector<StudentModel> getPastModels();
+	void changeCurrProfile(Utilities::LearningProfile currProfile);
 
-	void setCurrProfile(Utilities::LearningProfile currProfile);
 	Utilities::LearningProfile getCurrProfile();
 	Utilities::LearningProfile getInherentPreference();
 	double getLearningRate();

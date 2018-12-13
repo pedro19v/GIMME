@@ -1,8 +1,12 @@
 #include "../headers/Adaptation.h"
 
-Adaptation::Adaptation(int numberOfConfigChoices, int maxNumberOfStudentsPerGroup) {
+Adaptation::Adaptation(int numberOfConfigChoices, int maxNumberOfStudentsPerGroup, int numberOfFitnessNNs, bool isRandomFitness) {
 	this->numberOfConfigChoices = numberOfConfigChoices;
 	this->maxNumberOfStudentsPerGroup = maxNumberOfStudentsPerGroup;
+
+	this->numberOfFitnessNNs = numberOfFitnessNNs;
+
+	this->isRandomFitness = isRandomFitness;
 }
 
 std::vector<AdaptationMechanic> Adaptation::iterate(std::vector<Student*> students)
@@ -63,9 +67,9 @@ AdaptationConfiguration Adaptation::divideStudents(std::vector<Student*> student
 				}
 				Student* currStudent = studentsWithoutGroup[currStudentIndex];
 				currGroup.students.push_back(currStudent);
-				currStudent->setCurrProfile(currGroup.profile);
+				currStudent->changeCurrProfile(currGroup.profile);
 
-				double currStudentFitness = currStudent->fitness(currGroup.profile);
+				double currStudentFitness = fitness(currStudent,currGroup.profile,this->numberOfFitnessNNs);
 				currGroup.fitness += currStudentFitness / currGroupSize;
 
 				studentsWithoutGroup.erase(studentsWithoutGroup.begin() + currStudentIndex);
@@ -85,6 +89,28 @@ AdaptationConfiguration Adaptation::divideStudents(std::vector<Student*> student
 		}
 		return bestConfig;
 	}
+}
+
+double Adaptation::fitness(Student* student, Utilities::LearningProfile profile, int numberOfFitnessNNs) {
+
+	if (isRandomFitness) {
+		return rand() / (double)RAND_MAX;
+	}
+
+	std::vector<Student::StudentModel> pastModels = student->getPastModels();
+	int pastModelsSize = pastModels.size();
+	std::sort(pastModels.begin(), pastModels.end(), FitnessSort(student));
+
+	Student::StudentModel predictedModel = { profile, 0 , 0};
+	for (int i = 0; i < numberOfFitnessNNs; i++) {
+		if (i > pastModelsSize) {
+			break;
+		}
+		Student::StudentModel currModel = pastModels[i];
+		predictedModel.ability += currModel.ability / numberOfFitnessNNs;
+		predictedModel.preference += currModel.preference / numberOfFitnessNNs;
+	}
+	return 0.5*predictedModel.ability + 0.5*predictedModel.preference;
 }
 
 AdaptationMechanic Adaptation::generateMechanic(Utilities::LearningProfile bestConfigProfile) {

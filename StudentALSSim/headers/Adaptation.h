@@ -28,13 +28,34 @@ public:
 
 class Adaptation {
 private:
+	struct FitnessSort {
+		Student* currStudent;
+
+		FitnessSort(Student* currStudent) { this->currStudent = currStudent; }
+		bool operator () (Student::StudentModel i, Student::StudentModel j) {
+			double IprofileValue = i.currProfile.K_cl + i.currProfile.K_cp + i.currProfile.K_i;
+			double JprofileValue = j.currProfile.K_cl + j.currProfile.K_cp + j.currProfile.K_i;
+
+			double currProfileValue = currStudent->getCurrProfile().K_cl + currStudent->getCurrProfile().K_cp + currStudent->getCurrProfile().K_i;
+			return ((IprofileValue - currProfileValue) < (JprofileValue - currProfileValue));
+		}
+
+		int paramA;
+	};
+
+private:
 	int numberOfConfigChoices;
 	int maxNumberOfStudentsPerGroup;
 
+	int numberOfFitnessNNs;
+	bool isRandomFitness;
+
 	AdaptationConfiguration divideStudents(std::vector<Student*> students);
 	AdaptationMechanic generateMechanic(Utilities::LearningProfile bestConfigProfile);
+
+	double fitness(Student* student, Utilities::LearningProfile profile, int numberOfFitnessNNs);
 public:
-	Adaptation(int numberOfConfigChoices, int maxNumberOfStudentsPerGroup);
+	Adaptation(int numberOfConfigChoices, int maxNumberOfStudentsPerGroup, int numberOfFitnessNNs, bool isRandomFitness);
 	std::vector<AdaptationMechanic> iterate(std::vector<Student*> students);
 
 };

@@ -1,45 +1,49 @@
 #include "../headers/Student.h"
 
+
+
+
+
 Student::Student(int id, std::string name) {
 	this->inherentPreference = { Utilities::randBetween(0,1), Utilities::randBetween(0,1), Utilities::randBetween(0,1) };
 	this->learningRate = Utilities::randBetween(0, 1);
 
-	this->currProfile = { 0,0,0 };
+	this->myModel.currProfile = { 0,0,0 };
 
-	this->preference = 0;
-	this->ability = 0;
+	this->myModel.preference = 0;
+	this->myModel.ability = 0;
 
 	this->id = id;
 	this->name = name;
-	this->pastLearningProfiles = std::vector<Utilities::LearningProfile>();
-}
-double Student::fitness(Utilities::LearningProfile profile) {
-
-	return rand() / (double)RAND_MAX;
+	this->pastModels = std::vector<StudentModel>();
 }
 
 void Student::setPreference(double preference) {
-	this->preference = preference;
+	this->myModel.preference = preference;
 }
 double Student::getPreference() {
-	return this->preference;
+	return this->myModel.preference;
 }
 
+std::vector<Student::StudentModel> Student::getPastModels() {
+	return this->pastModels;
+}
 
 
 void Student::setAbility(double ability) {
-	this->ability = ability;
+	this->myModel.ability = ability;
 }
 double Student::getAbility() {
-	return this->ability;
+	return this->myModel.ability;
 }
 
 
-void Student::setCurrProfile(Utilities::LearningProfile currProfile) {
-	this->currProfile = currProfile;
+void Student::changeCurrProfile(Utilities::LearningProfile currProfile) {
+	this->pastModels.push_back(this->myModel);
+	this->myModel.currProfile = currProfile;
 }
 Utilities::LearningProfile Student::getCurrProfile() {
-	return this->currProfile;
+	return this->myModel.currProfile;
 }
 Utilities::LearningProfile Student::getInherentPreference() {
 	return this->inherentPreference;
