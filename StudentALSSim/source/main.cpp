@@ -7,20 +7,26 @@
 
 namespace plt = matplotlibcpp;
 
-const int numberOfStudentsInClass = 40;
-const int numberOfAdaptationCycles = 10;
-const int numberOfFitnessNNs = 3;
+const int numberOfStudentsInClass = 25;
+const int numberOfAdaptationCycles = 1000;
+const int numberOfFitnessNNs = 20;
 
-int numberOfAdaptationConfigurationChoices = 20;
+int numberOfAdaptationConfigurationChoices = 1000;
 int maxNumberOfStudentsPerGroup = 10;
 
 //define and init globals
 std::vector<Student*> Globals::students = std::vector<Student*>();
-void initGlobals() {
+void createGlobals() {
 	//generate all of the students models
 	Globals::students = std::vector<Student*>();
 	for (int i = 0; i < numberOfStudentsInClass; i++) {
 		Globals::students.push_back(new Student(i, "a"));
+	}
+}
+void resetGlobals() {
+	//generate all of the students models
+	for (int i = 0; i < numberOfStudentsInClass; i++) {
+		Globals::students[i]->reset();
 	}
 }
 void destroyGlobals() {
@@ -67,6 +73,7 @@ void runAdaptation(Adaptation adapt, std::vector<double> &avgAbilities) {
 	}
 }
 
+
 int main() {
 
 	std::vector<double> avgAbilities = std::vector<double>(numberOfAdaptationCycles);
@@ -80,21 +87,26 @@ int main() {
 
 
 	//with the adaptation algorithm
-	initGlobals();
+	createGlobals();
 
-	Adaptation adapt = Adaptation(numberOfAdaptationConfigurationChoices, maxNumberOfStudentsPerGroup, numberOfFitnessNNs, false);
+	Adaptation adapt = Adaptation(numberOfAdaptationConfigurationChoices, maxNumberOfStudentsPerGroup, numberOfFitnessNNs, true);
 	runAdaptation(adapt,avgAbilities);
 
-	destroyGlobals();
+	resetGlobals();
 	plt::plot(cycles, avgAbilities);
+	for (int i = 0; i < numberOfAdaptationCycles; i++) {
+		avgAbilities[i] = 0;
+	}
+	
 
-	initGlobals();
-
-	adapt = Adaptation(numberOfAdaptationConfigurationChoices, maxNumberOfStudentsPerGroup, numberOfFitnessNNs, true);
+	adapt = Adaptation(numberOfAdaptationConfigurationChoices, maxNumberOfStudentsPerGroup, numberOfFitnessNNs, false);
 	runAdaptation(adapt, avgAbilities);
 
+	resetGlobals();
+	plt::plot(cycles, avgAbilities);
+	
+
 	destroyGlobals();
-	plt::plot( cycles, avgAbilities);
 	plt::show();
 	
 	return 0;

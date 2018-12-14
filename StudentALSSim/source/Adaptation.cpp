@@ -86,6 +86,7 @@ AdaptationConfiguration Adaptation::divideStudents(std::vector<Student*> student
 
 		if (newConfig.fitness >= currMaxFitness) {
 			bestConfig = newConfig;
+			currMaxFitness = newConfig.fitness;
 		}
 		return bestConfig;
 	}
@@ -94,8 +95,10 @@ AdaptationConfiguration Adaptation::divideStudents(std::vector<Student*> student
 double Adaptation::fitness(Student* student, Utilities::LearningProfile profile, int numberOfFitnessNNs) {
 
 	if (isRandomFitness) {
+		printf("aaaaaaaaaa");
 		return rand() / (double)RAND_MAX;
 	}
+	printf("bbbbbb.,mbbb");
 
 	std::vector<Student::StudentModel> pastModels = student->getPastModels();
 	int pastModelsSize = pastModels.size();
@@ -103,12 +106,12 @@ double Adaptation::fitness(Student* student, Utilities::LearningProfile profile,
 
 	Student::StudentModel predictedModel = { profile, 0 , 0};
 	for (int i = 0; i < numberOfFitnessNNs; i++) {
-		if (i > pastModelsSize) {
+		if (i >= pastModelsSize) {
 			break;
 		}
 		Student::StudentModel currModel = pastModels[i];
-		predictedModel.ability += currModel.ability / numberOfFitnessNNs;
-		predictedModel.preference += currModel.preference / numberOfFitnessNNs;
+		predictedModel.ability += currModel.ability / std::min(pastModelsSize,numberOfFitnessNNs);
+		predictedModel.preference += currModel.preference / std::min(pastModelsSize, numberOfFitnessNNs);
 	}
 	return 0.5*predictedModel.ability + 0.5*predictedModel.preference;
 }

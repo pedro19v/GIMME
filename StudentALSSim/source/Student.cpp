@@ -2,11 +2,9 @@
 
 
 
-
-
 Student::Student(int id, std::string name) {
 	this->inherentPreference = { Utilities::randBetween(0,1), Utilities::randBetween(0,1), Utilities::randBetween(0,1) };
-	this->learningRate = Utilities::randBetween(0, 1);
+	this->learningRate = Utilities::randBetween(0, 10);
 
 	this->myModel.currProfile = { 0,0,0 };
 
@@ -15,6 +13,16 @@ Student::Student(int id, std::string name) {
 
 	this->id = id;
 	this->name = name;
+	this->pastModels = std::vector<StudentModel>();
+}
+
+void Student::reset() {
+	
+	this->myModel.currProfile = { 0,0,0 };
+
+	this->myModel.preference = 0;
+	this->myModel.ability = 0;
+
 	this->pastModels = std::vector<StudentModel>();
 }
 

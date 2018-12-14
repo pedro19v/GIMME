@@ -37,10 +37,8 @@ private:
 			double JprofileValue = j.currProfile.K_cl + j.currProfile.K_cp + j.currProfile.K_i;
 
 			double currProfileValue = currStudent->getCurrProfile().K_cl + currStudent->getCurrProfile().K_cp + currStudent->getCurrProfile().K_i;
-			return ((IprofileValue - currProfileValue) < (JprofileValue - currProfileValue));
+			return ((IprofileValue - currProfileValue) > (JprofileValue - currProfileValue));
 		}
-
-		int paramA;
 	};
 
 private:

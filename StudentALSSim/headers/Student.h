@@ -29,6 +29,7 @@ private:
 
 public:
 	Student(int id, std::string name);
+	void reset();
 
 	void setPreference(double preference);
 	double getPreference();
@@ -38,6 +39,7 @@ public:
 
 	std::vector<StudentModel> getPastModels();
 	void changeCurrProfile(Utilities::LearningProfile currProfile);
+
 
 	Utilities::LearningProfile getCurrProfile();
 	Utilities::LearningProfile getInherentPreference();
