@@ -95,23 +95,28 @@ AdaptationConfiguration Adaptation::divideStudents(std::vector<Student*> student
 double Adaptation::fitness(Student* student, Utilities::LearningProfile profile, int numberOfFitnessNNs) {
 
 	if (isRandomFitness) {
-		printf("aaaaaaaaaa");
 		return rand() / (double)RAND_MAX;
 	}
-	printf("bbbbbb.,mbbb");
 
 	std::vector<Student::StudentModel> pastModels = student->getPastModels();
 	int pastModelsSize = pastModels.size();
 	std::sort(pastModels.begin(), pastModels.end(), FitnessSort(student));
 
-	Student::StudentModel predictedModel = { profile, 0 , 0};
+	double currProfileValue = student->getCurrProfile().K_cl + student->getCurrProfile().K_cp + student->getCurrProfile().K_i;
+	
+	Student::StudentModel predictedModel = { profile, 0 , 0 };
 	for (int i = 0; i < numberOfFitnessNNs; i++) {
 		if (i >= pastModelsSize) {
 			break;
 		}
-		Student::StudentModel currModel = pastModels[i];
-		predictedModel.ability += currModel.ability / std::min(pastModelsSize,numberOfFitnessNNs);
-		predictedModel.preference += currModel.preference / std::min(pastModelsSize, numberOfFitnessNNs);
+		Utilities::LearningProfile pastProfile = pastModels[i].currProfile;
+		
+		double pastProfileValue = pastProfile.K_cl + pastProfile.K_cp + pastProfile.K_i;
+		double distance = std::abs(pastProfileValue - currProfileValue)/currProfileValue;
+
+
+		predictedModel.ability += student->getAbility() * distance / std::min(pastModelsSize,numberOfFitnessNNs);
+		predictedModel.preference += student->getPreference()  * distance / std::min(pastModelsSize, numberOfFitnessNNs);
 	}
 	return 0.5*predictedModel.ability + 0.5*predictedModel.preference;
 }

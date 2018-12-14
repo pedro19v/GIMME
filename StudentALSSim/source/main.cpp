@@ -1,17 +1,19 @@
 #include "../headers/Globals.h"
 #include "../headers/Utilities.h"
 #include "../headers/Adaptation.h"
-#include "../headers/matplotlibcpp.h"
+//#include "../headers/matplotlibcpp.h"
 
 #include <cmath>
-
-namespace plt = matplotlibcpp;
+#include <iostream>
+#include <fstream>
+//
+//namespace plt = matplotlibcpp;
 
 const int numberOfStudentsInClass = 25;
 const int numberOfAdaptationCycles = 1000;
 const int numberOfFitnessNNs = 20;
 
-int numberOfAdaptationConfigurationChoices = 1000;
+int numberOfAdaptationConfigurationChoices = 500;
 int maxNumberOfStudentsPerGroup = 10;
 
 //define and init globals
@@ -34,8 +36,42 @@ void destroyGlobals() {
 		delete Globals::students[i];
 	}
 }
+void trainingPhase() {
+	for (int i = 0; i < 30; i++) {
 
-void runAdaptation(Adaptation adapt, std::vector<double> &avgAbilities) {
+		//simulate students reaction
+		for (int j = 0; j < numberOfStudentsInClass; j++) {
+			Student* currStudent = Globals::students[j];
+			if (i < 10) {
+				currStudent->changeCurrProfile(Utilities::LearningProfile{ 1,0,0 });
+			}
+			else if (i >= 10 && i < 20) {
+				currStudent->changeCurrProfile(Utilities::LearningProfile{ 0,1,0 });
+			}
+			else if (i >= 20 && i < 30) {
+				currStudent->changeCurrProfile(Utilities::LearningProfile{ 0,0,1 });
+			}
+
+			Utilities::LearningProfile currProfile = currStudent->getCurrProfile();
+			Utilities::LearningProfile inherentPreference = currStudent->getInherentPreference();
+
+			double taskTotalTime = 100;
+
+			double onOffTaskSim = currProfile.K_cl*inherentPreference.K_cl*taskTotalTime
+				+ currProfile.K_cp*inherentPreference.K_cp*taskTotalTime
+				+ currProfile.K_i*inherentPreference.K_i*taskTotalTime;
+			currStudent->setPreference(onOffTaskSim);
+
+			double learningRate = currStudent->getLearningRate();
+			double abilityIncreaseSim = learningRate * onOffTaskSim;
+			currStudent->setAbility(currStudent->getAbility() + abilityIncreaseSim);
+
+			Globals::students[j] = currStudent;
+		}
+	}
+}
+
+void runSystem(Adaptation adapt, int numberOfAdaptationCycles, std::vector<double> &avgAbilities) {
 	for (int i = 0; i < numberOfAdaptationCycles; i++) {
 
 		//extract adapted mechanics
@@ -59,7 +95,11 @@ void runAdaptation(Adaptation adapt, std::vector<double> &avgAbilities) {
 			Utilities::LearningProfile currProfile = currStudent->getCurrProfile();
 			Utilities::LearningProfile inherentPreference = currStudent->getInherentPreference();
 
-			double onOffTaskSim = currProfile.K_cl*inherentPreference.K_cl + currProfile.K_cp*inherentPreference.K_cp + currProfile.K_i*inherentPreference.K_i;
+			double taskTotalTime = 100;
+
+			double onOffTaskSim = currProfile.K_cl*inherentPreference.K_cl*taskTotalTime 
+				+ currProfile.K_cp*inherentPreference.K_cp*taskTotalTime 
+				+ currProfile.K_i*inherentPreference.K_i*taskTotalTime;
 			currStudent->setPreference(onOffTaskSim);
 
 			double learningRate = currStudent->getLearningRate();
@@ -76,6 +116,10 @@ void runAdaptation(Adaptation adapt, std::vector<double> &avgAbilities) {
 
 int main() {
 
+	std::ofstream resultsFile;
+	resultsFile.open("./results.txt");
+	resultsFile << "b";
+
 	std::vector<double> avgAbilities = std::vector<double>(numberOfAdaptationCycles);
 	for (int i = 0; i < numberOfAdaptationCycles; i++) {
 		avgAbilities[i] = 0;
@@ -90,24 +134,40 @@ int main() {
 	createGlobals();
 
 	Adaptation adapt = Adaptation(numberOfAdaptationConfigurationChoices, maxNumberOfStudentsPerGroup, numberOfFitnessNNs, true);
-	runAdaptation(adapt,avgAbilities);
-
-	resetGlobals();
-	plt::plot(cycles, avgAbilities);
-	for (int i = 0; i < numberOfAdaptationCycles; i++) {
-		avgAbilities[i] = 0;
-	}
+	trainingPhase();
+	runSystem(adapt, numberOfAdaptationCycles, avgAbilities);
 	
+	resetGlobals();
+	resultsFile << "	y1=[";
+	for (int i = 0; i < numberOfAdaptationCycles; i++) {
+		resultsFile << avgAbilities[i];
+		avgAbilities[i] = 0;
+		if (i != (numberOfAdaptationCycles - 1)) {
+			resultsFile << ",";
+		}
+	}
+	resultsFile << "]\n\n";
 
 	adapt = Adaptation(numberOfAdaptationConfigurationChoices, maxNumberOfStudentsPerGroup, numberOfFitnessNNs, false);
-	runAdaptation(adapt, avgAbilities);
+	trainingPhase();
+	runSystem(adapt, numberOfAdaptationCycles, avgAbilities);
 
 	resetGlobals();
-	plt::plot(cycles, avgAbilities);
-	
+	resultsFile << "	y2=[";
+	for (int i = 0; i < numberOfAdaptationCycles; i++) {
+		resultsFile << avgAbilities[i];
+		avgAbilities[i] = 0;
+		if (i != (numberOfAdaptationCycles - 1)) {
+			resultsFile << ",";
+		}
+	}
+	resultsFile << "]";
+	resultsFile.flush();
+	resultsFile.close();
 
 	destroyGlobals();
-	plt::show();
+
 	
 	return 0;
 }
+
