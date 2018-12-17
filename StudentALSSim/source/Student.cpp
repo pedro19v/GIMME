@@ -2,9 +2,9 @@
 
 
 
-Student::Student(int id, std::string name) {
+Student::Student(int id, std::string name, int maxAmountOfStoredProfiles) {
 	this->inherentPreference = { Utilities::randBetween(0,1), Utilities::randBetween(0,1), Utilities::randBetween(0,1) };
-	this->learningRate = Utilities::randBetween(0, 10);
+	this->learningRate = Utilities::randBetween(0, 1);
 
 	this->myModel.currProfile = { 0,0,0 };
 
@@ -14,6 +14,8 @@ Student::Student(int id, std::string name) {
 	this->id = id;
 	this->name = name;
 	this->pastModels = std::vector<StudentModel>();
+
+	this->maxAmountOfStoredProfiles = maxAmountOfStoredProfiles;
 }
 
 void Student::reset() {
@@ -48,6 +50,9 @@ double Student::getAbility() {
 
 void Student::changeCurrProfile(Utilities::LearningProfile currProfile) {
 	this->pastModels.push_back(this->myModel);
+	if (this->pastModels.size() > maxAmountOfStoredProfiles) {
+		this->pastModels.erase(this->pastModels.begin());
+	}
 	this->myModel.currProfile = currProfile;
 }
 Utilities::LearningProfile Student::getCurrProfile() {
@@ -58,4 +63,20 @@ Utilities::LearningProfile Student::getInherentPreference() {
 }
 double Student::getLearningRate() {
 	return this->learningRate;
+}
+
+void Student::simulateReaction(int numberOfAdaptationCycles)
+{
+	Utilities::LearningProfile cost = { 0,0,0 };
+	Utilities::LearningProfile currProfile = this->myModel.currProfile;
+	cost.K_cl = inherentPreference.K_cl * currProfile.K_cl;
+	cost.K_cp = inherentPreference.K_cp * currProfile.K_cp;
+	cost.K_i = inherentPreference.K_i * currProfile.K_i;
+
+
+	double onOffTaskSim = (cost.K_cl + cost.K_cp + cost.K_i) / 3.0;
+	this->myModel.preference = onOffTaskSim;
+
+	double abilityIncreaseSim = (learningRate * onOffTaskSim); //between 0 and 1
+	this->myModel.ability += abilityIncreaseSim;
 }

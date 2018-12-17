@@ -6,19 +6,18 @@
 
 #include "time.h"
 
+#include <iostream>
+
 struct AdaptationGroup {
 public:
 	Utilities::LearningProfile profile;
 	std::vector<Student*> students;
-
-	double fitness;
 };
 
 
 struct AdaptationConfiguration {
 public:
 	std::vector<AdaptationGroup> groups;
-	double fitness;
 };
 
 struct AdaptationMechanic {
@@ -29,15 +28,23 @@ public:
 class Adaptation {
 private:
 	struct FitnessSort {
-		Student* currStudent;
+		Adaptation* owner;
+		Utilities::LearningProfile testedProfile;
 
-		FitnessSort(Student* currStudent) { this->currStudent = currStudent; }
-		bool operator () (Student::StudentModel i, Student::StudentModel j) {
-			double IprofileValue = i.currProfile.K_cl + i.currProfile.K_cp + i.currProfile.K_i;
-			double JprofileValue = j.currProfile.K_cl + j.currProfile.K_cp + j.currProfile.K_i;
+		FitnessSort(Adaptation* owner, Utilities::LearningProfile testedProfile) { 
+			this->owner = owner;
+			this->testedProfile = testedProfile;
+		}
 
-			double currProfileValue = currStudent->getCurrProfile().K_cl + currStudent->getCurrProfile().K_cp + currStudent->getCurrProfile().K_i;
-			return (std::abs(IprofileValue - currProfileValue) > std::abs(JprofileValue - currProfileValue));
+		bool operator () (Student::StudentModel& i, Student::StudentModel& j) {
+			
+			double gain1 = owner->calcGain(testedProfile, i.currProfile);
+			double gain2 = owner->calcGain(testedProfile, j.currProfile);
+
+			i.gain = gain1;
+			j.gain = gain2;
+
+			return gain1 < gain2;
 		}
 	};
 
@@ -56,4 +63,5 @@ public:
 	Adaptation(int numberOfConfigChoices, int maxNumberOfStudentsPerGroup, int numberOfFitnessNNs, bool isRandomFitness);
 	std::vector<AdaptationMechanic> iterate(std::vector<Student*> students);
 
+	double calcGain(Utilities::LearningProfile profile1, Utilities::LearningProfile profile2);
 };

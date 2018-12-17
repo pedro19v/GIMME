@@ -26,6 +26,9 @@ public:
 			this->K_cp = 0.0;
 			this->K_cl = 0.0;
 		}
+
+
+
 	};
 
 	

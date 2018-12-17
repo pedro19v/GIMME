@@ -11,10 +11,16 @@
 
 const int numberOfStudentsInClass = 25;
 const int numberOfAdaptationCycles = 1000;
-const int numberOfFitnessNNs = 20;
 
-int numberOfAdaptationConfigurationChoices = 500;
-int maxNumberOfStudentsPerGroup = 10;
+const int numberOfFitnessNNs = 10;
+const int maxAmountOfStoredProfiles = 20;
+
+int numberOfAdaptationConfigurationChoices = 5000;
+int maxNumberOfStudentsPerGroup = 5;
+
+
+std::ofstream resultsFile;
+
 
 //define and init globals
 std::vector<Student*> Globals::students = std::vector<Student*>();
@@ -22,7 +28,7 @@ void createGlobals() {
 	//generate all of the students models
 	Globals::students = std::vector<Student*>();
 	for (int i = 0; i < numberOfStudentsInClass; i++) {
-		Globals::students.push_back(new Student(i, "a"));
+		Globals::students.push_back(new Student(i, "a", maxAmountOfStoredProfiles));
 	}
 }
 void resetGlobals() {
@@ -36,89 +42,68 @@ void destroyGlobals() {
 		delete Globals::students[i];
 	}
 }
-void trainingPhase() {
-	for (int i = 0; i < 30; i++) {
 
+void simulateStudentsReaction() {
+	//simulate students reaction
+	for (int j = 0; j < numberOfStudentsInClass; j++) {
+		Student* currStudent = Globals::students[j];
+		currStudent->simulateReaction(numberOfAdaptationCycles);
+	}
+}
+
+void trainingPhase() {
+	for (int i = 0; i < maxAmountOfStoredProfiles; i++) {
 		//simulate students reaction
 		for (int j = 0; j < numberOfStudentsInClass; j++) {
 			Student* currStudent = Globals::students[j];
-			if (i < 10) {
+			if (i % 3 == 0) {
 				currStudent->changeCurrProfile(Utilities::LearningProfile{ 1,0,0 });
 			}
-			else if (i >= 10 && i < 20) {
+			else if (i % 3 == 1) {
 				currStudent->changeCurrProfile(Utilities::LearningProfile{ 0,1,0 });
 			}
-			else if (i >= 20 && i < 30) {
+			else if (i % 3 == 2) {
 				currStudent->changeCurrProfile(Utilities::LearningProfile{ 0,0,1 });
 			}
 
-			Utilities::LearningProfile currProfile = currStudent->getCurrProfile();
-			Utilities::LearningProfile inherentPreference = currStudent->getInherentPreference();
-
-			double taskTotalTime = 100;
-
-			double onOffTaskSim = currProfile.K_cl*inherentPreference.K_cl*taskTotalTime
-				+ currProfile.K_cp*inherentPreference.K_cp*taskTotalTime
-				+ currProfile.K_i*inherentPreference.K_i*taskTotalTime;
-			currStudent->setPreference(onOffTaskSim);
-
-			double learningRate = currStudent->getLearningRate();
-			double abilityIncreaseSim = learningRate * onOffTaskSim;
-			currStudent->setAbility(currStudent->getAbility() + abilityIncreaseSim);
-
-			Globals::students[j] = currStudent;
+			simulateStudentsReaction();
 		}
 	}
 }
 
-void runSystem(Adaptation adapt, int numberOfAdaptationCycles, std::vector<double> &avgAbilities) {
+void runAdaptationModule(Adaptation adapt, int numberOfAdaptationCycles, std::vector<double> &avgAbilities) {
 	for (int i = 0; i < numberOfAdaptationCycles; i++) {
+
+		printf("\rstep %d of %d", i, numberOfAdaptationCycles);
 
 		//extract adapted mechanics
 		std::vector<AdaptationMechanic> mechanics;
 		mechanics = adapt.iterate(Globals::students);
 		int mechanicsSize = mechanics.size();
+		
+		resultsFile << "currProfile: " << Globals::students[0]->getCurrProfile().K_cl << Globals::students[0]->getCurrProfile().K_cp << Globals::students[0]->getCurrProfile().K_i << std::endl;
+		resultsFile << "ability: " << Globals::students[0]->getAbility() << std::endl;
+		resultsFile << "preference: " << Globals::students[0]->getPreference() << std::endl;
 
 		//intervene
 		/*for (int j = 0; j < mechanicsSize; j++) {
 		printf("new mechanic: %s", mechanics[j].name.c_str());
 		}*/
+		simulateStudentsReaction();
 
 		for (int j = 0; j < numberOfStudentsInClass; j++) {
 			avgAbilities[i] += Globals::students[j]->getAbility() / numberOfStudentsInClass;
 		}
+		std::cout << "avgAb[" << i <<"]: " << avgAbilities[i] << std::endl;
 
-		//simulate students reaction
-		for (int j = 0; j < numberOfStudentsInClass; j++) {
-			Student* currStudent = Globals::students[j];
-
-			Utilities::LearningProfile currProfile = currStudent->getCurrProfile();
-			Utilities::LearningProfile inherentPreference = currStudent->getInherentPreference();
-
-			double taskTotalTime = 100;
-
-			double onOffTaskSim = currProfile.K_cl*inherentPreference.K_cl*taskTotalTime 
-				+ currProfile.K_cp*inherentPreference.K_cp*taskTotalTime 
-				+ currProfile.K_i*inherentPreference.K_i*taskTotalTime;
-			currStudent->setPreference(onOffTaskSim);
-
-			double learningRate = currStudent->getLearningRate();
-			double abilityIncreaseSim = learningRate * onOffTaskSim;
-			currStudent->setAbility(currStudent->getAbility() + abilityIncreaseSim);
-
-			Globals::students[j] = currStudent;
-		}
-
-		//getchar();
 	}
 }
 
 
 int main() {
 
-	std::ofstream resultsFile;
 	resultsFile.open("./results.txt");
-	resultsFile << "b";
+	resultsFile << "d";
 
 	std::vector<double> avgAbilities = std::vector<double>(numberOfAdaptationCycles);
 	for (int i = 0; i < numberOfAdaptationCycles; i++) {
@@ -135,7 +120,7 @@ int main() {
 
 	Adaptation adapt = Adaptation(numberOfAdaptationConfigurationChoices, maxNumberOfStudentsPerGroup, numberOfFitnessNNs, true);
 	trainingPhase();
-	runSystem(adapt, numberOfAdaptationCycles, avgAbilities);
+	runAdaptationModule(adapt, numberOfAdaptationCycles, avgAbilities);
 	
 	resetGlobals();
 	resultsFile << "	y1=[";
@@ -150,7 +135,7 @@ int main() {
 
 	adapt = Adaptation(numberOfAdaptationConfigurationChoices, maxNumberOfStudentsPerGroup, numberOfFitnessNNs, false);
 	trainingPhase();
-	runSystem(adapt, numberOfAdaptationCycles, avgAbilities);
+	runAdaptationModule(adapt, numberOfAdaptationCycles, avgAbilities);
 
 	resetGlobals();
 	resultsFile << "	y2=[";

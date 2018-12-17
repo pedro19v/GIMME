@@ -2,6 +2,7 @@
 #include <algorithm> 
 
 #include "Utilities.h"
+#include <iostream>
 
 class Student {
 public:
@@ -9,6 +10,8 @@ public:
 		Utilities::LearningProfile currProfile;
 		double preference; // on vs off task percentage
 		double ability; // score percentage
+
+		double gain;
 	};
 
 
@@ -22,13 +25,14 @@ private:
 
 	//Adaptation part
 	std::vector<StudentModel> pastModels;
-	int amountOfStoredProfiles;
+	int maxAmountOfStoredProfiles;
 
 	StudentModel myModel;
 	
 
 public:
-	Student(int id, std::string name);
+
+	Student(int id, std::string name, int maxAmountOfStoredProfiles);
 	void reset();
 
 	void setPreference(double preference);
@@ -44,4 +48,6 @@ public:
 	Utilities::LearningProfile getCurrProfile();
 	Utilities::LearningProfile getInherentPreference();
 	double getLearningRate();
+
+	void simulateReaction(int numberOfAdaptationCycles);
 };

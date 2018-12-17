@@ -17,7 +17,17 @@ std::vector<AdaptationMechanic> Adaptation::iterate(std::vector<Student*> studen
 	std::vector<AdaptationGroup> groups = adaptedConfig.groups;
 	int groupsSize = groups.size();
 	for (int i = 0; i < groupsSize; i++) {
-		Utilities::LearningProfile currGroupProfile = groups[i].profile;
+		AdaptationGroup currGroup = groups[i];
+		std::vector<Student*> groupStudents = currGroup.students;
+		int groupStudentsSize = groupStudents.size();
+
+		for (int j = 0; j < groupStudentsSize; j++) {
+			Student* currStudent = groupStudents[j];
+			currStudent->changeCurrProfile(currGroup.profile);
+		}
+
+
+		Utilities::LearningProfile currGroupProfile = currGroup.profile;
 		mechanics.push_back(generateMechanic(currGroupProfile));
 	}
 	return mechanics;
@@ -30,27 +40,29 @@ AdaptationConfiguration Adaptation::divideStudents(std::vector<Student*> student
 
 	//generate several random groups, calculate their fitness and select best one
 	for (int j = 0; j < this->numberOfConfigChoices; j++) {
+		double currFitness = 0.0;
 		std::vector<Student*> studentsWithoutGroup = std::vector<Student*>(students);
+		int studentsSize = students.size();
 		AdaptationConfiguration newConfig = AdaptationConfiguration();
 
 		while (!studentsWithoutGroup.empty()) {
 			AdaptationGroup currGroup = AdaptationGroup();
-			currGroup.fitness = 0;
 
-			double learningProfileTotal = 1.0;
 			//generate learning profile
+			double learningProfileTotal = 1.0;
+			
 			double newRand = Utilities::randBetween(0,1);
 			learningProfileTotal -= newRand;
 			currGroup.profile.K_cl = newRand;
 
-			newRand = Utilities::randBetween(newRand, 1);
+			newRand = Utilities::randBetween(0, learningProfileTotal);
 			learningProfileTotal -= newRand;
 			currGroup.profile.K_cp = newRand;
 
 			currGroup.profile.K_i = learningProfileTotal;
 
 
-			//append students
+			//generate group for profile
 			int studentsWithoutGroupSize = studentsWithoutGroup.size();
 			int currGroupSize = 0;
 			if (studentsWithoutGroupSize > 1) {
@@ -67,10 +79,9 @@ AdaptationConfiguration Adaptation::divideStudents(std::vector<Student*> student
 				}
 				Student* currStudent = studentsWithoutGroup[currStudentIndex];
 				currGroup.students.push_back(currStudent);
-				currStudent->changeCurrProfile(currGroup.profile);
 
-				double currStudentFitness = fitness(currStudent,currGroup.profile,this->numberOfFitnessNNs);
-				currGroup.fitness += currStudentFitness / currGroupSize;
+				double currStudentFitness = fitness(currStudent, currGroup.profile, this->numberOfFitnessNNs);
+				currFitness += currStudentFitness / studentsSize;
 
 				studentsWithoutGroup.erase(studentsWithoutGroup.begin() + currStudentIndex);
 			}
@@ -78,47 +89,54 @@ AdaptationConfiguration Adaptation::divideStudents(std::vector<Student*> student
 			newConfig.groups.push_back(currGroup);
 		}
 
-		std::vector<AdaptationGroup> currConfigGroups = newConfig.groups;
-		int currConfigGroupsSize = currConfigGroups.size();
-		for (int k = 0; k < currConfigGroupsSize; k++) {
-			newConfig.fitness += currConfigGroups[k].fitness / currConfigGroupsSize;
-		}
-
-		if (newConfig.fitness >= currMaxFitness) {
+		if (currFitness > currMaxFitness) {
 			bestConfig = newConfig;
-			currMaxFitness = newConfig.fitness;
+			currMaxFitness = currFitness;
 		}
-		return bestConfig;
 	}
+	return bestConfig;
+}
+
+double Adaptation::calcGain(Utilities::LearningProfile profile1, Utilities::LearningProfile profile2)
+{
+	Utilities::LearningProfile cost = { 0,0,0 };
+	cost.K_cl = std::abs(profile1.K_cl - profile2.K_cl);
+	cost.K_cp = std::abs(profile1.K_cp - profile2.K_cp);
+	cost.K_i = std::abs(profile1.K_i - profile2.K_i);
+	return (cost.K_cl + cost.K_cp + cost.K_i)/3.0;
 }
 
 double Adaptation::fitness(Student* student, Utilities::LearningProfile profile, int numberOfFitnessNNs) {
 
 	if (isRandomFitness) {
-		return rand() / (double)RAND_MAX;
+		return Utilities::randBetween(0,1);
 	}
 
 	std::vector<Student::StudentModel> pastModels = student->getPastModels();
 	int pastModelsSize = pastModels.size();
-	std::sort(pastModels.begin(), pastModels.end(), FitnessSort(student));
-
-	double currProfileValue = student->getCurrProfile().K_cl + student->getCurrProfile().K_cp + student->getCurrProfile().K_i;
 	
 	Student::StudentModel predictedModel = { profile, 0 , 0 };
+	std::sort(pastModels.begin(), pastModels.end(), FitnessSort(this, profile));
 	for (int i = 0; i < numberOfFitnessNNs; i++) {
-		if (i >= pastModelsSize) {
+		if (i == pastModelsSize) {
 			break;
 		}
 		Utilities::LearningProfile pastProfile = pastModels[i].currProfile;
-		
-		double pastProfileValue = pastProfile.K_cl + pastProfile.K_cp + pastProfile.K_i;
-		double distance = std::abs(pastProfileValue - currProfileValue)/currProfileValue;
+		double gainValue = calcGain(profile, pastProfile);
 
-
-		predictedModel.ability += student->getAbility() * distance / std::min(pastModelsSize,numberOfFitnessNNs);
-		predictedModel.preference += student->getPreference()  * distance / std::min(pastModelsSize, numberOfFitnessNNs);
+		predictedModel.ability +=  student->getAbility()*gainValue / (double) std::min(pastModelsSize, numberOfFitnessNNs);
+		predictedModel.preference += student->getPreference()*gainValue / (double) std::min(pastModelsSize, numberOfFitnessNNs);
 	}
-	return 0.5*predictedModel.ability + 0.5*predictedModel.preference;
+
+	//double onOffTaskSim = profile.K_cl*student->getInherentPreference().K_cl
+	//	+ profile.K_cp*student->getInherentPreference().K_cp
+	//	+ profile.K_i*student->getInherentPreference().K_i;
+	//predictedModel.preference = onOffTaskSim;
+
+	//double abilityIncreaseSim = (student->getLearningRate() * onOffTaskSim) / 1000; //between 0 and 1
+	//predictedModel.ability = student->getAbility() + abilityIncreaseSim;
+
+	return 0.5*predictedModel.ability+0.5*predictedModel.preference;
 }
 
 AdaptationMechanic Adaptation::generateMechanic(Utilities::LearningProfile bestConfigProfile) {
