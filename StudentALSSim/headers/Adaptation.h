@@ -38,13 +38,13 @@ private:
 
 		bool operator () (Student::StudentModel& i, Student::StudentModel& j) {
 			
-			double gain1 = owner->calcGain(testedProfile, i.currProfile);
-			double gain2 = owner->calcGain(testedProfile, j.currProfile);
+			double dist1 = testedProfile.distanceBetween(i.currProfile);
+			double dist2 = testedProfile.distanceBetween(j.currProfile);
 
-			i.gain = gain1;
-			j.gain = gain2;
+			i.dist = dist1;
+			j.dist = dist2;
 
-			return gain1 < gain2;
+			return dist1 < dist2;
 		}
 	};
 
@@ -63,5 +63,4 @@ public:
 	Adaptation(int numberOfConfigChoices, int maxNumberOfStudentsPerGroup, int numberOfFitnessNNs, bool isRandomFitness);
 	std::vector<AdaptationMechanic> iterate(std::vector<Student*> students);
 
-	double calcGain(Utilities::LearningProfile profile1, Utilities::LearningProfile profile2);
 };

@@ -49,17 +49,15 @@ AdaptationConfiguration Adaptation::divideStudents(std::vector<Student*> student
 			AdaptationGroup currGroup = AdaptationGroup();
 
 			//generate learning profile
-			double learningProfileTotal = 1.0;
-			
-			double newRand = Utilities::randBetween(0,1);
-			learningProfileTotal -= newRand;
-			currGroup.profile.K_cl = newRand;
+			double newRand1 = Utilities::randBetween(0, 1);
+			double newRand2 = Utilities::randBetween(0, 1);
+			double newRand3 = Utilities::randBetween(0, 1);
 
-			newRand = Utilities::randBetween(0, learningProfileTotal);
-			learningProfileTotal -= newRand;
-			currGroup.profile.K_cp = newRand;
+			double newRandSum = newRand1 + newRand2 + newRand3;
 
-			currGroup.profile.K_i = learningProfileTotal;
+			currGroup.profile.K_cl = newRand1/ newRandSum;
+			currGroup.profile.K_cp = newRand2/ newRandSum;
+			currGroup.profile.K_i = newRand3/ newRandSum;
 
 
 			//generate group for profile
@@ -97,14 +95,7 @@ AdaptationConfiguration Adaptation::divideStudents(std::vector<Student*> student
 	return bestConfig;
 }
 
-double Adaptation::calcGain(Utilities::LearningProfile profile1, Utilities::LearningProfile profile2)
-{
-	Utilities::LearningProfile cost = { 0,0,0 };
-	cost.K_cl = std::abs(profile1.K_cl - profile2.K_cl);
-	cost.K_cp = std::abs(profile1.K_cp - profile2.K_cp);
-	cost.K_i = std::abs(profile1.K_i - profile2.K_i);
-	return (cost.K_cl + cost.K_cp + cost.K_i)/3.0;
-}
+
 
 double Adaptation::fitness(Student* student, Utilities::LearningProfile profile, int numberOfFitnessNNs) {
 
@@ -122,10 +113,10 @@ double Adaptation::fitness(Student* student, Utilities::LearningProfile profile,
 			break;
 		}
 		Utilities::LearningProfile pastProfile = pastModels[i].currProfile;
-		double gainValue = calcGain(profile, pastProfile);
+		double distance = profile.distanceBetween(pastProfile);
 
-		predictedModel.ability +=  student->getAbility()*gainValue / (double) std::min(pastModelsSize, numberOfFitnessNNs);
-		predictedModel.preference += student->getPreference()*gainValue / (double) std::min(pastModelsSize, numberOfFitnessNNs);
+		predictedModel.ability +=  student->getAbility() * (1 - distance) / (double) std::min(pastModelsSize, numberOfFitnessNNs);
+		predictedModel.engagement += student->getEngagement() * (1 - distance) / (double) std::min(pastModelsSize, numberOfFitnessNNs);
 	}
 
 	//double onOffTaskSim = profile.K_cl*student->getInherentPreference().K_cl
@@ -136,7 +127,7 @@ double Adaptation::fitness(Student* student, Utilities::LearningProfile profile,
 	//double abilityIncreaseSim = (student->getLearningRate() * onOffTaskSim) / 1000; //between 0 and 1
 	//predictedModel.ability = student->getAbility() + abilityIncreaseSim;
 
-	return 0.5*predictedModel.ability+0.5*predictedModel.preference;
+	return 0.5*predictedModel.ability + 0.5*predictedModel.engagement;
 }
 
 AdaptationMechanic Adaptation::generateMechanic(Utilities::LearningProfile bestConfigProfile) {

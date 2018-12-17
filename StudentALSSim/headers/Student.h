@@ -8,10 +8,10 @@ class Student {
 public:
 	struct StudentModel {
 		Utilities::LearningProfile currProfile;
-		double preference; // on vs off task percentage
+		double engagement; // on vs off task percentage
 		double ability; // score percentage
 
-		double gain;
+		double dist;
 	};
 
 
@@ -35,8 +35,8 @@ public:
 	Student(int id, std::string name, int maxAmountOfStoredProfiles);
 	void reset();
 
-	void setPreference(double preference);
-	double getPreference();
+	void setEngagement(double preference);
+	double getEngagement();
 
 	void setAbility(double preference);
 	double getAbility();

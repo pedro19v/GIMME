@@ -27,7 +27,15 @@ public:
 			this->K_cl = 0.0;
 		}
 
-
+		double distanceBetween(Utilities::LearningProfile profile2)
+		{
+			Utilities::LearningProfile profile1 = *this;
+			Utilities::LearningProfile cost = { 0,0,0 };
+			cost.K_cl = std::pow((profile1.K_cl - profile2.K_cl), 2);
+			cost.K_cp = std::pow((profile1.K_cp - profile2.K_cp), 2);
+			cost.K_i = std::pow((profile1.K_i - profile2.K_i), 2);
+			return cost.K_cl + cost.K_cp + cost.K_i;
+		}
 
 	};
 

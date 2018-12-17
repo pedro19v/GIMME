@@ -10,12 +10,12 @@
 //namespace plt = matplotlibcpp;
 
 const int numberOfStudentsInClass = 25;
-const int numberOfAdaptationCycles = 1000;
+const int numberOfAdaptationCycles = 5000;
 
 const int numberOfFitnessNNs = 10;
 const int maxAmountOfStoredProfiles = 20;
 
-int numberOfAdaptationConfigurationChoices = 5000;
+int numberOfAdaptationConfigurationChoices = 2000;
 int maxNumberOfStudentsPerGroup = 5;
 
 
@@ -81,9 +81,9 @@ void runAdaptationModule(Adaptation adapt, int numberOfAdaptationCycles, std::ve
 		mechanics = adapt.iterate(Globals::students);
 		int mechanicsSize = mechanics.size();
 		
-		resultsFile << "currProfile: " << Globals::students[0]->getCurrProfile().K_cl << Globals::students[0]->getCurrProfile().K_cp << Globals::students[0]->getCurrProfile().K_i << std::endl;
+		/*resultsFile << "currProfile: " << Globals::students[0]->getCurrProfile().K_cl << Globals::students[0]->getCurrProfile().K_cp << Globals::students[0]->getCurrProfile().K_i << std::endl;
 		resultsFile << "ability: " << Globals::students[0]->getAbility() << std::endl;
-		resultsFile << "preference: " << Globals::students[0]->getPreference() << std::endl;
+		resultsFile << "preference: " << Globals::students[0]->getEngagement() << std::endl;*/
 
 		//intervene
 		/*for (int j = 0; j < mechanicsSize; j++) {
