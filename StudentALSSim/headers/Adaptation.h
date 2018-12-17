@@ -53,14 +53,14 @@ private:
 	int maxNumberOfStudentsPerGroup;
 
 	int numberOfFitnessNNs;
-	bool isRandomFitness;
+	int fitnessCondition;
 
 	AdaptationConfiguration divideStudents(std::vector<Student*> students);
 	AdaptationMechanic generateMechanic(Utilities::LearningProfile bestConfigProfile);
 
 	double fitness(Student* student, Utilities::LearningProfile profile, int numberOfFitnessNNs);
 public:
-	Adaptation(int numberOfConfigChoices, int maxNumberOfStudentsPerGroup, int numberOfFitnessNNs, bool isRandomFitness);
+	Adaptation(int numberOfConfigChoices, int maxNumberOfStudentsPerGroup, int numberOfFitnessNNs, int fitnessCondition);
 	std::vector<AdaptationMechanic> iterate(std::vector<Student*> students);
 
 };

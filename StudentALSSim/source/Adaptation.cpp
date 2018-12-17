@@ -1,12 +1,12 @@
 #include "../headers/Adaptation.h"
 
-Adaptation::Adaptation(int numberOfConfigChoices, int maxNumberOfStudentsPerGroup, int numberOfFitnessNNs, bool isRandomFitness) {
+Adaptation::Adaptation(int numberOfConfigChoices, int maxNumberOfStudentsPerGroup, int numberOfFitnessNNs, int fitnessCondition) {
 	this->numberOfConfigChoices = numberOfConfigChoices;
 	this->maxNumberOfStudentsPerGroup = maxNumberOfStudentsPerGroup;
 
 	this->numberOfFitnessNNs = numberOfFitnessNNs;
 
-	this->isRandomFitness = isRandomFitness;
+	this->fitnessCondition = fitnessCondition;
 }
 
 std::vector<AdaptationMechanic> Adaptation::iterate(std::vector<Student*> students)
@@ -99,8 +99,14 @@ AdaptationConfiguration Adaptation::divideStudents(std::vector<Student*> student
 
 double Adaptation::fitness(Student* student, Utilities::LearningProfile profile, int numberOfFitnessNNs) {
 
-	if (isRandomFitness) {
+	if (fitnessCondition == 0) {
 		return Utilities::randBetween(0,1);
+	}
+	else if(fitnessCondition == 1) {
+
+		double onOffTaskSim = 1 - student->getInherentPreference().distanceBetween(profile);
+		double abilityIncreaseSim = (student->getLearningRate() * onOffTaskSim); //between 0 and 1
+		return student->getAbility() + abilityIncreaseSim;
 	}
 
 	std::vector<Student::StudentModel> pastModels = student->getPastModels();
@@ -118,14 +124,6 @@ double Adaptation::fitness(Student* student, Utilities::LearningProfile profile,
 		predictedModel.ability +=  student->getAbility() * (1 - distance) / (double) std::min(pastModelsSize, numberOfFitnessNNs);
 		predictedModel.engagement += student->getEngagement() * (1 - distance) / (double) std::min(pastModelsSize, numberOfFitnessNNs);
 	}
-
-	//double onOffTaskSim = profile.K_cl*student->getInherentPreference().K_cl
-	//	+ profile.K_cp*student->getInherentPreference().K_cp
-	//	+ profile.K_i*student->getInherentPreference().K_i;
-	//predictedModel.preference = onOffTaskSim;
-
-	//double abilityIncreaseSim = (student->getLearningRate() * onOffTaskSim) / 1000; //between 0 and 1
-	//predictedModel.ability = student->getAbility() + abilityIncreaseSim;
 
 	return 0.5*predictedModel.ability + 0.5*predictedModel.engagement;
 }

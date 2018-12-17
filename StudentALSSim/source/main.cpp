@@ -15,7 +15,7 @@ const int numberOfAdaptationCycles = 5000;
 const int numberOfFitnessNNs = 10;
 const int maxAmountOfStoredProfiles = 20;
 
-int numberOfAdaptationConfigurationChoices = 2000;
+int numberOfAdaptationConfigurationChoices = 1000;
 int maxNumberOfStudentsPerGroup = 5;
 
 
@@ -118,7 +118,7 @@ int main() {
 	//with the adaptation algorithm
 	createGlobals();
 
-	Adaptation adapt = Adaptation(numberOfAdaptationConfigurationChoices, maxNumberOfStudentsPerGroup, numberOfFitnessNNs, true);
+	Adaptation adapt = Adaptation(numberOfAdaptationConfigurationChoices, maxNumberOfStudentsPerGroup, numberOfFitnessNNs, 1);
 	trainingPhase();
 	runAdaptationModule(adapt, numberOfAdaptationCycles, avgAbilities);
 	
@@ -132,8 +132,9 @@ int main() {
 		}
 	}
 	resultsFile << "]\n\n";
-
-	adapt = Adaptation(numberOfAdaptationConfigurationChoices, maxNumberOfStudentsPerGroup, numberOfFitnessNNs, false);
+	resultsFile.flush();
+/*
+	adapt = Adaptation(numberOfAdaptationConfigurationChoices, maxNumberOfStudentsPerGroup, numberOfFitnessNNs, 1);
 	trainingPhase();
 	runAdaptationModule(adapt, numberOfAdaptationCycles, avgAbilities);
 
@@ -146,8 +147,24 @@ int main() {
 			resultsFile << ",";
 		}
 	}
-	resultsFile << "]";
+	resultsFile << "]\n\n";
 	resultsFile.flush();
+
+	adapt = Adaptation(numberOfAdaptationConfigurationChoices, maxNumberOfStudentsPerGroup, numberOfFitnessNNs, 2);
+	trainingPhase();
+	runAdaptationModule(adapt, numberOfAdaptationCycles, avgAbilities);
+
+	resetGlobals();
+	resultsFile << "	y3=[";
+	for (int i = 0; i < numberOfAdaptationCycles; i++) {
+		resultsFile << avgAbilities[i];
+		avgAbilities[i] = 0;
+		if (i != (numberOfAdaptationCycles - 1)) {
+			resultsFile << ",";
+		}
+	}
+	resultsFile << "]";
+	resultsFile.flush();*/
 	resultsFile.close();
 
 	destroyGlobals();
