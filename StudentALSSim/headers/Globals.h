@@ -5,4 +5,5 @@
 class Globals {
 public:
 	std::vector<Student*> static students;
+
 };

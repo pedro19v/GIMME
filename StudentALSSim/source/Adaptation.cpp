@@ -103,26 +103,30 @@ double Adaptation::fitness(Student* student, Utilities::LearningProfile profile,
 		return Utilities::randBetween(0,1);
 	}
 	else if(fitnessCondition == 1) {
-
-		double onOffTaskSim = 1 - student->getInherentPreference().distanceBetween(profile);
+		double onOffTaskSim = 1 - student->getInherentPreference().normalizedDistanceBetween(profile);
 		double abilityIncreaseSim = (student->getLearningRate() * onOffTaskSim); //between 0 and 1
 		return student->getAbility() + abilityIncreaseSim;
+		//return onOffTaskSim;
 	}
 
-	std::vector<Student::StudentModel> pastModels = student->getPastModels();
-	int pastModelsSize = pastModels.size();
+	std::vector<Student::StudentModel> pastModelIncs = student->getPastModelIncreases();
+	std::vector<Student::StudentModel> pastModelncsCopy = std::vector<Student::StudentModel>(pastModelIncs);
+	int pastModelIncsSize = pastModelIncs.size();
 	
 	Student::StudentModel predictedModel = { profile, 0 , 0 };
-	std::sort(pastModels.begin(), pastModels.end(), FitnessSort(this, profile));
+	std::sort(pastModelncsCopy.begin(), pastModelncsCopy.end(), FitnessSort(this, profile));
+
+	predictedModel.ability = student->getAbility();
+	predictedModel.engagement = student->getEngagement();
 	for (int i = 0; i < numberOfFitnessNNs; i++) {
-		if (i == pastModelsSize) {
+		if (i == pastModelIncsSize) {
 			break;
 		}
-		Utilities::LearningProfile pastProfile = pastModels[i].currProfile;
-		double distance = profile.distanceBetween(pastProfile);
+		Utilities::LearningProfile pastProfile = pastModelncsCopy[i].currProfile;
+		double distance = profile.normalizedDistanceBetween(pastProfile);
 
-		predictedModel.ability +=  student->getAbility() * (1 - distance) / (double) std::min(pastModelsSize, numberOfFitnessNNs);
-		predictedModel.engagement += student->getEngagement() * (1 - distance) / (double) std::min(pastModelsSize, numberOfFitnessNNs);
+		predictedModel.ability += pastModelncsCopy[i].ability * (1.0 - distance) / (double) std::min(pastModelIncsSize, numberOfFitnessNNs);
+		predictedModel.engagement += pastModelncsCopy[i].engagement * (1.0 - distance) / (double) std::min(pastModelIncsSize, numberOfFitnessNNs);
 	}
 
 	return 0.5*predictedModel.ability + 0.5*predictedModel.engagement;

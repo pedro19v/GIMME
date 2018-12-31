@@ -1,11 +1,14 @@
 #pragma once
 #include <vector>
+#include <random>
 #include "string.h"
 
 #define _USE_MATH_DEFINES
 
+
 class Utilities {
 public:
+	static std::default_random_engine normalRandomGenerator;
 		
 	struct LearningProfile {
 		public:
@@ -27,14 +30,26 @@ public:
 			this->K_cl = 0.0;
 		}
 
-		double distanceBetween(Utilities::LearningProfile profile2)
+		double normalizedDistanceBetween(Utilities::LearningProfile profile2)
 		{
 			Utilities::LearningProfile profile1 = *this;
 			Utilities::LearningProfile cost = { 0,0,0 };
-			cost.K_cl = std::pow((profile1.K_cl - profile2.K_cl), 2);
-			cost.K_cp = std::pow((profile1.K_cp - profile2.K_cp), 2);
-			cost.K_i = std::pow((profile1.K_i - profile2.K_i), 2);
-			return cost.K_cl + cost.K_cp + cost.K_i;
+			//normalizar cada uma das dims X/X+Y+Z; Y/X+Y+Z, Z/X+Y+Z
+			cost.K_cl = std::abs(profile1.K_cl - profile2.K_cl);
+			cost.K_cp = std::abs(profile1.K_cp - profile2.K_cp);
+			cost.K_i = std::abs(profile1.K_i - profile2.K_i);
+
+			double totalDiff = cost.K_cl + cost.K_cp + cost.K_i;
+
+			cost.K_cl /= totalDiff;
+			cost.K_cp /= totalDiff;
+			cost.K_i /= totalDiff;
+
+			cost.K_cl = std::pow(cost.K_cl, 2);
+			cost.K_cp = std::pow(cost.K_cl, 2);
+			cost.K_i = std::pow(cost.K_cl, 2);
+
+			return sqrt(cost.K_cl + cost.K_cp + cost.K_i);
 		}
 
 	};
@@ -44,7 +59,11 @@ public:
 		double rand0_1 = (double)rand() / (double)(RAND_MAX);
 		return min + rand0_1 * (max - min);
 	}
+
+	double static normalRandom(double mu, double var) {
+
+		std::normal_distribution<double> distribution(mu, var);
+		return distribution(normalRandomGenerator);
+	}
 };
-
-
 

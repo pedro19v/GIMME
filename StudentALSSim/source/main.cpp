@@ -6,6 +6,7 @@
 #include <cmath>
 #include <iostream>
 #include <fstream>
+#include <ios>
 //
 //namespace plt = matplotlibcpp;
 
@@ -13,22 +14,25 @@ const int numberOfStudentsInClass = 25;
 const int numberOfAdaptationCycles = 5000;
 
 const int numberOfFitnessNNs = 10;
-const int maxAmountOfStoredProfiles = 20;
+const int numberOfStudentModelCells = 1;
+const int maxAmountOfStoredProfilesPerCell = 20;
 
 int numberOfAdaptationConfigurationChoices = 1000;
 int maxNumberOfStudentsPerGroup = 5;
 
 
-std::ofstream resultsFile;
+std::ofstream resultsFile("E:/interactions-based-adaptation-for-learning/StudentALSSim/results.txt", std::ios::in | std::ios::out);
 
 
-//define and init globals
+//define and init globals and utilities
 std::vector<Student*> Globals::students = std::vector<Student*>();
+std::default_random_engine Utilities::normalRandomGenerator;
+
 void createGlobals() {
 	//generate all of the students models
 	Globals::students = std::vector<Student*>();
 	for (int i = 0; i < numberOfStudentsInClass; i++) {
-		Globals::students.push_back(new Student(i, "a", maxAmountOfStoredProfiles));
+		Globals::students.push_back(new Student(i, "a", numberOfStudentModelCells, maxAmountOfStoredProfilesPerCell));
 	}
 }
 void resetGlobals() {
@@ -52,7 +56,7 @@ void simulateStudentsReaction() {
 }
 
 void trainingPhase() {
-	for (int i = 0; i < maxAmountOfStoredProfiles; i++) {
+	for (int i = 0; i < 20; i++) {
 		//simulate students reaction
 		for (int j = 0; j < numberOfStudentsInClass; j++) {
 			Student* currStudent = Globals::students[j];
@@ -71,7 +75,7 @@ void trainingPhase() {
 	}
 }
 
-void runAdaptationModule(Adaptation adapt, int numberOfAdaptationCycles, std::vector<double> &avgAbilities) {
+void runAdaptationModule(Adaptation adapt, int numberOfAdaptationCycles, std::vector<double> &avgAbilities, std::vector<double> &avgEngagements, std::vector<Utilities::LearningProfile> &firstStudentPath) {
 	for (int i = 0; i < numberOfAdaptationCycles; i++) {
 
 		printf("\rstep %d of %d", i, numberOfAdaptationCycles);
@@ -91,24 +95,82 @@ void runAdaptationModule(Adaptation adapt, int numberOfAdaptationCycles, std::ve
 		}*/
 		simulateStudentsReaction();
 
+		firstStudentPath.push_back(Globals::students[0]->getCurrProfile());
 		for (int j = 0; j < numberOfStudentsInClass; j++) {
 			avgAbilities[i] += Globals::students[j]->getAbility() / numberOfStudentsInClass;
+			avgEngagements[i] += Globals::students[j]->getEngagement() / numberOfStudentsInClass;
 		}
-		std::cout << "avgAb[" << i <<"]: " << avgAbilities[i] << std::endl;
+		std::cout << "avgAb[" << i << "]: " << avgAbilities[i] << std::endl;
+		std::cout << "avgEn[" << i <<"]: " << avgEngagements[i] << std::endl;
 
 	}
 }
 
 
-int main() {
+void storeSimData(std::string configId, std::vector<double> &avgAbilities, std::vector<double> &avgEngagements, std::vector<Utilities::LearningProfile> &firstStudentPath) {
+	resetGlobals();
+	resultsFile << configId.c_str() << "_profileCls=[";
+	for (int i = 0; i < numberOfAdaptationCycles; i++) {
+		resultsFile << firstStudentPath[i].K_cl;
+		if (i != (numberOfAdaptationCycles - 1)) {
+			resultsFile << ",";
+		}
+	}
 
-	resultsFile.open("./results.txt");
-	resultsFile << "d";
+	resultsFile << "]\n";
+	resultsFile << configId.c_str() << "_profileCps=[";
+	for (int i = 0; i < numberOfAdaptationCycles; i++) {
+		resultsFile << firstStudentPath[i].K_cp;
+		if (i != (numberOfAdaptationCycles - 1)) {
+			resultsFile << ",";
+		}
+	}
+	resultsFile << "]\n";
+	resultsFile << configId.c_str() << "_profileIs=[";
+	for (int i = 0; i < numberOfAdaptationCycles; i++) {
+		resultsFile << firstStudentPath[i].K_i;
+		if (i != (numberOfAdaptationCycles - 1)) {
+			resultsFile << ",";
+		}
+	}
+	resultsFile << "]\n";
+	firstStudentPath.clear();
+
+	resultsFile << configId.c_str() << "Abilities=[";
+	for (int i = 0; i < numberOfAdaptationCycles; i++) {
+		resultsFile << avgAbilities[i];
+		avgAbilities[i] = 0;
+		if (i != (numberOfAdaptationCycles - 1)) {
+			resultsFile << ",";
+		}
+	}
+	resultsFile << "]\n";
+
+	resultsFile << configId.c_str() << "Engagements=[";
+	for (int i = 0; i < numberOfAdaptationCycles; i++) {
+		resultsFile << avgEngagements[i];
+		avgEngagements[i] = 0;
+		if (i != (numberOfAdaptationCycles - 1)) {
+			resultsFile << ",";
+		}
+	}
+	resultsFile << "]\n\n";
+	resultsFile.flush();
+}
+
+int main() {
+	resultsFile << "e";
 
 	std::vector<double> avgAbilities = std::vector<double>(numberOfAdaptationCycles);
 	for (int i = 0; i < numberOfAdaptationCycles; i++) {
 		avgAbilities[i] = 0;
 	}
+	std::vector<double> avgEngagements = std::vector<double>(numberOfAdaptationCycles);
+	for (int i = 0; i < numberOfAdaptationCycles; i++) {
+		avgEngagements[i] = 0;
+	}
+	std::vector<Utilities::LearningProfile> firstStudentPath = std::vector<Utilities::LearningProfile>();
+	
 	std::vector<double> cycles = std::vector<double>(numberOfAdaptationCycles);
 	for (int i = 0; i < numberOfAdaptationCycles; i++) {
 		cycles[i]=i;
@@ -118,57 +180,27 @@ int main() {
 	//with the adaptation algorithm
 	createGlobals();
 
-	Adaptation adapt = Adaptation(numberOfAdaptationConfigurationChoices, maxNumberOfStudentsPerGroup, numberOfFitnessNNs, 1);
+	/*Adaptation adapt = Adaptation(numberOfAdaptationConfigurationChoices, maxNumberOfStudentsPerGroup, numberOfFitnessNNs, 0);
 	trainingPhase();
-	runAdaptationModule(adapt, numberOfAdaptationCycles, avgAbilities);
+	runAdaptationModule(adapt, numberOfAdaptationCycles, avgAbilities, avgEngagements, firstStudentPath);
 	
-	resetGlobals();
-	resultsFile << "	y1=[";
-	for (int i = 0; i < numberOfAdaptationCycles; i++) {
-		resultsFile << avgAbilities[i];
-		avgAbilities[i] = 0;
-		if (i != (numberOfAdaptationCycles - 1)) {
-			resultsFile << ",";
-		}
-	}
-	resultsFile << "]\n\n";
-	resultsFile.flush();
-/*
+	storeSimData("random", avgAbilities, avgEngagements, firstStudentPath);
+	
 	adapt = Adaptation(numberOfAdaptationConfigurationChoices, maxNumberOfStudentsPerGroup, numberOfFitnessNNs, 1);
 	trainingPhase();
-	runAdaptationModule(adapt, numberOfAdaptationCycles, avgAbilities);
+	runAdaptationModule(adapt, numberOfAdaptationCycles, avgAbilities, avgEngagements, firstStudentPath);
 
-	resetGlobals();
-	resultsFile << "	y2=[";
-	for (int i = 0; i < numberOfAdaptationCycles; i++) {
-		resultsFile << avgAbilities[i];
-		avgAbilities[i] = 0;
-		if (i != (numberOfAdaptationCycles - 1)) {
-			resultsFile << ",";
-		}
-	}
-	resultsFile << "]\n\n";
-	resultsFile.flush();
+	storeSimData("optimal", avgAbilities, avgEngagements, firstStudentPath);*/
 
-	adapt = Adaptation(numberOfAdaptationConfigurationChoices, maxNumberOfStudentsPerGroup, numberOfFitnessNNs, 2);
+	Adaptation adapt = Adaptation(numberOfAdaptationConfigurationChoices, maxNumberOfStudentsPerGroup, numberOfFitnessNNs, 2);
 	trainingPhase();
-	runAdaptationModule(adapt, numberOfAdaptationCycles, avgAbilities);
+	runAdaptationModule(adapt, numberOfAdaptationCycles, avgAbilities, avgEngagements, firstStudentPath);
 
-	resetGlobals();
-	resultsFile << "	y3=[";
-	for (int i = 0; i < numberOfAdaptationCycles; i++) {
-		resultsFile << avgAbilities[i];
-		avgAbilities[i] = 0;
-		if (i != (numberOfAdaptationCycles - 1)) {
-			resultsFile << ",";
-		}
-	}
-	resultsFile << "]";
-	resultsFile.flush();*/
+	storeSimData("IAL", avgAbilities, avgEngagements, firstStudentPath);
+
+
 	resultsFile.close();
-
 	destroyGlobals();
-
 	
 	return 0;
 }

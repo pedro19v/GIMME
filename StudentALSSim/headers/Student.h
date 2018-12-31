@@ -13,6 +13,19 @@ public:
 
 		double dist;
 	};
+	
+	class StudentModelGrid {
+		private:
+			std::vector<std::vector<StudentModel>> cells;
+			int numCells;
+			int maxAmountOfStoredProfilesPerCell;
+
+		public:
+			StudentModelGrid();
+			StudentModelGrid(int numCells, int maxAmountOfStoredProfilesPerCell);
+			void pushToGrid(StudentModel model);
+			std::vector<StudentModel> getAllModels();
+	};
 
 
 private:
@@ -24,15 +37,16 @@ private:
 	double learningRate;
 
 	//Adaptation part
-	std::vector<StudentModel> pastModels;
-	int maxAmountOfStoredProfiles;
+	int numPastModelIncreasesCells;
+	int maxAmountOfStoredProfilesPerCell;
+	StudentModelGrid pastModelIncreasesGrid;
 
-	StudentModel myModel;
+	StudentModel currModel;
 	
 
 public:
 
-	Student(int id, std::string name, int maxAmountOfStoredProfiles);
+	Student(int id, std::string name, int numPastModelIncreasesCells, int maxAmountOfStoredProfilesPerCell);
 	void reset();
 
 	void setEngagement(double preference);
@@ -41,8 +55,8 @@ public:
 	void setAbility(double preference);
 	double getAbility();
 
-	std::vector<StudentModel> getPastModels();
-	void changeCurrProfile(Utilities::LearningProfile currProfile);
+	std::vector<StudentModel> getPastModelIncreases();
+	void changeCurrProfile(Utilities::LearningProfile newProfile);
 
 
 	Utilities::LearningProfile getCurrProfile();

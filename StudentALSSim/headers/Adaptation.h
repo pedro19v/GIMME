@@ -38,8 +38,8 @@ private:
 
 		bool operator () (Student::StudentModel& i, Student::StudentModel& j) {
 			
-			double dist1 = testedProfile.distanceBetween(i.currProfile);
-			double dist2 = testedProfile.distanceBetween(j.currProfile);
+			double dist1 = testedProfile.normalizedDistanceBetween(i.currProfile);
+			double dist2 = testedProfile.normalizedDistanceBetween(j.currProfile);
 
 			i.dist = dist1;
 			j.dist = dist2;
