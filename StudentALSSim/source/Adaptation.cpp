@@ -103,10 +103,11 @@ double Adaptation::fitness(Student* student, Utilities::LearningProfile profile,
 		return Utilities::randBetween(0,1);
 	}
 	else if(fitnessCondition == 1) {
-		double onOffTaskSim = 1 - student->getInherentPreference().normalizedDistanceBetween(profile);
-		double abilityIncreaseSim = (student->getLearningRate() * onOffTaskSim); //between 0 and 1
-		return student->getAbility() + abilityIncreaseSim;
-		//return onOffTaskSim;
+		double engagement=0;
+		double simAbility = student->getAbility();
+		student->calcReaction(&engagement, &simAbility, &profile);
+
+		return simAbility;
 	}
 
 	std::vector<Student::StudentModel> pastModelIncs = student->getPastModelIncreases();
@@ -116,8 +117,8 @@ double Adaptation::fitness(Student* student, Utilities::LearningProfile profile,
 	Student::StudentModel predictedModel = { profile, 0 , 0 };
 	std::sort(pastModelncsCopy.begin(), pastModelncsCopy.end(), FitnessSort(this, profile));
 
-	predictedModel.ability = student->getAbility();
-	predictedModel.engagement = student->getEngagement();
+	predictedModel.ability = 0;
+	predictedModel.engagement = 0;
 	for (int i = 0; i < numberOfFitnessNNs; i++) {
 		if (i == pastModelIncsSize) {
 			break;

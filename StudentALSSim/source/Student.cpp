@@ -84,7 +84,6 @@ double Student::getAbility() {
 
 void Student::changeCurrProfile(Utilities::LearningProfile newProfile) {
 	Student::StudentModel currModel = this->currModel;
-	this->pastModelIncreasesGrid.pushToGrid(currModel);
 	this->currModel.currProfile = newProfile;
 }
 Utilities::LearningProfile Student::getCurrProfile() {
@@ -97,13 +96,25 @@ double Student::getLearningRate() {
 	return this->learningRate;
 }
 
-void Student::simulateReaction(int numberOfAdaptationCycles)
+void Student::simulateReaction()
+{
+	StudentModel increases = StudentModel(currModel);
+	this->calcReaction(&currModel.engagement,&currModel.ability, &currModel.currProfile);
+	
+	increases.ability = currModel.ability - increases.ability;
+	increases.engagement = currModel.engagement - increases.engagement;
+	
+	this->pastModelIncreasesGrid.pushToGrid(increases);
+}
+
+void Student::calcReaction(double* engagement, double* ability, Utilities::LearningProfile* profile)
 {
 	Utilities::LearningProfile currProfile = this->currModel.currProfile;
 
-	double onOffTaskSim = 1.0 - inherentPreference.normalizedDistanceBetween(currProfile);
-	this->currModel.engagement = onOffTaskSim;
+	double onOffTaskSim = 1.0 - inherentPreference.normalizedDistanceBetween(*profile);
+	*engagement = onOffTaskSim;
 
 	double abilityIncreaseSim = (learningRate * onOffTaskSim); //between 0 and 1
-	this->currModel.ability += abilityIncreaseSim;
+	*ability += abilityIncreaseSim;
+
 }

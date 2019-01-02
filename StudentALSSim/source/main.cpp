@@ -21,7 +21,7 @@ int numberOfAdaptationConfigurationChoices = 1000;
 int maxNumberOfStudentsPerGroup = 5;
 
 
-std::ofstream resultsFile("E:/interactions-based-adaptation-for-learning/StudentALSSim/results.txt", std::ios::in | std::ios::out);
+std::ofstream resultsFile("C:/Users/Utilizador/Documents/faculdade/doutoramento/thesis/ThesisMainTool/phdMainToolRep/StudentALSSim/results.txt", std::ios::in | std::ios::out);
 
 
 //define and init globals and utilities
@@ -51,7 +51,7 @@ void simulateStudentsReaction() {
 	//simulate students reaction
 	for (int j = 0; j < numberOfStudentsInClass; j++) {
 		Student* currStudent = Globals::students[j];
-		currStudent->simulateReaction(numberOfAdaptationCycles);
+		currStudent->simulateReaction();
 	}
 }
 
@@ -186,15 +186,15 @@ int main() {
 	
 	storeSimData("random", avgAbilities, avgEngagements, firstStudentPath);
 	
-	adapt = Adaptation(numberOfAdaptationConfigurationChoices, maxNumberOfStudentsPerGroup, numberOfFitnessNNs, 1);
+	Adaptation adapt2 = Adaptation(numberOfAdaptationConfigurationChoices, maxNumberOfStudentsPerGroup, numberOfFitnessNNs, 1);
 	trainingPhase();
-	runAdaptationModule(adapt, numberOfAdaptationCycles, avgAbilities, avgEngagements, firstStudentPath);
+	runAdaptationModule(adapt2, numberOfAdaptationCycles, avgAbilities, avgEngagements, firstStudentPath);
 
 	storeSimData("optimal", avgAbilities, avgEngagements, firstStudentPath);*/
 
-	Adaptation adapt = Adaptation(numberOfAdaptationConfigurationChoices, maxNumberOfStudentsPerGroup, numberOfFitnessNNs, 2);
+	Adaptation adapt3 = Adaptation(numberOfAdaptationConfigurationChoices, maxNumberOfStudentsPerGroup, numberOfFitnessNNs, 2);
 	trainingPhase();
-	runAdaptationModule(adapt, numberOfAdaptationCycles, avgAbilities, avgEngagements, firstStudentPath);
+	runAdaptationModule(adapt3, numberOfAdaptationCycles, avgAbilities, avgEngagements, firstStudentPath);
 
 	storeSimData("IAL", avgAbilities, avgEngagements, firstStudentPath);
 

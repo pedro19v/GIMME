@@ -63,5 +63,6 @@ public:
 	Utilities::LearningProfile getInherentPreference();
 	double getLearningRate();
 
-	void simulateReaction(int numberOfAdaptationCycles);
+	void simulateReaction();
+	void calcReaction(double* engagement, double* ability, Utilities::LearningProfile* profile);
 };
