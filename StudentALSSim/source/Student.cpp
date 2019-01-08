@@ -33,8 +33,18 @@ std::vector<Student::StudentModel> Student::StudentModelGrid::getAllModels() {
 
 Student::Student(int id, std::string name, int numPastModelIncreasesCells, int maxAmountOfStoredProfilesPerCell){
 	
-	this->inherentPreference = { Utilities::randBetween(0, 1), Utilities::randBetween(0, 1), Utilities::randBetween(0, 1) };
-	this->learningRate = Utilities::normalRandom(0.6, 0.08);
+	//generate learning profile
+	double newRand1 = Utilities::randBetween(0, 1);
+	double newRand2 = Utilities::randBetween(0, 1);
+	double newRand3 = Utilities::randBetween(0, 1);
+
+	double newRandSum = newRand1 + newRand2 + newRand3;
+
+	this->inherentPreference.K_cl = newRand1 / newRandSum;
+	this->inherentPreference.K_cp = newRand2 / newRandSum;
+	this->inherentPreference.K_i = newRand3 / newRandSum;
+
+	this->learningRate = Utilities::normalRandom(0.5, 0.1);
 	//this->learningRate = Utilities::randBetween(0, 1);
 
 

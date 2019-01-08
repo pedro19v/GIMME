@@ -11,17 +11,17 @@
 //namespace plt = matplotlibcpp;
 
 const int numberOfStudentsInClass = 25;
-const int numberOfAdaptationCycles = 5000;
+const int numberOfAdaptationCycles = 1000;
 
-const int numberOfFitnessNNs = 10;
-const int numberOfStudentModelCells = 1;
-const int maxAmountOfStoredProfilesPerCell = 20;
+const int numberOfFitnessNNs = 5;
+const int numberOfStudentModelCells = 10;
+const int maxAmountOfStoredProfilesPerCell = 2;
 
 int numberOfAdaptationConfigurationChoices = 1000;
 int maxNumberOfStudentsPerGroup = 5;
 
 
-std::ofstream resultsFile("C:/Users/Utilizador/Documents/faculdade/doutoramento/thesis/ThesisMainTool/phdMainToolRep/StudentALSSim/results.txt", std::ios::in | std::ios::out);
+std::ofstream resultsFile("E:/interactions-based-adaptation-for-learning/StudentALSSim/results.txt", std::ios::in | std::ios::out);
 
 
 //define and init globals and utilities
@@ -159,8 +159,7 @@ void storeSimData(std::string configId, std::vector<double> &avgAbilities, std::
 }
 
 int main() {
-	resultsFile << "e";
-
+	
 	std::vector<double> avgAbilities = std::vector<double>(numberOfAdaptationCycles);
 	for (int i = 0; i < numberOfAdaptationCycles; i++) {
 		avgAbilities[i] = 0;
@@ -180,6 +179,8 @@ int main() {
 	//with the adaptation algorithm
 	createGlobals();
 
+	resultsFile << "inhPrf: "<< Globals::students[0]->getInherentPreference().K_cl << "," << Globals::students[0]->getInherentPreference().K_cp << "," << Globals::students[0]->getInherentPreference().K_i << ")";
+
 	/*Adaptation adapt = Adaptation(numberOfAdaptationConfigurationChoices, maxNumberOfStudentsPerGroup, numberOfFitnessNNs, 0);
 	trainingPhase();
 	runAdaptationModule(adapt, numberOfAdaptationCycles, avgAbilities, avgEngagements, firstStudentPath);
@@ -190,14 +191,13 @@ int main() {
 	trainingPhase();
 	runAdaptationModule(adapt2, numberOfAdaptationCycles, avgAbilities, avgEngagements, firstStudentPath);
 
-	storeSimData("optimal", avgAbilities, avgEngagements, firstStudentPath);*/
-
+	storeSimData("optimal", avgAbilities, avgEngagements, firstStudentPath);
+*/
 	Adaptation adapt3 = Adaptation(numberOfAdaptationConfigurationChoices, maxNumberOfStudentsPerGroup, numberOfFitnessNNs, 2);
 	trainingPhase();
 	runAdaptationModule(adapt3, numberOfAdaptationCycles, avgAbilities, avgEngagements, firstStudentPath);
 
-	storeSimData("IAL", avgAbilities, avgEngagements, firstStudentPath);
-
+	storeSimData("IAL10_2", avgAbilities, avgEngagements, firstStudentPath);
 
 	resultsFile.close();
 	destroyGlobals();
