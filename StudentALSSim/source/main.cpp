@@ -7,21 +7,23 @@
 #include <iostream>
 #include <fstream>
 #include <ios>
+#include <string>
 //
 //namespace plt = matplotlibcpp;
 
 const int numberOfStudentsInClass = 25;
-const int numberOfAdaptationCycles = 1000;
+const int numberOfAdaptationCycles = 100;
 
-const int numberOfFitnessNNs = 5;
-const int numberOfStudentModelCells = 10;
-const int maxAmountOfStoredProfilesPerCell = 2;
+const int numberOfFitnessNNs = 3;
+const int numberOfStudentModelCells = 1;
+const int maxAmountOfStoredProfilesPerCell = 20;
 
 int numberOfAdaptationConfigurationChoices = 1000;
 int maxNumberOfStudentsPerGroup = 5;
+int minNumberOfStudentsPerGroup = 2;
 
+std::ofstream resultsFile("C:/Users/Utilizador/Documents/faculdade/doutoramento/thesis/ThesisMainTool/phdMainToolRep/StudentALSSim/results.txt", std::ios::in | std::ios::out);
 
-std::ofstream resultsFile("E:/interactions-based-adaptation-for-learning/StudentALSSim/results.txt", std::ios::in | std::ios::out);
 
 
 //define and init globals and utilities
@@ -75,7 +77,9 @@ void trainingPhase() {
 	}
 }
 
-void runAdaptationModule(Adaptation adapt, int numberOfAdaptationCycles, std::vector<double> &avgAbilities, std::vector<double> &avgEngagements, std::vector<Utilities::LearningProfile> &firstStudentPath) {
+void runAdaptationModule(Adaptation adapt, int numberOfAdaptationCycles, 
+	std::vector<double> &avgAbilities, std::vector<double> &avgEngagements, std::vector<double> &avgPrefDiff, 
+	std::vector<Utilities::LearningProfile> &firstStudentPath) {
 	for (int i = 0; i < numberOfAdaptationCycles; i++) {
 
 		printf("\rstep %d of %d", i, numberOfAdaptationCycles);
@@ -95,19 +99,29 @@ void runAdaptationModule(Adaptation adapt, int numberOfAdaptationCycles, std::ve
 		}*/
 		simulateStudentsReaction();
 
+		AdaptationConfiguration currAdaptedConfig = adapt.getCurrAdaptedConfig();
+		std::vector<AdaptationGroup> groups = currAdaptedConfig.groups;
+		for (int j = 0; j < groups.size(); j++) {
+			avgPrefDiff[i] += groups[j].avgPreferences.normalizedDistanceBetween(groups[j].profile) / groups.size();
+		}
+
 		firstStudentPath.push_back(Globals::students[0]->getCurrProfile());
 		for (int j = 0; j < numberOfStudentsInClass; j++) {
 			avgAbilities[i] += Globals::students[j]->getAbility() / numberOfStudentsInClass;
 			avgEngagements[i] += Globals::students[j]->getEngagement() / numberOfStudentsInClass;
 		}
 		std::cout << "avgAb[" << i << "]: " << avgAbilities[i] << std::endl;
-		std::cout << "avgEn[" << i <<"]: " << avgEngagements[i] << std::endl;
+		std::cout << "avgEn[" << i << "]: " << avgEngagements[i] << std::endl;
+		std::cout << "avgPrefDiff[" << i <<"]: " << avgPrefDiff[i] << std::endl;
 
 	}
 }
 
 
-void storeSimData(std::string configId, std::vector<double> &avgAbilities, std::vector<double> &avgEngagements, std::vector<Utilities::LearningProfile> &firstStudentPath) {
+void storeSimData(std::string configId, 
+	std::vector<double> &avgAbilities, std::vector<double> &avgEngagements, std::vector<double> &avgPrefDiff,
+	std::vector<Utilities::LearningProfile> &firstStudentPath) {
+
 	resetGlobals();
 	resultsFile << configId.c_str() << "_profileCls=[";
 	for (int i = 0; i < numberOfAdaptationCycles; i++) {
@@ -156,6 +170,17 @@ void storeSimData(std::string configId, std::vector<double> &avgAbilities, std::
 	}
 	resultsFile << "]\n\n";
 	resultsFile.flush();
+
+	resultsFile << configId.c_str() << "PrefDiffs=[";
+	for (int i = 0; i < numberOfAdaptationCycles; i++) {
+		resultsFile << avgPrefDiff[i];
+		avgPrefDiff[i] = 0;
+		if (i != (numberOfAdaptationCycles - 1)) {
+			resultsFile << ",";
+		}
+	}
+	resultsFile << "]\n\n";
+	resultsFile.flush();
 }
 
 int main() {
@@ -168,6 +193,10 @@ int main() {
 	for (int i = 0; i < numberOfAdaptationCycles; i++) {
 		avgEngagements[i] = 0;
 	}
+	std::vector<double> avgPrefDiff = std::vector<double>(numberOfAdaptationCycles);
+	for (int i = 0; i < numberOfAdaptationCycles; i++) {
+		avgPrefDiff[i] = 0;
+	}
 	std::vector<Utilities::LearningProfile> firstStudentPath = std::vector<Utilities::LearningProfile>();
 	
 	std::vector<double> cycles = std::vector<double>(numberOfAdaptationCycles);
@@ -179,25 +208,26 @@ int main() {
 	//with the adaptation algorithm
 	createGlobals();
 
-	resultsFile << "inhPrf: "<< Globals::students[0]->getInherentPreference().K_cl << "," << Globals::students[0]->getInherentPreference().K_cp << "," << Globals::students[0]->getInherentPreference().K_i << ")";
+	resultsFile << "inhPrf =  [" << Globals::students[0]->getInherentPreference().K_cl << "," << Globals::students[0]->getInherentPreference().K_cp << "," << Globals::students[0]->getInherentPreference().K_i << "]";
 
-	/*Adaptation adapt = Adaptation(numberOfAdaptationConfigurationChoices, maxNumberOfStudentsPerGroup, numberOfFitnessNNs, 0);
-	trainingPhase();
-	runAdaptationModule(adapt, numberOfAdaptationCycles, avgAbilities, avgEngagements, firstStudentPath);
-	
-	storeSimData("random", avgAbilities, avgEngagements, firstStudentPath);
-	
-	Adaptation adapt2 = Adaptation(numberOfAdaptationConfigurationChoices, maxNumberOfStudentsPerGroup, numberOfFitnessNNs, 1);
-	trainingPhase();
-	runAdaptationModule(adapt2, numberOfAdaptationCycles, avgAbilities, avgEngagements, firstStudentPath);
+	//Adaptation adapt = Adaptation(numberOfAdaptationConfigurationChoices, minNumberOfStudentsPerGroup, maxNumberOfStudentsPerGroup, numberOfFitnessNNs, 0);
+	//trainingPhase();
+	//runAdaptationModule(adapt, numberOfAdaptationCycles, avgAbilities, avgEngagements, avgPrefDiff, firstStudentPath);
+	//
+	//storeSimData("random" + std::to_string(maxAmountOfStoredProfilesPerCell), avgAbilities, avgEngagements, avgPrefDiff, firstStudentPath);
+	//
+	//Adaptation adapt2 = Adaptation(numberOfAdaptationConfigurationChoices, minNumberOfStudentsPerGroup, maxNumberOfStudentsPerGroup, numberOfFitnessNNs, 1);
+	//trainingPhase();
+	//runAdaptationModule(adapt2, numberOfAdaptationCycles, avgAbilities, avgEngagements, avgPrefDiff, firstStudentPath);
 
-	storeSimData("optimal", avgAbilities, avgEngagements, firstStudentPath);
-*/
-	Adaptation adapt3 = Adaptation(numberOfAdaptationConfigurationChoices, maxNumberOfStudentsPerGroup, numberOfFitnessNNs, 2);
-	trainingPhase();
-	runAdaptationModule(adapt3, numberOfAdaptationCycles, avgAbilities, avgEngagements, firstStudentPath);
+	//storeSimData("optimal" + std::to_string(maxAmountOfStoredProfilesPerCell), avgAbilities, avgEngagements, avgPrefDiff, firstStudentPath);
 
-	storeSimData("IAL10_2", avgAbilities, avgEngagements, firstStudentPath);
+	Adaptation adapt3 = Adaptation(numberOfAdaptationConfigurationChoices, minNumberOfStudentsPerGroup, maxNumberOfStudentsPerGroup, numberOfFitnessNNs, 2);
+	trainingPhase();
+	runAdaptationModule(adapt3, numberOfAdaptationCycles, avgAbilities, avgEngagements, avgPrefDiff, firstStudentPath);
+
+	storeSimData("IAL2_" + std::to_string(maxAmountOfStoredProfilesPerCell), avgAbilities, avgEngagements, avgPrefDiff, firstStudentPath);
+
 
 	resultsFile.close();
 	destroyGlobals();

@@ -12,6 +12,23 @@ struct AdaptationGroup {
 public:
 	Utilities::LearningProfile profile;
 	std::vector<Student*> students;
+
+	double avgEngagement;
+	double avgAbility;
+	Utilities::LearningProfile avgPreferences;
+	
+	void addStudent(Student* student) {
+		students.push_back(student);
+		int studentsSize = students.size();
+
+		Utilities::LearningProfile currStudentPreference = student->getInherentPreference();
+
+		avgEngagement += student->getEngagement() / studentsSize;
+		avgAbility += student->getAbility() / studentsSize;
+		avgPreferences.K_cl += currStudentPreference.K_cl / studentsSize;
+		avgPreferences.K_cp += currStudentPreference.K_cp / studentsSize;
+		avgPreferences.K_i += currStudentPreference.K_i / studentsSize;
+	}
 };
 
 
@@ -51,16 +68,21 @@ private:
 private:
 	int numberOfConfigChoices;
 	int maxNumberOfStudentsPerGroup;
+	int minNumberOfStudentsPerGroup;
 
 	int numberOfFitnessNNs;
 	int fitnessCondition;
 
-	AdaptationConfiguration divideStudents(std::vector<Student*> students);
+	AdaptationConfiguration adaptedConfig;
+
+	AdaptationConfiguration organizeStudents(std::vector<Student*> students);
 	AdaptationMechanic generateMechanic(Utilities::LearningProfile bestConfigProfile);
 
 	double fitness(Student* student, Utilities::LearningProfile profile, int numberOfFitnessNNs);
 public:
-	Adaptation(int numberOfConfigChoices, int maxNumberOfStudentsPerGroup, int numberOfFitnessNNs, int fitnessCondition);
+	Adaptation(int numberOfConfigChoices, int minNumberOfStudentsPerGroup, int maxNumberOfStudentsPerGroup, int numberOfFitnessNNs, int fitnessCondition);
 	std::vector<AdaptationMechanic> iterate(std::vector<Student*> students);
+	
+	AdaptationConfiguration getCurrAdaptedConfig();
 
 };
