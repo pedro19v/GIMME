@@ -18,11 +18,22 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="headers\Adaptation.h" />
+    <ClInclude Include="headers\Globals.h" />
+    <ClInclude Include="headers\Student.h" />
+    <ClInclude Include="headers\Utilities.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\Adaptation.cpp" />
+    <ClCompile Include="source\main.cpp" />
+    <ClCompile Include="source\Student.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{4567FFD8-26AA-4CE4-BE6E-8FCE975698DE}</ProjectGuid>
     <RootNamespace>StudentALSSim</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -76,10 +87,10 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\headers\pythonIncludes\numpy\;.\headers\pythonIncludes\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>.\libs\pythonLibs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -102,12 +113,12 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\headers\pythonIncludes\numpy\;.\headers\pythonIncludes\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>.\libs\pythonLibs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -129,134 +140,4 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
-  <ItemGroup>
-    <ClInclude Include="headers\Adaptation.h" />
-    <ClInclude Include="headers\matplotlibcpp.h" />
-    <ClInclude Include="headers\pythonIncludes\abstract.h" />
-    <ClInclude Include="headers\pythonIncludes\accu.h" />
-    <ClInclude Include="headers\pythonIncludes\asdl.h" />
-    <ClInclude Include="headers\pythonIncludes\ast.h" />
-    <ClInclude Include="headers\pythonIncludes\bitset.h" />
-    <ClInclude Include="headers\pythonIncludes\bltinmodule.h" />
-    <ClInclude Include="headers\pythonIncludes\boolobject.h" />
-    <ClInclude Include="headers\pythonIncludes\bytearrayobject.h" />
-    <ClInclude Include="headers\pythonIncludes\bytesobject.h" />
-    <ClInclude Include="headers\pythonIncludes\bytes_methods.h" />
-    <ClInclude Include="headers\pythonIncludes\cellobject.h" />
-    <ClInclude Include="headers\pythonIncludes\ceval.h" />
-    <ClInclude Include="headers\pythonIncludes\classobject.h" />
-    <ClInclude Include="headers\pythonIncludes\code.h" />
-    <ClInclude Include="headers\pythonIncludes\codecs.h" />
-    <ClInclude Include="headers\pythonIncludes\compile.h" />
-    <ClInclude Include="headers\pythonIncludes\complexobject.h" />
-    <ClInclude Include="headers\pythonIncludes\context.h" />
-    <ClInclude Include="headers\pythonIncludes\datetime.h" />
-    <ClInclude Include="headers\pythonIncludes\descrobject.h" />
-    <ClInclude Include="headers\pythonIncludes\dictobject.h" />
-    <ClInclude Include="headers\pythonIncludes\dtoa.h" />
-    <ClInclude Include="headers\pythonIncludes\dynamic_annotations.h" />
-    <ClInclude Include="headers\pythonIncludes\enumobject.h" />
-    <ClInclude Include="headers\pythonIncludes\errcode.h" />
-    <ClInclude Include="headers\pythonIncludes\eval.h" />
-    <ClInclude Include="headers\pythonIncludes\fileobject.h" />
-    <ClInclude Include="headers\pythonIncludes\fileutils.h" />
-    <ClInclude Include="headers\pythonIncludes\floatobject.h" />
-    <ClInclude Include="headers\pythonIncludes\frameobject.h" />
-    <ClInclude Include="headers\pythonIncludes\funcobject.h" />
-    <ClInclude Include="headers\pythonIncludes\genobject.h" />
-    <ClInclude Include="headers\pythonIncludes\graminit.h" />
-    <ClInclude Include="headers\pythonIncludes\grammar.h" />
-    <ClInclude Include="headers\pythonIncludes\import.h" />
-    <ClInclude Include="headers\pythonIncludes\intrcheck.h" />
-    <ClInclude Include="headers\pythonIncludes\iterobject.h" />
-    <ClInclude Include="headers\pythonIncludes\listobject.h" />
-    <ClInclude Include="headers\pythonIncludes\longintrepr.h" />
-    <ClInclude Include="headers\pythonIncludes\longobject.h" />
-    <ClInclude Include="headers\pythonIncludes\marshal.h" />
-    <ClInclude Include="headers\pythonIncludes\memoryobject.h" />
-    <ClInclude Include="headers\pythonIncludes\metagrammar.h" />
-    <ClInclude Include="headers\pythonIncludes\methodobject.h" />
-    <ClInclude Include="headers\pythonIncludes\modsupport.h" />
-    <ClInclude Include="headers\pythonIncludes\moduleobject.h" />
-    <ClInclude Include="headers\pythonIncludes\namespaceobject.h" />
-    <ClInclude Include="headers\pythonIncludes\node.h" />
-    <ClInclude Include="headers\pythonIncludes\numpy\arrayobject.h" />
-    <ClInclude Include="headers\pythonIncludes\numpy\arrayscalars.h" />
-    <ClInclude Include="headers\pythonIncludes\numpy\halffloat.h" />
-    <ClInclude Include="headers\pythonIncludes\numpy\ndarrayobject.h" />
-    <ClInclude Include="headers\pythonIncludes\numpy\ndarraytypes.h" />
-    <ClInclude Include="headers\pythonIncludes\numpy\noprefix.h" />
-    <ClInclude Include="headers\pythonIncludes\numpy\npy_1_7_deprecated_api.h" />
-    <ClInclude Include="headers\pythonIncludes\numpy\npy_3kcompat.h" />
-    <ClInclude Include="headers\pythonIncludes\numpy\npy_common.h" />
-    <ClInclude Include="headers\pythonIncludes\numpy\npy_cpu.h" />
-    <ClInclude Include="headers\pythonIncludes\numpy\npy_endian.h" />
-    <ClInclude Include="headers\pythonIncludes\numpy\npy_interrupt.h" />
-    <ClInclude Include="headers\pythonIncludes\numpy\npy_math.h" />
-    <ClInclude Include="headers\pythonIncludes\numpy\npy_no_deprecated_api.h" />
-    <ClInclude Include="headers\pythonIncludes\numpy\npy_os.h" />
-    <ClInclude Include="headers\pythonIncludes\numpy\numpyconfig.h" />
-    <ClInclude Include="headers\pythonIncludes\numpy\oldnumeric.h" />
-    <ClInclude Include="headers\pythonIncludes\numpy\old_defines.h" />
-    <ClInclude Include="headers\pythonIncludes\numpy\ufuncobject.h" />
-    <ClInclude Include="headers\pythonIncludes\numpy\utils.h" />
-    <ClInclude Include="headers\pythonIncludes\numpy\_neighborhood_iterator_imp.h" />
-    <ClInclude Include="headers\pythonIncludes\numpy\_numpyconfig.h" />
-    <ClInclude Include="headers\pythonIncludes\numpy\__multiarray_api.h" />
-    <ClInclude Include="headers\pythonIncludes\numpy\__ufunc_api.h" />
-    <ClInclude Include="headers\pythonIncludes\object.h" />
-    <ClInclude Include="headers\pythonIncludes\objimpl.h" />
-    <ClInclude Include="headers\pythonIncludes\odictobject.h" />
-    <ClInclude Include="headers\pythonIncludes\opcode.h" />
-    <ClInclude Include="headers\pythonIncludes\osdefs.h" />
-    <ClInclude Include="headers\pythonIncludes\osmodule.h" />
-    <ClInclude Include="headers\pythonIncludes\parsetok.h" />
-    <ClInclude Include="headers\pythonIncludes\patchlevel.h" />
-    <ClInclude Include="headers\pythonIncludes\pgen.h" />
-    <ClInclude Include="headers\pythonIncludes\pgenheaders.h" />
-    <ClInclude Include="headers\pythonIncludes\pyarena.h" />
-    <ClInclude Include="headers\pythonIncludes\pyatomic.h" />
-    <ClInclude Include="headers\pythonIncludes\pycapsule.h" />
-    <ClInclude Include="headers\pythonIncludes\pyconfig.h" />
-    <ClInclude Include="headers\pythonIncludes\pyctype.h" />
-    <ClInclude Include="headers\pythonIncludes\pydebug.h" />
-    <ClInclude Include="headers\pythonIncludes\pydtrace.h" />
-    <ClInclude Include="headers\pythonIncludes\pyerrors.h" />
-    <ClInclude Include="headers\pythonIncludes\pyexpat.h" />
-    <ClInclude Include="headers\pythonIncludes\pyfpe.h" />
-    <ClInclude Include="headers\pythonIncludes\pyhash.h" />
-    <ClInclude Include="headers\pythonIncludes\pylifecycle.h" />
-    <ClInclude Include="headers\pythonIncludes\pymacconfig.h" />
-    <ClInclude Include="headers\pythonIncludes\pymacro.h" />
-    <ClInclude Include="headers\pythonIncludes\pymath.h" />
-    <ClInclude Include="headers\pythonIncludes\pymem.h" />
-    <ClInclude Include="headers\pythonIncludes\pyport.h" />
-    <ClInclude Include="headers\pythonIncludes\pystate.h" />
-    <ClInclude Include="headers\pythonIncludes\pystrcmp.h" />
-    <ClInclude Include="headers\pythonIncludes\pystrhex.h" />
-    <ClInclude Include="headers\pythonIncludes\pystrtod.h" />
-    <ClInclude Include="headers\pythonIncludes\Python-ast.h" />
-    <ClInclude Include="headers\pythonIncludes\Python.h" />
-    <ClInclude Include="headers\pythonIncludes\pythonrun.h" />
-    <ClInclude Include="headers\pythonIncludes\pythread.h" />
-    <ClInclude Include="headers\pythonIncludes\pytime.h" />
-    <ClInclude Include="headers\pythonIncludes\py_curses.h" />
-    <ClInclude Include="headers\pythonIncludes\rangeobject.h" />
-    <ClInclude Include="headers\pythonIncludes\setobject.h" />
-    <ClInclude Include="headers\pythonIncludes\sliceobject.h" />
-    <ClInclude Include="headers\pythonIncludes\structmember.h" />
-    <ClInclude Include="headers\pythonIncludes\structseq.h" />
-    <ClInclude Include="headers\pythonIncludes\symtable.h" />
-    <ClInclude Include="headers\pythonIncludes\sysmodule.h" />
-    <ClInclude Include="headers\pythonIncludes\token.h" />
-    <ClInclude Include="headers\pythonIncludes\traceback.h" />
-    <ClInclude Include="headers\pythonIncludes\tupleobject.h" />
-    <ClInclude Include="headers\pythonIncludes\typeslots.h" />
-    <ClInclude Include="headers\pythonIncludes\ucnhash.h" />
-    <ClInclude Include="headers\pythonIncludes\unicodeobject.h" />
-    <ClInclude Include="headers\pythonIncludes\warnings.h" />
-    <ClInclude Include="headers\pythonIncludes\weakrefobject.h" />
-    <ClCompile Include="**/*.cpp" />
-    <ClInclude Include="headers\Student.h" />
-  </ItemGroup>
 </Project>

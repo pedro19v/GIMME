@@ -21,13 +21,24 @@ public:
 		students.push_back(student);
 		int studentsSize = students.size();
 
-		Utilities::LearningProfile currStudentPreference = student->getInherentPreference();
 
-		avgEngagement += student->getEngagement() / studentsSize;
-		avgAbility += student->getAbility() / studentsSize;
-		avgPreferences.K_cl += currStudentPreference.K_cl / studentsSize;
-		avgPreferences.K_cp += currStudentPreference.K_cp / studentsSize;
-		avgPreferences.K_i += currStudentPreference.K_i / studentsSize;
+		//recalculate averages
+		avgEngagement = 0;
+		avgAbility = 0;
+		avgPreferences.K_cl = 0;
+		avgPreferences.K_cp = 0;
+		avgPreferences.K_i = 0;
+
+		for (int i = 0; i < studentsSize; i++) {
+			Student* currStudent = students[i];
+			Utilities::LearningProfile currStudentPreference = currStudent->getInherentPreference();
+			avgEngagement += currStudent->getEngagement() / studentsSize;
+			avgAbility += currStudent->getAbility() / studentsSize;
+			avgPreferences.K_cl += currStudentPreference.K_cl / studentsSize;
+			avgPreferences.K_cp += currStudentPreference.K_cp / studentsSize;
+			avgPreferences.K_i += currStudentPreference.K_i / studentsSize;
+		}
+		
 	}
 };
 

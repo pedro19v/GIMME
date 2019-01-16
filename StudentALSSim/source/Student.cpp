@@ -121,10 +121,9 @@ void Student::calcReaction(double* engagement, double* ability, Utilities::Learn
 {
 	Utilities::LearningProfile currProfile = this->currModel.currProfile;
 
-	double onOffTaskSim = 1.0 - inherentPreference.normalizedDistanceBetween(*profile);
-	*engagement = onOffTaskSim;
+	*engagement = 1.0 - inherentPreference.normalizedDistanceBetween(*profile);
 
-	double abilityIncreaseSim = (learningRate * onOffTaskSim); //between 0 and 1
+	double abilityIncreaseSim = (learningRate * *engagement); //between 0 and 1
 	*ability += abilityIncreaseSim;
 
 }

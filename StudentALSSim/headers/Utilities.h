@@ -52,6 +52,23 @@ public:
 			return sqrt(cost.K_cl + cost.K_cp + cost.K_i);
 		}
 
+		double distanceBetween(Utilities::LearningProfile profile2)
+		{
+			Utilities::LearningProfile profile1 = *this;
+			Utilities::LearningProfile cost = { 0,0,0 };
+			//normalizar cada uma das dims X/X+Y+Z; Y/X+Y+Z, Z/X+Y+Z
+			cost.K_cl = std::abs(profile1.K_cl - profile2.K_cl);
+			cost.K_cp = std::abs(profile1.K_cp - profile2.K_cp);
+			cost.K_i = std::abs(profile1.K_i - profile2.K_i);
+
+
+			cost.K_cl = std::pow(cost.K_cl, 2);
+			cost.K_cp = std::pow(cost.K_cl, 2);
+			cost.K_i = std::pow(cost.K_cl, 2);
+
+			return sqrt(cost.K_cl + cost.K_cp + cost.K_i);
+		}
+
 	};
 
 	
