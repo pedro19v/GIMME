@@ -8,7 +8,7 @@
 #include <ios>
 #include <string>
 
-int numRuns = 50;
+int numRuns = 1;
 
 
 const int numberOfStudentsInClass = 25;
@@ -16,11 +16,11 @@ const int numberOfAdaptationCycles = 200;
 
 const int numberOfStudentModelCells = 1;
 
-int numberOfAdaptationConfigurationChoices = 1000;
-int maxNumberOfStudentsPerGroup = 5;
+int numberOfAdaptationConfigurationChoices = 10;
+int maxNumberOfStudentsPerGroup = 25;
 int minNumberOfStudentsPerGroup = 2;
 
-std::ofstream resultsFile("E:/interactions-based-adaptation-for-learning/StudentALSSim/results.txt", std::ios::in | std::ios::out);
+std::ofstream resultsFile("C:/Users/Utilizador/Documents/faculdade/doutoramento/thesis/ThesisMainTool/phdMainToolRep/StudentALSSim/results.txt", std::ios::in | std::ios::out);
 
 
 
@@ -185,46 +185,34 @@ void storeSimData(std::string configId,
 }
 
 int main() {
-	
+	//set random seed
+	srand(time(NULL));
+
+
 	Adaptation randomClose = Adaptation(10000, minNumberOfStudentsPerGroup, maxNumberOfStudentsPerGroup, 5, 0, numberOfAdaptationCycles);
 	Adaptation optimalClose = Adaptation(10000, minNumberOfStudentsPerGroup, maxNumberOfStudentsPerGroup, 5, 1, numberOfAdaptationCycles);
-	Adaptation GAL8_2 = Adaptation(numberOfAdaptationConfigurationChoices, minNumberOfStudentsPerGroup, maxNumberOfStudentsPerGroup, 2, 2, numberOfAdaptationCycles);
-	Adaptation GAL40_10 = Adaptation(numberOfAdaptationConfigurationChoices, minNumberOfStudentsPerGroup, maxNumberOfStudentsPerGroup, 10, 2, numberOfAdaptationCycles);
-	Adaptation GAL100_25 = Adaptation(numberOfAdaptationConfigurationChoices, minNumberOfStudentsPerGroup, maxNumberOfStudentsPerGroup, 25, 2, numberOfAdaptationCycles);
+	Adaptation GAL10_3 = Adaptation(numberOfAdaptationConfigurationChoices, minNumberOfStudentsPerGroup, maxNumberOfStudentsPerGroup, 3, 2, numberOfAdaptationCycles);
 	for (int i = 0; i < numRuns; i++) {
 		//resultsFile << "inhPrf =  [" << Globals::students[0]->getInherentPreference().K_cl << "," << Globals::students[0]->getInherentPreference().K_cp << "," << Globals::students[0]->getInherentPreference().K_i << "]";
 		
-		/*createGlobals(numberOfStudentModelCells, 10000);
+		createGlobals(numberOfStudentModelCells, 1);
 		trainingPhase();
 		runAdaptationModule(i, &randomClose);
 
 		resetGlobals(numberOfStudentModelCells, 10000);
 		trainingPhase();
-		runAdaptationModule(i, &optimalClose);*/
+		runAdaptationModule(i, &optimalClose);
 
-		createGlobals(numberOfStudentModelCells, 8);
+		createGlobals(numberOfStudentModelCells, 10);
 		trainingPhase();
-		runAdaptationModule(i, &GAL8_2);
+		runAdaptationModule(i, &GAL10_3);
 
-		/*resetGlobals(numberOfStudentModelCells, 20);
-		trainingPhase();
-		runAdaptationModule(i, &GAL20_5);
-
-		resetGlobals(numberOfStudentModelCells, 40);
-		trainingPhase();
-		runAdaptationModule(i, &GAL40_10);
-
-		resetGlobals(numberOfStudentModelCells, 100);
-		trainingPhase();
-		runAdaptationModule(i, &GAL100_25);*/
 	}
 
-	//storeSimData("randomClose", randomClose.avgAbilities, randomClose.avgEngagements, randomClose.avgPrefDiff, randomClose.avgExecutionTime);
-	//storeSimData("optimalClose", optimalClose.avgAbilities, optimalClose.avgEngagements, optimalClose.avgPrefDiff, optimalClose.avgExecutionTime);
+	storeSimData("randomClose", randomClose.avgAbilities, randomClose.avgEngagements, randomClose.avgPrefDiff, randomClose.avgExecutionTime);
+	storeSimData("optimalClose", optimalClose.avgAbilities, optimalClose.avgEngagements, optimalClose.avgPrefDiff, optimalClose.avgExecutionTime);
 	
-	storeSimData("GAL8_2", GAL8_2.avgAbilities, GAL8_2.avgEngagements, GAL8_2.avgPrefDiff, GAL8_2.avgExecutionTime);
-	//storeSimData("GAL40_10", GAL40_10.avgAbilities, GAL40_10.avgEngagements, GAL40_10.avgPrefDiff, GAL40_10.avgExecutionTime);
-	//storeSimData("GAL100_20", GAL100_25.avgAbilities, GAL100_25.avgEngagements, GAL100_25.avgPrefDiff, GAL100_25.avgExecutionTime);
+	storeSimData("GAL10_3", GAL10_3.avgAbilities, GAL10_3.avgEngagements, GAL10_3.avgPrefDiff, GAL10_3.avgExecutionTime);
 
 
 	

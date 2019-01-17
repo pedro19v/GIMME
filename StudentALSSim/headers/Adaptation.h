@@ -103,4 +103,7 @@ public:
 	std::vector<double> avgEngagements;
 	std::vector<double> avgPrefDiff;
 	double avgExecutionTime;
+
+	std::vector<int> groupSizeFreqs;
+
 };
