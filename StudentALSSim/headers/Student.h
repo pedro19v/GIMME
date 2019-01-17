@@ -47,7 +47,7 @@ private:
 public:
 
 	Student(int id, std::string name, int numPastModelIncreasesCells, int maxAmountOfStoredProfilesPerCell);
-	void reset();
+	void reset(int numberOfStudentModelCells, int maxAmountOfStoredProfilesPerCell);
 
 	void setEngagement(double preference);
 	double getEngagement();

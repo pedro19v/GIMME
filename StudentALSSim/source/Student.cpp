@@ -62,14 +62,14 @@ Student::Student(int id, std::string name, int numPastModelIncreasesCells, int m
 
 }
 
-void Student::reset() {
+void Student::reset(int numberOfStudentModelCells, int maxAmountOfStoredProfilesPerCell) {
 	
 	this->currModel.currProfile = { 0,0,0 };
 
 	this->currModel.engagement = 0;
 	this->currModel.ability = 0;
 
-	this->pastModelIncreasesGrid = StudentModelGrid(numPastModelIncreasesCells, maxAmountOfStoredProfilesPerCell);
+	this->pastModelIncreasesGrid = StudentModelGrid(numberOfStudentModelCells, maxAmountOfStoredProfilesPerCell);
 }
 
 void Student::setEngagement(double engagement) {

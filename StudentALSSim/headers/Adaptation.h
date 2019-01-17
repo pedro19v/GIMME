@@ -10,6 +10,7 @@
 
 struct AdaptationGroup {
 public:
+
 	Utilities::LearningProfile profile;
 	std::vector<Student*> students;
 
@@ -91,9 +92,15 @@ private:
 
 	double fitness(Student* student, Utilities::LearningProfile profile, int numberOfFitnessNNs);
 public:
-	Adaptation(int numberOfConfigChoices, int minNumberOfStudentsPerGroup, int maxNumberOfStudentsPerGroup, int numberOfFitnessNNs, int fitnessCondition);
+	Adaptation(int numberOfConfigChoices, int minNumberOfStudentsPerGroup, int maxNumberOfStudentsPerGroup, int numberOfFitnessNNs, int fitnessCondition, int numAdaptationCycles);
 	std::vector<AdaptationMechanic> iterate(std::vector<Student*> students);
 	
 	AdaptationConfiguration getCurrAdaptedConfig();
 
+
+
+	std::vector<double> avgAbilities;
+	std::vector<double> avgEngagements;
+	std::vector<double> avgPrefDiff;
+	double avgExecutionTime;
 };

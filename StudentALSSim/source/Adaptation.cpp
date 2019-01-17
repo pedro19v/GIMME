@@ -2,7 +2,7 @@
 
 Adaptation::Adaptation(int numberOfConfigChoices, 
 	int minNumberOfStudentsPerGroup, int maxNumberOfStudentsPerGroup, 
-	int numberOfFitnessNNs, int fitnessCondition) {
+	int numberOfFitnessNNs, int fitnessCondition, int numAdaptationCycles) {
 
 	this->numberOfConfigChoices = numberOfConfigChoices;
 	this->maxNumberOfStudentsPerGroup = maxNumberOfStudentsPerGroup;
@@ -11,6 +11,12 @@ Adaptation::Adaptation(int numberOfConfigChoices,
 	this->numberOfFitnessNNs = numberOfFitnessNNs;
 
 	this->fitnessCondition = fitnessCondition;
+
+	this->avgAbilities = std::vector<double>(numAdaptationCycles);
+	this->avgEngagements = std::vector<double>(numAdaptationCycles);
+	this->avgPrefDiff = std::vector<double>(numAdaptationCycles);
+	this->avgExecutionTime = 0;
+
 }
 
 std::vector<AdaptationMechanic> Adaptation::iterate(std::vector<Student*> students)
@@ -34,6 +40,7 @@ std::vector<AdaptationMechanic> Adaptation::iterate(std::vector<Student*> studen
 		Utilities::LearningProfile currGroupProfile = currGroup.profile;
 		mechanics.push_back(generateMechanic(currGroupProfile));
 	}
+	
 	return mechanics;
 }
 
