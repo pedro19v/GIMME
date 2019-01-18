@@ -35,6 +35,7 @@ private:
 	//for simulation
 	Utilities::LearningProfile inherentPreference;
 	double learningRate;
+	double learningRateSeed;
 
 	//Adaptation part
 	int numPastModelIncreasesCells;

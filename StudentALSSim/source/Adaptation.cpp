@@ -212,14 +212,51 @@ AdaptationConfiguration Adaptation::organizeStudents(std::vector<Student*> stude
 //	return bestConfig;
 //}
 
+//
+//double Adaptation::fitness(Student* student, Utilities::LearningProfile profile, int numberOfFitnessNNs) {
+//
+//	
+//	if(fitnessCondition == 1) {
+//		double engagement = 0;
+//		double predSimAbility = student->getAbility();
+//		
+//		student->calcReaction(&engagement, &predSimAbility, &profile);
+//
+//		double abilityInc = predSimAbility - student->getAbility();
+//
+//		return abilityInc;
+//	}
+//
+//	std::vector<Student::StudentModel> pastModelIncs = student->getPastModelIncreases();
+//	std::vector<Student::StudentModel> pastModelncsCopy = std::vector<Student::StudentModel>(pastModelIncs);
+//	int pastModelIncsSize = pastModelIncs.size();
+//	
+//	Student::StudentModel predictedModel = { profile, 0 , 0 };
+//	std::sort(pastModelncsCopy.begin(), pastModelncsCopy.end(), FitnessSort(this, profile));
+//
+//	predictedModel.ability = 0;
+//	predictedModel.engagement = 0;
+//	for (int i = 0; i < numberOfFitnessNNs; i++) {
+//		if (i == pastModelIncsSize) {
+//			break;
+//		}
+//		Utilities::LearningProfile pastProfile = pastModelncsCopy[i].currProfile;
+//		double distance = profile.distanceBetween(pastProfile);
+//
+//		predictedModel.ability += pastModelncsCopy[i].ability * (1 - distance) / (double) std::min(pastModelIncsSize, numberOfFitnessNNs);
+//		predictedModel.engagement += pastModelncsCopy[i].engagement * (1 - distance) / (double) std::min(pastModelIncsSize, numberOfFitnessNNs);
+//	}
+//
+//	return 0.5*predictedModel.ability + 0.5*predictedModel.engagement;
+//}
 
 double Adaptation::fitness(Student* student, Utilities::LearningProfile profile, int numberOfFitnessNNs) {
 
-	
-	if(fitnessCondition == 1) {
+
+	if (fitnessCondition == 1) {
 		double engagement = 0;
 		double predSimAbility = student->getAbility();
-		
+
 		student->calcReaction(&engagement, &predSimAbility, &profile);
 
 		double abilityInc = predSimAbility - student->getAbility();
@@ -230,21 +267,21 @@ double Adaptation::fitness(Student* student, Utilities::LearningProfile profile,
 	std::vector<Student::StudentModel> pastModelIncs = student->getPastModelIncreases();
 	std::vector<Student::StudentModel> pastModelncsCopy = std::vector<Student::StudentModel>(pastModelIncs);
 	int pastModelIncsSize = pastModelIncs.size();
-	
+
 	Student::StudentModel predictedModel = { profile, 0 , 0 };
 	std::sort(pastModelncsCopy.begin(), pastModelncsCopy.end(), FitnessSort(this, profile));
 
+	pastModelncsCopy.resize(numberOfFitnessNNs);
+	int pastModelncsCopySize = pastModelncsCopy.size();
+
 	predictedModel.ability = 0;
 	predictedModel.engagement = 0;
-	for (int i = 0; i < numberOfFitnessNNs; i++) {
-		if (i == pastModelIncsSize) {
-			break;
-		}
+	for (int i = 0; i < pastModelncsCopySize; i++) {
 		Utilities::LearningProfile pastProfile = pastModelncsCopy[i].currProfile;
-		double distance = profile.normalizedDistanceBetween(pastProfile);
+		double distance = profile.distanceBetween(pastProfile);
 
-		predictedModel.ability += pastModelncsCopy[i].ability * (1.0 - distance) / (double) std::min(pastModelIncsSize, numberOfFitnessNNs);
-		predictedModel.engagement += pastModelncsCopy[i].engagement * (1.0 - distance) / (double) std::min(pastModelIncsSize, numberOfFitnessNNs);
+		predictedModel.ability += pastModelncsCopy[i].ability * (1 - distance) / (double) (pastModelncsCopySize);
+		predictedModel.engagement += pastModelncsCopy[i].engagement * (1 - distance) / (double)(pastModelncsCopySize);
 	}
 
 	return 0.5*predictedModel.ability + 0.5*predictedModel.engagement;

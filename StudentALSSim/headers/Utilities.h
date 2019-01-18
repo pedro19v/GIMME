@@ -8,8 +8,8 @@
 
 class Utilities {
 public:
-	static std::default_random_engine normalRandomGenerator;
-		
+	static int defaultRandomSeed;
+
 	struct LearningProfile {
 		public:
 		double K_i;
@@ -72,15 +72,23 @@ public:
 	};
 
 	
-	double static randBetween(double min, double max) {
+	double static randBetween(int seed, double min, double max) {
+		srand(seed);
 		double rand0_1 = (double)rand() / (double)(RAND_MAX);
 		return min + rand0_1 * (max - min);
 	}
+	double static randBetween(double min, double max) {
+		return randBetween(defaultRandomSeed, min, max);
+	}
 
-	double static normalRandom(double mu, double var) {
+	double static normalRandom(int seed, double mu, double var) {
 
+		static std::default_random_engine normalRandomGenerator (seed);
 		std::normal_distribution<double> distribution(mu, var);
 		return distribution(normalRandomGenerator);
+	}
+	double static normalRandom(double mu, double var) {
+		return normalRandom(defaultRandomSeed, mu, var);
 	}
 };
 

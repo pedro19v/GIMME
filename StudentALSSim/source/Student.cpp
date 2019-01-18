@@ -44,9 +44,8 @@ Student::Student(int id, std::string name, int numPastModelIncreasesCells, int m
 	this->inherentPreference.K_cp = newRand2 / newRandSum;
 	this->inherentPreference.K_i = newRand3 / newRandSum;
 
-	this->learningRate = Utilities::normalRandom(0.5, 0.1);
+	this->learningRateSeed = Utilities::randBetween(0, 1000);
 	//this->learningRate = Utilities::randBetween(0, 1);
-
 
 	this->currModel.currProfile = { 0,0,0 };
 	this->currModel.engagement = 0;
@@ -121,8 +120,9 @@ void Student::calcReaction(double* engagement, double* ability, Utilities::Learn
 {
 	Utilities::LearningProfile currProfile = this->currModel.currProfile;
 
-	*engagement = 1.0 - inherentPreference.normalizedDistanceBetween(*profile);
+	*engagement = 1.0 - inherentPreference.distanceBetween(*profile);
 
+	this->learningRate = Utilities::normalRandom(0.5, 0.1);
 	double abilityIncreaseSim = (learningRate * *engagement); //between 0 and 1
 	*ability += abilityIncreaseSim;
 
