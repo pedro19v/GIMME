@@ -109,10 +109,10 @@ double Student::getLearningRate() {
 void Student::simulateReaction()
 {
 	StudentModel increases = StudentModel(currModel);
-	this->calcReaction(&currModel.engagement,&currModel.ability, &currModel.currProfile);
+	this->calcReaction(&currModel.engagement, &currModel.ability, &currModel.currProfile);
 	
 	increases.ability = currModel.ability - increases.ability;
-	increases.engagement = currModel.engagement - increases.engagement;
+	increases.engagement = currModel.engagement; // -increases.engagement;
 	
 	this->pastModelIncreasesGrid.pushToGrid(increases);
 }
