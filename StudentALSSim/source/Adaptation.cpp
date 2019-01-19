@@ -20,11 +20,11 @@ Adaptation::Adaptation(int numberOfConfigChoices,
 	this->groupSizeFreqs = std::vector<int>(maxNumberOfStudentsPerGroup);
 }
 
-std::vector<AdaptationMechanic> Adaptation::iterate(std::vector<Student*> students)
+std::vector<AdaptationMechanic> Adaptation::iterate(std::vector<Student*> students, int currIteration)
 {
 	std::vector<AdaptationMechanic> mechanics = std::vector<AdaptationMechanic>();
 
-	adaptedConfig = organizeStudents(students);
+	adaptedConfig = organizeStudents(students, currIteration);
 	std::vector<AdaptationGroup> groups = adaptedConfig.groups;
 	int groupsSize = groups.size();
 	for (int i = 0; i < groupsSize; i++) {
@@ -49,7 +49,7 @@ AdaptationConfiguration Adaptation::getCurrAdaptedConfig() {
 	return this->adaptedConfig;
 }
 
-AdaptationConfiguration Adaptation::organizeStudents(std::vector<Student*> students) {
+AdaptationConfiguration Adaptation::organizeStudents(std::vector<Student*> students, int currIteration) {
 
 	AdaptationConfiguration bestConfig = AdaptationConfiguration();
 	double currMaxFitness = 0.0;
@@ -114,7 +114,7 @@ AdaptationConfiguration Adaptation::organizeStudents(std::vector<Student*> stude
 
 			Student* currStudent = studentsWithoutGroup[currStudentIndex];
 			currGroup->students.push_back(currStudent);
-			double currStudentFitness = fitness(currStudent, currGroup->profile, this->numberOfFitnessNNs);
+			double currStudentFitness = fitness(currStudent, currGroup->profile, this->numberOfFitnessNNs, currIteration);
 			currFitness += currStudentFitness / studentsSize;
 
 			studentsWithoutGroup.erase(studentsWithoutGroup.begin() + currStudentIndex);
@@ -250,14 +250,14 @@ AdaptationConfiguration Adaptation::organizeStudents(std::vector<Student*> stude
 //	return 0.5*predictedModel.ability + 0.5*predictedModel.engagement;
 //}
 
-double Adaptation::fitness(Student* student, Utilities::LearningProfile profile, int numberOfFitnessNNs) {
+double Adaptation::fitness(Student* student, Utilities::LearningProfile profile, int numberOfFitnessNNs, int currIteration) {
 
 
 	if (fitnessCondition == 1) {
 		double engagement = 0;
 		double predSimAbility = student->getAbility();
 
-		student->calcReaction(&engagement, &predSimAbility, &profile);
+		student->calcReaction(&engagement, &predSimAbility, &profile, currIteration);
 
 		double abilityInc = predSimAbility - student->getAbility();
 

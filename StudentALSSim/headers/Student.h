@@ -35,7 +35,7 @@ private:
 	//for simulation
 	Utilities::LearningProfile inherentPreference;
 	double learningRate;
-	double learningRateSeed;
+	std::vector<double> iterationReactions;
 
 	//Adaptation part
 	int numPastModelIncreasesCells;
@@ -47,7 +47,7 @@ private:
 
 public:
 
-	Student(int id, std::string name, int numPastModelIncreasesCells, int maxAmountOfStoredProfilesPerCell);
+	Student(int id, std::string name, int numPastModelIncreasesCells, int maxAmountOfStoredProfilesPerCell, int numIterations);
 	void reset(int numberOfStudentModelCells, int maxAmountOfStoredProfilesPerCell);
 
 	void setEngagement(double preference);
@@ -64,6 +64,6 @@ public:
 	Utilities::LearningProfile getInherentPreference();
 	double getLearningRate();
 
-	void simulateReaction();
-	void calcReaction(double* engagement, double* ability, Utilities::LearningProfile* profile);
+	void simulateReaction(int currIteration);
+	void calcReaction(double* engagement, double* ability, Utilities::LearningProfile* profile, int currIteration);
 };

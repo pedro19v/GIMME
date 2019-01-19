@@ -8,7 +8,11 @@
 
 class Utilities {
 public:
+
 	static int defaultRandomSeed;
+	static std::normal_distribution<double> normalDistribution;
+	static std::uniform_real_distribution<double> uniformDistribution;
+
 
 	struct LearningProfile {
 		public:
@@ -72,20 +76,23 @@ public:
 	};
 
 	
+	void static resetRandoms() {
+		uniformDistribution.reset();
+		normalDistribution.reset();
+	}
 	double static randBetween(int seed, double min, double max) {
-		srand(seed);
-		double rand0_1 = (double)rand() / (double)(RAND_MAX);
-		return min + rand0_1 * (max - min);
+		static std::default_random_engine randomGenerator(seed);
+		uniformDistribution = std::uniform_real_distribution<double>(min, max);
+		return uniformDistribution(randomGenerator);
 	}
 	double static randBetween(double min, double max) {
 		return randBetween(defaultRandomSeed, min, max);
 	}
 
 	double static normalRandom(int seed, double mu, double var) {
-
 		static std::default_random_engine normalRandomGenerator (seed);
-		std::normal_distribution<double> distribution(mu, var);
-		return distribution(normalRandomGenerator);
+		normalDistribution = std::normal_distribution<double>(mu, var);
+		return normalDistribution(normalRandomGenerator);
 	}
 	double static normalRandom(double mu, double var) {
 		return normalRandom(defaultRandomSeed, mu, var);

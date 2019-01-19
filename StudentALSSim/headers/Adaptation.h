@@ -87,13 +87,13 @@ private:
 
 	AdaptationConfiguration adaptedConfig;
 
-	AdaptationConfiguration organizeStudents(std::vector<Student*> students);
+	AdaptationConfiguration organizeStudents(std::vector<Student*> students, int currIteration);
 	AdaptationMechanic generateMechanic(Utilities::LearningProfile bestConfigProfile);
 
-	double fitness(Student* student, Utilities::LearningProfile profile, int numberOfFitnessNNs);
+	double fitness(Student* student, Utilities::LearningProfile profile, int numberOfFitnessNNs, int currIteration);
 public:
 	Adaptation(int numberOfConfigChoices, int minNumberOfStudentsPerGroup, int maxNumberOfStudentsPerGroup, int numberOfFitnessNNs, int fitnessCondition, int numAdaptationCycles);
-	std::vector<AdaptationMechanic> iterate(std::vector<Student*> students);
+	std::vector<AdaptationMechanic> iterate(std::vector<Student*> students, int currIteration);
 	
 	AdaptationConfiguration getCurrAdaptedConfig();
 

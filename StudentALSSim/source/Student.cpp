@@ -31,7 +31,7 @@ std::vector<Student::StudentModel> Student::StudentModelGrid::getAllModels() {
 }
 
 
-Student::Student(int id, std::string name, int numPastModelIncreasesCells, int maxAmountOfStoredProfilesPerCell){
+Student::Student(int id, std::string name, int numPastModelIncreasesCells, int maxAmountOfStoredProfilesPerCell, int numTasks){
 	
 	//generate learning profile
 	double newRand1 = Utilities::randBetween(0, 1);
@@ -44,7 +44,13 @@ Student::Student(int id, std::string name, int numPastModelIncreasesCells, int m
 	this->inherentPreference.K_cp = newRand2 / newRandSum;
 	this->inherentPreference.K_i = newRand3 / newRandSum;
 
-	this->learningRateSeed = Utilities::randBetween(0, 1000);
+	this->learningRate = Utilities::randBetween(0, 1);
+	this->iterationReactions = std::vector<double>(numTasks);
+
+	for (int i = 0; i < numTasks; i++) {
+		this->iterationReactions.push_back(Utilities::normalRandom(learningRate,0.3));
+	}
+
 	//this->learningRate = Utilities::randBetween(0, 1);
 
 	this->currModel.currProfile = { 0,0,0 };
@@ -105,10 +111,10 @@ double Student::getLearningRate() {
 	return this->learningRate;
 }
 
-void Student::simulateReaction()
+void Student::simulateReaction(int currIteration)
 {
 	StudentModel increases = StudentModel(currModel);
-	this->calcReaction(&currModel.engagement, &currModel.ability, &currModel.currProfile);
+	this->calcReaction(&currModel.engagement, &currModel.ability, &currModel.currProfile, currIteration);
 	
 	increases.ability = currModel.ability - increases.ability;
 	increases.engagement = currModel.engagement; // -increases.engagement;
@@ -116,13 +122,13 @@ void Student::simulateReaction()
 	this->pastModelIncreasesGrid.pushToGrid(increases);
 }
 
-void Student::calcReaction(double* engagement, double* ability, Utilities::LearningProfile* profile)
+void Student::calcReaction(double* engagement, double* ability, Utilities::LearningProfile* profile, int currIteration)
 {
 	Utilities::LearningProfile currProfile = this->currModel.currProfile;
 
 	*engagement = 1.0 - inherentPreference.distanceBetween(*profile);
 
-	this->learningRate = Utilities::normalRandom(0.5, 0.1);
+	double currTaskReaction = iterationReactions[currIteration];
 	double abilityIncreaseSim = (learningRate * *engagement); //between 0 and 1
 	*ability += abilityIncreaseSim;
 
