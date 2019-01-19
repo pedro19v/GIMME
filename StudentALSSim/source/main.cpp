@@ -8,10 +8,10 @@
 #include <ios>
 #include <string>
 
-int numRuns = 20;
+int numRuns = 30;
 
 
-const int numberOfStudentsInClass = 25;
+const int numStudentsInClass = 25;
 
 int numTrainingCycles = 18;
 const int numAdaptationCycles = 200;
@@ -19,7 +19,8 @@ const int numAdaptationCycles = 200;
 const int numStudentModelCells = 1;
 
 int numAdaptationConfigurationChoices = 100;
-int maxNumStudentsPerGroup = 10;
+int timeWindow = 30;
+int maxNumStudentsPerGroup = 5;
 int minNumStudentsPerGroup = 2;
 
 std::ofstream resultsFile("C:/Users/Utilizador/Documents/faculdade/doutoramento/thesis/ThesisMainTool/phdMainToolRep/StudentALSSim/results.txt", std::ios::in | std::ios::out);
@@ -27,42 +28,43 @@ std::ofstream resultsFile("C:/Users/Utilizador/Documents/faculdade/doutoramento/
 //define and init globals and utilities
 std::vector<Student*> Globals::students = std::vector<Student*>();
 int Utilities::defaultRandomSeed = time(NULL);
-std::uniform_real_distribution<double> Utilities::uniformDistribution = std::uniform_real_distribution<double>();
+std::uniform_real_distribution<double> Utilities::uniformDistributionReal = std::uniform_real_distribution<double>();
+std::uniform_int_distribution<> Utilities::uniformDistributionInt = std::uniform_int_distribution<>();
 std::normal_distribution<double> Utilities::normalDistribution = std::normal_distribution<double>();
 
-void createGlobals(int numberOfStudentModelCells, int maxAmountOfStoredProfilesPerCell, int numIterations) {
+void createGlobals(int numStudentsInClass, int numberOfStudentModelCells, int maxAmountOfStoredProfilesPerCell, int numIterations) {
 	//generate all of the students models
 	Globals::students = std::vector<Student*>();
-	for (int i = 0; i < numberOfStudentsInClass; i++) {
+	for (int i = 0; i < numStudentsInClass; i++) {
 		Globals::students.push_back(new Student(i, "a", numberOfStudentModelCells, maxAmountOfStoredProfilesPerCell, numIterations));
 	}
 }
-void resetGlobals(int numberOfStudentModelCells, int maxAmountOfStoredProfilesPerCell) {
+void resetGlobals(int numStudentsInClass, int numberOfStudentModelCells, int maxAmountOfStoredProfilesPerCell) {
 	//generate all of the students models
-	for (int i = 0; i < numberOfStudentsInClass; i++) {
+	for (int i = 0; i < numStudentsInClass; i++) {
 		Student* currStudent = Globals::students[i];
 		currStudent->reset(numberOfStudentModelCells, maxAmountOfStoredProfilesPerCell);
 	}
 	Utilities::resetRandoms();
 }
-void destroyGlobals() {
-	for (int i = 0; i < numberOfStudentsInClass; i++) {
+void destroyGlobals(int numStudentsInClass) {
+	for (int i = 0; i < numStudentsInClass; i++) {
 		delete Globals::students[i];
 	}
 }
 
-void simulateStudentsReaction(int currIteration) {
+void simulateStudentsReaction(int numStudentsInClass, int currIteration) {
 	//simulate students reaction
-	for (int j = 0; j < numberOfStudentsInClass; j++) {
+	for (int j = 0; j < numStudentsInClass; j++) {
 		Student* currStudent = Globals::students[j];
 		currStudent->simulateReaction(currIteration);
 	}
 }
 
-void trainingPhase() {
+void trainingPhase(int numStudentsInClass) {
 	for (int i = 0; i < numTrainingCycles; i++) {
 		//simulate students reaction
-		for (int j = 0; j < numberOfStudentsInClass; j++) {
+		for (int j = 0; j < numStudentsInClass; j++) {
 			Student* currStudent = Globals::students[j];
 			if (i % 3 == 0) {
 				currStudent->changeCurrProfile(Utilities::LearningProfile{ 1,0,0 });
@@ -75,11 +77,11 @@ void trainingPhase() {
 			}
 		}
 
-		simulateStudentsReaction(i);
+		simulateStudentsReaction(numStudentsInClass,i);
 	}
 }
 
-void runAdaptationModule(int currRun, Adaptation* adapt) {
+void runAdaptationModule(int numStudentsInClass, int currRun, Adaptation* adapt) {
 	int i = 0;
 	while (true) {
 
@@ -95,9 +97,9 @@ void runAdaptationModule(int currRun, Adaptation* adapt) {
 		}
 
 		//firstStudentPath.push_back(Globals::students[0]->getCurrProfile());
-		for (int j = 0; j < numberOfStudentsInClass; j++) {
-			adapt->avgAbilities[i] += Globals::students[j]->getAbility() / (numberOfStudentsInClass * numRuns);
-			adapt->avgEngagements[i] += Globals::students[j]->getEngagement() / (numberOfStudentsInClass * numRuns);
+		for (int j = 0; j < numStudentsInClass; j++) {
+			adapt->avgAbilities[i] += Globals::students[j]->getAbility() / (numStudentsInClass * numRuns);
+			adapt->avgEngagements[i] += Globals::students[j]->getEngagement() / (numStudentsInClass * numRuns);
 		}
 
 		if (i > (numAdaptationCycles-1)) {
@@ -121,7 +123,7 @@ void runAdaptationModule(int currRun, Adaptation* adapt) {
 		/*for (int j = 0; j < mechanicsSize; j++) {
 		printf("new mechanic: %s", mechanics[j].name.c_str());
 		}*/
-		simulateStudentsReaction(numTrainingCycles + i);
+		simulateStudentsReaction(numStudentsInClass, numTrainingCycles + i);
 
 		i++;
 
@@ -131,10 +133,23 @@ void runAdaptationModule(int currRun, Adaptation* adapt) {
 
 void storeSimData(std::string configId, Adaptation adapt) {
 
+	std::vector<int> groupSizeFreqs = adapt.groupSizeFreqs;
+	std::vector<int> configSizeFreqs = adapt.configSizeFreqs;
+
 	std::vector<double> avgAbilities = adapt.avgAbilities;
 	std::vector<double> avgEngagements = adapt.avgEngagements;
 	std::vector<double> avgPrefDiff = adapt.avgPrefDiff;
 	double avgExecutionTime = adapt.avgExecutionTime;
+
+
+	resultsFile << "timesteps=[";
+	for (int i = 0; i < numAdaptationCycles; i++) {
+		resultsFile << i;
+		if (i != (numAdaptationCycles - 1)) {
+			resultsFile << ",";
+		}
+	}
+	resultsFile << "]\n";
 
 	/*resultsFile << configId.c_str() << "_profileCls=[";
 	for (int i = 0; i < numberOfAdaptationCycles; i++) {
@@ -166,7 +181,6 @@ void storeSimData(std::string configId, Adaptation adapt) {
 	resultsFile << configId.c_str() << "Abilities=[";
 	for (int i = 0; i < numAdaptationCycles; i++) {
 		resultsFile << avgAbilities[i];
-		avgAbilities[i] = 0;
 		if (i != (numAdaptationCycles - 1)) {
 			resultsFile << ",";
 		}
@@ -176,7 +190,6 @@ void storeSimData(std::string configId, Adaptation adapt) {
 	resultsFile << configId.c_str() << "Engagements=[";
 	for (int i = 0; i < numAdaptationCycles; i++) {
 		resultsFile << avgEngagements[i];
-		avgEngagements[i] = 0;
 		if (i != (numAdaptationCycles - 1)) {
 			resultsFile << ",";
 		}
@@ -186,8 +199,26 @@ void storeSimData(std::string configId, Adaptation adapt) {
 	resultsFile << configId.c_str() << "PrefDiffs=[";
 	for (int i = 0; i < numAdaptationCycles; i++) {
 		resultsFile << avgPrefDiff[i];
-		avgPrefDiff[i] = 0;
 		if (i != (numAdaptationCycles - 1)) {
+			resultsFile << ",";
+		}
+	}
+	resultsFile << "]\n";
+
+	resultsFile << configId.c_str() << "groupSizeFreqs=[";
+	for (int i = 0; i < numStudentsInClass; i++) {
+		resultsFile << groupSizeFreqs[i];
+		if (i != (numStudentsInClass - 1)) {
+			resultsFile << ",";
+		}
+	}
+	resultsFile << "]\n";
+
+
+	resultsFile << configId.c_str() << "configSizeFreqs=[";
+	for (int i = 0; i < numStudentsInClass; i++) {
+		resultsFile << configSizeFreqs[i];
+		if (i != (numStudentsInClass - 1)) {
 			resultsFile << ",";
 		}
 	}
@@ -203,59 +234,66 @@ void storeSimData(std::string configId, Adaptation adapt) {
 int main() {
 
 
-	Adaptation randomClose = Adaptation(10, minNumStudentsPerGroup, maxNumStudentsPerGroup, 5, 0, numAdaptationCycles);
-	Adaptation optimalClose = Adaptation(1000, minNumStudentsPerGroup, maxNumStudentsPerGroup, 5, 1, numAdaptationCycles);
-	Adaptation GAL1 = Adaptation(numAdaptationConfigurationChoices, minNumStudentsPerGroup, maxNumStudentsPerGroup, 1, 2, numAdaptationCycles);
-	Adaptation GAL2 = Adaptation(numAdaptationConfigurationChoices, minNumStudentsPerGroup, maxNumStudentsPerGroup, 2, 2, numAdaptationCycles);
-	Adaptation GAL3 = Adaptation(numAdaptationConfigurationChoices, minNumStudentsPerGroup, maxNumStudentsPerGroup, 3, 2, numAdaptationCycles);
-	Adaptation GAL4 = Adaptation(numAdaptationConfigurationChoices, minNumStudentsPerGroup, maxNumStudentsPerGroup, 4, 2, numAdaptationCycles);
-	Adaptation GAL5 = Adaptation(numAdaptationConfigurationChoices, minNumStudentsPerGroup, maxNumStudentsPerGroup, 5, 2, numAdaptationCycles);
-	Adaptation GAL6 = Adaptation(numAdaptationConfigurationChoices, minNumStudentsPerGroup, maxNumStudentsPerGroup, 6, 2, numAdaptationCycles);
-	Adaptation GAL7 = Adaptation(numAdaptationConfigurationChoices, minNumStudentsPerGroup, maxNumStudentsPerGroup, 7, 2, numAdaptationCycles);
-	Adaptation GAL8 = Adaptation(numAdaptationConfigurationChoices, minNumStudentsPerGroup, maxNumStudentsPerGroup, 8, 2, numAdaptationCycles);
-	Adaptation GAL9 = Adaptation(numAdaptationConfigurationChoices, minNumStudentsPerGroup, maxNumStudentsPerGroup, 9, 2, numAdaptationCycles);
-	Adaptation GAL10 = Adaptation(numAdaptationConfigurationChoices, minNumStudentsPerGroup, maxNumStudentsPerGroup, 10, 2, numAdaptationCycles);
+	Adaptation randomClose = Adaptation(numStudentsInClass, 10, minNumStudentsPerGroup, maxNumStudentsPerGroup, 5, 0, numAdaptationCycles);
+	Adaptation optimalClose = Adaptation(numStudentsInClass, 1000, minNumStudentsPerGroup, maxNumStudentsPerGroup, 5, 1, numAdaptationCycles);
+	Adaptation GAL1 = Adaptation(numStudentsInClass, numAdaptationConfigurationChoices, minNumStudentsPerGroup, maxNumStudentsPerGroup, 1, 2, numAdaptationCycles);
+	Adaptation GAL2 = Adaptation(numStudentsInClass, numAdaptationConfigurationChoices, minNumStudentsPerGroup, maxNumStudentsPerGroup, 2, 2, numAdaptationCycles);
+	Adaptation GAL3 = Adaptation(numStudentsInClass, numAdaptationConfigurationChoices, minNumStudentsPerGroup, maxNumStudentsPerGroup, 3, 2, numAdaptationCycles);
+	Adaptation GAL4 = Adaptation(numStudentsInClass, numAdaptationConfigurationChoices, minNumStudentsPerGroup, maxNumStudentsPerGroup, 4, 2, numAdaptationCycles);
+	Adaptation GAL5 = Adaptation(numStudentsInClass, numAdaptationConfigurationChoices, minNumStudentsPerGroup, maxNumStudentsPerGroup, 5, 2, numAdaptationCycles);
+	Adaptation GAL6 = Adaptation(numStudentsInClass, numAdaptationConfigurationChoices, minNumStudentsPerGroup, maxNumStudentsPerGroup, 6, 2, numAdaptationCycles);
+	Adaptation GAL7 = Adaptation(numStudentsInClass, numAdaptationConfigurationChoices, minNumStudentsPerGroup, maxNumStudentsPerGroup, 7, 2, numAdaptationCycles);
+	Adaptation GAL8 = Adaptation(numStudentsInClass, numAdaptationConfigurationChoices, minNumStudentsPerGroup, maxNumStudentsPerGroup, 8, 2, numAdaptationCycles);
+	Adaptation GAL9 = Adaptation(numStudentsInClass, numAdaptationConfigurationChoices, minNumStudentsPerGroup, maxNumStudentsPerGroup, 9, 2, numAdaptationCycles);
+	Adaptation GAL10 = Adaptation(numStudentsInClass, numAdaptationConfigurationChoices, minNumStudentsPerGroup, maxNumStudentsPerGroup, 10, 2, numAdaptationCycles);
+	Adaptation GAL12 = Adaptation(numStudentsInClass, numAdaptationConfigurationChoices, minNumStudentsPerGroup, maxNumStudentsPerGroup, 12, 2, numAdaptationCycles);
+	Adaptation GAL16 = Adaptation(numStudentsInClass, numAdaptationConfigurationChoices, minNumStudentsPerGroup, maxNumStudentsPerGroup, 16, 2, numAdaptationCycles);
+	Adaptation GAL20 = Adaptation(numStudentsInClass, numAdaptationConfigurationChoices, minNumStudentsPerGroup, maxNumStudentsPerGroup, 20, 2, numAdaptationCycles);
+	Adaptation GAL24 = Adaptation(numStudentsInClass, numAdaptationConfigurationChoices, minNumStudentsPerGroup, maxNumStudentsPerGroup, 24, 2, numAdaptationCycles);
+	Adaptation GAL28 = Adaptation(numStudentsInClass, numAdaptationConfigurationChoices, minNumStudentsPerGroup, maxNumStudentsPerGroup, 28, 2, numAdaptationCycles);
+	Adaptation GAL30 = Adaptation(numStudentsInClass, numAdaptationConfigurationChoices, minNumStudentsPerGroup, maxNumStudentsPerGroup, 30, 2, numAdaptationCycles);
 	for (int i = 0; i < numRuns; i++) {
 		//resultsFile << "inhPrf =  [" << Globals::students[0]->getInherentPreference().K_cl << "," << Globals::students[0]->getInherentPreference().K_cp << "," << Globals::students[0]->getInherentPreference().K_i << "]";
 		
-		createGlobals(numStudentModelCells, 10, numTrainingCycles + numAdaptationCycles);
-		trainingPhase();
-		runAdaptationModule(i, &optimalClose);
+		createGlobals(numStudentsInClass, numStudentModelCells, timeWindow, numTrainingCycles + numAdaptationCycles);
+		trainingPhase(numStudentsInClass);
+		runAdaptationModule(numStudentsInClass, i, &optimalClose);
 
-		resetGlobals(numStudentModelCells, 10);
-		trainingPhase();
-		runAdaptationModule(i, &randomClose);
+		resetGlobals(numStudentsInClass, numStudentModelCells, timeWindow);
+		trainingPhase(numStudentsInClass);
+		runAdaptationModule(numStudentsInClass, i, &randomClose);
 
-		resetGlobals(numStudentModelCells, 10);
-		trainingPhase();
-		runAdaptationModule(i, &GAL1);
-		resetGlobals(numStudentModelCells, 10);
-		trainingPhase();
-		runAdaptationModule(i, &GAL2);
-		resetGlobals(numStudentModelCells, 10);
-		trainingPhase();
-		runAdaptationModule(i, &GAL3);
-		resetGlobals(numStudentModelCells, 10);
-		trainingPhase();
-		runAdaptationModule(i, &GAL4);
-		resetGlobals(numStudentModelCells, 10);
-		trainingPhase();
-		runAdaptationModule(i, &GAL5);
-		resetGlobals(numStudentModelCells, 10);
-		trainingPhase();
-		runAdaptationModule(i, &GAL6);
-		resetGlobals(numStudentModelCells, 10);
-		trainingPhase();
-		runAdaptationModule(i, &GAL7);
-		resetGlobals(numStudentModelCells, 10);
-		trainingPhase();
-		runAdaptationModule(i, &GAL8);
-		resetGlobals(numStudentModelCells, 10);
-		trainingPhase();
-		runAdaptationModule(i, &GAL9);
-		resetGlobals(numStudentModelCells, 10);
-		trainingPhase();
-		runAdaptationModule(i, &GAL10);
+		resetGlobals(numStudentsInClass, numStudentModelCells, timeWindow);
+		trainingPhase(numStudentsInClass);
+		runAdaptationModule(numStudentsInClass, i, &GAL1);
+		resetGlobals(numStudentsInClass, numStudentModelCells, timeWindow);
+		trainingPhase(numStudentsInClass);
+		runAdaptationModule(numStudentsInClass, i, &GAL2);
+		resetGlobals(numStudentsInClass, numStudentModelCells, timeWindow);
+		trainingPhase(numStudentsInClass);
+		runAdaptationModule(numStudentsInClass, i, &GAL4);
+		resetGlobals(numStudentsInClass, numStudentModelCells, timeWindow);
+		trainingPhase(numStudentsInClass);
+		runAdaptationModule(numStudentsInClass, i, &GAL8);
+		resetGlobals(numStudentsInClass, numStudentModelCells, timeWindow);
+		trainingPhase(numStudentsInClass);
+		runAdaptationModule(numStudentsInClass, i, &GAL12);
+		resetGlobals(numStudentsInClass, numStudentModelCells, timeWindow);
+		trainingPhase(numStudentsInClass);
+		runAdaptationModule(numStudentsInClass, i, &GAL16);
+		resetGlobals(numStudentsInClass, numStudentModelCells, timeWindow);
+		trainingPhase(numStudentsInClass);
+		runAdaptationModule(numStudentsInClass, i, &GAL20);
+		resetGlobals(numStudentsInClass, numStudentModelCells, timeWindow);
+		trainingPhase(numStudentsInClass);
+		runAdaptationModule(numStudentsInClass, i, &GAL24);
+		resetGlobals(numStudentsInClass, numStudentModelCells, timeWindow);
+		trainingPhase(numStudentsInClass);
+		runAdaptationModule(numStudentsInClass, i, &GAL28);
+		resetGlobals(numStudentsInClass, numStudentModelCells, timeWindow);
+		trainingPhase(numStudentsInClass);
+		runAdaptationModule(numStudentsInClass, i, &GAL30);
+
 	}
 
 	storeSimData("randomClose", randomClose);
@@ -263,15 +301,14 @@ int main() {
 	
 	storeSimData("GAL1", GAL1);
 	storeSimData("GAL2", GAL2);
-	storeSimData("GAL3", GAL3);
 	storeSimData("GAL4", GAL4);
-	storeSimData("GAL5", GAL5);
-	storeSimData("GAL6", GAL6);
-	storeSimData("GAL7", GAL7);
 	storeSimData("GAL8", GAL8);
-	storeSimData("GAL9", GAL9);
-	storeSimData("GAL10", GAL10);
-
+	storeSimData("GAL12", GAL12);
+	storeSimData("GAL16", GAL16);
+	storeSimData("GAL20", GAL20);
+	storeSimData("GAL24", GAL24);
+	storeSimData("GAL28", GAL28);
+	storeSimData("GAL30", GAL30);
 
 	
 	resultsFile.close();

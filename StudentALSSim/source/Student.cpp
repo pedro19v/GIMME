@@ -48,7 +48,7 @@ Student::Student(int id, std::string name, int numPastModelIncreasesCells, int m
 	this->iterationReactions = std::vector<double>(numTasks);
 
 	for (int i = 0; i < numTasks; i++) {
-		this->iterationReactions.push_back(Utilities::normalRandom(learningRate,0.3));
+		this->iterationReactions[i] = Utilities::normalRandom(learningRate, 0.6);
 	}
 
 	//this->learningRate = Utilities::randBetween(0, 1);
@@ -129,7 +129,6 @@ void Student::calcReaction(double* engagement, double* ability, Utilities::Learn
 	*engagement = 1.0 - inherentPreference.distanceBetween(*profile);
 
 	double currTaskReaction = iterationReactions[currIteration];
-	double abilityIncreaseSim = (learningRate * *engagement); //between 0 and 1
+	double abilityIncreaseSim = (currTaskReaction * *engagement); //between 0 and 1
 	*ability += abilityIncreaseSim;
-
 }

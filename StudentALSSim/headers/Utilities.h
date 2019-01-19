@@ -11,7 +11,8 @@ public:
 
 	static int defaultRandomSeed;
 	static std::normal_distribution<double> normalDistribution;
-	static std::uniform_real_distribution<double> uniformDistribution;
+	static std::uniform_real_distribution<double> uniformDistributionReal;
+	static std::uniform_int_distribution<> uniformDistributionInt;
 
 
 	struct LearningProfile {
@@ -77,16 +78,25 @@ public:
 
 	
 	void static resetRandoms() {
-		uniformDistribution.reset();
+		uniformDistributionReal.reset();
 		normalDistribution.reset();
 	}
 	double static randBetween(int seed, double min, double max) {
 		static std::default_random_engine randomGenerator(seed);
-		uniformDistribution = std::uniform_real_distribution<double>(min, max);
-		return uniformDistribution(randomGenerator);
+		uniformDistributionReal = std::uniform_real_distribution<double>(min, max);
+		return uniformDistributionReal(randomGenerator);
 	}
 	double static randBetween(double min, double max) {
 		return randBetween(defaultRandomSeed, min, max);
+	}
+
+	double static randIntBetween(int seed, int min, int max) {
+		static std::default_random_engine randomGenerator(seed);
+		uniformDistributionInt = std::uniform_int_distribution<>(min, max);
+		return uniformDistributionInt(randomGenerator);
+	}
+	double static randIntBetween(int min, int max) {
+		return randIntBetween(defaultRandomSeed, min, max);
 	}
 
 	double static normalRandom(int seed, double mu, double var) {

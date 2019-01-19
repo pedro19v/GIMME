@@ -92,7 +92,7 @@ private:
 
 	double fitness(Student* student, Utilities::LearningProfile profile, int numberOfFitnessNNs, int currIteration);
 public:
-	Adaptation(int numberOfConfigChoices, int minNumberOfStudentsPerGroup, int maxNumberOfStudentsPerGroup, int numberOfFitnessNNs, int fitnessCondition, int numAdaptationCycles);
+	Adaptation(int studentSize, int numberOfConfigChoices, int minNumberOfStudentsPerGroup, int maxNumberOfStudentsPerGroup, int numberOfFitnessNNs, int fitnessCondition, int numAdaptationCycles);
 	std::vector<AdaptationMechanic> iterate(std::vector<Student*> students, int currIteration);
 	
 	AdaptationConfiguration getCurrAdaptedConfig();
@@ -105,5 +105,6 @@ public:
 	double avgExecutionTime;
 
 	std::vector<int> groupSizeFreqs;
+	std::vector<int> configSizeFreqs;
 
 };
