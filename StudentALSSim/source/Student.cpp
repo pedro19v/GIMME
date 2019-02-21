@@ -101,6 +101,14 @@ void Student::changeCurrProfile(Utilities::LearningProfile newProfile) {
 	Student::StudentModel currModel = this->currModel;
 	this->currModel.currProfile = newProfile;
 }
+int Student::getId()
+{
+	return this->id;
+}
+std::string Student::getName()
+{
+	return this->name;
+}
 Utilities::LearningProfile Student::getCurrProfile() {
 	return this->currModel.currProfile;
 }

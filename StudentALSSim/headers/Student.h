@@ -59,6 +59,8 @@ public:
 	std::vector<StudentModel> getPastModelIncreases();
 	void changeCurrProfile(Utilities::LearningProfile newProfile);
 
+	int getId();
+	std::string getName();
 
 	Utilities::LearningProfile getCurrProfile();
 	Utilities::LearningProfile getInherentPreference();

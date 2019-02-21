@@ -49,9 +49,16 @@ public:
 	std::vector<AdaptationGroup> groups;
 };
 
-struct AdaptationMechanic {
+enum AdaptationTaskType {
+	COLLABORATION = 0,
+	COMPETITION = 1,
+	SELF_INTERACTION = 2
+};
+
+struct AdaptationTask {
 public:
-	std::string name;
+	AdaptationTaskType type;
+	std::string description;
 };
 
 class Adaptation {
@@ -82,18 +89,27 @@ private:
 	int maxNumberOfStudentsPerGroup;
 	int minNumberOfStudentsPerGroup;
 
+	int numTasksPerGroup;
+
 	int numberOfFitnessNNs;
 	int fitnessCondition;
 
 	AdaptationConfiguration adaptedConfig;
 
 	AdaptationConfiguration organizeStudents(std::vector<Student*> students, int currIteration);
-	AdaptationMechanic generateMechanic(Utilities::LearningProfile bestConfigProfile);
+	std::vector<AdaptationTask> generateMechanic(Utilities::LearningProfile bestConfigProfile, 
+		std::vector<AdaptationTask> possibleCollaborativeTasks,
+		std::vector<AdaptationTask> possibleCompetitiveTasks,
+		std::vector<AdaptationTask> possibleIndividualTasks);
 
 	double fitness(Student* student, Utilities::LearningProfile profile, int numberOfFitnessNNs, int currIteration);
 public:
-	Adaptation(int studentSize, int numberOfConfigChoices, int minNumberOfStudentsPerGroup, int maxNumberOfStudentsPerGroup, int numberOfFitnessNNs, int fitnessCondition, int numAdaptationCycles);
-	std::vector<AdaptationMechanic> iterate(std::vector<Student*> students, int currIteration);
+	Adaptation(int studentSize, int numberOfConfigChoices, int minNumberOfStudentsPerGroup, int maxNumberOfStudentsPerGroup, int numberOfFitnessNNs, int fitnessCondition, int numAdaptationCycles, int numTasksPerGroup);
+	std::vector<std::pair<AdaptationGroup, std::vector<AdaptationTask>>> iterate(std::vector<Student*> students, 
+		std::vector<AdaptationTask> possibleCollaborativeTasks,
+		std::vector<AdaptationTask> possibleCompetitiveTasks,
+		std::vector<AdaptationTask> possibleIndividualTasks, 
+		int currIteration);
 	
 	AdaptationConfiguration getCurrAdaptedConfig();
 
