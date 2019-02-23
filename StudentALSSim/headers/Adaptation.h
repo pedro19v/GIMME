@@ -9,23 +9,22 @@
 #include <iostream>
 
 struct AdaptationGroup {
+private:
+	Student::LearningState avgLearningState;
+	Utilities::LearningProfile avgPreferences;
+	Utilities::LearningProfile learningProfile;
+	std::vector<Student*> students;
 public:
 
-	Utilities::LearningProfile profile;
-	std::vector<Student*> students;
 
-	double avgEngagement;
-	double avgAbility;
-	Utilities::LearningProfile avgPreferences;
-	
 	void addStudent(Student* student) {
+
 		students.push_back(student);
 		int studentsSize = students.size();
 
 
 		//recalculate averages
-		avgEngagement = 0;
-		avgAbility = 0;
+		avgLearningState = Student::LearningState();
 		avgPreferences.K_cl = 0;
 		avgPreferences.K_cp = 0;
 		avgPreferences.K_i = 0;
@@ -33,13 +32,29 @@ public:
 		for (int i = 0; i < studentsSize; i++) {
 			Student* currStudent = students[i];
 			Utilities::LearningProfile currStudentPreference = currStudent->getInherentPreference();
-			avgEngagement += currStudent->getEngagement() / studentsSize;
-			avgAbility += currStudent->getAbility() / studentsSize;
+			avgLearningState.engagement += currStudent->getEngagement() / studentsSize;
+			avgLearningState.ability += currStudent->getAbility() / studentsSize;
 			avgPreferences.K_cl += currStudentPreference.K_cl / studentsSize;
 			avgPreferences.K_cp += currStudentPreference.K_cp / studentsSize;
 			avgPreferences.K_i += currStudentPreference.K_i / studentsSize;
 		}
 		
+	}
+	std::vector<Student*> getStudents() {
+		return this->students;
+	}
+	void setLearningProfile(Utilities::LearningProfile learningProfile) {
+		this->learningProfile = learningProfile;
+	}
+
+	Utilities::LearningProfile getLearningProfile() {
+		return this->learningProfile;
+	}
+	Student::LearningState getAvgLearningState() {
+		return this->avgLearningState;
+	}
+	Utilities::LearningProfile getAvgPreferences() {
+		return this->avgPreferences;
 	}
 };
 
@@ -56,9 +71,26 @@ enum AdaptationTaskType {
 };
 
 struct AdaptationTask {
+private:
+	/*struct WayToSortTaskInstances {
+		bool operator()(const AdaptationTask& i, const AdaptationTask& j) { return i.minRequiredAbility < j.minRequiredAbility; }
+	};*/
 public:
 	AdaptationTaskType type;
 	std::string description;
+	float minRequiredAbility;
+	std::vector<AdaptationTask> taskInstances; //maintained in order
+
+	AdaptationTask(AdaptationTaskType type, std::string description, float minRequiredAbility, std::vector<AdaptationTask> taskInstances) {
+		this->type = type;
+		this->description = description;
+		this->minRequiredAbility = minRequiredAbility;
+		
+		//std::sort(taskInstances.begin(), taskInstances.end(), WayToSortTaskInstances());
+		this->taskInstances = taskInstances;
+	}
+	AdaptationTask(AdaptationTaskType type, std::string description, std::vector<AdaptationTask> taskInstances) : AdaptationTask(type, description, 0, taskInstances) {}
+	AdaptationTask(AdaptationTaskType type, std::string description, float minRequiredAbility) : AdaptationTask(type, description, minRequiredAbility, std::vector<AdaptationTask>()) {}
 };
 
 class Adaptation {
@@ -72,7 +104,7 @@ private:
 			this->testedProfile = testedProfile;
 		}
 
-		bool operator () (Student::StudentModel& i, Student::StudentModel& j) {
+		bool operator () (Student::LearningState& i, Student::LearningState& j) {
 			
 			double dist1 = testedProfile.distanceBetween(i.currProfile);
 			double dist2 = testedProfile.distanceBetween(j.currProfile);
@@ -99,10 +131,12 @@ private:
 	AdaptationConfiguration adaptedConfig;
 
 	AdaptationConfiguration organizeStudents(std::vector<Student*> students, int currIteration);
-	std::vector<AdaptationTask> generateMechanic(Utilities::LearningProfile bestConfigProfile, 
+	std::vector<AdaptationTask> generateMechanic(Utilities::LearningProfile bestConfigProfile,
+		Student::LearningState avgLearningState,
 		std::vector<AdaptationTask> possibleCollaborativeTasks,
 		std::vector<AdaptationTask> possibleCompetitiveTasks,
 		std::vector<AdaptationTask> possibleIndividualTasks);
+	AdaptationTask pickRandTaskInstance(std::vector<AdaptationTask> possibleTasks, Student::LearningState avgLearningState);
 
 	double fitness(Student* student, Utilities::LearningProfile profile, int numberOfFitnessNNs, int currIteration);
 

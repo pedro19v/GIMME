@@ -100,10 +100,11 @@ public:
 		return randIntBetween(defaultRandomSeed, min, max);
 	}
 
-	/*template <class c>
-	void static randShuffle(std::vector<c> vector) {
-		shuffle(vector.begin(), vector.end(), uniformDistributionInt);
-	}*/
+	template <class c>
+	void static randShuffle(std::vector<c>& vector) {
+		static std::default_random_engine randomGenerator(defaultRandomSeed);
+		shuffle(vector.begin(), vector.end(), randomGenerator);
+	}
 
 	double static normalRandom(int seed, double mu, double var) {
 		static std::default_random_engine normalRandomGenerator (seed);

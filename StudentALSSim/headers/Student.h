@@ -6,7 +6,7 @@
 
 class Student {
 public:
-	struct StudentModel {
+	struct LearningState {
 		Utilities::LearningProfile currProfile;
 		double engagement; // on vs off task percentage
 		double ability; // score percentage
@@ -16,15 +16,15 @@ public:
 	
 	class StudentModelGrid {
 		private:
-			std::vector<std::vector<StudentModel>> cells;
+			std::vector<std::vector<LearningState>> cells;
 			int numCells;
 			int maxAmountOfStoredProfilesPerCell;
 
 		public:
 			StudentModelGrid();
 			StudentModelGrid(int numCells, int maxAmountOfStoredProfilesPerCell);
-			void pushToGrid(StudentModel model);
-			std::vector<StudentModel> getAllModels();
+			void pushToGrid(LearningState model);
+			std::vector<LearningState> getAllModels();
 	};
 
 
@@ -42,7 +42,7 @@ private:
 	int maxAmountOfStoredProfilesPerCell;
 	StudentModelGrid pastModelIncreasesGrid;
 
-	StudentModel currModel;
+	LearningState currModel;
 
 
 
@@ -57,7 +57,7 @@ public:
 	void setAbility(double preference);
 	double getAbility();
 
-	std::vector<StudentModel> getPastModelIncreases();
+	std::vector<LearningState> getPastModelIncreases();
 	void changeCurrProfile(Utilities::LearningProfile newProfile);
 
 	int getId();
@@ -72,5 +72,5 @@ public:
 
 
 
-	StudentModel currModelIncreases; //for displaying in the chart
+	LearningState currModelIncreases; //for displaying in the chart
 };

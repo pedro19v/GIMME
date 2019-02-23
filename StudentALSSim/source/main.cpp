@@ -51,40 +51,85 @@ void createGlobals(int numStudentsInClass, int numberOfStudentModelCells, int ma
 	}
 
 	Globals::possibleCollaborativeTasks = std::vector<AdaptationTask>();
-	Globals::possibleCollaborativeTasks.push_back({ AdaptationTaskType::COLLABORATION,"collab1" });
-	Globals::possibleCollaborativeTasks.push_back({ AdaptationTaskType::COLLABORATION,"collab2" });
-	Globals::possibleCollaborativeTasks.push_back({ AdaptationTaskType::COLLABORATION,"collab3" });
-	Globals::possibleCollaborativeTasks.push_back({ AdaptationTaskType::COLLABORATION,"collab4" });
-	Globals::possibleCollaborativeTasks.push_back({ AdaptationTaskType::COLLABORATION,"collab5" });
-	Globals::possibleCollaborativeTasks.push_back({ AdaptationTaskType::COLLABORATION,"collab6" });
-	Globals::possibleCollaborativeTasks.push_back({ AdaptationTaskType::COLLABORATION,"collab7" });
-	Globals::possibleCollaborativeTasks.push_back({ AdaptationTaskType::COLLABORATION,"collab8" });
-	Globals::possibleCollaborativeTasks.push_back({ AdaptationTaskType::COLLABORATION,"collab9" });
-	Globals::possibleCollaborativeTasks.push_back({ AdaptationTaskType::COLLABORATION,"collab10" });
+	std::vector<AdaptationTask> taskInstances = std::vector<AdaptationTask>();
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::COLLABORATION, "collab1Inst1", 0.1f));
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::COLLABORATION, "collab1Inst2", 0.3f));
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::COLLABORATION, "collab1Inst3", 0.5f));
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::COLLABORATION, "collab1Inst4", 0.7f));
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::COLLABORATION, "collab1Inst5", 0.9f));
+	AdaptationTask task1 = AdaptationTask(AdaptationTaskType::COLLABORATION, "collab1", taskInstances);
+	Globals::possibleCollaborativeTasks.push_back(task1);
+	taskInstances = std::vector<AdaptationTask>();
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::COLLABORATION, "collab2Inst1", 0.1f));
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::COLLABORATION, "collab2Inst2", 0.3f));
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::COLLABORATION, "collab2Inst3", 0.5f));
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::COLLABORATION, "collab2Inst4", 0.7f));
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::COLLABORATION, "collab2Inst5", 0.9f));
+	AdaptationTask task2 = AdaptationTask(AdaptationTaskType::COLLABORATION, "collab2", taskInstances);
+	Globals::possibleCollaborativeTasks.push_back(task2);
+	taskInstances = std::vector<AdaptationTask>();
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::COLLABORATION, "collab3Inst1", 0.1f));
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::COLLABORATION, "collab3Inst2", 0.3f));
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::COLLABORATION, "collab3Inst3", 0.5f));
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::COLLABORATION, "collab3Inst4", 0.7f));
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::COLLABORATION, "collab3Inst5", 0.9f));
+	AdaptationTask task3 = AdaptationTask(AdaptationTaskType::COLLABORATION, "collab3", taskInstances);
+	Globals::possibleCollaborativeTasks.push_back(task3);
+
 
 	Globals::possibleCompetitiveTasks = std::vector<AdaptationTask>();
-	Globals::possibleCompetitiveTasks.push_back({ AdaptationTaskType::COMPETITION,"comp1" });
-	Globals::possibleCompetitiveTasks.push_back({ AdaptationTaskType::COMPETITION,"comp2" });
-	Globals::possibleCompetitiveTasks.push_back({ AdaptationTaskType::COMPETITION,"comp3" });
-	Globals::possibleCompetitiveTasks.push_back({ AdaptationTaskType::COMPETITION,"comp4" });
-	Globals::possibleCompetitiveTasks.push_back({ AdaptationTaskType::COMPETITION,"comp5" });
-	Globals::possibleCompetitiveTasks.push_back({ AdaptationTaskType::COMPETITION,"comp6" });
-	Globals::possibleCompetitiveTasks.push_back({ AdaptationTaskType::COMPETITION,"comp7" });
-	Globals::possibleCompetitiveTasks.push_back({ AdaptationTaskType::COMPETITION,"comp8" });
-	Globals::possibleCompetitiveTasks.push_back({ AdaptationTaskType::COMPETITION,"comp9" });
-	Globals::possibleCompetitiveTasks.push_back({ AdaptationTaskType::COMPETITION,"comp10" });
+	taskInstances = std::vector<AdaptationTask>();
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::COMPETITION, "comp1Inst1", 0.1f));
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::COMPETITION, "comp1Inst2", 0.3f));
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::COMPETITION, "comp1Inst3", 0.5f));
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::COMPETITION, "comp1Inst4", 0.7f));
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::COMPETITION, "comp1Inst5", 0.9f));
+	task1 = AdaptationTask(AdaptationTaskType::COMPETITION, "comp1", taskInstances);
+	Globals::possibleCompetitiveTasks.push_back(task1);
+	taskInstances = std::vector<AdaptationTask>();
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::COMPETITION, "comp2Inst1", 0.1f));
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::COMPETITION, "comp2Inst2", 0.3f));
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::COMPETITION, "comp2Inst3", 0.5f));
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::COMPETITION, "comp2Inst4", 0.7f));
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::COMPETITION, "comp2Inst5", 0.9f));
+	task2 = AdaptationTask(AdaptationTaskType::COMPETITION, "comp2", taskInstances);
+	Globals::possibleCompetitiveTasks.push_back(task2);
+	taskInstances = std::vector<AdaptationTask>();
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::COMPETITION, "comp3Inst1", 0.1f));
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::COMPETITION, "comp3Inst2", 0.3f));
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::COMPETITION, "comp3Inst3", 0.5f));
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::COMPETITION, "comp3Inst4", 0.7f));
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::COMPETITION, "comp3Inst5", 0.9f));
+	task3 = AdaptationTask(AdaptationTaskType::COMPETITION, "comp3", taskInstances);
+	Globals::possibleCompetitiveTasks.push_back(task3);
+
 
 	Globals::possibleIndividualTasks = std::vector<AdaptationTask>();
-	Globals::possibleIndividualTasks.push_back({ AdaptationTaskType::SELF_INTERACTION,"self1" });
-	Globals::possibleIndividualTasks.push_back({ AdaptationTaskType::SELF_INTERACTION,"self2" });
-	Globals::possibleIndividualTasks.push_back({ AdaptationTaskType::SELF_INTERACTION,"self3" });
-	Globals::possibleIndividualTasks.push_back({ AdaptationTaskType::SELF_INTERACTION,"self4" });
-	Globals::possibleIndividualTasks.push_back({ AdaptationTaskType::SELF_INTERACTION,"self5" });
-	Globals::possibleIndividualTasks.push_back({ AdaptationTaskType::SELF_INTERACTION,"self6" });
-	Globals::possibleIndividualTasks.push_back({ AdaptationTaskType::SELF_INTERACTION,"self7" });
-	Globals::possibleIndividualTasks.push_back({ AdaptationTaskType::SELF_INTERACTION,"self8" });
-	Globals::possibleIndividualTasks.push_back({ AdaptationTaskType::SELF_INTERACTION,"self9" });
-	Globals::possibleIndividualTasks.push_back({ AdaptationTaskType::SELF_INTERACTION,"self10" });
+	taskInstances = std::vector<AdaptationTask>();
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::SELF_INTERACTION, "self1Inst1", 0.1f));
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::SELF_INTERACTION, "self1Inst2", 0.3f));
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::SELF_INTERACTION, "self1Inst3", 0.5f));
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::SELF_INTERACTION, "self1Inst4", 0.7f));
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::SELF_INTERACTION, "self1Inst5", 0.9f));
+	task1 = AdaptationTask(AdaptationTaskType::SELF_INTERACTION, "self1", taskInstances);
+	Globals::possibleIndividualTasks.push_back(task1);
+	taskInstances = std::vector<AdaptationTask>();
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::SELF_INTERACTION, "self2Inst1", 0.1f));
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::SELF_INTERACTION, "self2Inst2", 0.3f));
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::SELF_INTERACTION, "self2Inst3", 0.5f));
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::SELF_INTERACTION, "self2Inst4", 0.7f));
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::SELF_INTERACTION, "self2Inst5", 0.9f));
+	task2 = AdaptationTask(AdaptationTaskType::SELF_INTERACTION, "self2", taskInstances);
+	Globals::possibleIndividualTasks.push_back(task2);
+	taskInstances = std::vector<AdaptationTask>();
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::SELF_INTERACTION, "self3Inst1", 0.1f));
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::SELF_INTERACTION, "self3Inst2", 0.3f));
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::SELF_INTERACTION, "self3Inst3", 0.5f));
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::SELF_INTERACTION, "self3Inst4", 0.7f));
+	taskInstances.push_back(AdaptationTask(AdaptationTaskType::SELF_INTERACTION, "self3Inst5", 0.9f));
+	task3 = AdaptationTask(AdaptationTaskType::SELF_INTERACTION, "self3", taskInstances);
+	Globals::possibleIndividualTasks.push_back(task3);
+
 }
 void resetGlobals(int numStudentsInClass, int numberOfStudentModelCells, int maxAmountOfStoredProfilesPerCell) {
 	//generate all of the students models
@@ -120,7 +165,7 @@ void runAdaptationModule(int numStudentsInClass, int currRun, Adaptation* adapt,
 		AdaptationConfiguration currAdaptedConfig = adapt->getCurrAdaptedConfig();
 		std::vector<AdaptationGroup> groups = currAdaptedConfig.groups;
 		for (int j = 0; j < groups.size(); j++) {
-			adapt->avgPrefDiff[i] += groups[j].avgPreferences.distanceBetween(groups[j].profile) / (groups.size() * numRuns);
+			adapt->avgPrefDiff[i] += groups[j].getAvgPreferences().distanceBetween(groups[j].getLearningProfile()) / (groups.size() * numRuns);
 		}
 
 		//firstStudentPath.push_back(Globals::students[0]->getCurrProfile());
@@ -148,8 +193,7 @@ void runAdaptationModule(int numStudentsInClass, int currRun, Adaptation* adapt,
 
 		//intervene
 		for (int j = 0; j < mechanicsSize; j++) {
-
-			std::vector<Student*> currGroup = groupMechanicPairs[j].first.students;
+			std::vector<Student*> currGroup = groupMechanicPairs[j].first.getStudents();
 			std::vector<AdaptationTask> currMechanic = groupMechanicPairs[j].second;
 
 			resultsFile << "promote on students:" << std::endl;

@@ -7,24 +7,24 @@ Student::StudentModelGrid::StudentModelGrid(int numCells, int maxAmountOfStoredP
 	this->numCells = numCells;
 	this->maxAmountOfStoredProfilesPerCell = maxAmountOfStoredProfilesPerCell;
 
-	cells = std::vector<std::vector<StudentModel>>(numCells);
+	cells = std::vector<std::vector<LearningState>>(numCells);
 }
-void Student::StudentModelGrid::pushToGrid(Student::StudentModel model) {
+void Student::StudentModelGrid::pushToGrid(Student::LearningState model) {
 	double dimSpan = cbrt((double)numCells-1);
 	int currCellInd = dimSpan * dimSpan * floor(dimSpan * model.currProfile.K_cl) + dimSpan * floor(dimSpan * model.currProfile.K_cp) + floor(dimSpan* model.currProfile.K_i);
 	/*printf("ind: %d\n", currCellInd);
 	printf("profi: (%f,%f,%f)\n", model.currProfile.K_cl, model.currProfile.K_cp, model.currProfile.K_i);*/
-	std::vector<StudentModel>* currCell = &(cells[currCellInd]);
+	std::vector<LearningState>* currCell = &(cells[currCellInd]);
 	currCell->push_back(model);
 	int cellsSize = cells[currCellInd].size();
 	if (cellsSize > maxAmountOfStoredProfilesPerCell) {
 		currCell->erase(currCell->begin());
 	}
 }
-std::vector<Student::StudentModel> Student::StudentModelGrid::getAllModels() {
-	std::vector<StudentModel> allCells = std::vector<StudentModel>();
+std::vector<Student::LearningState> Student::StudentModelGrid::getAllModels() {
+	std::vector<LearningState> allCells = std::vector<LearningState>();
 	for (int i = 0; i < cells.size(); i++) {
-		std::vector<StudentModel>* currCell = &cells[i];
+		std::vector<LearningState>* currCell = &cells[i];
 		allCells.insert(allCells.end(), currCell->begin(), currCell->end());
 	}
 	return allCells;
@@ -84,7 +84,7 @@ double Student::getEngagement() {
 	return this->currModel.engagement;
 }
 
-std::vector<Student::StudentModel> Student::getPastModelIncreases() {
+std::vector<Student::LearningState> Student::getPastModelIncreases() {
 	return this->pastModelIncreasesGrid.getAllModels();
 }
 
@@ -98,7 +98,7 @@ double Student::getAbility() {
 
 
 void Student::changeCurrProfile(Utilities::LearningProfile newProfile) {
-	Student::StudentModel currModel = this->currModel;
+	Student::LearningState currModel = this->currModel;
 	this->currModel.currProfile = newProfile;
 }
 int Student::getId()
@@ -121,7 +121,7 @@ double Student::getLearningRate() {
 
 void Student::simulateReaction(int currIteration)
 {
-	StudentModel increases = StudentModel(currModel);
+	LearningState increases = LearningState(currModel);
 	this->calcReaction(&currModel.engagement, &currModel.ability, &currModel.currProfile, currIteration);
 	
 	increases.ability = currModel.ability - increases.ability;
