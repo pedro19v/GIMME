@@ -17,8 +17,10 @@ Adaptation::Adaptation(int studentSize, int numberOfConfigChoices,
 	this->avgPrefDiff = std::vector<double>(numAdaptationCycles+1);
 	this->avgExecutionTime = 0;
 
-	this->groupSizeFreqs = std::vector<int>(studentSize);
-	this->configSizeFreqs = std::vector<int>(studentSize);
+	this->groupSizeFreqs = std::vector<int>(studentSize+1);
+	this->configSizeFreqs = std::vector<int>(studentSize+1);
+
+	this->numAdaptationCycles = numAdaptationCycles;
 }
 
 std::vector<AdaptationMechanic> Adaptation::iterate(std::vector<Student*> students, int currIteration)
@@ -49,6 +51,12 @@ std::vector<AdaptationMechanic> Adaptation::iterate(std::vector<Student*> studen
 AdaptationConfiguration Adaptation::getCurrAdaptedConfig() {
 	return this->adaptedConfig;
 }
+
+
+int Adaptation::getNumAdaptationCycles() {
+	return this->numAdaptationCycles;
+}
+
 
 AdaptationConfiguration Adaptation::organizeStudents(std::vector<Student*> students, int currIteration) {
 
@@ -91,7 +99,12 @@ AdaptationConfiguration Adaptation::organizeStudents(std::vector<Student*> stude
 				studentsWithoutGroupSize = studentsWithoutGroup.size();
 				int currStudentIndex = Utilities::randIntBetween(0,studentsWithoutGroupSize-1);
 
-				currGroup.students.push_back(studentsWithoutGroup[currStudentIndex]);
+				Student* currStudent = studentsWithoutGroup[currStudentIndex];
+				currGroup.students.push_back(currStudent);
+
+				double currStudentFitness = fitness(currStudent, currGroup.profile, this->numberOfFitnessNNs, currIteration);
+				currFitness += currStudentFitness;
+
 				studentsWithoutGroup.erase(studentsWithoutGroup.begin() + currStudentIndex);
 			}
 
@@ -115,13 +128,13 @@ AdaptationConfiguration Adaptation::organizeStudents(std::vector<Student*> stude
 
 			Student* currStudent = studentsWithoutGroup[currStudentIndex];
 			currGroup->students.push_back(currStudent);
+
 			double currStudentFitness = fitness(currStudent, currGroup->profile, this->numberOfFitnessNNs, currIteration);
-			currFitness += currStudentFitness / studentsSize;
+			currFitness += currStudentFitness;
 
 			studentsWithoutGroup.erase(studentsWithoutGroup.begin() + currStudentIndex);
 			studentsWithoutGroupSize = studentsWithoutGroup.size();
 		}
-
 
 		std::vector<AdaptationGroup>* currGroups = &newConfig.groups;
 		this->configSizeFreqs[currGroups->size()]++;
@@ -227,7 +240,6 @@ AdaptationConfiguration Adaptation::organizeStudents(std::vector<Student*> stude
 
 double Adaptation::fitness(Student* student, Utilities::LearningProfile profile, int numberOfFitnessNNs, int currIteration) {
 
-
 	if (fitnessCondition == 1) {
 		double engagement = 0;
 		double predSimAbility = student->getAbility();
@@ -255,11 +267,11 @@ double Adaptation::fitness(Student* student, Utilities::LearningProfile profile,
 		Utilities::LearningProfile pastProfile = pastModelncsCopy[i].currProfile;
 		double distance = profile.distanceBetween(pastProfile);
 
-		predictedModel.ability += pastModelncsCopy[i].ability * (1 - distance) / (double) (pastModelncsCopySize);
-		predictedModel.engagement += pastModelncsCopy[i].engagement * (1 - distance) / (double)(pastModelncsCopySize);
+		predictedModel.ability += pastModelncsCopy[i].ability* (1 - distance) / (double) (pastModelncsCopySize); //* (1 - distance) 
+		predictedModel.engagement += pastModelncsCopy[i].engagement* (1 - distance) / (double)(pastModelncsCopySize); //* (1 - distance)
 	}
 
-	return 0.5*predictedModel.ability + 0.5*predictedModel.engagement;
+	return 0.5*(predictedModel.ability) + 0.5*predictedModel.engagement; //ability must be normalized to [0,1]
 }
 
 AdaptationMechanic Adaptation::generateMechanic(Utilities::LearningProfile bestConfigProfile) {

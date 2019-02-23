@@ -43,7 +43,8 @@ private:
 	StudentModelGrid pastModelIncreasesGrid;
 
 	StudentModel currModel;
-	
+
+
 
 public:
 
@@ -66,4 +67,8 @@ public:
 
 	void simulateReaction(int currIteration);
 	void calcReaction(double* engagement, double* ability, Utilities::LearningProfile* profile, int currIteration);
+
+
+
+	StudentModel currModelIncreases; //for displaying in the chart
 };
