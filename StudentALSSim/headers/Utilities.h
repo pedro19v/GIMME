@@ -5,6 +5,7 @@
 
 #define _USE_MATH_DEFINES
 
+struct AdaptationTask; //forward declaration
 
 class Utilities {
 public:
@@ -98,6 +99,11 @@ public:
 	double static randIntBetween(int min, int max) {
 		return randIntBetween(defaultRandomSeed, min, max);
 	}
+
+	/*template <class c>
+	void static randShuffle(std::vector<c> vector) {
+		shuffle(vector.begin(), vector.end(), uniformDistributionInt);
+	}*/
 
 	double static normalRandom(int seed, double mu, double var) {
 		static std::default_random_engine normalRandomGenerator (seed);

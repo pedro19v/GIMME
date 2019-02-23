@@ -1,0 +1,4167 @@
+promote on students:
+Number: 18, Name: a
+Number: 8, Name: a
+Number: 17, Name: a
+Number: 12, Name: a
+, the following tasks:
+collab1
+comp4
+comp7
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 3, Name: a
+Number: 21, Name: a
+Number: 9, Name: a
+Number: 14, Name: a
+, the following tasks:
+collab7
+collab5
+comp7
+self1
+self5
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 20, Name: a
+Number: 1, Name: a
+Number: 2, Name: a
+Number: 13, Name: a
+, the following tasks:
+collab2
+collab9
+comp1
+self1
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 22, Name: a
+Number: 19, Name: a
+, the following tasks:
+collab5
+comp2
+self2
+self9
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 15, Name: a
+Number: 4, Name: a
+Number: 16, Name: a
+Number: 6, Name: a
+Number: 11, Name: a
+, the following tasks:
+collab8
+collab1
+comp2
+comp5
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 0, Name: a
+Number: 5, Name: a
+Number: 10, Name: a
+Number: 7, Name: a
+, the following tasks:
+collab2
+comp3
+comp1
+self1
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 1, Name: a
+Number: 16, Name: a
+, the following tasks:
+collab1
+comp2
+comp8
+self5
+self5
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 15, Name: a
+Number: 2, Name: a
+Number: 13, Name: a
+, the following tasks:
+collab5
+collab9
+comp6
+self4
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 11, Name: a
+Number: 5, Name: a
+, the following tasks:
+collab1
+collab5
+comp10
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 10, Name: a
+Number: 6, Name: a
+Number: 22, Name: a
+Number: 14, Name: a
+Number: 18, Name: a
+, the following tasks:
+collab10
+comp1
+comp3
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 4, Name: a
+Number: 12, Name: a
+, the following tasks:
+collab8
+comp1
+comp2
+self9
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 0, Name: a
+Number: 21, Name: a
+, the following tasks:
+collab6
+comp10
+comp8
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 20, Name: a
+Number: 7, Name: a
+, the following tasks:
+collab6
+collab5
+comp2
+comp1
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 9, Name: a
+Number: 17, Name: a
+Number: 3, Name: a
+, the following tasks:
+collab3
+collab10
+comp3
+comp1
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 19, Name: a
+Number: 8, Name: a
+, the following tasks:
+collab2
+collab10
+comp4
+self5
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 4, Name: a
+Number: 17, Name: a
+, the following tasks:
+collab10
+collab10
+comp9
+self1
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 22, Name: a
+Number: 18, Name: a
+Number: 0, Name: a
+, the following tasks:
+collab6
+collab8
+collab1
+comp6
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 21, Name: a
+Number: 7, Name: a
+Number: 14, Name: a
+, the following tasks:
+collab4
+comp10
+comp2
+self4
+self1
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 16, Name: a
+Number: 8, Name: a
+, the following tasks:
+collab5
+comp5
+self7
+self1
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 9, Name: a
+Number: 20, Name: a
+Number: 6, Name: a
+, the following tasks:
+collab6
+collab8
+comp9
+self7
+self3
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 13, Name: a
+Number: 10, Name: a
+, the following tasks:
+collab6
+collab3
+comp5
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 15, Name: a
+Number: 1, Name: a
+Number: 11, Name: a
+, the following tasks:
+collab10
+comp4
+comp10
+self1
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 12, Name: a
+Number: 2, Name: a
+, the following tasks:
+collab3
+collab7
+comp1
+self7
+self7
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 5, Name: a
+Number: 3, Name: a
+Number: 19, Name: a
+, the following tasks:
+collab10
+collab9
+comp4
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 12, Name: a
+Number: 1, Name: a
+Number: 19, Name: a
+, the following tasks:
+collab9
+comp5
+comp1
+self4
+self3
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 21, Name: a
+Number: 11, Name: a
+Number: 14, Name: a
+Number: 20, Name: a
+Number: 4, Name: a
+, the following tasks:
+collab6
+collab8
+comp1
+self5
+self3
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 17, Name: a
+Number: 16, Name: a
+Number: 7, Name: a
+Number: 3, Name: a
+Number: 2, Name: a
+, the following tasks:
+collab2
+collab4
+comp9
+self8
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 15, Name: a
+Number: 9, Name: a
+Number: 5, Name: a
+Number: 10, Name: a
+, the following tasks:
+collab10
+comp8
+comp6
+self5
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 6, Name: a
+Number: 22, Name: a
+Number: 8, Name: a
+Number: 18, Name: a
+, the following tasks:
+collab4
+comp4
+comp2
+self5
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 0, Name: a
+Number: 13, Name: a
+, the following tasks:
+collab6
+collab1
+comp9
+self9
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 12, Name: a
+Number: 15, Name: a
+Number: 16, Name: a
+, the following tasks:
+collab5
+comp8
+self2
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 1, Name: a
+Number: 3, Name: a
+Number: 22, Name: a
+, the following tasks:
+collab7
+collab9
+collab6
+comp9
+self3
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 17, Name: a
+Number: 14, Name: a
+, the following tasks:
+collab4
+collab4
+comp6
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 0, Name: a
+Number: 4, Name: a
+Number: 7, Name: a
+, the following tasks:
+collab2
+comp10
+comp3
+comp3
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 9, Name: a
+Number: 20, Name: a
+, the following tasks:
+collab10
+comp8
+comp2
+self6
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 2, Name: a
+Number: 5, Name: a
+Number: 11, Name: a
+, the following tasks:
+collab8
+collab3
+comp7
+comp10
+self9
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 13, Name: a
+Number: 8, Name: a
+, the following tasks:
+collab3
+collab6
+comp10
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 10, Name: a
+Number: 6, Name: a
+, the following tasks:
+collab10
+comp1
+comp6
+comp7
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 21, Name: a
+Number: 19, Name: a
+Number: 18, Name: a
+, the following tasks:
+collab10
+comp10
+self4
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 1, Name: a
+Number: 5, Name: a
+, the following tasks:
+collab1
+collab1
+comp6
+comp8
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 18, Name: a
+Number: 19, Name: a
+, the following tasks:
+collab6
+comp4
+comp10
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 8, Name: a
+Number: 16, Name: a
+, the following tasks:
+collab6
+collab9
+comp4
+self10
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 20, Name: a
+Number: 15, Name: a
+, the following tasks:
+collab7
+collab5
+comp2
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 14, Name: a
+Number: 17, Name: a
+, the following tasks:
+collab3
+comp6
+comp9
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 13, Name: a
+Number: 3, Name: a
+, the following tasks:
+collab5
+comp9
+comp4
+self6
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 11, Name: a
+Number: 21, Name: a
+, the following tasks:
+collab4
+collab8
+comp7
+comp2
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 4, Name: a
+Number: 0, Name: a
+, the following tasks:
+collab7
+collab5
+comp6
+self1
+self1
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 22, Name: a
+Number: 9, Name: a
+, the following tasks:
+collab2
+collab1
+comp3
+self9
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 7, Name: a
+Number: 2, Name: a
+, the following tasks:
+collab2
+comp8
+self5
+self7
+self5
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 12, Name: a
+Number: 6, Name: a
+Number: 10, Name: a
+, the following tasks:
+collab4
+collab9
+comp10
+self1
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 20, Name: a
+Number: 5, Name: a
+Number: 14, Name: a
+Number: 19, Name: a
+, the following tasks:
+collab5
+comp8
+self1
+self7
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 1, Name: a
+Number: 2, Name: a
+Number: 10, Name: a
+Number: 7, Name: a
+Number: 0, Name: a
+, the following tasks:
+collab10
+comp9
+comp6
+self6
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 16, Name: a
+Number: 6, Name: a
+Number: 12, Name: a
+Number: 17, Name: a
+Number: 9, Name: a
+, the following tasks:
+collab1
+collab7
+comp4
+self7
+self9
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 22, Name: a
+Number: 4, Name: a
+Number: 13, Name: a
+Number: 11, Name: a
+Number: 3, Name: a
+, the following tasks:
+collab10
+collab10
+comp3
+self8
+self3
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 21, Name: a
+Number: 8, Name: a
+Number: 15, Name: a
+Number: 18, Name: a
+, the following tasks:
+collab2
+collab4
+comp9
+comp7
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 1, Name: a
+Number: 6, Name: a
+, the following tasks:
+collab10
+collab10
+comp8
+comp10
+self7
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 18, Name: a
+Number: 20, Name: a
+Number: 11, Name: a
+, the following tasks:
+collab9
+comp3
+comp5
+self3
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 7, Name: a
+Number: 14, Name: a
+, the following tasks:
+collab2
+collab10
+comp10
+self7
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 17, Name: a
+Number: 9, Name: a
+, the following tasks:
+collab2
+collab1
+comp3
+self3
+self5
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 21, Name: a
+Number: 19, Name: a
+, the following tasks:
+collab6
+collab3
+comp3
+self7
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 3, Name: a
+Number: 15, Name: a
+, the following tasks:
+collab9
+comp2
+self3
+self1
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 16, Name: a
+Number: 2, Name: a
+, the following tasks:
+collab7
+collab8
+comp2
+self8
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 22, Name: a
+Number: 10, Name: a
+Number: 5, Name: a
+Number: 12, Name: a
+, the following tasks:
+collab6
+comp5
+comp3
+self1
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 0, Name: a
+Number: 4, Name: a
+, the following tasks:
+collab7
+comp6
+comp8
+self4
+self1
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 13, Name: a
+Number: 8, Name: a
+, the following tasks:
+collab4
+comp3
+comp9
+self9
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 9, Name: a
+Number: 8, Name: a
+Number: 22, Name: a
+Number: 12, Name: a
+, the following tasks:
+collab1
+collab6
+comp1
+comp9
+self3
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 4, Name: a
+Number: 13, Name: a
+, the following tasks:
+collab1
+collab8
+comp8
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 17, Name: a
+Number: 5, Name: a
+Number: 0, Name: a
+, the following tasks:
+collab1
+comp4
+comp9
+self5
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 10, Name: a
+Number: 20, Name: a
+Number: 7, Name: a
+Number: 1, Name: a
+, the following tasks:
+collab10
+comp6
+comp5
+self8
+self3
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 6, Name: a
+Number: 15, Name: a
+, the following tasks:
+collab3
+comp2
+comp1
+self8
+self1
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 16, Name: a
+Number: 3, Name: a
+Number: 19, Name: a
+Number: 14, Name: a
+Number: 2, Name: a
+, the following tasks:
+collab6
+comp8
+comp5
+self5
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 21, Name: a
+Number: 11, Name: a
+Number: 18, Name: a
+, the following tasks:
+collab1
+comp9
+comp4
+self3
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 0, Name: a
+Number: 14, Name: a
+Number: 1, Name: a
+, the following tasks:
+collab6
+comp10
+self8
+self1
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 2, Name: a
+Number: 15, Name: a
+Number: 8, Name: a
+Number: 9, Name: a
+, the following tasks:
+collab8
+comp10
+comp1
+self9
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 13, Name: a
+Number: 20, Name: a
+Number: 6, Name: a
+Number: 4, Name: a
+Number: 12, Name: a
+, the following tasks:
+collab2
+collab9
+comp2
+comp5
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 21, Name: a
+Number: 17, Name: a
+Number: 3, Name: a
+, the following tasks:
+collab4
+comp1
+self7
+self5
+self9
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 19, Name: a
+Number: 22, Name: a
+Number: 10, Name: a
+Number: 18, Name: a
+, the following tasks:
+collab9
+collab7
+comp8
+comp4
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 11, Name: a
+Number: 5, Name: a
+Number: 16, Name: a
+Number: 7, Name: a
+, the following tasks:
+collab8
+comp6
+comp6
+self4
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 3, Name: a
+Number: 13, Name: a
+, the following tasks:
+collab4
+comp8
+comp3
+self2
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 4, Name: a
+Number: 6, Name: a
+, the following tasks:
+collab7
+collab10
+comp3
+self3
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 17, Name: a
+Number: 8, Name: a
+, the following tasks:
+collab8
+comp10
+self5
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 1, Name: a
+Number: 12, Name: a
+, the following tasks:
+collab1
+collab3
+comp10
+self7
+self1
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 18, Name: a
+Number: 2, Name: a
+, the following tasks:
+collab2
+collab9
+comp6
+comp7
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 9, Name: a
+Number: 10, Name: a
+, the following tasks:
+collab3
+comp1
+comp4
+self2
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 22, Name: a
+Number: 20, Name: a
+, the following tasks:
+collab2
+comp9
+self5
+self9
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 16, Name: a
+Number: 7, Name: a
+Number: 5, Name: a
+, the following tasks:
+collab6
+comp9
+comp8
+self4
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 0, Name: a
+Number: 21, Name: a
+, the following tasks:
+collab5
+comp7
+comp10
+self5
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 14, Name: a
+Number: 15, Name: a
+, the following tasks:
+collab7
+comp9
+comp4
+self4
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 19, Name: a
+Number: 11, Name: a
+, the following tasks:
+collab6
+collab6
+collab5
+comp4
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 2, Name: a
+Number: 1, Name: a
+Number: 7, Name: a
+Number: 21, Name: a
+, the following tasks:
+collab3
+comp6
+self2
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 15, Name: a
+Number: 6, Name: a
+Number: 12, Name: a
+Number: 9, Name: a
+, the following tasks:
+collab3
+comp10
+self3
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 3, Name: a
+Number: 11, Name: a
+Number: 19, Name: a
+Number: 18, Name: a
+Number: 0, Name: a
+, the following tasks:
+collab4
+collab5
+comp6
+comp3
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 13, Name: a
+Number: 5, Name: a
+Number: 20, Name: a
+, the following tasks:
+collab5
+comp1
+comp8
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 10, Name: a
+Number: 8, Name: a
+Number: 16, Name: a
+, the following tasks:
+collab9
+collab8
+comp8
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 22, Name: a
+Number: 4, Name: a
+Number: 17, Name: a
+Number: 14, Name: a
+, the following tasks:
+collab4
+comp2
+comp7
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 17, Name: a
+Number: 4, Name: a
+Number: 10, Name: a
+Number: 20, Name: a
+Number: 8, Name: a
+, the following tasks:
+collab8
+comp6
+comp2
+self6
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 12, Name: a
+Number: 14, Name: a
+Number: 7, Name: a
+, the following tasks:
+collab7
+comp2
+comp5
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 6, Name: a
+Number: 21, Name: a
+Number: 9, Name: a
+, the following tasks:
+collab2
+comp5
+self8
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 3, Name: a
+Number: 16, Name: a
+Number: 11, Name: a
+Number: 1, Name: a
+, the following tasks:
+collab2
+collab7
+comp1
+self6
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 18, Name: a
+Number: 0, Name: a
+, the following tasks:
+collab2
+comp2
+comp3
+self8
+self1
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 15, Name: a
+Number: 2, Name: a
+, the following tasks:
+collab5
+comp7
+comp8
+comp10
+self9
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 13, Name: a
+Number: 22, Name: a
+, the following tasks:
+collab4
+comp6
+comp8
+comp2
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 5, Name: a
+Number: 19, Name: a
+, the following tasks:
+collab9
+comp6
+comp5
+self5
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 12, Name: a
+Number: 1, Name: a
+, the following tasks:
+collab2
+collab5
+collab5
+comp7
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 20, Name: a
+Number: 7, Name: a
+Number: 2, Name: a
+Number: 17, Name: a
+, the following tasks:
+collab6
+comp9
+self1
+self7
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 11, Name: a
+Number: 0, Name: a
+Number: 13, Name: a
+Number: 3, Name: a
+Number: 18, Name: a
+, the following tasks:
+collab9
+collab9
+comp7
+comp3
+self3
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 14, Name: a
+Number: 15, Name: a
+Number: 9, Name: a
+Number: 19, Name: a
+Number: 5, Name: a
+, the following tasks:
+collab4
+comp3
+comp7
+comp3
+self3
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 21, Name: a
+Number: 8, Name: a
+Number: 16, Name: a
+Number: 10, Name: a
+, the following tasks:
+collab4
+collab9
+comp4
+comp10
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 4, Name: a
+Number: 6, Name: a
+Number: 22, Name: a
+, the following tasks:
+collab1
+comp10
+comp4
+comp4
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 14, Name: a
+Number: 7, Name: a
+Number: 11, Name: a
+, the following tasks:
+collab10
+comp7
+comp8
+self7
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 17, Name: a
+Number: 18, Name: a
+, the following tasks:
+collab2
+comp3
+comp6
+self5
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 6, Name: a
+Number: 8, Name: a
+, the following tasks:
+collab4
+collab5
+comp7
+self5
+self7
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 19, Name: a
+Number: 0, Name: a
+Number: 9, Name: a
+, the following tasks:
+collab7
+comp1
+comp2
+comp2
+self9
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 4, Name: a
+Number: 20, Name: a
+Number: 1, Name: a
+, the following tasks:
+collab10
+comp7
+comp5
+self9
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 22, Name: a
+Number: 12, Name: a
+, the following tasks:
+collab5
+collab1
+comp2
+self6
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 13, Name: a
+Number: 16, Name: a
+, the following tasks:
+collab3
+collab8
+collab3
+comp3
+self1
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 3, Name: a
+Number: 21, Name: a
+, the following tasks:
+collab10
+collab4
+comp9
+comp7
+self5
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 15, Name: a
+Number: 10, Name: a
+, the following tasks:
+collab1
+comp4
+comp10
+self2
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 2, Name: a
+Number: 5, Name: a
+, the following tasks:
+collab8
+collab9
+comp3
+self3
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 8, Name: a
+Number: 6, Name: a
+Number: 20, Name: a
+Number: 4, Name: a
+Number: 19, Name: a
+, the following tasks:
+collab10
+comp4
+self7
+self5
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 13, Name: a
+Number: 21, Name: a
+Number: 1, Name: a
+Number: 10, Name: a
+, the following tasks:
+collab7
+comp3
+comp2
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 5, Name: a
+Number: 11, Name: a
+, the following tasks:
+collab10
+comp6
+comp7
+self6
+self1
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 22, Name: a
+Number: 2, Name: a
+, the following tasks:
+collab8
+collab1
+comp7
+self2
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 16, Name: a
+Number: 9, Name: a
+, the following tasks:
+collab9
+collab4
+comp3
+self3
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 12, Name: a
+Number: 7, Name: a
+Number: 18, Name: a
+, the following tasks:
+collab6
+comp5
+comp1
+self8
+self1
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 14, Name: a
+Number: 3, Name: a
+Number: 0, Name: a
+Number: 17, Name: a
+Number: 15, Name: a
+, the following tasks:
+collab8
+comp8
+self10
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 5, Name: a
+Number: 9, Name: a
+Number: 10, Name: a
+Number: 3, Name: a
+, the following tasks:
+collab10
+comp7
+self9
+self7
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 0, Name: a
+Number: 21, Name: a
+, the following tasks:
+collab1
+collab1
+comp1
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 16, Name: a
+Number: 12, Name: a
+, the following tasks:
+collab7
+comp1
+comp9
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 17, Name: a
+Number: 18, Name: a
+Number: 11, Name: a
+Number: 6, Name: a
+, the following tasks:
+collab10
+collab1
+comp3
+self9
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 7, Name: a
+Number: 1, Name: a
+Number: 14, Name: a
+, the following tasks:
+collab1
+comp10
+self3
+self1
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 22, Name: a
+Number: 2, Name: a
+, the following tasks:
+collab3
+collab7
+comp7
+self10
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 8, Name: a
+Number: 13, Name: a
+Number: 20, Name: a
+Number: 4, Name: a
+, the following tasks:
+collab2
+collab2
+comp10
+comp8
+self1
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 15, Name: a
+Number: 19, Name: a
+, the following tasks:
+collab6
+collab5
+comp1
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 13, Name: a
+Number: 20, Name: a
+, the following tasks:
+collab2
+comp10
+self4
+self5
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 9, Name: a
+Number: 5, Name: a
+Number: 16, Name: a
+Number: 17, Name: a
+, the following tasks:
+collab8
+collab1
+comp5
+comp8
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 0, Name: a
+Number: 10, Name: a
+, the following tasks:
+collab2
+collab2
+collab6
+comp6
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 2, Name: a
+Number: 14, Name: a
+, the following tasks:
+collab1
+collab8
+comp5
+comp4
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 11, Name: a
+Number: 18, Name: a
+Number: 21, Name: a
+Number: 19, Name: a
+, the following tasks:
+collab10
+collab1
+comp2
+self3
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 15, Name: a
+Number: 12, Name: a
+Number: 3, Name: a
+Number: 22, Name: a
+, the following tasks:
+collab8
+comp7
+comp5
+self8
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 1, Name: a
+Number: 6, Name: a
+Number: 8, Name: a
+, the following tasks:
+collab8
+collab7
+comp1
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 4, Name: a
+Number: 7, Name: a
+, the following tasks:
+collab6
+collab9
+comp10
+comp10
+self7
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 1, Name: a
+Number: 12, Name: a
+Number: 5, Name: a
+Number: 2, Name: a
+, the following tasks:
+collab10
+collab3
+comp6
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 7, Name: a
+Number: 15, Name: a
+Number: 13, Name: a
+, the following tasks:
+collab7
+comp5
+comp10
+self5
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 9, Name: a
+Number: 16, Name: a
+Number: 6, Name: a
+, the following tasks:
+collab2
+collab4
+comp1
+self2
+self3
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 3, Name: a
+Number: 21, Name: a
+Number: 22, Name: a
+, the following tasks:
+collab8
+comp4
+self9
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 11, Name: a
+Number: 20, Name: a
+, the following tasks:
+collab7
+collab7
+comp6
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 14, Name: a
+Number: 17, Name: a
+Number: 18, Name: a
+, the following tasks:
+collab10
+comp3
+comp6
+self3
+self7
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 4, Name: a
+Number: 19, Name: a
+Number: 8, Name: a
+, the following tasks:
+collab7
+collab8
+comp10
+self9
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 10, Name: a
+Number: 0, Name: a
+, the following tasks:
+collab3
+collab7
+comp9
+self1
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 3, Name: a
+Number: 0, Name: a
+Number: 10, Name: a
+Number: 4, Name: a
+, the following tasks:
+collab2
+collab9
+comp9
+comp4
+self9
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 11, Name: a
+Number: 19, Name: a
+, the following tasks:
+collab1
+collab7
+comp7
+self4
+self5
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 20, Name: a
+Number: 21, Name: a
+, the following tasks:
+collab4
+collab1
+comp6
+self7
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 13, Name: a
+Number: 6, Name: a
+Number: 9, Name: a
+, the following tasks:
+collab7
+collab3
+comp4
+comp8
+self7
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 1, Name: a
+Number: 12, Name: a
+, the following tasks:
+collab1
+comp5
+comp2
+self8
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 16, Name: a
+Number: 22, Name: a
+Number: 18, Name: a
+Number: 17, Name: a
+Number: 7, Name: a
+, the following tasks:
+collab5
+collab8
+comp4
+comp2
+self9
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 5, Name: a
+Number: 8, Name: a
+Number: 14, Name: a
+, the following tasks:
+collab8
+comp5
+comp8
+comp4
+self5
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 15, Name: a
+Number: 2, Name: a
+, the following tasks:
+collab2
+comp6
+self2
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 15, Name: a
+Number: 9, Name: a
+Number: 17, Name: a
+, the following tasks:
+collab10
+comp3
+self9
+self2
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 2, Name: a
+Number: 4, Name: a
+Number: 13, Name: a
+, the following tasks:
+collab7
+comp7
+self8
+self10
+self1
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 1, Name: a
+Number: 14, Name: a
+Number: 8, Name: a
+, the following tasks:
+collab3
+comp2
+comp1
+self3
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 18, Name: a
+Number: 7, Name: a
+Number: 19, Name: a
+, the following tasks:
+collab6
+collab4
+comp2
+self5
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 21, Name: a
+Number: 0, Name: a
+, the following tasks:
+collab8
+collab10
+comp5
+self5
+self5
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 10, Name: a
+Number: 11, Name: a
+, the following tasks:
+collab1
+comp1
+comp8
+self7
+self1
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 20, Name: a
+Number: 22, Name: a
+, the following tasks:
+collab8
+comp5
+self2
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 5, Name: a
+Number: 3, Name: a
+, the following tasks:
+collab6
+collab5
+comp5
+self7
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 16, Name: a
+Number: 12, Name: a
+Number: 6, Name: a
+, the following tasks:
+collab10
+collab7
+comp3
+comp10
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 14, Name: a
+Number: 2, Name: a
+, the following tasks:
+collab1
+collab1
+comp5
+self9
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 22, Name: a
+Number: 13, Name: a
+, the following tasks:
+collab1
+collab8
+comp5
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 21, Name: a
+Number: 16, Name: a
+, the following tasks:
+collab1
+comp8
+comp2
+self3
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 1, Name: a
+Number: 9, Name: a
+, the following tasks:
+collab7
+comp5
+comp5
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 15, Name: a
+Number: 19, Name: a
+, the following tasks:
+collab5
+collab1
+comp6
+self1
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 3, Name: a
+Number: 10, Name: a
+, the following tasks:
+collab5
+collab3
+comp4
+self1
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 18, Name: a
+Number: 5, Name: a
+Number: 0, Name: a
+, the following tasks:
+collab5
+comp1
+comp6
+self3
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 17, Name: a
+Number: 8, Name: a
+, the following tasks:
+collab2
+collab8
+comp8
+self10
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 7, Name: a
+Number: 20, Name: a
+, the following tasks:
+collab4
+collab6
+collab6
+comp9
+self9
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 4, Name: a
+Number: 6, Name: a
+, the following tasks:
+collab10
+collab6
+collab7
+comp8
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 11, Name: a
+Number: 12, Name: a
+, the following tasks:
+collab3
+comp5
+comp2
+self2
+self3
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 11, Name: a
+Number: 0, Name: a
+Number: 4, Name: a
+Number: 14, Name: a
+Number: 10, Name: a
+, the following tasks:
+collab2
+comp8
+comp7
+comp7
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 18, Name: a
+Number: 19, Name: a
+Number: 13, Name: a
+, the following tasks:
+collab9
+collab1
+comp2
+comp2
+self7
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 3, Name: a
+Number: 2, Name: a
+Number: 6, Name: a
+Number: 22, Name: a
+Number: 5, Name: a
+, the following tasks:
+collab3
+comp4
+comp10
+self5
+self3
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 1, Name: a
+Number: 7, Name: a
+Number: 17, Name: a
+Number: 9, Name: a
+Number: 20, Name: a
+, the following tasks:
+collab4
+collab8
+collab7
+comp3
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 16, Name: a
+Number: 21, Name: a
+Number: 8, Name: a
+Number: 12, Name: a
+Number: 15, Name: a
+, the following tasks:
+collab10
+comp9
+self7
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 6, Name: a
+Number: 4, Name: a
+Number: 21, Name: a
+Number: 2, Name: a
+Number: 8, Name: a
+, the following tasks:
+collab9
+comp4
+comp7
+self2
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 22, Name: a
+Number: 5, Name: a
+Number: 15, Name: a
+Number: 9, Name: a
+, the following tasks:
+collab7
+collab4
+comp3
+self10
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 7, Name: a
+Number: 16, Name: a
+Number: 18, Name: a
+Number: 0, Name: a
+, the following tasks:
+collab9
+comp6
+comp2
+self1
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 1, Name: a
+Number: 13, Name: a
+Number: 11, Name: a
+Number: 20, Name: a
+Number: 17, Name: a
+, the following tasks:
+collab3
+comp7
+comp4
+comp10
+self9
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 19, Name: a
+Number: 12, Name: a
+Number: 3, Name: a
+Number: 14, Name: a
+Number: 10, Name: a
+, the following tasks:
+collab9
+collab9
+comp6
+self6
+self3
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 9, Name: a
+Number: 16, Name: a
+Number: 20, Name: a
+, the following tasks:
+collab1
+comp4
+comp1
+self3
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 8, Name: a
+Number: 15, Name: a
+Number: 19, Name: a
+, the following tasks:
+collab2
+collab9
+comp8
+self7
+self5
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 12, Name: a
+Number: 13, Name: a
+Number: 1, Name: a
+Number: 4, Name: a
+, the following tasks:
+collab1
+collab9
+comp9
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 7, Name: a
+Number: 2, Name: a
+, the following tasks:
+collab6
+collab1
+comp6
+self7
+self7
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 17, Name: a
+Number: 22, Name: a
+, the following tasks:
+collab4
+comp4
+comp5
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 10, Name: a
+Number: 11, Name: a
+Number: 3, Name: a
+, the following tasks:
+collab10
+comp1
+self5
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 21, Name: a
+Number: 6, Name: a
+Number: 0, Name: a
+, the following tasks:
+collab9
+comp2
+comp6
+self10
+self9
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 18, Name: a
+Number: 5, Name: a
+Number: 14, Name: a
+, the following tasks:
+collab10
+collab7
+collab5
+comp9
+self9
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 7, Name: a
+Number: 5, Name: a
+Number: 1, Name: a
+, the following tasks:
+collab2
+collab5
+comp9
+self10
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 19, Name: a
+Number: 0, Name: a
+, the following tasks:
+collab7
+comp5
+self2
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 15, Name: a
+Number: 14, Name: a
+Number: 2, Name: a
+Number: 3, Name: a
+, the following tasks:
+collab5
+collab7
+comp1
+self8
+self1
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 17, Name: a
+Number: 22, Name: a
+Number: 6, Name: a
+Number: 13, Name: a
+, the following tasks:
+collab4
+comp6
+self1
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 10, Name: a
+Number: 4, Name: a
+Number: 18, Name: a
+Number: 21, Name: a
+, the following tasks:
+collab6
+comp2
+comp5
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 11, Name: a
+Number: 12, Name: a
+Number: 8, Name: a
+, the following tasks:
+collab6
+collab6
+comp4
+comp8
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 16, Name: a
+Number: 9, Name: a
+Number: 20, Name: a
+, the following tasks:
+collab2
+comp9
+self2
+self5
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 6, Name: a
+Number: 16, Name: a
+, the following tasks:
+collab10
+comp2
+comp8
+self8
+self9
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 5, Name: a
+Number: 7, Name: a
+Number: 13, Name: a
+, the following tasks:
+collab7
+comp6
+comp5
+self1
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 15, Name: a
+Number: 2, Name: a
+, the following tasks:
+collab10
+comp1
+self7
+self5
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 9, Name: a
+Number: 4, Name: a
+Number: 8, Name: a
+Number: 21, Name: a
+Number: 3, Name: a
+, the following tasks:
+collab2
+comp7
+comp9
+self3
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 19, Name: a
+Number: 17, Name: a
+Number: 0, Name: a
+Number: 22, Name: a
+Number: 11, Name: a
+, the following tasks:
+collab1
+collab5
+comp7
+comp9
+self7
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 14, Name: a
+Number: 12, Name: a
+, the following tasks:
+collab7
+comp4
+self7
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 10, Name: a
+Number: 1, Name: a
+, the following tasks:
+collab5
+collab6
+comp6
+self5
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 20, Name: a
+Number: 18, Name: a
+, the following tasks:
+collab9
+comp1
+comp2
+self3
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 2, Name: a
+Number: 11, Name: a
+Number: 7, Name: a
+Number: 4, Name: a
+Number: 5, Name: a
+, the following tasks:
+collab10
+comp7
+comp3
+self9
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 20, Name: a
+Number: 8, Name: a
+Number: 18, Name: a
+Number: 6, Name: a
+Number: 16, Name: a
+, the following tasks:
+collab1
+comp9
+comp7
+self8
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 13, Name: a
+Number: 21, Name: a
+Number: 0, Name: a
+Number: 9, Name: a
+Number: 10, Name: a
+, the following tasks:
+collab4
+comp7
+self8
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 12, Name: a
+Number: 19, Name: a
+Number: 17, Name: a
+, the following tasks:
+collab6
+comp7
+comp2
+self7
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 22, Name: a
+Number: 1, Name: a
+Number: 14, Name: a
+Number: 15, Name: a
+Number: 3, Name: a
+, the following tasks:
+collab5
+collab3
+comp10
+comp5
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 5, Name: a
+Number: 15, Name: a
+, the following tasks:
+collab7
+comp2
+comp1
+self3
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 8, Name: a
+Number: 6, Name: a
+, the following tasks:
+collab5
+comp6
+comp8
+self10
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 3, Name: a
+Number: 18, Name: a
+, the following tasks:
+collab9
+comp5
+self3
+self9
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 4, Name: a
+Number: 19, Name: a
+Number: 1, Name: a
+, the following tasks:
+collab6
+comp5
+comp5
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 9, Name: a
+Number: 11, Name: a
+, the following tasks:
+collab10
+collab4
+comp4
+self7
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 20, Name: a
+Number: 7, Name: a
+, the following tasks:
+collab4
+comp9
+comp6
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 17, Name: a
+Number: 16, Name: a
+, the following tasks:
+collab5
+collab4
+comp6
+self3
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 10, Name: a
+Number: 21, Name: a
+, the following tasks:
+collab3
+collab6
+comp2
+comp7
+self1
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 13, Name: a
+Number: 14, Name: a
+, the following tasks:
+collab2
+collab9
+comp9
+comp9
+self5
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 22, Name: a
+Number: 12, Name: a
+, the following tasks:
+collab10
+collab2
+comp4
+comp10
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 2, Name: a
+Number: 0, Name: a
+, the following tasks:
+collab1
+comp10
+comp1
+self3
+self9
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 0, Name: a
+Number: 11, Name: a
+, the following tasks:
+collab4
+collab5
+comp6
+self8
+self1
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 19, Name: a
+Number: 4, Name: a
+, the following tasks:
+collab2
+collab8
+comp9
+self5
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 18, Name: a
+Number: 10, Name: a
+, the following tasks:
+collab10
+collab5
+comp8
+self8
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 17, Name: a
+Number: 1, Name: a
+, the following tasks:
+collab4
+collab9
+comp3
+self10
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 7, Name: a
+Number: 3, Name: a
+Number: 6, Name: a
+, the following tasks:
+collab2
+collab6
+collab10
+comp2
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 13, Name: a
+Number: 14, Name: a
+, the following tasks:
+collab9
+comp1
+comp5
+comp3
+self7
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 9, Name: a
+Number: 16, Name: a
+Number: 5, Name: a
+, the following tasks:
+collab4
+comp8
+comp4
+self1
+self7
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 2, Name: a
+Number: 20, Name: a
+Number: 8, Name: a
+, the following tasks:
+collab10
+collab9
+comp3
+comp7
+self5
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 15, Name: a
+Number: 21, Name: a
+, the following tasks:
+collab9
+collab10
+comp10
+comp3
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 12, Name: a
+Number: 22, Name: a
+, the following tasks:
+collab9
+collab4
+comp9
+self5
+self7
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 20, Name: a
+Number: 3, Name: a
+Number: 11, Name: a
+Number: 9, Name: a
+Number: 12, Name: a
+, the following tasks:
+collab10
+comp8
+self3
+self9
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 14, Name: a
+Number: 15, Name: a
+Number: 17, Name: a
+, the following tasks:
+collab4
+comp4
+comp6
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 16, Name: a
+Number: 6, Name: a
+Number: 19, Name: a
+Number: 22, Name: a
+Number: 1, Name: a
+, the following tasks:
+collab3
+collab10
+comp2
+self2
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 0, Name: a
+Number: 4, Name: a
+, the following tasks:
+collab9
+collab7
+comp8
+comp10
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 7, Name: a
+Number: 13, Name: a
+Number: 5, Name: a
+Number: 21, Name: a
+Number: 2, Name: a
+, the following tasks:
+collab3
+collab6
+comp3
+comp3
+self9
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 8, Name: a
+Number: 10, Name: a
+Number: 18, Name: a
+, the following tasks:
+collab9
+comp1
+self10
+self7
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 3, Name: a
+Number: 22, Name: a
+Number: 0, Name: a
+, the following tasks:
+collab10
+collab4
+comp3
+self8
+self1
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 4, Name: a
+Number: 17, Name: a
+Number: 13, Name: a
+Number: 15, Name: a
+, the following tasks:
+collab2
+comp4
+comp1
+self9
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 1, Name: a
+Number: 19, Name: a
+Number: 16, Name: a
+Number: 20, Name: a
+, the following tasks:
+collab4
+collab3
+comp3
+self1
+self3
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 5, Name: a
+Number: 14, Name: a
+, the following tasks:
+collab8
+comp8
+self9
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 6, Name: a
+Number: 10, Name: a
+Number: 9, Name: a
+Number: 7, Name: a
+Number: 8, Name: a
+, the following tasks:
+collab10
+collab5
+comp7
+self5
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 11, Name: a
+Number: 21, Name: a
+, the following tasks:
+collab5
+collab5
+comp10
+self8
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 18, Name: a
+Number: 2, Name: a
+Number: 12, Name: a
+, the following tasks:
+collab9
+collab1
+comp8
+self4
+self5
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 8, Name: a
+Number: 9, Name: a
+, the following tasks:
+collab10
+comp9
+comp8
+self3
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 7, Name: a
+Number: 21, Name: a
+Number: 19, Name: a
+Number: 18, Name: a
+Number: 5, Name: a
+, the following tasks:
+collab3
+collab4
+comp7
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 2, Name: a
+Number: 22, Name: a
+Number: 13, Name: a
+Number: 15, Name: a
+Number: 0, Name: a
+, the following tasks:
+collab8
+collab4
+comp8
+self8
+self5
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 1, Name: a
+Number: 12, Name: a
+, the following tasks:
+collab10
+collab4
+comp7
+comp2
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 3, Name: a
+Number: 20, Name: a
+Number: 14, Name: a
+Number: 4, Name: a
+Number: 10, Name: a
+, the following tasks:
+collab5
+collab2
+comp8
+comp4
+self9
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 11, Name: a
+Number: 17, Name: a
+Number: 16, Name: a
+Number: 6, Name: a
+, the following tasks:
+collab7
+collab10
+comp3
+comp3
+self3
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 5, Name: a
+Number: 20, Name: a
+Number: 0, Name: a
+, the following tasks:
+collab9
+comp5
+self5
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 3, Name: a
+Number: 18, Name: a
+Number: 14, Name: a
+Number: 6, Name: a
+Number: 13, Name: a
+, the following tasks:
+collab8
+collab2
+comp5
+self6
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 11, Name: a
+Number: 15, Name: a
+Number: 2, Name: a
+Number: 16, Name: a
+Number: 9, Name: a
+, the following tasks:
+collab7
+comp5
+comp7
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 12, Name: a
+Number: 17, Name: a
+Number: 21, Name: a
+Number: 19, Name: a
+Number: 1, Name: a
+, the following tasks:
+collab8
+collab7
+comp1
+self4
+self3
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 7, Name: a
+Number: 4, Name: a
+Number: 10, Name: a
+Number: 8, Name: a
+Number: 22, Name: a
+, the following tasks:
+collab10
+collab8
+comp6
+comp5
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 12, Name: a
+Number: 15, Name: a
+Number: 5, Name: a
+, the following tasks:
+collab9
+collab8
+comp3
+self8
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 20, Name: a
+Number: 9, Name: a
+Number: 2, Name: a
+Number: 16, Name: a
+Number: 22, Name: a
+, the following tasks:
+collab6
+collab6
+comp7
+self9
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 6, Name: a
+Number: 19, Name: a
+Number: 11, Name: a
+Number: 7, Name: a
+Number: 10, Name: a
+, the following tasks:
+collab10
+collab9
+comp8
+self10
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 17, Name: a
+Number: 14, Name: a
+Number: 18, Name: a
+Number: 1, Name: a
+, the following tasks:
+collab4
+collab8
+comp2
+self9
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 21, Name: a
+Number: 3, Name: a
+, the following tasks:
+collab3
+collab1
+comp4
+comp4
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 13, Name: a
+Number: 0, Name: a
+Number: 4, Name: a
+Number: 8, Name: a
+, the following tasks:
+collab9
+comp9
+comp5
+comp8
+self3
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 1, Name: a
+Number: 9, Name: a
+Number: 6, Name: a
+, the following tasks:
+collab9
+collab8
+comp10
+comp8
+self1
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 11, Name: a
+Number: 15, Name: a
+Number: 10, Name: a
+, the following tasks:
+collab6
+collab4
+comp2
+self5
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 22, Name: a
+Number: 4, Name: a
+, the following tasks:
+collab2
+collab6
+comp10
+self1
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 14, Name: a
+Number: 13, Name: a
+, the following tasks:
+collab1
+comp2
+self9
+self7
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 7, Name: a
+Number: 17, Name: a
+Number: 5, Name: a
+, the following tasks:
+collab3
+comp7
+self3
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 18, Name: a
+Number: 0, Name: a
+Number: 20, Name: a
+Number: 3, Name: a
+, the following tasks:
+collab3
+collab3
+comp8
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 19, Name: a
+Number: 16, Name: a
+Number: 2, Name: a
+, the following tasks:
+collab7
+collab7
+comp8
+self1
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 21, Name: a
+Number: 8, Name: a
+Number: 12, Name: a
+, the following tasks:
+collab7
+comp7
+self6
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 1, Name: a
+Number: 2, Name: a
+Number: 15, Name: a
+Number: 22, Name: a
+Number: 3, Name: a
+, the following tasks:
+collab1
+collab10
+comp7
+comp6
+self5
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 8, Name: a
+Number: 14, Name: a
+Number: 12, Name: a
+Number: 20, Name: a
+Number: 19, Name: a
+, the following tasks:
+collab6
+collab8
+comp3
+comp8
+self3
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 6, Name: a
+Number: 11, Name: a
+Number: 16, Name: a
+, the following tasks:
+collab4
+collab1
+comp10
+comp7
+self1
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 10, Name: a
+Number: 17, Name: a
+Number: 7, Name: a
+Number: 0, Name: a
+Number: 13, Name: a
+, the following tasks:
+collab4
+collab5
+comp3
+self1
+self7
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 9, Name: a
+Number: 5, Name: a
+Number: 18, Name: a
+Number: 4, Name: a
+Number: 21, Name: a
+, the following tasks:
+collab10
+comp10
+comp9
+self3
+self9
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 22, Name: a
+Number: 7, Name: a
+, the following tasks:
+collab6
+comp2
+comp1
+self7
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 21, Name: a
+Number: 6, Name: a
+Number: 12, Name: a
+Number: 10, Name: a
+Number: 4, Name: a
+, the following tasks:
+collab7
+collab10
+comp3
+comp9
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 14, Name: a
+Number: 13, Name: a
+Number: 16, Name: a
+Number: 19, Name: a
+Number: 8, Name: a
+, the following tasks:
+collab3
+collab9
+comp6
+comp4
+self9
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 20, Name: a
+Number: 3, Name: a
+Number: 0, Name: a
+Number: 15, Name: a
+Number: 2, Name: a
+, the following tasks:
+collab7
+comp6
+self8
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 11, Name: a
+Number: 5, Name: a
+Number: 1, Name: a
+Number: 18, Name: a
+, the following tasks:
+collab10
+collab5
+comp10
+comp5
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 17, Name: a
+Number: 9, Name: a
+, the following tasks:
+collab3
+collab8
+comp5
+comp9
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 11, Name: a
+Number: 22, Name: a
+, the following tasks:
+collab10
+collab7
+comp5
+comp4
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 10, Name: a
+Number: 1, Name: a
+Number: 19, Name: a
+, the following tasks:
+collab10
+collab5
+comp3
+comp2
+self9
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 4, Name: a
+Number: 2, Name: a
+, the following tasks:
+collab3
+comp1
+comp6
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 12, Name: a
+Number: 14, Name: a
+, the following tasks:
+collab1
+comp9
+comp6
+self10
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 3, Name: a
+Number: 6, Name: a
+, the following tasks:
+collab6
+collab3
+comp6
+comp10
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 8, Name: a
+Number: 21, Name: a
+, the following tasks:
+collab4
+comp6
+self1
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 13, Name: a
+Number: 5, Name: a
+Number: 20, Name: a
+, the following tasks:
+collab4
+collab1
+comp5
+self8
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 18, Name: a
+Number: 9, Name: a
+Number: 7, Name: a
+, the following tasks:
+collab3
+comp9
+comp1
+comp4
+self1
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 15, Name: a
+Number: 0, Name: a
+, the following tasks:
+collab4
+collab8
+comp9
+comp9
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 17, Name: a
+Number: 16, Name: a
+, the following tasks:
+collab4
+collab9
+comp6
+self6
+self3
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 20, Name: a
+Number: 10, Name: a
+Number: 0, Name: a
+, the following tasks:
+collab5
+collab6
+comp2
+self1
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 11, Name: a
+Number: 13, Name: a
+Number: 21, Name: a
+, the following tasks:
+collab4
+collab9
+comp5
+self6
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 7, Name: a
+Number: 19, Name: a
+, the following tasks:
+collab8
+collab5
+comp10
+comp7
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 17, Name: a
+Number: 4, Name: a
+, the following tasks:
+collab8
+comp2
+comp2
+self9
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 22, Name: a
+Number: 1, Name: a
+Number: 2, Name: a
+, the following tasks:
+collab10
+collab1
+comp1
+self2
+self5
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 5, Name: a
+Number: 16, Name: a
+, the following tasks:
+collab7
+comp3
+self9
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 15, Name: a
+Number: 6, Name: a
+Number: 18, Name: a
+, the following tasks:
+collab3
+collab7
+comp2
+self4
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 9, Name: a
+Number: 12, Name: a
+Number: 3, Name: a
+, the following tasks:
+collab10
+collab6
+comp3
+self10
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 14, Name: a
+Number: 8, Name: a
+, the following tasks:
+collab2
+collab2
+comp7
+self6
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 20, Name: a
+Number: 7, Name: a
+Number: 18, Name: a
+, the following tasks:
+collab10
+comp4
+self3
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 12, Name: a
+Number: 0, Name: a
+, the following tasks:
+collab2
+comp10
+comp9
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 11, Name: a
+Number: 17, Name: a
+Number: 5, Name: a
+, the following tasks:
+collab5
+collab5
+comp10
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 2, Name: a
+Number: 22, Name: a
+, the following tasks:
+collab3
+comp1
+comp10
+self7
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 13, Name: a
+Number: 15, Name: a
+, the following tasks:
+collab10
+collab10
+comp3
+self3
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 4, Name: a
+Number: 9, Name: a
+, the following tasks:
+collab9
+collab5
+comp6
+comp2
+self3
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 3, Name: a
+Number: 10, Name: a
+, the following tasks:
+collab3
+collab4
+comp5
+self3
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 1, Name: a
+Number: 19, Name: a
+, the following tasks:
+collab1
+collab4
+comp1
+self1
+self9
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 21, Name: a
+Number: 8, Name: a
+Number: 14, Name: a
+, the following tasks:
+collab10
+collab3
+comp4
+comp4
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 6, Name: a
+Number: 16, Name: a
+, the following tasks:
+collab9
+collab1
+comp10
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 10, Name: a
+Number: 11, Name: a
+, the following tasks:
+collab8
+comp5
+comp7
+self10
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 6, Name: a
+Number: 17, Name: a
+, the following tasks:
+collab9
+comp3
+comp1
+self4
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 16, Name: a
+Number: 2, Name: a
+, the following tasks:
+collab1
+collab9
+comp9
+comp8
+self3
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 3, Name: a
+Number: 8, Name: a
+, the following tasks:
+collab8
+collab1
+comp6
+self9
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 1, Name: a
+Number: 14, Name: a
+Number: 0, Name: a
+, the following tasks:
+collab10
+collab1
+comp9
+comp2
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 15, Name: a
+Number: 19, Name: a
+, the following tasks:
+collab10
+collab2
+comp7
+comp4
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 4, Name: a
+Number: 22, Name: a
+, the following tasks:
+collab2
+collab4
+comp6
+self3
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 7, Name: a
+Number: 18, Name: a
+, the following tasks:
+collab4
+comp7
+comp7
+self5
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 13, Name: a
+Number: 21, Name: a
+, the following tasks:
+collab3
+collab3
+comp3
+comp1
+self3
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 9, Name: a
+Number: 5, Name: a
+, the following tasks:
+collab8
+collab2
+comp4
+comp2
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 20, Name: a
+Number: 12, Name: a
+, the following tasks:
+collab5
+comp7
+self8
+self3
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 16, Name: a
+Number: 4, Name: a
+, the following tasks:
+collab9
+comp3
+self6
+self7
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 5, Name: a
+Number: 10, Name: a
+, the following tasks:
+collab6
+collab5
+comp10
+self10
+self5
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 17, Name: a
+Number: 20, Name: a
+, the following tasks:
+collab8
+comp10
+self9
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 3, Name: a
+Number: 18, Name: a
+, the following tasks:
+collab5
+collab1
+comp6
+comp6
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 12, Name: a
+Number: 14, Name: a
+, the following tasks:
+collab10
+comp5
+comp2
+self3
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 0, Name: a
+Number: 9, Name: a
+, the following tasks:
+collab3
+comp5
+comp8
+self6
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 8, Name: a
+Number: 11, Name: a
+, the following tasks:
+collab5
+comp5
+self2
+self5
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 22, Name: a
+Number: 15, Name: a
+, the following tasks:
+collab9
+comp3
+comp8
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 21, Name: a
+Number: 13, Name: a
+, the following tasks:
+collab10
+comp10
+comp2
+comp2
+self9
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 1, Name: a
+Number: 2, Name: a
+Number: 7, Name: a
+, the following tasks:
+collab1
+collab4
+comp10
+self1
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 6, Name: a
+Number: 19, Name: a
+, the following tasks:
+collab6
+collab3
+comp3
+comp7
+self3
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 21, Name: a
+Number: 6, Name: a
+, the following tasks:
+collab8
+collab1
+comp7
+self7
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 12, Name: a
+Number: 11, Name: a
+Number: 9, Name: a
+, the following tasks:
+collab10
+collab5
+comp10
+comp2
+self7
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 13, Name: a
+Number: 10, Name: a
+, the following tasks:
+collab8
+collab2
+comp10
+self7
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 0, Name: a
+Number: 15, Name: a
+Number: 17, Name: a
+Number: 5, Name: a
+Number: 3, Name: a
+, the following tasks:
+collab7
+collab6
+comp2
+self7
+self1
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 7, Name: a
+Number: 1, Name: a
+, the following tasks:
+collab5
+collab3
+comp4
+self8
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 22, Name: a
+Number: 18, Name: a
+, the following tasks:
+collab2
+collab10
+comp1
+comp1
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 4, Name: a
+Number: 19, Name: a
+Number: 16, Name: a
+, the following tasks:
+collab3
+collab7
+comp2
+comp3
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 20, Name: a
+Number: 8, Name: a
+Number: 2, Name: a
+Number: 14, Name: a
+, the following tasks:
+collab3
+comp4
+comp10
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 2, Name: a
+Number: 9, Name: a
+Number: 18, Name: a
+Number: 4, Name: a
+Number: 1, Name: a
+, the following tasks:
+collab7
+comp7
+comp9
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 21, Name: a
+Number: 3, Name: a
+Number: 10, Name: a
+Number: 11, Name: a
+, the following tasks:
+collab7
+collab9
+comp10
+comp6
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 7, Name: a
+Number: 17, Name: a
+Number: 16, Name: a
+Number: 13, Name: a
+Number: 5, Name: a
+, the following tasks:
+collab2
+comp6
+self5
+self7
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 19, Name: a
+Number: 6, Name: a
+Number: 12, Name: a
+Number: 22, Name: a
+Number: 0, Name: a
+, the following tasks:
+collab6
+collab9
+comp3
+comp6
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 14, Name: a
+Number: 8, Name: a
+Number: 20, Name: a
+Number: 15, Name: a
+, the following tasks:
+collab2
+collab9
+comp5
+self4
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 4, Name: a
+Number: 20, Name: a
+, the following tasks:
+collab5
+comp1
+comp2
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 17, Name: a
+Number: 22, Name: a
+Number: 15, Name: a
+, the following tasks:
+collab7
+collab8
+comp5
+comp7
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 9, Name: a
+Number: 21, Name: a
+Number: 5, Name: a
+, the following tasks:
+collab2
+comp6
+self3
+self6
+self7
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 13, Name: a
+Number: 8, Name: a
+Number: 11, Name: a
+, the following tasks:
+collab4
+collab3
+comp3
+comp2
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 10, Name: a
+Number: 12, Name: a
+Number: 1, Name: a
+, the following tasks:
+collab2
+collab6
+comp7
+comp6
+self3
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 19, Name: a
+Number: 2, Name: a
+Number: 0, Name: a
+, the following tasks:
+collab8
+collab10
+comp6
+self3
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 18, Name: a
+Number: 14, Name: a
+, the following tasks:
+collab5
+collab7
+comp5
+comp4
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 16, Name: a
+Number: 3, Name: a
+Number: 7, Name: a
+Number: 6, Name: a
+, the following tasks:
+collab9
+collab1
+comp7
+self10
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 14, Name: a
+Number: 5, Name: a
+, the following tasks:
+collab10
+comp8
+comp9
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 7, Name: a
+Number: 15, Name: a
+Number: 3, Name: a
+, the following tasks:
+collab10
+collab6
+comp10
+self6
+self5
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 9, Name: a
+Number: 0, Name: a
+, the following tasks:
+collab5
+collab9
+comp2
+comp7
+self3
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 13, Name: a
+Number: 17, Name: a
+, the following tasks:
+collab3
+comp10
+comp9
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 6, Name: a
+Number: 16, Name: a
+, the following tasks:
+collab8
+collab5
+comp9
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 2, Name: a
+Number: 20, Name: a
+, the following tasks:
+collab6
+collab5
+comp3
+self4
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 18, Name: a
+Number: 12, Name: a
+, the following tasks:
+collab4
+comp9
+comp7
+self5
+self9
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 10, Name: a
+Number: 22, Name: a
+, the following tasks:
+collab8
+collab4
+comp5
+comp8
+self9
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 21, Name: a
+Number: 1, Name: a
+, the following tasks:
+collab1
+collab3
+comp8
+comp1
+self3
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 8, Name: a
+Number: 4, Name: a
+, the following tasks:
+collab1
+collab3
+comp2
+self5
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 11, Name: a
+Number: 19, Name: a
+, the following tasks:
+collab1
+collab9
+comp2
+comp1
+self5
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 4, Name: a
+Number: 12, Name: a
+Number: 1, Name: a
+Number: 20, Name: a
+, the following tasks:
+collab3
+comp1
+comp8
+self4
+self1
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 13, Name: a
+Number: 11, Name: a
+Number: 6, Name: a
+Number: 15, Name: a
+, the following tasks:
+collab6
+collab4
+comp7
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 22, Name: a
+Number: 8, Name: a
+Number: 10, Name: a
+Number: 18, Name: a
+Number: 9, Name: a
+, the following tasks:
+collab6
+collab2
+comp9
+self6
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 2, Name: a
+Number: 3, Name: a
+Number: 0, Name: a
+Number: 21, Name: a
+Number: 19, Name: a
+, the following tasks:
+collab6
+collab10
+comp6
+comp4
+self2
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 16, Name: a
+Number: 14, Name: a
+Number: 5, Name: a
+Number: 7, Name: a
+Number: 17, Name: a
+, the following tasks:
+collab1
+collab6
+comp8
+self3
+self1
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 22, Name: a
+Number: 13, Name: a
+, the following tasks:
+collab5
+collab10
+comp9
+comp5
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 11, Name: a
+Number: 8, Name: a
+, the following tasks:
+collab7
+collab2
+comp7
+comp3
+self3
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 3, Name: a
+Number: 4, Name: a
+Number: 10, Name: a
+Number: 5, Name: a
+, the following tasks:
+collab1
+collab5
+comp6
+self1
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 6, Name: a
+Number: 12, Name: a
+, the following tasks:
+collab10
+collab7
+comp7
+comp8
+self9
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 15, Name: a
+Number: 21, Name: a
+Number: 19, Name: a
+Number: 14, Name: a
+, the following tasks:
+collab4
+collab1
+comp7
+comp4
+self7
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 18, Name: a
+Number: 16, Name: a
+Number: 0, Name: a
+Number: 17, Name: a
+, the following tasks:
+collab4
+collab9
+comp3
+comp3
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 20, Name: a
+Number: 9, Name: a
+Number: 2, Name: a
+, the following tasks:
+collab1
+comp7
+comp1
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 7, Name: a
+Number: 1, Name: a
+, the following tasks:
+collab10
+collab7
+comp8
+self10
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------
+promote on students:
+Number: 18, Name: a
+Number: 0, Name: a
+Number: 17, Name: a
+Number: 3, Name: a
+, the following tasks:
+collab2
+comp7
+comp7
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 16, Name: a
+Number: 21, Name: a
+Number: 9, Name: a
+Number: 19, Name: a
+, the following tasks:
+collab1
+collab9
+comp5
+self8
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 8, Name: a
+Number: 12, Name: a
+Number: 22, Name: a
+, the following tasks:
+collab7
+collab1
+comp1
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 11, Name: a
+Number: 1, Name: a
+, the following tasks:
+collab3
+collab7
+comp6
+comp8
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 5, Name: a
+Number: 14, Name: a
+Number: 20, Name: a
+Number: 10, Name: a
+, the following tasks:
+collab5
+comp5
+self6
+self8
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 4, Name: a
+Number: 15, Name: a
+Number: 6, Name: a
+Number: 13, Name: a
+, the following tasks:
+collab3
+collab10
+comp6
+self9
+self10
+-- -- -- -- -- -- -- -- -- -- -- -- --
+promote on students:
+Number: 7, Name: a
+Number: 2, Name: a
+, the following tasks:
+collab1
+comp3
+self4
+self5
+self4
+-- -- -- -- -- -- -- -- -- -- -- -- --
+----------------------End of Iteration--------------------

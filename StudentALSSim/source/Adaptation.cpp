@@ -2,11 +2,14 @@
 
 Adaptation::Adaptation(int studentSize, int numberOfConfigChoices, 
 	int minNumberOfStudentsPerGroup, int maxNumberOfStudentsPerGroup, 
-	int numberOfFitnessNNs, int fitnessCondition, int numAdaptationCycles) {
+	int numberOfFitnessNNs, int fitnessCondition, int numAdaptationCycles,
+	int numTasksPerGroup) {
 
 	this->numberOfConfigChoices = numberOfConfigChoices;
 	this->maxNumberOfStudentsPerGroup = maxNumberOfStudentsPerGroup;
 	this->minNumberOfStudentsPerGroup = minNumberOfStudentsPerGroup;
+
+	this->numTasksPerGroup = numTasksPerGroup;
 
 	this->numberOfFitnessNNs = numberOfFitnessNNs;
 
@@ -23,9 +26,13 @@ Adaptation::Adaptation(int studentSize, int numberOfConfigChoices,
 	this->numAdaptationCycles = numAdaptationCycles;
 }
 
-std::vector<AdaptationMechanic> Adaptation::iterate(std::vector<Student*> students, int currIteration)
+std::vector<std::pair<AdaptationGroup, std::vector<AdaptationTask>>> Adaptation::iterate(std::vector<Student*> students, 
+	std::vector<AdaptationTask> possibleCollaborativeTasks,
+	std::vector<AdaptationTask> possibleCompetitiveTasks,
+	std::vector<AdaptationTask> possibleIndividualTasks,
+	int currIteration)
 {
-	std::vector<AdaptationMechanic> mechanics = std::vector<AdaptationMechanic>();
+	std::vector<std::pair<AdaptationGroup, std::vector<AdaptationTask>>> groupMechanicPairs = std::vector<std::pair<AdaptationGroup, std::vector<AdaptationTask>>>();
 
 	adaptedConfig = organizeStudents(students, currIteration);
 	std::vector<AdaptationGroup> groups = adaptedConfig.groups;
@@ -40,12 +47,11 @@ std::vector<AdaptationMechanic> Adaptation::iterate(std::vector<Student*> studen
 			currStudent->changeCurrProfile(currGroup.profile);
 		}
 
-
 		Utilities::LearningProfile currGroupProfile = currGroup.profile;
-		mechanics.push_back(generateMechanic(currGroupProfile));
+		groupMechanicPairs.push_back({ currGroup , generateMechanic(currGroupProfile, possibleCollaborativeTasks, possibleCompetitiveTasks, possibleIndividualTasks) });
 	}
 	
-	return mechanics;
+	return groupMechanicPairs;
 }
 
 AdaptationConfiguration Adaptation::getCurrAdaptedConfig() {
@@ -274,6 +280,30 @@ double Adaptation::fitness(Student* student, Utilities::LearningProfile profile,
 	return 0.5*(predictedModel.ability) + 0.5*predictedModel.engagement; //ability must be normalized to [0,1]
 }
 
-AdaptationMechanic Adaptation::generateMechanic(Utilities::LearningProfile bestConfigProfile) {
-	return AdaptationMechanic { "chest" };
+std::vector<AdaptationTask> Adaptation::generateMechanic(Utilities::LearningProfile bestConfigProfile,
+	std::vector<AdaptationTask> possibleCollaborativeTasks,
+	std::vector<AdaptationTask> possibleCompetitiveTasks,
+	std::vector<AdaptationTask> possibleIndividualTasks) {
+
+	
+	int collaborativeTaskSize = std::ceil(bestConfigProfile.K_cl*numTasksPerGroup);
+	int competitiveTaskSize = std::ceil(bestConfigProfile.K_cp*numTasksPerGroup);
+	int individualTaskSize = std::ceil(bestConfigProfile.K_i*numTasksPerGroup);
+
+	std::vector<AdaptationTask> mechanicTasks = std::vector<AdaptationTask>();
+	
+	for (int i = 0; i < collaborativeTaskSize; i++) {
+		int randIndex = Utilities::randIntBetween(0, possibleCollaborativeTasks.size()-1);
+		mechanicTasks.push_back(Globals::possibleCollaborativeTasks[randIndex]);
+	}
+	for (int i = 0; i < competitiveTaskSize; i++) {
+		int randIndex = Utilities::randIntBetween(0, possibleCompetitiveTasks.size()-1);
+		mechanicTasks.push_back(Globals::possibleCompetitiveTasks[randIndex]);
+	}
+	for (int i = 0; i < individualTaskSize; i++) {
+		int randIndex = Utilities::randIntBetween(0, possibleIndividualTasks.size()-1);
+		mechanicTasks.push_back(Globals::possibleIndividualTasks[randIndex]);
+	}
+	//Utilities::randShuffle(mechanicTasks);
+	return mechanicTasks;
 }

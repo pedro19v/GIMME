@@ -31,7 +31,7 @@ std::vector<Student::StudentModel> Student::StudentModelGrid::getAllModels() {
 }
 
 
-Student::Student(int id, std::string name, int numPastModelIncreasesCells, int maxAmountOfStoredProfilesPerCell, int numTasks){
+Student::Student(int id, std::string name, int numPastModelIncreasesCells, int maxAmountOfStoredProfilesPerCell, int numIterations){
 	
 	//generate learning profile
 	double newRand1 = Utilities::randBetween(0, 1);
@@ -45,9 +45,9 @@ Student::Student(int id, std::string name, int numPastModelIncreasesCells, int m
 	this->inherentPreference.K_i = newRand3 / newRandSum;
 
 	this->learningRate = Utilities::randBetween(0.2, 0.6);
-	this->iterationReactions = std::vector<double>(numTasks);
+	this->iterationReactions = std::vector<double>(numIterations);
 
-	for (int i = 0; i < numTasks; i++) {
+	for (int i = 0; i < numIterations; i++) {
 		this->iterationReactions[i] = Utilities::normalRandom(learningRate, 0.05);
 	}
 
@@ -100,6 +100,14 @@ double Student::getAbility() {
 void Student::changeCurrProfile(Utilities::LearningProfile newProfile) {
 	Student::StudentModel currModel = this->currModel;
 	this->currModel.currProfile = newProfile;
+}
+int Student::getId()
+{
+	return this->id;
+}
+std::string Student::getName()
+{
+	return this->name;
 }
 Utilities::LearningProfile Student::getCurrProfile() {
 	return this->currModel.currProfile;
