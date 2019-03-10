@@ -1,5 +1,6 @@
 import numpy
 import pandas as pd
+import matplotlib
 import matplotlib.pyplot as plt
 import math
 
@@ -25,6 +26,12 @@ def main():
 	print(sum(optimalClosegroupSizeFreqsNew[10:nStudents]/ sum(optimalClosegroupSizeFreqsNew)))
 
 
+	font = {'family' : 'normal',
+        'weight' : 'normal',
+        'size'   : 20}
+
+	matplotlib.rc('font', **font)
+
 	width = 0.35;
 
 	plt.subplot(1,2,1)
@@ -46,8 +53,6 @@ def main():
 	plt.xlabel("Config. Size")
 	plt.ylabel("Occurence (%)")
 	plt.show()
-
-
 
 
 
@@ -191,13 +196,14 @@ def main():
 
 	# plt.xticks([i for i in range(nValuesToDisplay)])
 
-	plt.plot(timesteps[:nValuesToDisplay], randomCloseAbilities[:nValuesToDisplay], label=r'$Random\ strategy$')
-	plt.plot(timesteps[:nValuesToDisplay], optimalCloseAbilities[:nValuesToDisplay], label=r'$Optimal\ strategy$')
-	# plt.plot(timesteps[:nValuesToDisplay], GAL1Abilities[:nValuesToDisplay],  color="red", label=r'$GAL\ k\ =\ 1$')
-	# plt.plot(timesteps[:nValuesToDisplay], GAL5Abilities[:nValuesToDisplay],  color="green", label=r'$GAL\ k\ =\ 5$')
-	plt.plot(timesteps[:nValuesToDisplay], GAL5Abilities[:nValuesToDisplay],  color="green", label=r'$GAL\ strategy$')
-	# plt.plot(timesteps[:nValuesToDisplay], GAL24Abilities[:nValuesToDisplay],  color="brown", label=r'$GAL\ k\ =\ 24$')
-	# plt.plot(timesteps[:nValuesToDisplay], GAL30Abilities[:nValuesToDisplay],  color="salmon", label=r'$GAL\ k\ =\ 30$')
+	# plt.plot(timesteps[:nValuesToDisplay], randomCloseAbilities[:nValuesToDisplay], label=r'$Random\ strategy$')
+	# plt.plot(timesteps[:nValuesToDisplay], optimalCloseAbilities[:nValuesToDisplay], label=r'$Optimal\ strategy$')
+	# plt.plot(timesteps[:nValuesToDisplay], GAL5Abilities[:nValuesToDisplay],  color="green", label=r'$GAL\ strategy$')
+
+	plt.plot(timesteps[:nValuesToDisplay], GAL1Abilities[:nValuesToDisplay],  color="red", label=r'$GAL\ k\ =\ 1$')
+	plt.plot(timesteps[:nValuesToDisplay], GAL5Abilities[:nValuesToDisplay],  color="green", label=r'$GAL\ k\ =\ 5$')
+	plt.plot(timesteps[:nValuesToDisplay], GAL24Abilities[:nValuesToDisplay],  color="brown", label=r'$GAL\ k\ =\ 24$')
+	plt.plot(timesteps[:nValuesToDisplay], GAL30Abilities[:nValuesToDisplay],  color="salmon", label=r'$GAL\ k\ =\ 30$')
 
 	plt.xlabel("Iteration")
 	plt.ylabel("avg Ability Increase")
@@ -280,7 +286,7 @@ def main():
 		pathsY[i] = y
 
 	plt.subplot(1,3,1)
-	plt.annotate("Individualism", xy=(limitsX[0], limitsY[0]))
+	plt.annotate("Self-Education", xy=(limitsX[0], limitsY[0]))
 	plt.annotate("Cooperation", xy=(limitsX[1], limitsY[1]))
 	plt.annotate("Competition", xy=(limitsX[2], limitsY[2]))
 	plt.plot(limitsX, limitsY,  linestyle='dashed', color="black")
@@ -300,7 +306,7 @@ def main():
 		pathsY[i] = y
 
 	plt.subplot(1,3,2)
-	plt.annotate("Individualism", xy=(limitsX[0], limitsY[0]))
+	plt.annotate("Self-Education", xy=(limitsX[0], limitsY[0]))
 	plt.annotate("Cooperation", xy=(limitsX[1], limitsY[1]))
 	plt.annotate("Competition", xy=(limitsX[2], limitsY[2]))
 	plt.plot(limitsX, limitsY,  linestyle='dashed', color="black")
@@ -321,7 +327,7 @@ def main():
 		pathsY[i] = y
 
 	plt.subplot(1,3,3)
-	plt.annotate("Individualism", xy=(limitsX[0], limitsY[0]))
+	plt.annotate("Self-Education", xy=(limitsX[0], limitsY[0]))
 	plt.annotate("Cooperation", xy=(limitsX[1], limitsY[1]))
 	plt.annotate("Competition", xy=(limitsX[2], limitsY[2]))
 	plt.plot(limitsX, limitsY,  linestyle='dashed', color="black")
