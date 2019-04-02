@@ -3,18 +3,17 @@
 Adaptation::Adaptation(int studentSize, int numberOfConfigChoices, 
 	int minNumberOfStudentsPerGroup, int maxNumberOfStudentsPerGroup, 
 	int numberOfFitnessNNs, int fitnessCondition, int numAdaptationCycles,
-	int numTasksPerGroup) {
+	int numTasksPerGroup, Utilities* utilities) {
 
 	this->numberOfConfigChoices = numberOfConfigChoices;
 	this->maxNumberOfStudentsPerGroup = maxNumberOfStudentsPerGroup;
 	this->minNumberOfStudentsPerGroup = minNumberOfStudentsPerGroup;
 
 	this->numTasksPerGroup = numTasksPerGroup;
-
 	this->numberOfFitnessNNs = numberOfFitnessNNs;
-
 	this->fitnessCondition = fitnessCondition;
 
+	this->numAdaptationCycles = numAdaptationCycles;
 	this->avgAbilities = std::vector<double>(numAdaptationCycles+1);
 	this->avgEngagements = std::vector<double>(numAdaptationCycles+1);
 	this->avgPrefDiff = std::vector<double>(numAdaptationCycles+1);
@@ -23,7 +22,8 @@ Adaptation::Adaptation(int studentSize, int numberOfConfigChoices,
 	this->groupSizeFreqs = std::vector<int>(studentSize+1);
 	this->configSizeFreqs = std::vector<int>(studentSize+1);
 
-	this->numAdaptationCycles = numAdaptationCycles;
+	this->utilities = utilities;
+
 }
 
 std::vector<std::pair<AdaptationGroup, std::vector<AdaptationTask>>> Adaptation::iterate(std::vector<Student*> students, 
@@ -44,11 +44,11 @@ std::vector<std::pair<AdaptationGroup, std::vector<AdaptationTask>>> Adaptation:
 
 		for (int j = 0; j < groupStudentsSize; j++) {
 			Student* currStudent = groupStudents[j];
-			currStudent->changeCurrProfile(currGroup.getLearningProfile());
+			currStudent->changeCurrProfile(currGroup.getInteractionsProfile());
 		}
 
-		Utilities::LearningProfile currGroupProfile = currGroup.getLearningProfile();
-		Student::LearningState currGroupState = currGroup.getAvgLearningState();
+		InteractionsProfile currGroupProfile = currGroup.getInteractionsProfile();
+		LearningState currGroupState = currGroup.getAvgLearningState();
 		groupMechanicPairs.push_back({ currGroup , generateMechanic(currGroupProfile, currGroupState, possibleCollaborativeTasks, possibleCompetitiveTasks, possibleIndividualTasks) });
 	}
 	
@@ -79,9 +79,9 @@ AdaptationConfiguration Adaptation::organizeStudents(std::vector<Student*> stude
 		int studentsSize = students.size();
 		AdaptationConfiguration newConfig = AdaptationConfiguration();
 		
-		int minNumGroups = std::ceil((double) Globals::students.size() / (double) maxNumberOfStudentsPerGroup);
-		int maxNumGroups = std::floor((double) Globals::students.size() / (double) minNumberOfStudentsPerGroup);
-		int numGroups = Utilities::randIntBetween(minNumGroups,maxNumGroups);
+		int minNumGroups = std::ceil((double) students.size() / (double) maxNumberOfStudentsPerGroup);
+		int maxNumGroups = std::floor((double) students.size() / (double) minNumberOfStudentsPerGroup);
+		int numGroups = utilities->randIntBetween(minNumGroups,maxNumGroups);
 		
 		//generate min groups
 		int studentsWithoutGroupSize = 0;
@@ -90,13 +90,13 @@ AdaptationConfiguration Adaptation::organizeStudents(std::vector<Student*> stude
 			AdaptationGroup currGroup = AdaptationGroup();
 
 			//generate learning profile
-			double newRand1 = Utilities::randBetween(0, 1);
-			double newRand2 = Utilities::randBetween(0, 1);
-			double newRand3 = Utilities::randBetween(0, 1);
+			double newRand1 = utilities->randBetween(0, 1);
+			double newRand2 = utilities->randBetween(0, 1);
+			double newRand3 = utilities->randBetween(0, 1);
 
 			double newRandSum = newRand1 + newRand2 + newRand3;
 
-			Utilities::LearningProfile profile = Utilities::LearningProfile();
+			InteractionsProfile profile = InteractionsProfile();
 			profile.K_cl = newRand1/ newRandSum;
 			profile.K_cp = newRand2/ newRandSum;
 			profile.K_i = newRand3/ newRandSum;
@@ -105,12 +105,12 @@ AdaptationConfiguration Adaptation::organizeStudents(std::vector<Student*> stude
 
 			for (int s = 0; s < minNumberOfStudentsPerGroup; s++) {
 				studentsWithoutGroupSize = studentsWithoutGroup.size();
-				int currStudentIndex = Utilities::randIntBetween(0,studentsWithoutGroupSize-1);
+				int currStudentIndex = utilities->randIntBetween(0,studentsWithoutGroupSize-1);
 
 				Student* currStudent = studentsWithoutGroup[currStudentIndex];
 				currGroup.addStudent(currStudent);
 
-				double currStudentFitness = fitness(currStudent, currGroup.getLearningProfile(), this->numberOfFitnessNNs, currIteration);
+				double currStudentFitness = fitness(currStudent, currGroup.getInteractionsProfile(), this->numberOfFitnessNNs, currIteration);
 				currFitness += currStudentFitness;
 
 				studentsWithoutGroup.erase(studentsWithoutGroup.begin() + currStudentIndex);
@@ -121,11 +121,11 @@ AdaptationConfiguration Adaptation::organizeStudents(std::vector<Student*> stude
 
 		studentsWithoutGroupSize = studentsWithoutGroup.size();
 		while (studentsWithoutGroupSize > 0) {
-			int randomGroupIndex = Utilities::randIntBetween(0, newConfig.groups.size() - 1);
+			int randomGroupIndex = utilities->randIntBetween(0, newConfig.groups.size() - 1);
 
 			int currStudentIndex = 0;
 			if (studentsWithoutGroupSize > 1) {
-				currStudentIndex = Utilities::randIntBetween(0, studentsWithoutGroupSize - 1);
+				currStudentIndex = utilities->randIntBetween(0, studentsWithoutGroupSize - 1);
 			}
 
 			AdaptationGroup* currGroup = &newConfig.groups[randomGroupIndex];
@@ -137,7 +137,7 @@ AdaptationConfiguration Adaptation::organizeStudents(std::vector<Student*> stude
 			Student* currStudent = studentsWithoutGroup[currStudentIndex];
 			currGroup->addStudent(currStudent);
 
-			double currStudentFitness = fitness(currStudent, currGroup->getLearningProfile(), this->numberOfFitnessNNs, currIteration);
+			double currStudentFitness = fitness(currStudent, currGroup->getInteractionsProfile(), this->numberOfFitnessNNs, currIteration);
 			currFitness += currStudentFitness;
 
 			studentsWithoutGroup.erase(studentsWithoutGroup.begin() + currStudentIndex);
@@ -164,7 +164,7 @@ AdaptationConfiguration Adaptation::organizeStudents(std::vector<Student*> stude
 }
 
 
-double Adaptation::fitness(Student* student, Utilities::LearningProfile profile, int numberOfFitnessNNs, int currIteration) {
+double Adaptation::fitness(Student* student, InteractionsProfile profile, int numberOfFitnessNNs, int currIteration) {
 
 	if (fitnessCondition == 1) {
 		double engagement = 0;
@@ -177,11 +177,11 @@ double Adaptation::fitness(Student* student, Utilities::LearningProfile profile,
 		return abilityInc;
 	}
 
-	std::vector<Student::LearningState> pastModelIncs = student->getPastModelIncreases();
-	std::vector<Student::LearningState> pastModelncsCopy = std::vector<Student::LearningState>(pastModelIncs);
+	std::vector<LearningState> pastModelIncs = student->getPastModelIncreases();
+	std::vector<LearningState> pastModelncsCopy = std::vector<LearningState>(pastModelIncs);
 	int pastModelIncsSize = pastModelIncs.size();
 
-	Student::LearningState predictedModel = { profile, 0 , 0 };
+	LearningState predictedModel = { profile, 0 , 0 };
 	std::sort(pastModelncsCopy.begin(), pastModelncsCopy.end(), FitnessSort(this, profile));
 
 	pastModelncsCopy.resize(numberOfFitnessNNs);
@@ -190,7 +190,7 @@ double Adaptation::fitness(Student* student, Utilities::LearningProfile profile,
 	predictedModel.ability = 0;
 	predictedModel.engagement = 0;
 	for (int i = 0; i < pastModelncsCopySize; i++) {
-		Utilities::LearningProfile pastProfile = pastModelncsCopy[i].currProfile;
+		InteractionsProfile pastProfile = pastModelncsCopy[i].currProfile;
 		double distance = profile.distanceBetween(pastProfile);
 
 		predictedModel.ability += pastModelncsCopy[i].ability* (1 - distance) / (double) (pastModelncsCopySize); //* (1 - distance) 
@@ -200,8 +200,8 @@ double Adaptation::fitness(Student* student, Utilities::LearningProfile profile,
 	return 0.5*(predictedModel.ability) + 0.5*predictedModel.engagement; //ability must be normalized to [0,1]
 }
 
-std::vector<AdaptationTask> Adaptation::generateMechanic(Utilities::LearningProfile bestConfigProfile,
-	Student::LearningState avgLearningState,
+std::vector<AdaptationTask> Adaptation::generateMechanic(InteractionsProfile bestConfigProfile,
+	LearningState avgLearningState,
 	std::vector<AdaptationTask> possibleCollaborativeTasks,
 	std::vector<AdaptationTask> possibleCompetitiveTasks,
 	std::vector<AdaptationTask> possibleIndividualTasks) {
@@ -214,21 +214,21 @@ std::vector<AdaptationTask> Adaptation::generateMechanic(Utilities::LearningProf
 	std::vector<AdaptationTask> mechanicTasks = std::vector<AdaptationTask>();
 	
 	for (int i = 0; i < collaborativeTaskSize; i++) {
-		mechanicTasks.push_back(pickRandTaskInstance(Globals::possibleCollaborativeTasks, avgLearningState));
+		mechanicTasks.push_back(pickRandTaskInstance(possibleCollaborativeTasks, avgLearningState));
 	}
 	for (int i = 0; i < competitiveTaskSize; i++) {
-		mechanicTasks.push_back(pickRandTaskInstance(Globals::possibleCompetitiveTasks, avgLearningState));
+		mechanicTasks.push_back(pickRandTaskInstance(possibleCompetitiveTasks, avgLearningState));
 	}
 	for (int i = 0; i < individualTaskSize; i++) {
-		mechanicTasks.push_back(pickRandTaskInstance(Globals::possibleIndividualTasks, avgLearningState));
+		mechanicTasks.push_back(pickRandTaskInstance(possibleIndividualTasks, avgLearningState));
 	}
-	Utilities::randShuffle(mechanicTasks);
+	utilities->randShuffle(mechanicTasks);
 	return mechanicTasks;
 }
 
-AdaptationTask Adaptation::pickRandTaskInstance(std::vector<AdaptationTask> possibleTasks, Student::LearningState avgLearningState)
+AdaptationTask Adaptation::pickRandTaskInstance(std::vector<AdaptationTask> possibleTasks, LearningState avgLearningState)
 {
-	int randIndex = Utilities::randIntBetween(0, possibleTasks.size() - 1);
+	int randIndex = utilities->randIntBetween(0, possibleTasks.size() - 1);
 	AdaptationTask randomTask = possibleTasks[randIndex];
 	std::vector<AdaptationTask> randomTaskInstances = randomTask.taskInstances;
 	int randomTaskInstancesSize = randomTaskInstances.size();

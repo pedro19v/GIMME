@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Core.h" />
     <ClInclude Include="headers\Adaptation.h" />
     <ClInclude Include="headers\Globals.h" />
     <ClInclude Include="headers\Student.h" />
@@ -26,14 +27,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Adaptation.cpp" />
-    <ClCompile Include="source\main.cpp" />
+    <ClCompile Include="source\Core.cpp" />
     <ClCompile Include="source\Student.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{4567FFD8-26AA-4CE4-BE6E-8FCE975698DE}</ProjectGuid>
     <RootNamespace>StudentALSSim</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

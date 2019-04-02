@@ -9,7 +9,7 @@ Student::StudentModelGrid::StudentModelGrid(int numCells, int maxAmountOfStoredP
 
 	cells = std::vector<std::vector<LearningState>>(numCells);
 }
-void Student::StudentModelGrid::pushToGrid(Student::LearningState model) {
+void Student::StudentModelGrid::pushToGrid(LearningState model) {
 	double dimSpan = cbrt((double)numCells-1);
 	int currCellInd = dimSpan * dimSpan * floor(dimSpan * model.currProfile.K_cl) + dimSpan * floor(dimSpan * model.currProfile.K_cp) + floor(dimSpan* model.currProfile.K_i);
 	/*printf("ind: %d\n", currCellInd);
@@ -21,7 +21,7 @@ void Student::StudentModelGrid::pushToGrid(Student::LearningState model) {
 		currCell->erase(currCell->begin());
 	}
 }
-std::vector<Student::LearningState> Student::StudentModelGrid::getAllModels() {
+std::vector<LearningState> Student::StudentModelGrid::getAllModels() {
 	std::vector<LearningState> allCells = std::vector<LearningState>();
 	for (int i = 0; i < cells.size(); i++) {
 		std::vector<LearningState>* currCell = &cells[i];
@@ -31,12 +31,12 @@ std::vector<Student::LearningState> Student::StudentModelGrid::getAllModels() {
 }
 
 
-Student::Student(int id, std::string name, int numPastModelIncreasesCells, int maxAmountOfStoredProfilesPerCell, int numIterations){
+Student::Student(int id, std::string name, int numPastModelIncreasesCells, int maxAmountOfStoredProfilesPerCell, int numIterations, Utilities* utilities){
 	
 	//generate learning profile
-	double newRand1 = Utilities::randBetween(0, 1);
-	double newRand2 = Utilities::randBetween(0, 1);
-	double newRand3 = Utilities::randBetween(0, 1);
+	double newRand1 = utilities->randBetween(0, 1);
+	double newRand2 = utilities->randBetween(0, 1);
+	double newRand3 = utilities->randBetween(0, 1);
 
 	double newRandSum = newRand1 + newRand2 + newRand3;
 
@@ -44,11 +44,11 @@ Student::Student(int id, std::string name, int numPastModelIncreasesCells, int m
 	this->inherentPreference.K_cp = newRand2 / newRandSum;
 	this->inherentPreference.K_i = newRand3 / newRandSum;
 
-	this->learningRate = Utilities::randBetween(0.2, 0.6);
+	this->learningRate = utilities->randBetween(0.2, 0.6);
 	this->iterationReactions = std::vector<double>(numIterations);
 
 	for (int i = 0; i < numIterations; i++) {
-		this->iterationReactions[i] = Utilities::normalRandom(learningRate, 0.05);
+		this->iterationReactions[i] = utilities->normalRandom(learningRate, 0.05);
 	}
 
 	//this->learningRate = Utilities::randBetween(0, 1);
@@ -65,6 +65,7 @@ Student::Student(int id, std::string name, int numPastModelIncreasesCells, int m
 	this->numPastModelIncreasesCells = numPastModelIncreasesCells;
 	this->maxAmountOfStoredProfilesPerCell = maxAmountOfStoredProfilesPerCell;
 
+	this->utilities = utilities;
 }
 
 void Student::reset(int numberOfStudentModelCells, int maxAmountOfStoredProfilesPerCell) {
@@ -84,7 +85,7 @@ double Student::getEngagement() {
 	return this->currModel.engagement;
 }
 
-std::vector<Student::LearningState> Student::getPastModelIncreases() {
+std::vector<LearningState> Student::getPastModelIncreases() {
 	return this->pastModelIncreasesGrid.getAllModels();
 }
 
@@ -97,8 +98,8 @@ double Student::getAbility() {
 }
 
 
-void Student::changeCurrProfile(Utilities::LearningProfile newProfile) {
-	Student::LearningState currModel = this->currModel;
+void Student::changeCurrProfile(InteractionsProfile newProfile) {
+	LearningState currModel = this->currModel;
 	this->currModel.currProfile = newProfile;
 }
 int Student::getId()
@@ -109,10 +110,10 @@ std::string Student::getName()
 {
 	return this->name;
 }
-Utilities::LearningProfile Student::getCurrProfile() {
+InteractionsProfile Student::getCurrProfile() {
 	return this->currModel.currProfile;
 }
-Utilities::LearningProfile Student::getInherentPreference() {
+InteractionsProfile Student::getInherentPreference() {
 	return this->inherentPreference;
 }
 double Student::getLearningRate() {
@@ -132,9 +133,9 @@ void Student::simulateReaction(int currIteration)
 	this->pastModelIncreasesGrid.pushToGrid(increases);
 }
 
-void Student::calcReaction(double* engagement, double* ability, Utilities::LearningProfile* profile, int currIteration)
+void Student::calcReaction(double* engagement, double* ability, InteractionsProfile* profile, int currIteration)
 {
-	Utilities::LearningProfile currProfile = this->currModel.currProfile;
+	InteractionsProfile currProfile = this->currModel.currProfile;
 
 	*engagement = 0.5* (*engagement) + 0.5* (1.0 - inherentPreference.distanceBetween(*profile));
 

@@ -1,19 +1,12 @@
 #pragma once
 #include <algorithm> 
 
+#include "GlobalStructs.h"
 #include "Utilities.h"
 #include <iostream>
 
 class Student {
 public:
-	struct LearningState {
-		Utilities::LearningProfile currProfile;
-		double engagement; // on vs off task percentage
-		double ability; // score percentage
-
-		double dist;
-	};
-	
 	class StudentModelGrid {
 		private:
 			std::vector<std::vector<LearningState>> cells;
@@ -33,7 +26,7 @@ private:
 	std::string name;
 
 	//for simulation
-	Utilities::LearningProfile inherentPreference;
+	InteractionsProfile inherentPreference;
 	double learningRate;
 	std::vector<double> iterationReactions;
 
@@ -44,11 +37,11 @@ private:
 
 	LearningState currModel;
 
-
+	Utilities* utilities;
 
 public:
 
-	Student(int id, std::string name, int numPastModelIncreasesCells, int maxAmountOfStoredProfilesPerCell, int numIterations);
+	Student(int id, std::string name, int numPastModelIncreasesCells, int maxAmountOfStoredProfilesPerCell, int numIterations, Utilities* utilities);
 	void reset(int numberOfStudentModelCells, int maxAmountOfStoredProfilesPerCell);
 
 	void setEngagement(double preference);
@@ -58,17 +51,17 @@ public:
 	double getAbility();
 
 	std::vector<LearningState> getPastModelIncreases();
-	void changeCurrProfile(Utilities::LearningProfile newProfile);
+	void changeCurrProfile(InteractionsProfile newProfile);
 
 	int getId();
 	std::string getName();
 
-	Utilities::LearningProfile getCurrProfile();
-	Utilities::LearningProfile getInherentPreference();
+	InteractionsProfile getCurrProfile();
+	InteractionsProfile getInherentPreference();
 	double getLearningRate();
 
 	void simulateReaction(int currIteration);
-	void calcReaction(double* engagement, double* ability, Utilities::LearningProfile* profile, int currIteration);
+	void calcReaction(double* engagement, double* ability, InteractionsProfile* profile, int currIteration);
 
 
 

@@ -26,7 +26,7 @@ def main():
 	print(sum(optimalClosegroupSizeFreqsNew[10:nStudents]/ sum(optimalClosegroupSizeFreqsNew)))
 
 
-	font = {'family' : 'normal',
+	font = {'family' : 'helvetica',
         'weight' : 'normal',
         'size'   : 20}
 
@@ -34,7 +34,7 @@ def main():
 
 	width = 0.35;
 
-	plt.subplot(1,2,1)
+	plt.subplot(2,1,1)
 	ticks = numpy.array([i for i in range(2,nStudents)])
 	plt.bar(ticks-width/2, optimalClosegroupSizeFreqsOld[2:nStudents]/ sum(optimalClosegroupSizeFreqsOld), width, align='center', color= "red", alpha=0.5)
 	plt.bar(ticks+width/2, optimalClosegroupSizeFreqsNew[2:nStudents]/ sum(optimalClosegroupSizeFreqsNew), width, align='center', color= "green", alpha=0.5)
@@ -44,7 +44,7 @@ def main():
 	plt.ylabel("Occurence (%)")
 
 
-	plt.subplot(1,2,2)
+	plt.subplot(2,1,2)
 	ticks = numpy.array([i for i in range(1, 12)])
 	plt.bar(ticks-width/2, optimalCloseconfigSizeFreqsOld[1:12]/ sum(optimalCloseconfigSizeFreqsOld), width, align='center', color= "red", alpha=0.5)
 	plt.bar(ticks+width/2, optimalCloseconfigSizeFreqsNew[1:12]/ sum(optimalCloseconfigSizeFreqsNew), width, align='center', color= "green", alpha=0.5)
@@ -111,10 +111,10 @@ def main():
 
 	# plt.plot(timesteps, randomCloseAbilities[:nValuesToDisplay], label=r'$Random\ strategy$')
 	# plt.plot(timesteps, optimalCloseAbilities[:nValuesToDisplay], label=r'$Optimal\ strategy$')
-	plt.plot(timesteps[:nValuesToDisplay], GAL10Abilities[:nValuesToDisplay],  color="red", label=r'$GAL\ 10\ Samples\ (Avg\ It.\ Exec.\ Time\ =\ 0.0006037)$')
-	plt.plot(timesteps[:nValuesToDisplay], GAL100Abilities[:nValuesToDisplay],  color="green", label=r'$GAL\ 100\ Samples\ (Avg\ It.\ Exec.\ Time\ =\ 0.0061422)$')
-	plt.plot(timesteps[:nValuesToDisplay], GAL1000Abilities[:nValuesToDisplay],  color="brown", label=r'$GAL\ 1000\ Samples\ (Avg\ It.\ Exec.\ Time\ =\ 0.0610035)$')
-	plt.plot(timesteps[:nValuesToDisplay], GAL2000Abilities[:nValuesToDisplay],  color="salmon", label=r'$GAL\ 2000\ Samples\ (Avg\ It.\ Exec.\ Time\ =\ 0.121699)$')
+	plt.plot(timesteps[:nValuesToDisplay], GAL10Abilities[:nValuesToDisplay],  color="red", label=r'$IMAS\ 10\ Samples\ (Avg\ It.\ Exec.\ Time\ =\ 0.0006037)$')
+	plt.plot(timesteps[:nValuesToDisplay], GAL100Abilities[:nValuesToDisplay],  color="green", label=r'$IMAS\ 100\ Samples\ (Avg\ It.\ Exec.\ Time\ =\ 0.0061422)$')
+	plt.plot(timesteps[:nValuesToDisplay], GAL1000Abilities[:nValuesToDisplay],  color="brown", label=r'$IMAS\ 1000\ Samples\ (Avg\ It.\ Exec.\ Time\ =\ 0.0610035)$')
+	plt.plot(timesteps[:nValuesToDisplay], GAL2000Abilities[:nValuesToDisplay],  color="salmon", label=r'$IMAS\ 2000\ Samples\ (Avg\ It.\ Exec.\ Time\ =\ 0.121699)$')
 
 	plt.xlabel("Iteration")
 	plt.ylabel("avg Ability Increase")
@@ -196,17 +196,17 @@ def main():
 
 	# plt.xticks([i for i in range(nValuesToDisplay)])
 
-	# plt.plot(timesteps[:nValuesToDisplay], randomCloseAbilities[:nValuesToDisplay], label=r'$Random\ strategy$')
+	plt.plot(timesteps[:nValuesToDisplay], numpy.array(optimalCloseAbilities[:nValuesToDisplay]) - numpy.array(randomCloseAbilities[:nValuesToDisplay]), label=r'$Random\ strategy$')
 	# plt.plot(timesteps[:nValuesToDisplay], optimalCloseAbilities[:nValuesToDisplay], label=r'$Optimal\ strategy$')
-	# plt.plot(timesteps[:nValuesToDisplay], GAL5Abilities[:nValuesToDisplay],  color="green", label=r'$GAL\ strategy$')
+	plt.plot(timesteps[:nValuesToDisplay], numpy.array(optimalCloseAbilities[:nValuesToDisplay]) - numpy.array(GAL5Abilities[:nValuesToDisplay]),  color="green", label=r'$IMAS\ strategy$')
 
-	plt.plot(timesteps[:nValuesToDisplay], GAL1Abilities[:nValuesToDisplay],  color="red", label=r'$GAL\ k\ =\ 1$')
-	plt.plot(timesteps[:nValuesToDisplay], GAL5Abilities[:nValuesToDisplay],  color="green", label=r'$GAL\ k\ =\ 5$')
-	plt.plot(timesteps[:nValuesToDisplay], GAL24Abilities[:nValuesToDisplay],  color="brown", label=r'$GAL\ k\ =\ 24$')
-	plt.plot(timesteps[:nValuesToDisplay], GAL30Abilities[:nValuesToDisplay],  color="salmon", label=r'$GAL\ k\ =\ 30$')
+	# plt.plot(timesteps[:nValuesToDisplay], GAL1Abilities[:nValuesToDisplay],  color="red", label=r'$IMAS\ k\ =\ 1$')
+	# plt.plot(timesteps[:nValuesToDisplay], GAL5Abilities[:nValuesToDisplay],  color="green", label=r'$IMAS\ k\ =\ 5$')
+	# plt.plot(timesteps[:nValuesToDisplay], GAL24Abilities[:nValuesToDisplay],  color="brown", label=r'$IMAS\ k\ =\ 24$')
+	# plt.plot(timesteps[:nValuesToDisplay], GAL30Abilities[:nValuesToDisplay],  color="salmon", label=r'$IMAS\ k\ =\ 30$')
 
 	plt.xlabel("Iteration")
-	plt.ylabel("avg Ability Increase")
+	plt.ylabel("Distance from Optimal avg Ability Increase")
 
 	plt.legend(loc='best')
 	plt.show()
@@ -227,9 +227,9 @@ def main():
 
 
 
-	plt.plot(timesteps[:nValuesToDisplay], numpy.array(randomClosePrefDiffs[:nValuesToDisplay]), label=r'$Random\ strategy$')
-	plt.plot(timesteps[:nValuesToDisplay], numpy.array(optimalClosePrefDiffs[:nValuesToDisplay]), color="orange", label=r'$Optimal\ strategy$')
-	plt.plot(timesteps[:nValuesToDisplay], numpy.array(GAL5PrefDiffs[:nValuesToDisplay]), color="green", label=r'$GAL\ strategy$')
+	plt.plot(timesteps[:nValuesToDisplay], numpy.array(randomClosePrefDiffs[:nValuesToDisplay]) - numpy.array(optimalClosePrefDiffs[:nValuesToDisplay]), label=r'$Random\ strategy$')
+	# plt.plot(timesteps[:nValuesToDisplay], numpy.array(optimalClosePrefDiffs[:nValuesToDisplay]), color="orange", label=r'$Optimal\ strategy$')
+	plt.plot(timesteps[:nValuesToDisplay], numpy.array(GAL5PrefDiffs[:nValuesToDisplay]) - numpy.array(optimalClosePrefDiffs[:nValuesToDisplay]), color="green", label=r'$IMAS\ strategy$')
 	
 	# plt.plot(timesteps, abs(numpy.array(optimal20PrefDiffs[:nValuesToDisplay]) - numpy.array(GAL20PrefDiffs[:nValuesToDisplay])), label=r'$GAL/Optimal\ avg\ difference$')
 
@@ -242,7 +242,7 @@ def main():
 
 	plt.plot(timesteps[:nValuesToDisplay], randomCloseEngagements[:nValuesToDisplay],  label=r'$Random\ strategy$')
 	plt.plot(timesteps[:nValuesToDisplay], optimalCloseEngagements[:nValuesToDisplay], color="orange", label=r'$Optimal\ strategy$')
-	plt.plot(timesteps[:nValuesToDisplay], GAL5Engagements[:nValuesToDisplay], color="green", label=r'$GAL\ strategy$')
+	plt.plot(timesteps[:nValuesToDisplay], GAL5Engagements[:nValuesToDisplay], color="green", label=r'$IMAS\ strategy$')
 	# plt.plot(timesteps, GAL100_25Engagements[:nValuesToDisplay], color="red", label=r'$GAL\ group\ formation\ strategy\ 100\ profiles\ 25\%\ NNs$')
 
 	plt.xlabel("Iteration")
