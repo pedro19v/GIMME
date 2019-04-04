@@ -1,11 +1,5 @@
-struct LearningState {
-	InteractionsProfile currProfile;
-	double engagement; // on vs off task percentage
-	double ability; // score percentage
-
-	double dist;
-};
-
+#pragma once
+#include "Student.h"
 
 struct InteractionsProfile {
 public:
@@ -68,23 +62,28 @@ public:
 
 };
 
+struct LearningState {
+	InteractionsProfile currProfile;
+	double engagement; // on vs off task percentage
+	double ability; // score percentage
+
+	double dist;
+};
+
 struct AdaptationGroup {
 private:
-	Student::LearningState avgLearningState;
+	LearningState avgLearningState;
 	InteractionsProfile avgPreferences;
 	InteractionsProfile learningProfile;
 	std::vector<Student*> students;
 public:
 
-
 	void addStudent(Student* student) {
-
 		students.push_back(student);
 		int studentsSize = students.size();
 
-
 		//recalculate averages
-		avgLearningState = Student::LearningState();
+		avgLearningState = LearningState();
 		avgPreferences.K_cl = 0;
 		avgPreferences.K_cp = 0;
 		avgPreferences.K_i = 0;
@@ -110,7 +109,7 @@ public:
 	InteractionsProfile getInteractionsProfile() {
 		return this->learningProfile;
 	}
-	Student::LearningState getAvgLearningState() {
+	LearningState getAvgLearningState() {
 		return this->avgLearningState;
 	}
 	InteractionsProfile getAvgPreferences() {

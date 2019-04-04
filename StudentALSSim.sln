@@ -3,9 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2018
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StudentALSSim", "StudentALSSim\StudentALSSim.vcxproj", "{4567FFD8-26AA-4CE4-BE6E-8FCE975698DE}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GIMMECore", "StudentALSSim\StudentALSSim.vcxproj", "{4567FFD8-26AA-4CE4-BE6E-8FCE975698DE}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GIMMEToolUI", "GIMMEToolUI\GIMMEToolUI.vcxproj", "{B12702AD-ABFB-343A-A199-8E24837244A3}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GIMMEUI", "GIMMEToolUI\GIMMEToolUI.vcxproj", "{B12702AD-ABFB-343A-A199-8E24837244A3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4567FFD8-26AA-4CE4-BE6E-8FCE975698DE} = {4567FFD8-26AA-4CE4-BE6E-8FCE975698DE}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

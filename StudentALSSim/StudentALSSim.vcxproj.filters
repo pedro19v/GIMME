@@ -3,18 +3,14 @@
   <ItemGroup>
     <ClCompile Include="source\Student.cpp" />
     <ClCompile Include="source\Student.cpp" />
-    <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\Student.cpp" />
     <ClCompile Include="source\Adaptation.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="source\main.cpp">
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="source\Student.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="source\Core.cpp">
+    <ClCompile Include="source\GIMMECore.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -33,13 +29,10 @@
     <ClInclude Include="headers\Adaptation.h">
       <Filter>headers</Filter>
     </ClInclude>
-    <ClInclude Include="headers\Globals.h">
-      <Filter>headers</Filter>
-    </ClInclude>
     <ClInclude Include="headers\Student.h">
       <Filter>headers</Filter>
     </ClInclude>
-    <ClInclude Include="Core.h">
+    <ClInclude Include="headers\GIMMECore.h">
       <Filter>headers</Filter>
     </ClInclude>
   </ItemGroup>

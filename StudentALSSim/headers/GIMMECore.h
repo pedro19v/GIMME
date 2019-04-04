@@ -8,18 +8,18 @@
 #include <ios>
 #include <string>
 
-class Core {
+class GIMMECore {
 private:
-	int numRuns = 30;
-	int numTrainingCycles = 30;
-	const int numStudentModelCells = 1;
+	int numRuns;
+	int numTrainingCycles;
 
-	int numAdaptationConfigurationChoices = 100;
-	int timeWindow = 30;
-	int maxNumStudentsPerGroup = 5;
-	int minNumStudentsPerGroup = 2;
+	int numConfigurationChoices;
+	int numFitnessNNs;
+	int timeWindow;
+	int maxNumStudentsPerGroup;
+	int minNumStudentsPerGroup;
 
-	int numTasksPerGroup = 3;
+	int numTasksPerGroup;
 
 	int numStudentsInClass;
 	int numStudentModelCells;
@@ -30,16 +30,12 @@ private:
 	std::vector<AdaptationTask> possibleCompetitiveTasks;
 	std::vector<AdaptationTask> possibleIndividualTasks;
 
+	Adaptation* adapt;
 	Utilities* utilities;
 
-	std::ofstream statisticsFile;
-	std::ofstream resultsFile;
+	/*std::ofstream statisticsFile;
+	std::ofstream resultsFile;*/
 
-	Core(int numStudentsInClass, int numberOfStudentModelCells, int maxAmountOfStoredProfilesPerCell, int numIterations,
-		std::vector<AdaptationTask> possibleCollaborativeTasks,
-		std::vector<AdaptationTask> possibleCompetitiveTasks,
-		std::vector<AdaptationTask> possibleIndividualTasks);
-	~Core();
 	void reset();
 
 	void simulateStudentsReaction(int currIteration);
@@ -48,8 +44,14 @@ private:
 	void storeSimData(std::string configId, Adaptation* adapt);
 	void executeSimulation(int numRuns, Adaptation* adapt);
 
-	void executeAdaptationStep(int currStepIndex, int currRun, Adaptation* adapt);
 	void simulateAdaptationModule(int currRun, Adaptation* adapt, int initialStep);
 public:
-
+	GIMMECore(int numStudentsInClass, int numberOfStudentModelCells, int maxAmountOfStoredProfilesPerCell,
+		int numConfigurtionChoices, int numFitnessNNs, int timeWindow,
+		int minNumStudentsPerGroup, int maxNumStudentsPerGroup,
+		std::vector<AdaptationTask> possibleCollaborativeTasks,
+		std::vector<AdaptationTask> possibleCompetitiveTasks,
+		std::vector<AdaptationTask> possibleIndividualTasks);
+	~GIMMECore();
+	void executeAdaptationStep(int currStepIndex, int currRun);
 };

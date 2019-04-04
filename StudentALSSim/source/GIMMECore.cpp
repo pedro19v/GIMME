@@ -1,26 +1,42 @@
-#include "../headers/Core.h"
+#include "../headers/GIMMECore.h"
 
 
-
-Core::Core(int numStudentsInClass, int numberOfStudentModelCells, int maxAmountOfStoredProfilesPerCell, int numIterations,
+GIMMECore::GIMMECore(int numStudentsInClass, int numberOfStudentModelCells, int maxAmountOfStoredProfilesPerCell,
+	int numConfigurtionChoices, int numFitnessNNs, int timeWindow, 
+	int minNumStudentsPerGroup, int maxNumStudentsPerGroup,
 	std::vector<AdaptationTask> possibleCollaborativeTasks,
 	std::vector<AdaptationTask> possibleCompetitiveTasks,
 	std::vector<AdaptationTask> possibleIndividualTasks){
+
+	this->numRuns = 0;
+	this->numTrainingCycles = 30;
+	this->numConfigurationChoices = numConfigurtionChoices;
+	this->numFitnessNNs = numFitnessNNs;
+	this->timeWindow = timeWindow;
+	this->minNumStudentsPerGroup = minNumStudentsPerGroup;
+	this->maxNumStudentsPerGroup = maxNumStudentsPerGroup;
+
+	this->numTasksPerGroup = 5;
+	this->numStudentsInClass = numStudentsInClass;
+	this->numStudentModelCells = numberOfStudentModelCells;
+	this->maxAmountOfStoredProfilesPerCell = maxAmountOfStoredProfilesPerCell;
+
+	int numIterations = 0;
+
 	//define and init globals and utilities
 	std::vector<Student*> students = std::vector<Student*>();
-
-
-	std::vector<AdaptationTask> possibleCollaborativeTasks = std::vector<AdaptationTask>();
-	std::vector<AdaptationTask> possibleCompetitiveTasks = std::vector<AdaptationTask>();
-	std::vector<AdaptationTask> possibleIndividualTasks = std::vector<AdaptationTask>();
 
 
 	possibleCollaborativeTasks = std::vector<AdaptationTask>();
 	possibleCompetitiveTasks = std::vector<AdaptationTask>();
 	possibleIndividualTasks = std::vector<AdaptationTask>();
 
-	utilities = new Utilities();
+/*
+	possibleCollaborativeTasks = std::vector<AdaptationTask>();
+	possibleCompetitiveTasks = std::vector<AdaptationTask>();
+	possibleIndividualTasks = std::vector<AdaptationTask>();*/
 
+	utilities = new Utilities();
 	utilities->resetRandoms();
 	//generate all of the students models
 	students = std::vector<Student*>();
@@ -29,25 +45,27 @@ Core::Core(int numStudentsInClass, int numberOfStudentModelCells, int maxAmountO
 	}
 
 	
+	adapt = new Adaptation(numStudentsInClass, numConfigurtionChoices, minNumStudentsPerGroup,
+		maxNumStudentsPerGroup, numFitnessNNs, 2, numIterations, numTasksPerGroup, utilities);
 
-	statisticsFile = std::ofstream("./statistics.txt", std::ios::in | std::ios::out);
-	resultsFile = std::ofstream("./results.txt", std::ios::in | std::ios::out);
+	//statisticsFile = std::ofstream("./statistics.txt", std::ios::in | std::ios::out);
+	//resultsFile = std::ofstream("./results.txt", std::ios::in | std::ios::out);
 
 }
-void Core::reset() {
+void GIMMECore::reset() {
 	//generate all of the students models
 	for (int i = 0; i < numStudentsInClass; i++) {
 		Student* currStudent = students[i];
 		currStudent->reset(numStudentModelCells, maxAmountOfStoredProfilesPerCell);
 	}
 }
-Core::~Core(){
+GIMMECore::~GIMMECore(){
 	for (int i = 0; i < numStudentsInClass; i++) {
 		delete students[i];
 	}
 }
 
-void Core::simulateStudentsReaction(int currIteration) {
+void GIMMECore::simulateStudentsReaction(int currIteration) {
 	//simulate students reaction
 	for (int j = 0; j < numStudentsInClass; j++) {
 		Student* currStudent = students[j];
@@ -56,12 +74,12 @@ void Core::simulateStudentsReaction(int currIteration) {
 }
 
 
-void Core::simulateTrainingPhase() {
+void GIMMECore::simulateTrainingPhase() {
 	Adaptation randomClose = Adaptation(numStudentsInClass, 10, minNumStudentsPerGroup, maxNumStudentsPerGroup, 5, 0, numTrainingCycles, numTasksPerGroup, utilities);
 	simulateAdaptationModule(0, &randomClose, 0);
 }
 
-void Core::storeSimData(std::string configId, Adaptation* adapt) {
+void GIMMECore::storeSimData(std::string configId, Adaptation* adapt) {
 	std::vector<int> groupSizeFreqs = adapt->groupSizeFreqs;
 	std::vector<int> configSizeFreqs = adapt->configSizeFreqs;
 
@@ -71,9 +89,9 @@ void Core::storeSimData(std::string configId, Adaptation* adapt) {
 	double avgExecutionTime = adapt->avgExecutionTime;
 
 	int numAdaptationCycles = adapt->getNumAdaptationCycles();
-	int numStudentsInClass = adapt->getNumStudentsInClass();
+	//int numStudentsInClass = adapt->getNumStudentsInClass();
 
-	statisticsFile << "timesteps=[";
+	/*statisticsFile << "timesteps=[";
 	for (int i = 0; i < numAdaptationCycles; i++) {
 		statisticsFile << i;
 		if (i != (numAdaptationCycles - 1)) {
@@ -134,11 +152,11 @@ void Core::storeSimData(std::string configId, Adaptation* adapt) {
 	statisticsFile << configId.c_str() << "avgExecTime=" << avgExecutionTime;
 	statisticsFile << "\n\n";
 
-	statisticsFile.flush();
+	statisticsFile.flush();*/
 	//return statisticsFile;
 }
 
-void Core::executeSimulation(int numRuns, Adaptation* adapt) {
+void GIMMECore::executeSimulation(int numRuns, Adaptation* adapt) {
 
 	int numAdaptationCycles = adapt->getNumAdaptationCycles();
 
@@ -150,11 +168,11 @@ void Core::executeSimulation(int numRuns, Adaptation* adapt) {
 	}
 
 	storeSimData("GAL100", adapt);
-	statisticsFile.close();
+	//statisticsFile.close();
 }
 
 
-void Core::executeAdaptationStep(int currStepIndex, int currRun, Adaptation* adapt) {
+void GIMMECore::executeAdaptationStep(int currStepIndex, int currRun) {
 
 	AdaptationConfiguration currAdaptedConfig = adapt->getCurrAdaptedConfig();
 	std::vector<AdaptationGroup> groups = currAdaptedConfig.groups;
@@ -175,7 +193,7 @@ void Core::executeAdaptationStep(int currStepIndex, int currRun, Adaptation* ada
 		std::vector<Student*> currGroup = groupMechanicPairs[j].first.getStudents();
 		std::vector<AdaptationTask> currMechanic = groupMechanicPairs[j].second;
 
-		resultsFile << "promote on students:" << std::endl;
+		/*resultsFile << "promote on students:" << std::endl;
 		for (int k = 0; k < currGroup.size(); k++) {
 			resultsFile << "Number: " << currGroup[k]->getId() << ", Name: " << currGroup[k]->getName() << std::endl;
 		}
@@ -183,12 +201,12 @@ void Core::executeAdaptationStep(int currStepIndex, int currRun, Adaptation* ada
 		for (int k = 0; k < currMechanic.size(); k++) {
 			resultsFile << currMechanic[k].description << std::endl;
 		}
-		resultsFile << "-- -- -- -- -- -- -- -- -- -- -- -- --" << std::endl;
+		resultsFile << "-- -- -- -- -- -- -- -- -- -- -- -- --" << std::endl;*/
 	}
-	resultsFile << "----------------------End of Iteration--------------------" << std::endl;
+	//resultsFile << "----------------------End of Iteration--------------------" << std::endl;
 }
 
-void Core::simulateAdaptationModule(int currRun, Adaptation* adapt, int initialStep) {
+void GIMMECore::simulateAdaptationModule(int currRun, Adaptation* adapt, int initialStep) {
 	int i = 0;
 	int numAdaptationCycles = adapt->getNumAdaptationCycles();
 	while (true) {
@@ -206,7 +224,7 @@ void Core::simulateAdaptationModule(int currRun, Adaptation* adapt, int initialS
 			adapt->avgEngagements[i] += students[j]->currModelIncreases.engagement / (numStudentsInClass * numRuns);
 		}
 
-		executeAdaptationStep(initialStep + i, currRun, adapt);
+		executeAdaptationStep(initialStep + i, currRun);
 		if (i > (adapt->getNumAdaptationCycles() - 1)) {
 			break;
 		}

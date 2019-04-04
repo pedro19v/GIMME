@@ -1,16 +1,17 @@
+#include "..\headers\Utilities.h"
 #include "Utilities.h"
 
 #define _USE_MATH_DEFINES
 
 //struct AdaptationTask; //forward declaration
 
-
-void Utilities::Utilities() {
+Utilities::Utilities() {
 	this.defaultRandomSeed = time(NULL);
 	this.uniformDistributionReal = std::uniform_real_distribution<double>();
 	this.uniformDistributionInt = std::uniform_int_distribution<>();
 	this.normalDistribution = std::normal_distribution<double>();
 }
+
 
 void Utilities::resetRandoms() {
 	uniformDistributionReal.reset();

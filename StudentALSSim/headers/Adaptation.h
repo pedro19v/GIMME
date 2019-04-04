@@ -3,13 +3,90 @@
 #include <algorithm>
 #include <numeric>
 #include "Student.h"
-#include "GlobalStructs.h"
 #include "Utilities.h"
 
 #include "time.h"
 
 #include <iostream>
 
+
+struct AdaptationGroup {
+private:
+	LearningState avgLearningState;
+	InteractionsProfile avgPreferences;
+	InteractionsProfile learningProfile;
+	std::vector<Student*> students;
+public:
+
+	void addStudent(Student* student) {
+		students.push_back(student);
+		int studentsSize = students.size();
+
+		//recalculate averages
+		avgLearningState = LearningState();
+		avgPreferences.K_cl = 0;
+		avgPreferences.K_cp = 0;
+		avgPreferences.K_i = 0;
+
+		for (int i = 0; i < studentsSize; i++) {
+			Student* currStudent = students[i];
+			InteractionsProfile currStudentPreference = currStudent->getInherentPreference();
+			avgLearningState.engagement += currStudent->getEngagement() / studentsSize;
+			avgLearningState.ability += currStudent->getAbility() / studentsSize;
+			avgPreferences.K_cl += currStudentPreference.K_cl / studentsSize;
+			avgPreferences.K_cp += currStudentPreference.K_cp / studentsSize;
+			avgPreferences.K_i += currStudentPreference.K_i / studentsSize;
+		}
+
+	}
+	std::vector<Student*> getStudents() {
+		return this->students;
+	}
+	void setLearningProfile(InteractionsProfile learningProfile) {
+		this->learningProfile = learningProfile;
+	}
+
+	InteractionsProfile getInteractionsProfile() {
+		return this->learningProfile;
+	}
+	LearningState getAvgLearningState() {
+		return this->avgLearningState;
+	}
+	InteractionsProfile getAvgPreferences() {
+		return this->avgPreferences;
+	}
+};
+struct AdaptationConfiguration {
+public:
+	std::vector<AdaptationGroup> groups;
+};
+enum AdaptationTaskType {
+	COLLABORATION = 0,
+	COMPETITION = 1,
+	SELF_INTERACTION = 2
+};
+struct AdaptationTask {
+private:
+	/*struct WayToSortTaskInstances {
+		bool operator()(const AdaptationTask& i, const AdaptationTask& j) { return i.minRequiredAbility < j.minRequiredAbility; }
+	};*/
+public:
+	AdaptationTaskType type;
+	std::string description;
+	float minRequiredAbility;
+	std::vector<AdaptationTask> taskInstances; //maintained in order
+
+	AdaptationTask(AdaptationTaskType type, std::string description, float minRequiredAbility, std::vector<AdaptationTask> taskInstances) {
+		this->type = type;
+		this->description = description;
+		this->minRequiredAbility = minRequiredAbility;
+
+		//std::sort(taskInstances.begin(), taskInstances.end(), WayToSortTaskInstances());
+		this->taskInstances = taskInstances;
+	}
+	AdaptationTask(AdaptationTaskType type, std::string description, std::vector<AdaptationTask> taskInstances) : AdaptationTask(type, description, 0, taskInstances) {}
+	AdaptationTask(AdaptationTaskType type, std::string description, float minRequiredAbility) : AdaptationTask(type, description, minRequiredAbility, std::vector<AdaptationTask>()) {}
+};
 
 class Adaptation {
 

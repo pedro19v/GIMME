@@ -1,16 +1,18 @@
-#include "GIMMEToolUI.h"
+#include "GIMMEUI.h"
 #include <QPushButton>
 
-//include core functionalities
-#include "../StudentALSSim/headers/Core.h"
 
-GIMMEToolUI::GIMMEToolUI(QWidget *parent)
+GIMMEUI::GIMMEUI(QWidget *parent)
 	: QMainWindow(parent)
 {
 
 	QPushButton button("Hello world !");
 	button.show();
 
+
+	std::vector<AdaptationTask> possibleCollaborativeTasks = std::vector<AdaptationTask>();
+	std::vector<AdaptationTask> possibleCompetitiveTasks = std::vector<AdaptationTask>();
+	std::vector<AdaptationTask> possibleIndividualTasks = std::vector<AdaptationTask>();
 
 	possibleCollaborativeTasks.clear();
 	std::vector<AdaptationTask> taskInstances = std::vector<AdaptationTask>();
@@ -90,7 +92,14 @@ GIMMEToolUI::GIMMEToolUI(QWidget *parent)
 	task3 = AdaptationTask(AdaptationTaskType::SELF_INTERACTION, "self3", taskInstances);
 	possibleIndividualTasks.push_back(task3);
 
-	Core GIMMECore = Core(23,5,5,);
+	//GIMMECore gIMMECore = GIMMECore(23, 1, 1,
+	//	100, 20, 30,
+	//	2, 5,
+	//	possibleCollaborativeTasks,
+	//	possibleCompetitiveTasks,
+	//	possibleIndividualTasks);
+	//gIMMECore.executeAdaptationStep(0, 0);
+
 
 	ui.setupUi(this);
 }
