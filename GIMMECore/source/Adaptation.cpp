@@ -12,7 +12,7 @@ Adaptation::Adaptation(
 	std::vector<AdaptationTask> possibleIndividualTasks){
 
 	this->students = students;
-	int studentSize = students.size();
+	int studentSize = (int) students.size();
 
 
 	this->numberOfConfigChoices = numberOfConfigChoices;
@@ -156,7 +156,7 @@ AdaptationConfiguration Adaptation::organizeStudents(std::vector<Student*> stude
 
 		studentsWithoutGroupSize = (int) studentsWithoutGroup.size();
 		while (studentsWithoutGroupSize > 0) {
-			int randomGroupIndex = utilities->randIntBetween(0, newConfig.groups.size() - 1);
+			int randomGroupIndex = utilities->randIntBetween(0, (int) newConfig.groups.size() - 1);
 
 			int currStudentIndex = 0;
 			if (studentsWithoutGroupSize > 1) {
@@ -263,7 +263,7 @@ std::vector<AdaptationTask> Adaptation::generateMechanic(InteractionsProfile bes
 
 AdaptationTask Adaptation::pickRandTaskInstance(std::vector<AdaptationTask> possibleTasks, LearningState avgLearningState)
 {
-	int randIndex = utilities->randIntBetween(0, possibleTasks.size() - 1);
+	int randIndex = utilities->randIntBetween(0, (int) possibleTasks.size() - 1);
 	AdaptationTask randomTask = possibleTasks[randIndex];
 	std::vector<AdaptationTask> randomTaskInstances = randomTask.taskInstances;
 	int randomTaskInstancesSize = (int) randomTaskInstances.size();
