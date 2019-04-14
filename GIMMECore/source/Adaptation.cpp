@@ -79,7 +79,7 @@ std::vector<std::pair<AdaptationGroup, std::vector<AdaptationTask>>> Adaptation:
 		}
 
 		InteractionsProfile currGroupProfile = currGroup.getInteractionsProfile();
-		LearningState currGroupState = currGroup.getAvgLearningState();
+		PlayerState currGroupState = currGroup.getAvgLearningState();
 		groupMechanicPairs.push_back({ currGroup , generateMechanic(currGroupProfile, currGroupState, possibleCollaborativeTasks, possibleCompetitiveTasks, possibleIndividualTasks) });
 	}
 	
@@ -204,17 +204,17 @@ double Adaptation::fitness(Student* student, InteractionsProfile profile, int nu
 
 	if (fitnessCondition == 1) {
 		double engagement = 0;
-		double predSimAbility = student->getCurrState().ability;
+		double predSimAbility = student->getCurrState().characteristics.ability;
 		student->calcReaction(&engagement, &predSimAbility, &profile, currIteration);
-		double abilityInc = predSimAbility - student->getCurrState().ability;
+		double abilityInc = predSimAbility - student->getCurrState().characteristics.ability;
 		return abilityInc;
 	}
 
-	std::vector<LearningState> pastModelIncs = student->getPastModelIncreases();
-	std::vector<LearningState> pastModelncsCopy = std::vector<LearningState>(pastModelIncs);
+	std::vector<PlayerState> pastModelIncs = student->getPastModelIncreases();
+	std::vector<PlayerState> pastModelncsCopy = std::vector<PlayerState>(pastModelIncs);
 	int pastModelIncsSize = (int) pastModelIncs.size();
 
-	LearningState predictedModel = { profile, 0 , 0 };
+	PlayerState predictedModel = { profile, 0 , 0 };
 	std::sort(pastModelncsCopy.begin(), pastModelncsCopy.end(), FitnessSort(this, profile));
 
 	if (pastModelIncsSize > numberOfFitnessNNs) {
@@ -222,21 +222,21 @@ double Adaptation::fitness(Student* student, InteractionsProfile profile, int nu
 	}
 	int pastModelncsCopySize = (int) pastModelncsCopy.size();
 
-	predictedModel.ability = 0;
-	predictedModel.engagement = 0;
+	predictedModel.characteristics.ability = 0;
+	predictedModel.characteristics.engagement = 0;
 	for (int i = 0; i < pastModelncsCopySize; i++) {
 		InteractionsProfile pastProfile = pastModelncsCopy[i].profile;
 		double distance = profile.distanceBetween(pastProfile);
 
-		predictedModel.ability += pastModelncsCopy[i].ability* (1 - distance) / (double) (pastModelncsCopySize); //* (1 - distance) 
-		predictedModel.engagement += pastModelncsCopy[i].engagement* (1 - distance) / (double)(pastModelncsCopySize); //* (1 - distance)
+		predictedModel.characteristics.ability += pastModelncsCopy[i].characteristics.ability* (1 - distance) / (double) (pastModelncsCopySize); //* (1 - distance) 
+		predictedModel.characteristics.engagement += pastModelncsCopy[i].characteristics.engagement* (1 - distance) / (double)(pastModelncsCopySize); //* (1 - distance)
 	}
 
-	return 0.5*(predictedModel.ability) + 0.5*predictedModel.engagement; //ability must be normalized to [0,1]
+	return 0.5*(predictedModel.characteristics.ability) + 0.5*predictedModel.characteristics.engagement; //ability must be normalized to [0,1]
 }
 
 std::vector<AdaptationTask> Adaptation::generateMechanic(InteractionsProfile bestConfigProfile,
-	LearningState avgLearningState,
+	PlayerState avgLearningState,
 	std::vector<AdaptationTask> possibleCollaborativeTasks,
 	std::vector<AdaptationTask> possibleCompetitiveTasks,
 	std::vector<AdaptationTask> possibleIndividualTasks) {
@@ -261,7 +261,7 @@ std::vector<AdaptationTask> Adaptation::generateMechanic(InteractionsProfile bes
 	return mechanicTasks;
 }
 
-AdaptationTask Adaptation::pickRandTaskInstance(std::vector<AdaptationTask> possibleTasks, LearningState avgLearningState)
+AdaptationTask Adaptation::pickRandTaskInstance(std::vector<AdaptationTask> possibleTasks, PlayerState avgLearningState)
 {
 	int randIndex = utilities->randIntBetween(0, (int) possibleTasks.size() - 1);
 	AdaptationTask randomTask = possibleTasks[randIndex];
@@ -272,7 +272,7 @@ AdaptationTask Adaptation::pickRandTaskInstance(std::vector<AdaptationTask> poss
 	for (int j = 1; j < randomTaskInstancesSize; j++) {
 		AdaptationTask currInstance = randomTaskInstances[j];
 		float minRequiredAbility = currInstance.minRequiredAbility;
-		if (minRequiredAbility < avgLearningState.ability && minRequiredAbility > adaptedInstance.minRequiredAbility) {
+		if (minRequiredAbility < avgLearningState.characteristics.ability && minRequiredAbility > adaptedInstance.minRequiredAbility) {
 			adaptedInstance = currInstance;
 		}
 	}

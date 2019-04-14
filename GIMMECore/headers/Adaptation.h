@@ -10,7 +10,7 @@
 
 struct AdaptationGroup {
 private:
-	LearningState avgLearningState;
+	PlayerState avgLearningState;
 	InteractionsProfile avgPreferences;
 	InteractionsProfile interactionsProfile;
 	std::vector<Student*> students;
@@ -21,7 +21,7 @@ public:
 		int studentsSize = (int) students.size();
 
 		//recalculate averages
-		avgLearningState = LearningState();
+		avgLearningState = PlayerState();
 		avgPreferences.K_cl = 0;
 		avgPreferences.K_cp = 0;
 		avgPreferences.K_i = 0;
@@ -29,8 +29,8 @@ public:
 		for (int i = 0; i < studentsSize; i++) {
 			Student* currStudent = students[i];
 			InteractionsProfile currStudentPreference = currStudent->getInherentPreference();
-			avgLearningState.engagement += currStudent->getCurrState().engagement / studentsSize;
-			avgLearningState.ability += currStudent->getCurrState().ability / studentsSize;
+			avgLearningState.characteristics.engagement += currStudent->getCurrState().characteristics.engagement / studentsSize;
+			avgLearningState.characteristics.ability += currStudent->getCurrState().characteristics.ability / studentsSize;
 			avgPreferences.K_cl += currStudentPreference.K_cl / studentsSize;
 			avgPreferences.K_cp += currStudentPreference.K_cp / studentsSize;
 			avgPreferences.K_i += currStudentPreference.K_i / studentsSize;
@@ -47,7 +47,7 @@ public:
 	InteractionsProfile getInteractionsProfile() {
 		return this->interactionsProfile;
 	}
-	LearningState getAvgLearningState() {
+	PlayerState getAvgLearningState() {
 		return this->avgLearningState;
 	}
 	InteractionsProfile getAvgPreferences() {
@@ -114,11 +114,11 @@ private:
 	AdaptationConfiguration adaptedConfig;
 	AdaptationConfiguration organizeStudents(std::vector<Student*> students, int currIteration);
 	std::vector<AdaptationTask> generateMechanic(InteractionsProfile bestConfigProfile,
-		LearningState avgLearningState,
+		PlayerState avgLearningState,
 		std::vector<AdaptationTask> possibleCollaborativeTasks,
 		std::vector<AdaptationTask> possibleCompetitiveTasks,
 		std::vector<AdaptationTask> possibleIndividualTasks);
-	AdaptationTask pickRandTaskInstance(std::vector<AdaptationTask> possibleTasks, LearningState avgLearningState);
+	AdaptationTask pickRandTaskInstance(std::vector<AdaptationTask> possibleTasks, PlayerState avgLearningState);
 
 	double fitness(Student* student, InteractionsProfile profile, int numberOfFitnessNNs, int currIteration);
 
@@ -132,7 +132,7 @@ private:
 			this->testedProfile = testedProfile;
 		}
 
-		bool operator () (LearningState& i, LearningState& j) {
+		bool operator () (PlayerState& i, PlayerState& j) {
 			
 			double dist1 = testedProfile.distanceBetween(i.profile);
 			double dist2 = testedProfile.distanceBetween(j.profile);

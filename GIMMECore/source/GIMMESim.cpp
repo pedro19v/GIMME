@@ -227,8 +227,8 @@ void GIMMESim::simulateAdaptationModule(int currRun, Adaptation* adapt, int init
 			adapt->avgPrefDiff[i] += groups[j].getAvgPreferences().distanceBetween(groups[j].getInteractionsProfile()) / (groups.size() * numRuns);
 		}
 		for (int j = 0; j < numStudentsInClass; j++) {
-			adapt->avgAbilities[i] += students[j]->currModelIncreases.ability / (numStudentsInClass * numRuns);
-			adapt->avgEngagements[i] += students[j]->currModelIncreases.engagement / (numStudentsInClass * numRuns);
+			adapt->avgAbilities[i] += students[j]->currModelIncreases.characteristics.ability / (numStudentsInClass * numRuns);
+			adapt->avgEngagements[i] += students[j]->currModelIncreases.characteristics.engagement / (numStudentsInClass * numRuns);
 		}
 
 		executeAdaptationStep(initialStep + i, currRun);

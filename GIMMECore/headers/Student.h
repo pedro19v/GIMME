@@ -66,11 +66,15 @@ public:
 
 };
 
-struct LearningState {
-	InteractionsProfile profile;
+
+struct PlayerCharacteristics {
 	double engagement; // on vs off task percentage
 	double ability; // score percentage
+};
 
+struct PlayerState {
+	InteractionsProfile profile;
+	PlayerCharacteristics characteristics;
 	double dist;
 };
 
@@ -79,15 +83,15 @@ class Student {
 public:
 	class StudentStateGrid {
 		private:
-			std::vector<std::vector<LearningState>> cells;
+			std::vector<std::vector<PlayerState>> cells;
 			int numCells;
 			int maxAmountOfStoredProfilesPerCell;
 
 		public:
 			StudentStateGrid();
 			StudentStateGrid(int numCells, int maxAmountOfStoredProfilesPerCell);
-			void pushToGrid(LearningState model);
-			std::vector<LearningState> getAllStates();
+			void pushToGrid(PlayerState model);
+			std::vector<PlayerState> getAllStates();
 	};
 
 private:
@@ -104,7 +108,7 @@ private:
 	int maxAmountOfStoredProfilesPerCell;
 	StudentStateGrid pastModelIncreasesGrid;
 
-	LearningState currState;
+	PlayerState currState;
 	Utilities* utilities;
 
 public:
@@ -113,8 +117,9 @@ public:
 	void reset(int numberOfStudentModelCells, int maxAmountOfStoredProfilesPerCell);
 
 
-	std::vector<LearningState> getPastModelIncreases();
-	LearningState getCurrState();
+	std::vector<PlayerState> getPastModelIncreases();
+	PlayerState getCurrState();
+	void setCharacteristics(PlayerCharacteristics characteristics);
 	void setCurrProfile(InteractionsProfile newProfile);
 
 	int getId();
@@ -127,5 +132,5 @@ public:
 	void simulateReaction(int currIteration);
 	void calcReaction(double* engagement, double* ability, InteractionsProfile* profile, int currIteration);
 
-	LearningState currModelIncreases; //for displaying in the chart
+	PlayerState currModelIncreases; //for displaying in the chart
 };

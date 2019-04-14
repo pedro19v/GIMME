@@ -7,24 +7,24 @@ Student::StudentStateGrid::StudentStateGrid(int numCells, int maxAmountOfStoredP
 	this->numCells = numCells;
 	this->maxAmountOfStoredProfilesPerCell = maxAmountOfStoredProfilesPerCell;
 
-	cells = std::vector<std::vector<LearningState>>(numCells);
+	cells = std::vector<std::vector<PlayerState>>(numCells);
 }
-void Student::StudentStateGrid::pushToGrid(LearningState model) {
+void Student::StudentStateGrid::pushToGrid(PlayerState model) {
 	double dimSpan = cbrt((double)numCells-1);
 	int currCellInd = (int) (dimSpan * dimSpan * floor(dimSpan * model.profile.K_cl) + dimSpan * floor(dimSpan * model.profile.K_cp) + floor(dimSpan* model.profile.K_i));
 	/*printf("ind: %d\n", currCellInd);
 	printf("profi: (%f,%f,%f)\n", model.currProfile.K_cl, model.currProfile.K_cp, model.currProfile.K_i);*/
-	std::vector<LearningState>* currCell = &(cells[currCellInd]);
+	std::vector<PlayerState>* currCell = &(cells[currCellInd]);
 	currCell->push_back(model);
 	int cellsSize = (int) cells[currCellInd].size();
 	if (cellsSize > maxAmountOfStoredProfilesPerCell) {
 		currCell->erase(currCell->begin());
 	}
 }
-std::vector<LearningState> Student::StudentStateGrid::getAllStates() {
-	std::vector<LearningState> allCells = std::vector<LearningState>();
+std::vector<PlayerState> Student::StudentStateGrid::getAllStates() {
+	std::vector<PlayerState> allCells = std::vector<PlayerState>();
 	for (int i = 0; i < cells.size(); i++) {
-		std::vector<LearningState>* currCell = &cells[i];
+		std::vector<PlayerState>* currCell = &cells[i];
 		allCells.insert(allCells.end(), currCell->begin(), currCell->end());
 	}
 	return allCells;
@@ -54,8 +54,8 @@ Student::Student(int id, std::string name, int numPastModelIncreasesCells, int m
 	//this->learningRate = Utilities::randBetween(0, 1);
 
 	this->currState.profile = { 0,0,0 };
-	this->currState.engagement = 0;
-	this->currState.ability = 0;
+	this->currState.characteristics.engagement = 0;
+	this->currState.characteristics.ability = 0;
 
 	this->id = id;
 	this->name = name;
@@ -72,16 +72,20 @@ void Student::reset(int numberOfStudentModelCells, int maxAmountOfStoredProfiles
 	
 	this->currState.profile = { 0,0,0 };
 
-	this->currState.engagement = 0;
-	this->currState.ability = 0;
+	this->currState.characteristics.engagement = 0;
+	this->currState.characteristics.ability = 0;
 
 	this->pastModelIncreasesGrid = StudentStateGrid(numberOfStudentModelCells, maxAmountOfStoredProfilesPerCell);
 }
 
-LearningState Student::getCurrState() {
+PlayerState Student::getCurrState() {
 	return this->currState;
 }
-std::vector<LearningState> Student::getPastModelIncreases() {
+void Student::setCharacteristics(PlayerCharacteristics characteristics) {
+	this->currState.characteristics = characteristics;
+}
+
+std::vector<PlayerState> Student::getPastModelIncreases() {
 	return this->pastModelIncreasesGrid.getAllStates();
 }
 
@@ -89,10 +93,10 @@ std::vector<LearningState> Student::getPastModelIncreases() {
 void Student::setCurrProfile(InteractionsProfile newProfile){
 	
 	//save past profiles
-	LearningState increases = LearningState(currState);
+	PlayerState increases = PlayerState(currState);
 
-	increases.ability = currState.ability - increases.ability;
-	increases.engagement = currState.engagement; // -increases.engagement;
+	increases.characteristics.ability = currState.characteristics.ability - increases.characteristics.ability;
+	increases.characteristics.engagement = currState.characteristics.engagement; // -increases.engagement;
 
 	this->pastModelIncreasesGrid.pushToGrid(increases);
 
@@ -118,13 +122,11 @@ double Student::getLearningRate() {
 
 void Student::simulateReaction(int currIteration)
 {
-	LearningState increases = LearningState(currState);
-	this->calcReaction(&currState.engagement, &currState.ability, &currState.profile, currIteration);
-	
-	increases.ability = currState.ability - increases.ability;
-	increases.engagement = currState.engagement; // -increases.engagement;
-	
-	currModelIncreases = increases;
+	PlayerState increases = PlayerState(currState);
+	this->calcReaction(&currState.characteristics.engagement, &currState.characteristics.ability, &currState.profile, currIteration);
+
+	increases.characteristics.ability = currState.characteristics.ability - increases.characteristics.ability;
+	increases.characteristics.engagement = currState.characteristics.engagement; // -increases.engagement;
 
 	this->pastModelIncreasesGrid.pushToGrid(increases);
 }

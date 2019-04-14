@@ -105,10 +105,7 @@ int main()
 		possibleCollaborativeTasks,
 		possibleCompetitiveTasks,
 		possibleIndividualTasks);
-
-
 	
-
 	//getchar();
 
 	//Define a form object, class form will create a window
