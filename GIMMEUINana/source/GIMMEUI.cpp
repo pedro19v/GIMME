@@ -107,28 +107,7 @@ int main()
 		possibleIndividualTasks);
 
 
-	std::vector<std::pair<AdaptationGroup, std::vector<AdaptationTask>>> groupMechanicPairs = adapt.iterate();
-	groupMechanicPairs = adapt.iterate();
-
-	int mechanicsSize = (int)groupMechanicPairs.size();
-
-	std::string mechanicsOutput = "";
-
-	for (int j = 0; j < mechanicsSize; j++) {
-		std::vector<Student*> currGroup = groupMechanicPairs[j].first.getStudents();
-		std::vector<AdaptationTask> currMechanic = groupMechanicPairs[j].second;
-
-		mechanicsOutput += "promote on students:\n";
-		for (int k = 0; k < currGroup.size(); k++) {
-			mechanicsOutput += "Number: " + std::to_string(currGroup[k]->getId()) + ", Name: " + currGroup[k]->getName()+"\n";
-		}
-		mechanicsOutput += ", the following tasks:\n";
-		for (int k = 0; k < currMechanic.size(); k++) {
-			mechanicsOutput += currMechanic[k].description+"\n";
-		}
-		mechanicsOutput += "-- -- -- -- -- -- -- -- -- -- -- -- --\n";
-	}
-	mechanicsOutput += "----------------------End of Iteration--------------------\n";
+	
 
 	//getchar();
 
@@ -136,20 +115,53 @@ int main()
 	//when a form instance is created.
 	//The new window default visibility is false.
 	nana::form fm;
-	//Define a label on the fm(form) with a specified area,
-	//and set the caption.
-	nana::label lb{ fm, nana::rectangle{ 20, 20, 300, 300 } };
-	lb.caption(mechanicsOutput);
-	//lb.bgcolor(nana::color(256, 256, 256, 1.0f));
-	nana::button btn{ fm, nana::rectangle{ 300, 20, 100, 20 }, true };
-	btn.caption("iterate");
 
+	/*nana::label lab{ fm, "Hello, <bold blue size=16>Nana C++ Library</>" };
+	lab.format(true);*/
+
+	nana::textbox outputLabel{ fm };
+	//outputLabel.format(true);
+	//outputLabel.bgcolor(nana::color(256, 256, 256, 1.0f));
+	nana::button btn{ fm };
+	btn.caption("iterate");
+	btn.events().click([&fm,&outputLabel, &adapt] {
+		std::vector<std::pair<AdaptationGroup, std::vector<AdaptationTask>>> groupMechanicPairs = adapt.iterate();
+		groupMechanicPairs = adapt.iterate();
+
+		int mechanicsSize = (int)groupMechanicPairs.size();
+
+		std::string mechanicsOutput = "";
+
+		for (int j = 0; j < mechanicsSize; j++) {
+			std::vector<Student*> currGroup = groupMechanicPairs[j].first.getStudents();
+			std::vector<AdaptationTask> currMechanic = groupMechanicPairs[j].second;
+
+			mechanicsOutput += "promote on students:\n";
+			for (int k = 0; k < currGroup.size(); k++) {
+				mechanicsOutput += "Number: " + std::to_string(currGroup[k]->getId()) + ", Name: " + currGroup[k]->getName() + "\n";
+			}
+			mechanicsOutput += ", the following tasks:\n";
+			for (int k = 0; k < currMechanic.size(); k++) {
+				mechanicsOutput += currMechanic[k].description + "\n";
+			}
+			mechanicsOutput += "-- -- -- -- -- -- -- -- -- -- -- -- --\n";
+		}
+		mechanicsOutput += "----------------------End of Iteration--------------------\n";
+		outputLabel.append(mechanicsOutput,true);
+	});
+	
+	//manage layout
+	fm.div("vert <><<><width=80% text><>><><weight=24<><button><>><>");
+	fm["text"] << outputLabel;
+	fm["button"] << btn;
+	fm.collocate();
+	
 	//Expose the form.
 	fm.show();
-	btn.show();
 
 	//Pass the control of the application to Nana's event
 	//service. It blocks the execution for dispatching user
 	//input until the form is closed.
 	nana::exec();
+
 }

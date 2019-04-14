@@ -6,8 +6,6 @@
 
 #define _USE_MATH_DEFINES
 
-//struct AdaptationTask; //forward declaration
-
 class Utilities {
 	
 public:
@@ -27,8 +25,10 @@ public:
 	int randIntBetween(int min, int max);
 
 	template <class c>
-	void randShuffle(std::vector<c>& vector);
+	inline void randShuffle(std::vector<c>& vector);
 
 	double normalRandom(int seed, double mu, double var);
 	double normalRandom(double mu, double var);
 };
+
+#include "../source/Utilities.inl"

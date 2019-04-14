@@ -75,7 +75,7 @@ std::vector<std::pair<AdaptationGroup, std::vector<AdaptationTask>>> Adaptation:
 
 		for (int j = 0; j < groupStudentsSize; j++) {
 			Student* currStudent = groupStudents[j];
-			currStudent->changeCurrProfile(currGroup.getInteractionsProfile());
+			currStudent->setCurrProfile(currGroup.getInteractionsProfile());
 		}
 
 		InteractionsProfile currGroupProfile = currGroup.getInteractionsProfile();
@@ -204,9 +204,9 @@ double Adaptation::fitness(Student* student, InteractionsProfile profile, int nu
 
 	if (fitnessCondition == 1) {
 		double engagement = 0;
-		double predSimAbility = student->getAbility();
+		double predSimAbility = student->getCurrState().ability;
 		student->calcReaction(&engagement, &predSimAbility, &profile, currIteration);
-		double abilityInc = predSimAbility - student->getAbility();
+		double abilityInc = predSimAbility - student->getCurrState().ability;
 		return abilityInc;
 	}
 
@@ -225,7 +225,7 @@ double Adaptation::fitness(Student* student, InteractionsProfile profile, int nu
 	predictedModel.ability = 0;
 	predictedModel.engagement = 0;
 	for (int i = 0; i < pastModelncsCopySize; i++) {
-		InteractionsProfile pastProfile = pastModelncsCopy[i].currProfile;
+		InteractionsProfile pastProfile = pastModelncsCopy[i].profile;
 		double distance = profile.distanceBetween(pastProfile);
 
 		predictedModel.ability += pastModelncsCopy[i].ability* (1 - distance) / (double) (pastModelncsCopySize); //* (1 - distance) 
@@ -257,7 +257,7 @@ std::vector<AdaptationTask> Adaptation::generateMechanic(InteractionsProfile bes
 	for (int i = 0; i < individualTaskSize; i++) {
 		mechanicTasks.push_back(pickRandTaskInstance(possibleIndividualTasks, avgLearningState));
 	}
-	//utilities->randShuffle(mechanicTasks);
+	utilities->randShuffle(mechanicTasks);
 	return mechanicTasks;
 }
 

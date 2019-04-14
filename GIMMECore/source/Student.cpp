@@ -1,17 +1,17 @@
 #include "../headers/Student.h"
 
 
-Student::StudentModelGrid::StudentModelGrid(){}
-Student::StudentModelGrid::StudentModelGrid(int numCells, int maxAmountOfStoredProfilesPerCell)
+Student::StudentStateGrid::StudentStateGrid(){}
+Student::StudentStateGrid::StudentStateGrid(int numCells, int maxAmountOfStoredProfilesPerCell)
 {
 	this->numCells = numCells;
 	this->maxAmountOfStoredProfilesPerCell = maxAmountOfStoredProfilesPerCell;
 
 	cells = std::vector<std::vector<LearningState>>(numCells);
 }
-void Student::StudentModelGrid::pushToGrid(LearningState model) {
+void Student::StudentStateGrid::pushToGrid(LearningState model) {
 	double dimSpan = cbrt((double)numCells-1);
-	int currCellInd = (int) (dimSpan * dimSpan * floor(dimSpan * model.currProfile.K_cl) + dimSpan * floor(dimSpan * model.currProfile.K_cp) + floor(dimSpan* model.currProfile.K_i));
+	int currCellInd = (int) (dimSpan * dimSpan * floor(dimSpan * model.profile.K_cl) + dimSpan * floor(dimSpan * model.profile.K_cp) + floor(dimSpan* model.profile.K_i));
 	/*printf("ind: %d\n", currCellInd);
 	printf("profi: (%f,%f,%f)\n", model.currProfile.K_cl, model.currProfile.K_cp, model.currProfile.K_i);*/
 	std::vector<LearningState>* currCell = &(cells[currCellInd]);
@@ -21,7 +21,7 @@ void Student::StudentModelGrid::pushToGrid(LearningState model) {
 		currCell->erase(currCell->begin());
 	}
 }
-std::vector<LearningState> Student::StudentModelGrid::getAllModels() {
+std::vector<LearningState> Student::StudentStateGrid::getAllStates() {
 	std::vector<LearningState> allCells = std::vector<LearningState>();
 	for (int i = 0; i < cells.size(); i++) {
 		std::vector<LearningState>* currCell = &cells[i];
@@ -53,13 +53,13 @@ Student::Student(int id, std::string name, int numPastModelIncreasesCells, int m
 
 	//this->learningRate = Utilities::randBetween(0, 1);
 
-	this->currModel.currProfile = { 0,0,0 };
-	this->currModel.engagement = 0;
-	this->currModel.ability = 0;
+	this->currState.profile = { 0,0,0 };
+	this->currState.engagement = 0;
+	this->currState.ability = 0;
 
 	this->id = id;
 	this->name = name;
-	this->pastModelIncreasesGrid = StudentModelGrid(numPastModelIncreasesCells, maxAmountOfStoredProfilesPerCell);
+	this->pastModelIncreasesGrid = StudentStateGrid(numPastModelIncreasesCells, maxAmountOfStoredProfilesPerCell);
 
 
 	this->numPastModelIncreasesCells = numPastModelIncreasesCells;
@@ -70,46 +70,33 @@ Student::Student(int id, std::string name, int numPastModelIncreasesCells, int m
 
 void Student::reset(int numberOfStudentModelCells, int maxAmountOfStoredProfilesPerCell) {
 	
-	this->currModel.currProfile = { 0,0,0 };
+	this->currState.profile = { 0,0,0 };
 
-	this->currModel.engagement = 0;
-	this->currModel.ability = 0;
+	this->currState.engagement = 0;
+	this->currState.ability = 0;
 
-	this->pastModelIncreasesGrid = StudentModelGrid(numberOfStudentModelCells, maxAmountOfStoredProfilesPerCell);
+	this->pastModelIncreasesGrid = StudentStateGrid(numberOfStudentModelCells, maxAmountOfStoredProfilesPerCell);
 }
 
-void Student::setEngagement(double engagement) {
-	this->currModel.engagement = engagement;
+LearningState Student::getCurrState() {
+	return this->currState;
 }
-double Student::getEngagement() {
-	return this->currModel.engagement;
-}
-
 std::vector<LearningState> Student::getPastModelIncreases() {
-	return this->pastModelIncreasesGrid.getAllModels();
+	return this->pastModelIncreasesGrid.getAllStates();
 }
 
 
-void Student::setAbility(double ability) {
-	this->currModel.ability = ability;
-}
-double Student::getAbility() {
-	return this->currModel.ability;
-}
-
-
-void Student::changeCurrProfile(InteractionsProfile newProfile){
+void Student::setCurrProfile(InteractionsProfile newProfile){
 	
 	//save past profiles
-	LearningState increases = LearningState(currModel);
+	LearningState increases = LearningState(currState);
 
-	increases.ability = currModel.ability - increases.ability;
-	increases.engagement = currModel.engagement; // -increases.engagement;
+	increases.ability = currState.ability - increases.ability;
+	increases.engagement = currState.engagement; // -increases.engagement;
 
 	this->pastModelIncreasesGrid.pushToGrid(increases);
 
-	LearningState currModel = this->currModel;
-	this->currModel.currProfile = newProfile;
+	this->currState.profile = newProfile;
 }
 int Student::getId()
 {
@@ -120,7 +107,7 @@ std::string Student::getName()
 	return this->name;
 }
 InteractionsProfile Student::getCurrProfile() {
-	return this->currModel.currProfile;
+	return this->currState.profile;
 }
 InteractionsProfile Student::getInherentPreference() {
 	return this->inherentPreference;
@@ -131,11 +118,11 @@ double Student::getLearningRate() {
 
 void Student::simulateReaction(int currIteration)
 {
-	LearningState increases = LearningState(currModel);
-	this->calcReaction(&currModel.engagement, &currModel.ability, &currModel.currProfile, currIteration);
+	LearningState increases = LearningState(currState);
+	this->calcReaction(&currState.engagement, &currState.ability, &currState.profile, currIteration);
 	
-	increases.ability = currModel.ability - increases.ability;
-	increases.engagement = currModel.engagement; // -increases.engagement;
+	increases.ability = currState.ability - increases.ability;
+	increases.engagement = currState.engagement; // -increases.engagement;
 	
 	currModelIncreases = increases;
 
@@ -144,7 +131,7 @@ void Student::simulateReaction(int currIteration)
 
 void Student::calcReaction(double* engagement, double* ability, InteractionsProfile* profile, int currIteration)
 {
-	InteractionsProfile currProfile = this->currModel.currProfile;
+	InteractionsProfile currProfile = this->currState.profile;
 
 	*engagement = 0.5* (*engagement) + 0.5* (1.0 - inherentPreference.distanceBetween(*profile));
 

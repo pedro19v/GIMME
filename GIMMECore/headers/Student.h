@@ -67,7 +67,7 @@ public:
 };
 
 struct LearningState {
-	InteractionsProfile currProfile;
+	InteractionsProfile profile;
 	double engagement; // on vs off task percentage
 	double ability; // score percentage
 
@@ -77,17 +77,17 @@ struct LearningState {
 
 class Student {
 public:
-	class StudentModelGrid {
+	class StudentStateGrid {
 		private:
 			std::vector<std::vector<LearningState>> cells;
 			int numCells;
 			int maxAmountOfStoredProfilesPerCell;
 
 		public:
-			StudentModelGrid();
-			StudentModelGrid(int numCells, int maxAmountOfStoredProfilesPerCell);
+			StudentStateGrid();
+			StudentStateGrid(int numCells, int maxAmountOfStoredProfilesPerCell);
 			void pushToGrid(LearningState model);
-			std::vector<LearningState> getAllModels();
+			std::vector<LearningState> getAllStates();
 	};
 
 private:
@@ -102,9 +102,9 @@ private:
 	//Adaptation part
 	int numPastModelIncreasesCells;
 	int maxAmountOfStoredProfilesPerCell;
-	StudentModelGrid pastModelIncreasesGrid;
+	StudentStateGrid pastModelIncreasesGrid;
 
-	LearningState currModel;
+	LearningState currState;
 	Utilities* utilities;
 
 public:
@@ -112,14 +112,10 @@ public:
 	Student(int id, std::string name, int numPastModelIncreasesCells, int maxAmountOfStoredProfilesPerCell, int numStoredPastIterations, Utilities* utilities);
 	void reset(int numberOfStudentModelCells, int maxAmountOfStoredProfilesPerCell);
 
-	void setEngagement(double preference);
-	double getEngagement();
-
-	void setAbility(double preference);
-	double getAbility();
 
 	std::vector<LearningState> getPastModelIncreases();
-	void changeCurrProfile(InteractionsProfile newProfile);
+	LearningState getCurrState();
+	void setCurrProfile(InteractionsProfile newProfile);
 
 	int getId();
 	std::string getName();

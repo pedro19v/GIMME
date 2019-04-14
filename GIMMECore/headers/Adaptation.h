@@ -29,8 +29,8 @@ public:
 		for (int i = 0; i < studentsSize; i++) {
 			Student* currStudent = students[i];
 			InteractionsProfile currStudentPreference = currStudent->getInherentPreference();
-			avgLearningState.engagement += currStudent->getEngagement() / studentsSize;
-			avgLearningState.ability += currStudent->getAbility() / studentsSize;
+			avgLearningState.engagement += currStudent->getCurrState().engagement / studentsSize;
+			avgLearningState.ability += currStudent->getCurrState().ability / studentsSize;
 			avgPreferences.K_cl += currStudentPreference.K_cl / studentsSize;
 			avgPreferences.K_cp += currStudentPreference.K_cp / studentsSize;
 			avgPreferences.K_i += currStudentPreference.K_i / studentsSize;
@@ -134,8 +134,8 @@ private:
 
 		bool operator () (LearningState& i, LearningState& j) {
 			
-			double dist1 = testedProfile.distanceBetween(i.currProfile);
-			double dist2 = testedProfile.distanceBetween(j.currProfile);
+			double dist1 = testedProfile.distanceBetween(i.profile);
+			double dist2 = testedProfile.distanceBetween(j.profile);
 
 			i.dist = dist1;
 			j.dist = dist2;

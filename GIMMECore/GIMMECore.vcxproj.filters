@@ -44,4 +44,9 @@
       <Filter>headers</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Utilities.inl">
+      <Filter>source</Filter>
+    </None>
+  </ItemGroup>
 </Project>

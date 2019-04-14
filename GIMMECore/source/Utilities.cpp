@@ -34,12 +34,6 @@ int Utilities::randIntBetween(int min, int max) {
 	return randIntBetween(defaultRandomSeed, min, max);
 }
 
-template <class c>
-void Utilities::randShuffle(std::vector<c>& vector) {
-	static std::default_random_engine randomGenerator(defaultRandomSeed);
-	shuffle(vector.begin(), vector.end(), randomGenerator);
-}
-
 double Utilities::normalRandom(int seed, double mu, double var) {
 	static std::default_random_engine normalRandomGenerator(seed);
 	normalDistribution = std::normal_distribution<double>(mu, var);

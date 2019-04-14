@@ -31,6 +31,9 @@
     <ClCompile Include="source\Student.cpp" />
     <ClCompile Include="source\Utilities.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Utilities.inl" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{4567FFD8-26AA-4CE4-BE6E-8FCE975698DE}</ProjectGuid>
