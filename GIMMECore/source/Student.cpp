@@ -31,27 +31,10 @@ std::vector<PlayerState> Student::StudentStateGrid::getAllStates() {
 }
 
 
+
 Student::Student(int id, std::string name, int numPastModelIncreasesCells, int maxAmountOfStoredProfilesPerCell, int numStoredPastIterations, Utilities* utilities){
 	
-	//generate learning profile
-	double newRand1 = utilities->randBetween(0, 1);
-	double newRand2 = utilities->randBetween(0, 1);
-	double newRand3 = utilities->randBetween(0, 1);
-
-	double newRandSum = newRand1 + newRand2 + newRand3;
-
-	this->inherentPreference.K_cl = newRand1 / newRandSum;
-	this->inherentPreference.K_cp = newRand2 / newRandSum;
-	this->inherentPreference.K_i = newRand3 / newRandSum;
-
-	this->learningRate = utilities->randBetween(0.2, 0.6);
-	this->iterationReactions = std::vector<double>(numStoredPastIterations);
-
-	for (int i = 0; i < numStoredPastIterations; i++) {
-		this->iterationReactions[i] = utilities->normalRandom(learningRate, 0.05);
-	}
-
-	//this->learningRate = Utilities::randBetween(0, 1);
+	
 
 	this->currState.profile = { 0,0,0 };
 	this->currState.characteristics.engagement = 0;
@@ -113,31 +96,4 @@ std::string Student::getName()
 InteractionsProfile Student::getCurrProfile() {
 	return this->currState.profile;
 }
-InteractionsProfile Student::getInherentPreference() {
-	return this->inherentPreference;
-}
-double Student::getLearningRate() {
-	return this->learningRate;
-}
 
-void Student::simulateReaction(int currIteration)
-{
-	PlayerState increases = PlayerState(currState);
-	this->calcReaction(&currState.characteristics.engagement, &currState.characteristics.ability, &currState.profile, currIteration);
-
-	increases.characteristics.ability = currState.characteristics.ability - increases.characteristics.ability;
-	increases.characteristics.engagement = currState.characteristics.engagement; // -increases.engagement;
-
-	this->pastModelIncreasesGrid.pushToGrid(increases);
-}
-
-void Student::calcReaction(double* engagement, double* ability, InteractionsProfile* profile, int currIteration)
-{
-	InteractionsProfile currProfile = this->currState.profile;
-
-	*engagement = 0.5* (*engagement) + 0.5* (1.0 - inherentPreference.distanceBetween(*profile));
-
-	double currTaskReaction = iterationReactions[currIteration];
-	double abilityIncreaseSim = (currTaskReaction * *engagement); //between 0 and 1
-	*ability += abilityIncreaseSim;
-}

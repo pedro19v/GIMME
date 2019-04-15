@@ -38,25 +38,6 @@ Adaptation::Adaptation(
 	this->possibleCompetitiveTasks = possibleCompetitiveTasks;
 	this->possibleIndividualTasks = possibleIndividualTasks;
 }
-Adaptation::Adaptation(
-	std::vector<Student*> students,
-	int numberOfConfigChoices,
-	int minNumberOfStudentsPerGroup, int maxNumberOfStudentsPerGroup,
-	int numberOfFitnessNNs,
-	Utilities* utilities, int numTasksPerGroup,
-	std::vector<AdaptationTask> possibleCollaborativeTasks,
-	std::vector<AdaptationTask> possibleCompetitiveTasks,
-	std::vector<AdaptationTask> possibleIndividualTasks): 
-	Adaptation(students,
-		numberOfConfigChoices,
-		minNumberOfStudentsPerGroup, maxNumberOfStudentsPerGroup,
-		numberOfFitnessNNs, 2,
-		0,
-		utilities, numTasksPerGroup,
-		possibleCollaborativeTasks,
-		possibleCompetitiveTasks,
-		possibleIndividualTasks)
-{ }
 
 
 
@@ -187,7 +168,7 @@ AdaptationConfiguration Adaptation::organizeStudents(std::vector<Student*> stude
 			this->groupSizeFreqs[(int) currGroup.getStudents().size()]++;
 		}
 
-		if (fitnessCondition == 0) {
+		if (fitnessCondition == 0) { //return random config when fitnessCondition = 0
 			return newConfig;
 		}
 
@@ -203,10 +184,12 @@ AdaptationConfiguration Adaptation::organizeStudents(std::vector<Student*> stude
 double Adaptation::fitness(Student* student, InteractionsProfile profile, int numberOfFitnessNNs, int currIteration) {
 
 	if (fitnessCondition == 1) {
-		double engagement = 0;
-		double predSimAbility = student->getCurrState().characteristics.ability;
-		student->calcReaction(&engagement, &predSimAbility, &profile, currIteration);
-		double abilityInc = predSimAbility - student->getCurrState().characteristics.ability;
+		/*double engagement = student->getCurrState().characteristics.engagement;
+		double ability = student->getCurrState().characteristics.ability;*/
+		PlayerState predictedState = PlayerState(student->getCurrState());
+
+		student->calcReaction(&predictedState, &profile, currIteration);
+		double abilityInc = predictedState.characteristics.ability - student->getCurrState().characteristics.ability;
 		return abilityInc;
 	}
 

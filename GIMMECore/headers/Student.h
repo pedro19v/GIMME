@@ -94,13 +94,13 @@ public:
 			std::vector<PlayerState> getAllStates();
 	};
 
-private:
+protected:
 	int id;
 	std::string name;
 
 	//for simulation
 	InteractionsProfile inherentPreference;
-	double learningRate;
+	double baseLearningRate;
 	std::vector<double> iterationReactions;
 
 	//Adaptation part
@@ -114,6 +114,7 @@ private:
 public:
 
 	Student(int id, std::string name, int numPastModelIncreasesCells, int maxAmountOfStoredProfilesPerCell, int numStoredPastIterations, Utilities* utilities);
+	
 	void reset(int numberOfStudentModelCells, int maxAmountOfStoredProfilesPerCell);
 
 
@@ -126,11 +127,7 @@ public:
 	std::string getName();
 
 	InteractionsProfile getCurrProfile();
-	InteractionsProfile getInherentPreference();
-	double getLearningRate();
-
-	void simulateReaction(int currIteration);
-	void calcReaction(double* engagement, double* ability, InteractionsProfile* profile, int currIteration);
+	
 
 	PlayerState currModelIncreases; //for displaying in the chart
 };

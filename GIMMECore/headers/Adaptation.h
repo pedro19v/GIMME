@@ -28,12 +28,12 @@ public:
 
 		for (int i = 0; i < studentsSize; i++) {
 			Student* currStudent = students[i];
-			InteractionsProfile currStudentPreference = currStudent->getInherentPreference();
+			//InteractionsProfile currStudentPreference = currStudent->getInherentPreference();
 			avgLearningState.characteristics.engagement += currStudent->getCurrState().characteristics.engagement / studentsSize;
 			avgLearningState.characteristics.ability += currStudent->getCurrState().characteristics.ability / studentsSize;
-			avgPreferences.K_cl += currStudentPreference.K_cl / studentsSize;
+			/*avgPreferences.K_cl += currStudentPreference.K_cl / studentsSize;
 			avgPreferences.K_cp += currStudentPreference.K_cp / studentsSize;
-			avgPreferences.K_i += currStudentPreference.K_i / studentsSize;
+			avgPreferences.K_i += currStudentPreference.K_i / studentsSize;*/
 		}
 
 	}
@@ -88,7 +88,6 @@ public:
 
 
 class Adaptation {
-
 
 private:
 
@@ -158,16 +157,7 @@ public:
 		std::vector<AdaptationTask> possibleCompetitiveTasks,
 		std::vector<AdaptationTask> possibleIndividualTasks
 	);
-	Adaptation(
-		std::vector<Student*> students,
-		int numberOfConfigChoices,
-		int minNumberOfStudentsPerGroup, int maxNumberOfStudentsPerGroup,
-		int numberOfFitnessNNs,
-		Utilities* utilities, int numTasksPerGroup,
-		std::vector<AdaptationTask> possibleCollaborativeTasks,
-		std::vector<AdaptationTask> possibleCompetitiveTasks,
-		std::vector<AdaptationTask> possibleIndividualTasks
-	);
+	
 
 	std::vector<std::pair<AdaptationGroup, std::vector<AdaptationTask>>> iterate();
 	std::vector<std::pair<AdaptationGroup, std::vector<AdaptationTask>>> iterate(int currIteration);

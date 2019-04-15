@@ -15,9 +15,6 @@
     <ClCompile Include="source\Student.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="source\GIMMESim.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="headers">
@@ -35,9 +32,6 @@
       <Filter>headers</Filter>
     </ClInclude>
     <ClInclude Include="headers\Student.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\GIMMESim.h">
       <Filter>headers</Filter>
     </ClInclude>
     <ClInclude Include="headers\GIMMECore.h">
