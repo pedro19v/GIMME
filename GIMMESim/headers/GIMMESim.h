@@ -25,7 +25,7 @@ private:
 	int numStudentsInClass;
 	int numStudentModelCells;
 	int maxAmountOfStoredProfilesPerCell;
-	std::vector<SimStudent*>  students;
+	std::vector<Student*>  students;
 
 	std::vector<AdaptationTask> possibleCollaborativeTasks;
 	std::vector<AdaptationTask> possibleCompetitiveTasks;
@@ -43,7 +43,6 @@ private:
 
 	void simulateTrainingPhase();
 	void storeSimData(std::string configId, Adaptation* adapt);
-	void executeSimulation(int numRuns, Adaptation* adapt);
 
 	void executeAdaptationStep(int currStepIndex, int currRun);
 	void simulateAdaptationModule(int currRun, Adaptation* adapt, int initialStep);

@@ -29,9 +29,11 @@ GIMMESim::GIMMESim(
 	this->numIterationsPerRun = numIterationsPerRun;
 
 	//define and init globals and utilities
+	utilities = new Utilities();
+	utilities->resetRandoms();
 
 	//generate all of the students models
-	students = std::vector<SimStudent*>();
+	students = std::vector<Student*>();
 	for (int i = 0; i < numStudentsInClass; i++) {
 		students.push_back(new SimStudent(i, "a", numStudentModelCells, maxAmountOfStoredProfilesPerCell, numIterationsPerRun + 30, utilities));
 	}
@@ -41,28 +43,32 @@ GIMMESim::GIMMESim(
 	possibleCompetitiveTasks = std::vector<AdaptationTask>();
 	possibleIndividualTasks = std::vector<AdaptationTask>();
 
-	/*
-		possibleCollaborativeTasks = std::vector<AdaptationTask>();
-		possibleCompetitiveTasks = std::vector<AdaptationTask>();
-		possibleIndividualTasks = std::vector<AdaptationTask>();*/
+	this->adapt = new Adaptation(
+		"GIMME",
+		students,
+		numConfigurationChoices,
+		minNumStudentsPerGroup, maxNumStudentsPerGroup,
+		numFitnessNNs, 2,
+		numIterationsPerRun,
+		utilities, numTasksPerGroup,
+		possibleCollaborativeTasks,
+		possibleCompetitiveTasks,
+		possibleIndividualTasks
+	);
 
-	utilities = new Utilities();
-	utilities->resetRandoms();
+	
+	possibleCollaborativeTasks = std::vector<AdaptationTask>();
+	possibleCompetitiveTasks = std::vector<AdaptationTask>();
+	possibleIndividualTasks = std::vector<AdaptationTask>();
 
-
-
-	/*adapt = new Adaptation(students, numConfigurtionChoices, minNumStudentsPerGroup,
-		maxNumStudentsPerGroup, numFitnessNNs, 2, numIterations, numTasksPerGroup, utilities,
-		possibleCollaborativeTasks, possibleCompetitiveTasks, possibleIndividualTasks);*/
-
-	//statisticsFile = &std::ofstream("./statistics.txt", std::ios::in | std::ios::out);
-	//resultsFile = &std::ofstream("./results.txt", std::ios::in | std::ios::out);
-
+	statisticsFile = new std::ofstream("./statistics.txt", std::ios::in | std::ios::out);
+	resultsFile = new std::ofstream("./results.txt", std::ios::in | std::ios::out);
 }
+
 void GIMMESim::reset() {
 	//generate all of the students models
 	for (int i = 0; i < numStudentsInClass; i++) {
-		SimStudent* currStudent = students[i];
+		SimStudent* currStudent = (SimStudent*) students[i];
 		currStudent->reset(numStudentModelCells, maxAmountOfStoredProfilesPerCell);
 	}
 }
@@ -71,22 +77,35 @@ GIMMESim::~GIMMESim() {
 		delete students[i];
 	}*/
 
-
-	//delete &statisticsFile;
-	//delete &resultsFile;
+	delete adapt;
+	
+	delete statisticsFile;
+	delete resultsFile;
 }
 
 void GIMMESim::simulateStudentsReaction(int currIteration) {
 	//simulate students reaction
 	for (int j = 0; j < numStudentsInClass; j++) {
-		SimStudent* currStudent = students[j];
+		SimStudent* currStudent = (SimStudent*) students[j];
 		currStudent->simulateReaction(currIteration);
 	}
 }
 
 
 void GIMMESim::simulateTrainingPhase() {
-	Adaptation randomClose = Adaptation(students, numConfigurationChoices, minNumStudentsPerGroup, maxNumStudentsPerGroup, 10, utilities, numTasksPerGroup,  possibleCollaborativeTasks, possibleCompetitiveTasks, possibleIndividualTasks );
+	Adaptation randomClose = Adaptation(
+		"randomClose",
+		students,
+		numConfigurationChoices,
+		minNumStudentsPerGroup, maxNumStudentsPerGroup,
+		numFitnessNNs, 0,
+		30,
+		utilities, numTasksPerGroup,
+		possibleCollaborativeTasks,
+		possibleCompetitiveTasks,
+		possibleIndividualTasks
+	);
+
 	simulateAdaptationModule(0, &randomClose, 0);
 }
 
@@ -163,23 +182,9 @@ void GIMMESim::storeSimData(std::string configId, Adaptation* adapt) {
 	*statisticsFile << configId.c_str() << "avgExecTime=" << avgExecutionTime;
 	*statisticsFile << "\n\n";
 
-	statisticsFile->flush();
 	//return statisticsFile;
-}
-
-void GIMMESim::executeSimulation(int numRuns, Adaptation* adapt) {
-
-	int numAdaptationCycles = adapt->getNumAdaptationCycles();
-
-	for (int i = 0; i < numRuns; i++) {
-		reset();
-		simulateTrainingPhase();
-		simulateAdaptationModule(i, adapt, numTrainingCycles);
-		//destroyGlobals(numStudentsInClass);
-	}
-
-	storeSimData("GAL100", adapt);
-	//statisticsFile.close();
+	statisticsFile->flush();
+	statisticsFile->close();
 }
 
 
@@ -195,9 +200,9 @@ void GIMMESim::executeAdaptationStep(int currStepIndex, int currRun) {
 
 	int mechanicsSize = (int) groupMechanicPairs.size();
 
-	*statisticsFile << "currProfile: " << students[0]->getCurrProfile().K_cl << students[0]->getCurrProfile().K_cp << students[0]->getCurrProfile().K_i << std::endl;
+	/**statisticsFile << "currProfile: " << students[0]->getCurrProfile().K_cl << students[0]->getCurrProfile().K_cp << students[0]->getCurrProfile().K_i << std::endl;
 	*statisticsFile << "ability: " << students[0]->getCurrState().characteristics.ability << std::endl;
-	*statisticsFile << "preference: " << students[0]->getCurrState().characteristics.engagement << std::endl;
+	*statisticsFile << "preference: " << students[0]->getCurrState().characteristics.engagement << std::endl;*/
 
 	//intervene
 	for (int j = 0; j < mechanicsSize; j++) {
@@ -215,20 +220,25 @@ void GIMMESim::executeAdaptationStep(int currStepIndex, int currRun) {
 		*resultsFile << "-- -- -- -- -- -- -- -- -- -- -- -- --" << std::endl;
 	}
 	*resultsFile << "----------------------End of Iteration--------------------" << std::endl;
+	resultsFile->flush();
 }
 
 void GIMMESim::simulate() {
 	for (int i = 0; i < numRuns; i++) {
+		reset();
 		simulateTrainingPhase();
-		simulateAdaptationModule(i, adapt, 30);
+		simulateAdaptationModule(i, adapt, numTrainingCycles);
+		//destroyGlobals(numStudentsInClass);
 	}
+
+	storeSimData(adapt->getName(), adapt);
 }
 void GIMMESim::simulateAdaptationModule(int currRun, Adaptation* adapt, int initialStep) {
 	int i = 0;
 	int numAdaptationCycles = adapt->getNumAdaptationCycles();
 	while (true) {
 		const clock_t beginTime = clock();
-		printf("\rstep %d of %d of run %d", i, numAdaptationCycles, currRun);
+		printf("\rstep %d of %d of run %d               ", i, numAdaptationCycles, currRun);
 
 		AdaptationConfiguration currAdaptedConfig = adapt->getCurrAdaptedConfig();
 		std::vector<AdaptationGroup> groups = currAdaptedConfig.groups;

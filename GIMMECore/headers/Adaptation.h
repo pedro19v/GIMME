@@ -5,6 +5,8 @@
 #include "Student.h"
 #include "Utilities.h"
 
+#include "../../GIMMESim/headers/SimStudent.h"
+
 #include <iostream>
 
 
@@ -61,7 +63,8 @@ public:
 enum AdaptationTaskType {
 	COLLABORATION = 0,
 	COMPETITION = 1,
-	SELF_INTERACTION = 2
+	SELF_INTERACTION = 2,
+	NONE = 3
 };
 struct AdaptationTask {
 private:
@@ -147,6 +150,7 @@ private:
 public:
 
 	Adaptation(
+		std::string name,
 		std::vector<Student*> students, 
 		int numberOfConfigChoices,
 		int minNumberOfStudentsPerGroup, int maxNumberOfStudentsPerGroup,
@@ -158,6 +162,7 @@ public:
 		std::vector<AdaptationTask> possibleIndividualTasks
 	);
 	
+	std::string getName();
 
 	std::vector<std::pair<AdaptationGroup, std::vector<AdaptationTask>>> iterate();
 	std::vector<std::pair<AdaptationGroup, std::vector<AdaptationTask>>> iterate(int currIteration);
@@ -174,4 +179,6 @@ public:
 
 	std::vector<int> groupSizeFreqs;
 	std::vector<int> configSizeFreqs;
+
+	std::string name;
 };

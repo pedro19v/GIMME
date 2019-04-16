@@ -1,6 +1,7 @@
 #include "../headers/Adaptation.h"
 
 Adaptation::Adaptation(
+	std::string name,
 	std::vector<Student*> students,
 	int numberOfConfigChoices,
 	int minNumberOfStudentsPerGroup, int maxNumberOfStudentsPerGroup,
@@ -10,6 +11,8 @@ Adaptation::Adaptation(
 	std::vector<AdaptationTask> possibleCollaborativeTasks,
 	std::vector<AdaptationTask> possibleCompetitiveTasks,
 	std::vector<AdaptationTask> possibleIndividualTasks){
+
+	this->name = name;
 
 	this->students = students;
 	int studentSize = (int) students.size();
@@ -37,6 +40,11 @@ Adaptation::Adaptation(
 	this->possibleCollaborativeTasks = possibleCollaborativeTasks;
 	this->possibleCompetitiveTasks = possibleCompetitiveTasks;
 	this->possibleIndividualTasks = possibleIndividualTasks;
+}
+
+std::string Adaptation::getName()
+{
+	return this->name;
 }
 
 
@@ -188,7 +196,7 @@ double Adaptation::fitness(Student* student, InteractionsProfile profile, int nu
 		double ability = student->getCurrState().characteristics.ability;*/
 		PlayerState predictedState = PlayerState(student->getCurrState());
 
-		student->calcReaction(&predictedState, &profile, currIteration);
+		((SimStudent*)student)->calcReaction(&predictedState, currIteration);
 		double abilityInc = predictedState.characteristics.ability - student->getCurrState().characteristics.ability;
 		return abilityInc;
 	}
@@ -246,6 +254,9 @@ std::vector<AdaptationTask> Adaptation::generateMechanic(InteractionsProfile bes
 
 AdaptationTask Adaptation::pickRandTaskInstance(std::vector<AdaptationTask> possibleTasks, PlayerState avgLearningState)
 {
+	if (possibleTasks.empty()) {
+		return AdaptationTask(AdaptationTaskType::NONE, "default", 0.0f);
+	}
 	int randIndex = utilities->randIntBetween(0, (int) possibleTasks.size() - 1);
 	AdaptationTask randomTask = possibleTasks[randIndex];
 	std::vector<AdaptationTask> randomTaskInstances = randomTask.taskInstances;

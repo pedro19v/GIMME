@@ -40,7 +40,7 @@ double SimStudent::getLearningRate() {
 void SimStudent::simulateReaction(int currIteration)
 {
 	PlayerState increases = PlayerState(currState);
-	this->calcReaction(&currState.characteristics.engagement, &currState.characteristics.ability, &currState.profile, currIteration);
+	this->calcReaction(&currState, currIteration);
 
 	increases.characteristics.ability = currState.characteristics.ability - increases.characteristics.ability;
 	increases.characteristics.engagement = currState.characteristics.engagement; // -increases.engagement;
