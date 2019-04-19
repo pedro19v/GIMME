@@ -30,7 +30,7 @@
     <ClCompile Include="source\Utilities.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Utilities.inl" />
+    <None Include="source\Utilities.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

@@ -12,6 +12,7 @@ Adaptation::Adaptation(
 	std::vector<AdaptationTask> possibleCompetitiveTasks,
 	std::vector<AdaptationTask> possibleIndividualTasks){
 
+
 	this->name = name;
 
 	this->students = students;
@@ -40,6 +41,31 @@ Adaptation::Adaptation(
 	this->possibleCollaborativeTasks = possibleCollaborativeTasks;
 	this->possibleCompetitiveTasks = possibleCompetitiveTasks;
 	this->possibleIndividualTasks = possibleIndividualTasks;
+}
+
+Adaptation::Adaptation(
+	std::string name,
+	std::vector<Student*> students,
+	int numberOfConfigChoices,
+	int minNumberOfStudentsPerGroup, int maxNumberOfStudentsPerGroup,
+	int numberOfFitnessNNs,
+	Utilities* utilities, 
+	int numTasksPerGroup,
+	std::vector<AdaptationTask> possibleCollaborativeTasks,
+	std::vector<AdaptationTask> possibleCompetitiveTasks,
+	std::vector<AdaptationTask> possibleIndividualTasks):
+	Adaptation(
+		name,
+		students,
+		numberOfConfigChoices,
+		minNumberOfStudentsPerGroup, maxNumberOfStudentsPerGroup,
+		numberOfFitnessNNs, 0,
+		1,
+		utilities, numTasksPerGroup,
+		possibleCollaborativeTasks,
+		possibleCompetitiveTasks,
+		possibleIndividualTasks
+	) {
 }
 
 std::string Adaptation::getName()
@@ -176,7 +202,8 @@ AdaptationConfiguration Adaptation::organizeStudents(std::vector<Student*> stude
 			this->groupSizeFreqs[(int) currGroup.getStudents().size()]++;
 		}
 
-		if (fitnessCondition == 0) { //return random config when fitnessCondition = 0
+		//return random config when fitnessCondition = 0
+		if (fitnessCondition == 0) {
 			return newConfig;
 		}
 
@@ -191,7 +218,8 @@ AdaptationConfiguration Adaptation::organizeStudents(std::vector<Student*> stude
 
 double Adaptation::fitness(Student* student, InteractionsProfile profile, int numberOfFitnessNNs, int currIteration) {
 
-	if (fitnessCondition == 1) {
+	//this is the optimal simulation condition, therefore the 'wierd' cast...
+	if (fitnessCondition == 1) { 
 		/*double engagement = student->getCurrState().characteristics.engagement;
 		double ability = student->getCurrState().characteristics.ability;*/
 		PlayerState predictedState = PlayerState(student->getCurrState());
@@ -261,6 +289,7 @@ AdaptationTask Adaptation::pickRandTaskInstance(std::vector<AdaptationTask> poss
 	AdaptationTask randomTask = possibleTasks[randIndex];
 	std::vector<AdaptationTask> randomTaskInstances = randomTask.taskInstances;
 	int randomTaskInstancesSize = (int) randomTaskInstances.size();
+	
 	//pick the right difficulty
 	AdaptationTask adaptedInstance = randomTaskInstances[0];
 	for (int j = 1; j < randomTaskInstancesSize; j++) {

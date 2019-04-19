@@ -60,9 +60,13 @@ GIMMESim::GIMMESim(
 	possibleCollaborativeTasks = std::vector<AdaptationTask>();
 	possibleCompetitiveTasks = std::vector<AdaptationTask>();
 	possibleIndividualTasks = std::vector<AdaptationTask>();
+	
+	statisticsFile = new std::fstream();
+	resultsFile = new std::fstream();
 
-	statisticsFile = new std::ofstream("./statistics.txt", std::ios::in | std::ios::out);
-	resultsFile = new std::ofstream("./results.txt", std::ios::in | std::ios::out);
+	statisticsFile->open("./statistics.txt", std::fstream::out);
+	resultsFile->open("./results.txt", std::fstream::out);
+
 }
 
 void GIMMESim::reset() {

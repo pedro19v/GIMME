@@ -97,14 +97,13 @@ int main()
 	}
 
 	Adaptation adapt = Adaptation(
+		"test",
 		students,
 		100,
 		2, 5,
-		10,
-		utilities, 5,
-		possibleCollaborativeTasks,
-		possibleCompetitiveTasks,
-		possibleIndividualTasks);
+		5,
+		utilities, 
+		5, possibleCollaborativeTasks, possibleCompetitiveTasks, possibleIndividualTasks);
 	
 	//getchar();
 

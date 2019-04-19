@@ -39,7 +39,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Utilities.inl">
+    <None Include="source\Utilities.inl">
       <Filter>source</Filter>
     </None>
   </ItemGroup>

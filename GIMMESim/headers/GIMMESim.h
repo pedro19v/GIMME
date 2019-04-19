@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cmath>
-#include <iostream>
 #include <fstream>
 #include <ios>
 #include <string>
@@ -34,8 +33,8 @@ private:
 	Adaptation* adapt;
 	Utilities* utilities;
 
-	std::ofstream* statisticsFile;
-	std::ofstream* resultsFile;
+	std::fstream* statisticsFile;
+	std::fstream* resultsFile;
 
 	void reset();
 

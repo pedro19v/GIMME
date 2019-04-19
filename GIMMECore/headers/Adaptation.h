@@ -1,14 +1,14 @@
 #pragma once
 
+
 #include <algorithm>
 #include <numeric>
 #include "Student.h"
 #include "Utilities.h"
 
+#include <string>
+
 #include "../../GIMMESim/headers/SimStudent.h"
-
-#include <iostream>
-
 
 struct AdaptationGroup {
 private:
@@ -16,6 +16,7 @@ private:
 	InteractionsProfile avgPreferences;
 	InteractionsProfile interactionsProfile;
 	std::vector<Student*> students;
+
 public:
 
 	void addStudent(Student* student) {
@@ -151,16 +152,27 @@ public:
 
 	Adaptation(
 		std::string name,
-		std::vector<Student*> students, 
+		std::vector<Student*> students,
 		int numberOfConfigChoices,
 		int minNumberOfStudentsPerGroup, int maxNumberOfStudentsPerGroup,
 		int numberOfFitnessNNs, int fitnessCondition,
-		int numAdaptationCycles, 
+		int numAdaptationCycles,
 		Utilities* utilities, int numTasksPerGroup,
 		std::vector<AdaptationTask> possibleCollaborativeTasks,
 		std::vector<AdaptationTask> possibleCompetitiveTasks,
 		std::vector<AdaptationTask> possibleIndividualTasks
 	);
+
+	Adaptation(
+		std::string name,
+		std::vector<Student*> students,
+		int numberOfConfigChoices,
+		int minNumberOfStudentsPerGroup, int maxNumberOfStudentsPerGroup,
+		int numberOfFitnessNNs,
+		Utilities* utilities, int numTasksPerGroup,
+		std::vector<AdaptationTask> possibleCollaborativeTasks,
+		std::vector<AdaptationTask> possibleCompetitiveTasks,
+		std::vector<AdaptationTask> possibleIndividualTasks);
 	
 	std::string getName();
 
