@@ -60,7 +60,7 @@ Adaptation::Adaptation(
 		numberOfConfigChoices,
 		minNumberOfStudentsPerGroup, maxNumberOfStudentsPerGroup,
 		numberOfFitnessNNs, 0,
-		1,
+		2,
 		utilities, numTasksPerGroup,
 		possibleCollaborativeTasks,
 		possibleCompetitiveTasks,
@@ -224,7 +224,7 @@ double Adaptation::fitness(Student* student, InteractionsProfile profile, int nu
 		double ability = student->getCurrState().characteristics.ability;*/
 		PlayerState predictedState = PlayerState(student->getCurrState());
 
-		((SimStudent*)student)->calcReaction(&predictedState, currIteration);
+		//((SimStudent*)student)->calcReaction(&predictedState, currIteration);
 		double abilityInc = predictedState.characteristics.ability - student->getCurrState().characteristics.ability;
 		return abilityInc;
 	}
