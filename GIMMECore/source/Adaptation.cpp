@@ -1,5 +1,9 @@
 #include "../headers/Adaptation.h"
 
+Adaptation::Adaptation()
+{
+}
+
 Adaptation::Adaptation(
 	std::string name,
 	std::vector<Student*> students,
@@ -76,9 +80,9 @@ std::string Adaptation::getName()
 
 
 
-std::vector<std::pair<AdaptationGroup, std::vector<AdaptationTask>>> Adaptation::iterate(int currIteration)
+std::vector<std::pair<AdaptationGroup, AdaptationMechanic>> Adaptation::iterate(int currIteration)
 {
-	std::vector<std::pair<AdaptationGroup, std::vector<AdaptationTask>>> groupMechanicPairs = std::vector<std::pair<AdaptationGroup, std::vector<AdaptationTask>>>();
+	std::vector<std::pair<AdaptationGroup, AdaptationMechanic>> groupMechanicPairs = std::vector<std::pair<AdaptationGroup, AdaptationMechanic>>();
 
 	adaptedConfig = organizeStudents(students, currIteration);
 	std::vector<AdaptationGroup> groups = adaptedConfig.groups;
@@ -100,7 +104,7 @@ std::vector<std::pair<AdaptationGroup, std::vector<AdaptationTask>>> Adaptation:
 	
 	return groupMechanicPairs;
 }
-std::vector<std::pair<AdaptationGroup, std::vector<AdaptationTask>>> Adaptation::iterate()
+std::vector<std::pair<AdaptationGroup, AdaptationMechanic>> Adaptation::iterate()
 {
 	return iterate(0);
 }
@@ -254,7 +258,7 @@ double Adaptation::fitness(Student* student, InteractionsProfile profile, int nu
 	return 0.5*(predictedModel.characteristics.ability) + 0.5*predictedModel.characteristics.engagement; //ability must be normalized to [0,1]
 }
 
-std::vector<AdaptationTask> Adaptation::generateMechanic(InteractionsProfile bestConfigProfile,
+AdaptationMechanic Adaptation::generateMechanic(InteractionsProfile bestConfigProfile,
 	PlayerState avgLearningState,
 	std::vector<AdaptationTask> possibleCollaborativeTasks,
 	std::vector<AdaptationTask> possibleCompetitiveTasks,
@@ -277,7 +281,9 @@ std::vector<AdaptationTask> Adaptation::generateMechanic(InteractionsProfile bes
 		mechanicTasks.push_back(pickRandTaskInstance(possibleIndividualTasks, avgLearningState));
 	}
 	utilities->randShuffle(mechanicTasks);
-	return mechanicTasks;
+
+	AdaptationMechanic mechanic = { bestConfigProfile, mechanicTasks };
+	return mechanic;
 }
 
 AdaptationTask Adaptation::pickRandTaskInstance(std::vector<AdaptationTask> possibleTasks, PlayerState avgLearningState)

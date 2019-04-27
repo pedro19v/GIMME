@@ -92,50 +92,38 @@ int main()
 	
 	//generate all of the students models
 	std::vector<Student*> students = std::vector<Student*>();
-	for (int i = 0; i < numStudentsInClass; i++) {
+	/*for (int i = 0; i < numStudentsInClass; i++) {
 		students.push_back(new Student(i, "a", 1, 1, 1, utilities));
-	}
-
-	Adaptation adapt = Adaptation(
-		"test",
-		students,
-		100,
-		2, 5,
-		5,
-		utilities, 
-		5, possibleCollaborativeTasks, possibleCompetitiveTasks, possibleIndividualTasks);
+	}*/
+	Adaptation adapt;
 	
 	//getchar();
 
-	//Define a form object, class form will create a window
-	//when a form instance is created.
-	//The new window default visibility is false.
+
 	nana::form fm;
-
-	/*nana::label lab{ fm, "Hello, <bold blue size=16>Nana C++ Library</>" };
-	lab.format(true);*/
-
 	nana::textbox outputLabel{ fm };
 	//outputLabel.format(true);
 	//outputLabel.bgcolor(nana::color(256, 256, 256, 1.0f));
 	nana::button btn{ fm };
 	btn.caption("iterate");
-	btn.events().click([&fm,&outputLabel, &adapt] {
-		std::vector<std::pair<AdaptationGroup, std::vector<AdaptationTask>>> groupMechanicPairs = adapt.iterate();
+	btn.events().click([&fm, &outputLabel, &adapt] {
+		std::vector<std::pair<AdaptationGroup, AdaptationMechanic>> groupMechanicPairs = adapt.iterate();
 		groupMechanicPairs = adapt.iterate();
-
 		int mechanicsSize = (int)groupMechanicPairs.size();
-
 		std::string mechanicsOutput = "";
 
 		for (int j = 0; j < mechanicsSize; j++) {
 			std::vector<Student*> currGroup = groupMechanicPairs[j].first.getStudents();
-			std::vector<AdaptationTask> currMechanic = groupMechanicPairs[j].second;
+			std::vector<AdaptationTask> currMechanic = groupMechanicPairs[j].second.tasks;
+			InteractionsProfile currProfile = groupMechanicPairs[j].second.profile;
 
 			mechanicsOutput += "promote on students:\n";
 			for (int k = 0; k < currGroup.size(); k++) {
 				mechanicsOutput += "Number: " + std::to_string(currGroup[k]->getId()) + ", Name: " + currGroup[k]->getName() + "\n";
 			}
+			
+			mechanicsOutput += "Profile: <K_cl: "+ std::to_string(currProfile.K_cl) + " , K_cp: " + std::to_string(currProfile.K_cp) + " , K_i: " + std::to_string(currProfile.K_i) + ">";
+			
 			mechanicsOutput += ", the following tasks:\n";
 			for (int k = 0; k < currMechanic.size(); k++) {
 				mechanicsOutput += currMechanic[k].description + "\n";
@@ -143,17 +131,54 @@ int main()
 			mechanicsOutput += "-- -- -- -- -- -- -- -- -- -- -- -- --\n";
 		}
 		mechanicsOutput += "----------------------End of Iteration--------------------\n";
-		outputLabel.append(mechanicsOutput,true);
+		outputLabel.append(mechanicsOutput, true);
 	});
-	
+
 	//manage layout
 	fm.div("vert <><<><width=80% text><>><><weight=24<><button><>><>");
 	fm["text"] << outputLabel;
 	fm["button"] << btn;
 	fm.collocate();
+
 	
-	//Expose the form.
-	fm.show();
+
+	//Define a form object, class form will create a window
+	//when a form instance is created.
+	//The new window default visibility is false.
+	nana::form initFm;
+	nana::textbox studentIDLabel{ initFm };
+	nana::textbox studentNameLabel{ initFm };
+	nana::button addStudentButton{ initFm };
+	addStudentButton.caption("Add Student");
+	addStudentButton.events().click([&initFm, &studentIDLabel, &studentNameLabel, &students, &utilities] {
+		students.push_back(new Student(std::stoi(std::string(studentIDLabel.caption())), std::string(studentNameLabel.caption()), 1, 1, 1, utilities));
+	});
+	nana::button startAdaptationButton{ initFm };
+	startAdaptationButton.caption("Start Adaptation");
+	startAdaptationButton.events().click([&initFm, &fm, &adapt, &students, &utilities, &possibleCollaborativeTasks, &possibleCompetitiveTasks, &possibleIndividualTasks] {
+		adapt = Adaptation(
+			"test",
+			students,
+			100,
+			2, 5,
+			5,
+			utilities,
+			5, possibleCollaborativeTasks, possibleCompetitiveTasks, possibleIndividualTasks);
+
+		//Expose the form.
+		fm.restore();
+		fm.show();
+	});
+
+	//manage layout
+	initFm.div("vert <><<><width=80% text><>><<><width=80% text2><>> <weight=24<><button><>><weight=24<><button2><>><>");
+	initFm["text"] << studentIDLabel;
+	initFm["text2"] << studentNameLabel;
+	initFm["button"] << addStudentButton;
+	initFm["button2"] << startAdaptationButton;
+	initFm.collocate();
+	initFm.show();
+	
 
 	//Pass the control of the application to Nana's event
 	//service. It blocks the execution for dispatching user

@@ -198,7 +198,7 @@ void GIMMESim::executeAdaptationStep(int currStepIndex, int currRun) {
 	std::vector<AdaptationGroup> groups = currAdaptedConfig.groups;
 
 	//extract adapted mechanics
-	std::vector<std::pair<AdaptationGroup, std::vector<AdaptationTask>>> groupMechanicPairs;
+	std::vector<std::pair<AdaptationGroup, AdaptationMechanic>> groupMechanicPairs;
 
 	groupMechanicPairs = adapt->iterate(currStepIndex);
 
@@ -211,7 +211,13 @@ void GIMMESim::executeAdaptationStep(int currStepIndex, int currRun) {
 	//intervene
 	for (int j = 0; j < mechanicsSize; j++) {
 		std::vector<Student*> currGroup = groupMechanicPairs[j].first.getStudents();
-		std::vector<AdaptationTask> currMechanic = groupMechanicPairs[j].second;
+		std::vector<AdaptationTask> currMechanic = groupMechanicPairs[j].second.tasks;
+
+
+		*resultsFile << "promote on students:\n";
+		for (int k = 0; k < currGroup.size(); k++) {
+			*resultsFile << "Number: " + std::to_string(currGroup[k]->getId()) + ", Name: " + currGroup[k]->getName() + "\n";
+		}
 
 		*resultsFile << "promote on students:" << std::endl;
 		for (int k = 0; k < currGroup.size(); k++) {

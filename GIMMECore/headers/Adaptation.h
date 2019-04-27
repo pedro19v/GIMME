@@ -89,7 +89,11 @@ public:
 	AdaptationTask(AdaptationTaskType type, std::string description, std::vector<AdaptationTask> taskInstances) : AdaptationTask(type, description, 0, taskInstances) {}
 	AdaptationTask(AdaptationTaskType type, std::string description, float minRequiredAbility) : AdaptationTask(type, description, minRequiredAbility, std::vector<AdaptationTask>()) {}
 };
-
+struct AdaptationMechanic {
+public:
+	InteractionsProfile profile;
+	std::vector<AdaptationTask> tasks;
+};
 
 class Adaptation {
 
@@ -116,7 +120,7 @@ private:
 
 	AdaptationConfiguration adaptedConfig;
 	AdaptationConfiguration organizeStudents(std::vector<Student*> students, int currIteration);
-	std::vector<AdaptationTask> generateMechanic(InteractionsProfile bestConfigProfile,
+	AdaptationMechanic generateMechanic(InteractionsProfile bestConfigProfile,
 		PlayerState avgLearningState,
 		std::vector<AdaptationTask> possibleCollaborativeTasks,
 		std::vector<AdaptationTask> possibleCompetitiveTasks,
@@ -149,6 +153,7 @@ private:
 
 
 public:
+	Adaptation();
 
 	Adaptation(
 		std::string name,
@@ -176,8 +181,8 @@ public:
 	
 	std::string getName();
 
-	std::vector<std::pair<AdaptationGroup, std::vector<AdaptationTask>>> iterate();
-	std::vector<std::pair<AdaptationGroup, std::vector<AdaptationTask>>> iterate(int currIteration);
+	std::vector<std::pair<AdaptationGroup, AdaptationMechanic>> iterate();
+	std::vector<std::pair<AdaptationGroup, AdaptationMechanic>> iterate(int currIteration);
 
 	AdaptationConfiguration getCurrAdaptedConfig();
 	int getNumAdaptationCycles();
