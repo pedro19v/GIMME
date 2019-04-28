@@ -97,3 +97,4 @@ InteractionsProfile Student::getCurrProfile() {
 	return this->currState.profile;
 }
 
+

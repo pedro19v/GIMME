@@ -100,7 +100,7 @@ class Adaptation {
 private:
 
 	//students model refs
-	std::vector<Student*> students; 
+	std::vector<Student*>* students; 
 
 	//possible tasks
 	std::vector<AdaptationTask> possibleCollaborativeTasks;
@@ -119,7 +119,7 @@ private:
 	Utilities* utilities;
 
 	AdaptationConfiguration adaptedConfig;
-	AdaptationConfiguration organizeStudents(std::vector<Student*> students, int currIteration);
+	AdaptationConfiguration organizeStudents(int currIteration);
 	AdaptationMechanic generateMechanic(InteractionsProfile bestConfigProfile,
 		PlayerState avgLearningState,
 		std::vector<AdaptationTask> possibleCollaborativeTasks,
@@ -157,7 +157,7 @@ public:
 
 	Adaptation(
 		std::string name,
-		std::vector<Student*> students,
+		std::vector<Student*>* students,
 		int numberOfConfigChoices,
 		int minNumberOfStudentsPerGroup, int maxNumberOfStudentsPerGroup,
 		int numberOfFitnessNNs, int fitnessCondition,
@@ -170,7 +170,7 @@ public:
 
 	Adaptation(
 		std::string name,
-		std::vector<Student*> students,
+		std::vector<Student*>* students,
 		int numberOfConfigChoices,
 		int minNumberOfStudentsPerGroup, int maxNumberOfStudentsPerGroup,
 		int numberOfFitnessNNs,
