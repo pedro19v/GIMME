@@ -11,12 +11,12 @@ private:
 	nana::textbox studentEngagementInput;
 
 	nana::button updateStudentsButton;
-
-	std::vector<Student*>* students;
 public:
 
 	UpdatePlayerStatesForm()
-	{
+	{}
+
+	void create(std::vector<Student*>* students){
 		this->div("vert <studentDescriptionLabels> <<stateLabels><stateInputs>> <buttons>");
 
 		std::vector<nana::textbox> studentAbilityInputs = std::vector<nana::textbox>();
@@ -57,9 +57,6 @@ public:
 
 	}
 
-	void setAttributes(std::vector<Student*>* students) {
-		this->students = students;
-	}
 };
 
 
@@ -71,16 +68,17 @@ class AdaptationForm : public nana::form {
 private:
 	nana::textbox outputLabel;
 	nana::button iterateButton;
-	Adaptation* adapt;
 
 public:
 	AdaptationForm()
-	{
+	{}
+
+	void create(Adaptation* adapt){
 		outputLabel.create(*this);
 
 		iterateButton.create(*this);
 		iterateButton.caption("iterate");
-		iterateButton.events().click([this] {
+		iterateButton.events().click([this, adapt] {
 			std::vector<std::pair<AdaptationGroup, AdaptationMechanic>> groupMechanicPairs = adapt->iterate();
 			groupMechanicPairs = adapt->iterate();
 			int mechanicsSize = (int)groupMechanicPairs.size();
@@ -114,11 +112,6 @@ public:
 		(*this)["button"] << iterateButton;
 		this->collocate();
 	}
-
-	void setAdapt(Adaptation* adapt) {
-		this->adapt = adapt;
-	}
-
 };
 
 
@@ -127,15 +120,6 @@ public:
 class PlayerSetupForm : public nana::form {
 
 private:
-	std::vector<Student*>* students; 
-	
-	Adaptation* adapt; 
-	Utilities* utilities; 
-	std::vector<AdaptationTask>* possibleCollaborativeTasks; 
-	std::vector<AdaptationTask>* possibleCompetitiveTasks; 
-	std::vector<AdaptationTask>* possibleIndividualTasks;
-
-
 	nana::textbox currStudentsDisplay;
 	
 	nana::label studentIDLabel;
@@ -145,13 +129,15 @@ private:
 	nana::textbox studentNameInput;
 
 	nana::button addStudentButton;
+	nana::button removeStudentButton;
 	nana::button startAdaptationButton;
 
-	AdaptationForm* adaptationForm;
 public:
 
 	PlayerSetupForm()
-	{
+	{}
+
+	void create(AdaptationForm* adaptationForm, std::vector<Student*>* students, Adaptation* adapt, Utilities* utilities, std::vector<AdaptationTask>* possibleCollaborativeTasks, std::vector<AdaptationTask>* possibleCompetitiveTasks, std::vector<AdaptationTask>* possibleIndividualTasks){
 		currStudentsDisplay.create(*this);
 		currStudentsDisplay.append("------------ [Registered Players] -------------\n", true);
 		currStudentsDisplay.append("Name: | ID: \n", true);
@@ -168,17 +154,56 @@ public:
 
 		addStudentButton.create(*this);
 		addStudentButton.caption("Add Student");
-		addStudentButton.events().click([this] {
-			Student* newStudent = new Student(std::stoi(std::string(studentIDInput.caption())), std::string(studentNameInput.caption()), 1, 1, 1, utilities);
+
+
+		//create warning popups
+		nana::form warning;
+		nana::label label{ warning };
+		label.caption("Student Id must be a positive integer!");
+		warning.div("vert <label>");
+		warning["label"] << label;
+
+		warning.collocate();
+
+
+		addStudentButton.events().click([this,&warning, &students, &utilities] {
+			if (!isNumber(studentIDInput.caption())) {
+				warning.show();
+				return;
+			}
+			Student* newStudent = new Student(std::stoi(studentIDInput.caption()), std::string(studentNameInput.caption()), 1, 1, 1, utilities);
 			students->push_back(newStudent);
 			studentIDInput.reset();
 			studentNameInput.reset();
 			currStudentsDisplay.append(newStudent->getName() + "|" + std::to_string(newStudent->getId()) + "\n", true);
 		});
 
+		removeStudentButton.create(*this);
+		removeStudentButton.caption("Remove Student");
+		removeStudentButton.events().click([this, &students, &utilities] {
+			currStudentsDisplay.reset();
+			int studentsInitialSize = students->size();
+			std::vector<int> oldStudentsIndexes;
+			for (int i = 0; i < studentsInitialSize; i++) {
+				Student* currStudent = (*students)[i];
+				if (currStudent->getId() == std::stoi(studentIDInput.caption())) {
+					oldStudentsIndexes.push_back(i);
+					continue;
+				}
+				currStudentsDisplay.append(currStudent->getName() + "|" + std::to_string(currStudent->getId()) + "\n", true);
+			}
+
+			for (int i = oldStudentsIndexes.size(); i > 0; i--) {
+				students->erase(students->begin() + oldStudentsIndexes[i]);
+			}
+		});
+
 		startAdaptationButton.create(*this);
 		startAdaptationButton.caption("Start Adaptation");
-		startAdaptationButton.events().click([this] {
+		startAdaptationButton.events().click([this, adaptationForm, &students, &adapt, &utilities, &possibleCollaborativeTasks, &possibleCompetitiveTasks, &possibleIndividualTasks] {
+			if (adapt != NULL) {
+				delete adapt;
+			}
 			adapt = new Adaptation(
 				"test",
 				students,
@@ -188,7 +213,7 @@ public:
 				utilities,
 				5, *possibleCollaborativeTasks, *possibleCompetitiveTasks, *possibleIndividualTasks);
 
-			adaptationForm->setAdapt(adapt);
+			adaptationForm->create(adapt);
 			adaptationForm->show();
 		});
 		this->div("vert <height=70% currStudentsDisplay> <height=10% studentIDElements> <height=10% studentNameElements> <height=10% buttons>");
@@ -198,33 +223,18 @@ public:
 		(*this)["studentNameElements"] << studentNameLabel;
 		(*this)["studentNameElements"] << studentNameInput;
 		(*this)["buttons"] << addStudentButton;
+		(*this)["buttons"] << removeStudentButton;
 		(*this)["buttons"] << startAdaptationButton;
 
 		this->collocate();
 	}
-
-	void setAttributes(AdaptationForm* adaptationForm, std::vector<Student*>* students, Adaptation* adapt, Utilities* utilities, std::vector<AdaptationTask>* possibleCollaborativeTasks, std::vector<AdaptationTask>* possibleCompetitiveTasks, std::vector<AdaptationTask>* possibleIndividualTasks) {
-		this->adaptationForm = adaptationForm;
-		
-		this->students = students;
-
-		this->adapt = adapt;
-		this->utilities = utilities;
-		this->possibleCollaborativeTasks = possibleCollaborativeTasks;
-		this->possibleCompetitiveTasks = possibleCompetitiveTasks;
-		this->possibleIndividualTasks = possibleIndividualTasks;
+	bool isNumber(const std::string& s)
+	{
+		std::string::const_iterator it = s.begin();
+		while (it != s.end() && std::isdigit(*it)) ++it;
+		return !s.empty() && it == s.end();
 	}
-
 };
-
-
-
-
-
-
-
-
-
 
 
 
@@ -334,11 +344,12 @@ int main()
 
 
 	PlayerSetupForm playerSetupForm;
-	playerSetupForm.setAttributes(&adaptationForm, students, adapt, utilities, possibleCollaborativeTasks, possibleCompetitiveTasks, possibleIndividualTasks);
+	playerSetupForm.create(&adaptationForm, students, adapt, utilities, possibleCollaborativeTasks, possibleCompetitiveTasks, possibleIndividualTasks);
+	playerSetupForm.show();
 
 
 	UpdatePlayerStatesForm updateForm;
-
+	updateForm.create(students);
 	updateForm.show();
 
 	//nana::form& playerSetupForm = nana::form_loader<nana::form, true>()();
