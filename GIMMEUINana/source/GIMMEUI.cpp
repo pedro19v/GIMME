@@ -22,8 +22,8 @@ public:
 		std::vector<nana::textbox> studentAbilityInputs = std::vector<nana::textbox>();
 		std::vector<nana::textbox> studentEngagementInputs = std::vector<nana::textbox>();
 
-		for (int i = 0; i < students->size(); i++) {
-			Student* currStudent = (*students)[i];
+		//for (int i = 0; i < students->size(); i++) {
+			Student* currStudent = (*students)[0];
 
 			studentDescriptionLabel.create(*this);
 			studentDescriptionLabel.caption("Student Id: " + std::to_string(currStudent->getId()) + ", name: " + currStudent->getName());
@@ -44,7 +44,7 @@ public:
 			(*this)["stateLabels"] << studentEngagementLabel;
 			(*this)["stateInputs"] << studentAbilityInput;
 			(*this)["stateInputs"] << studentEngagementInput;
-		}
+		//}
 
 		updateStudentsButton.create(*this);
 		updateStudentsButton.caption("Update Students Characteristics");
@@ -132,6 +132,8 @@ private:
 	nana::button removeStudentButton;
 	nana::button startAdaptationButton;
 
+	nana::form warning;
+
 public:
 
 	PlayerSetupForm()
@@ -157,16 +159,15 @@ public:
 
 
 		//create warning popups
-		nana::form warning;
-		nana::label label{ warning };
+		nana::label label;
+		label.create(warning);
 		label.caption("Student Id must be a positive integer!");
 		warning.div("vert <label>");
 		warning["label"] << label;
-
 		warning.collocate();
 
 
-		addStudentButton.events().click([this,&warning, &students, &utilities] {
+		addStudentButton.events().click([this, &students, &utilities] {
 			if (!isNumber(studentIDInput.caption())) {
 				warning.show();
 				return;
@@ -181,6 +182,11 @@ public:
 		removeStudentButton.create(*this);
 		removeStudentButton.caption("Remove Student");
 		removeStudentButton.events().click([this, &students, &utilities] {
+			if (!isNumber(studentIDInput.caption())) {
+				warning.show();
+				return;
+			}
+
 			currStudentsDisplay.reset();
 			int studentsInitialSize = students->size();
 			std::vector<int> oldStudentsIndexes;
@@ -193,7 +199,7 @@ public:
 				currStudentsDisplay.append(currStudent->getName() + "|" + std::to_string(currStudent->getId()) + "\n", true);
 			}
 
-			for (int i = oldStudentsIndexes.size(); i > 0; i--) {
+			for (int i = oldStudentsIndexes.size()-1; i > -1; i--) {
 				students->erase(students->begin() + oldStudentsIndexes[i]);
 			}
 		});
