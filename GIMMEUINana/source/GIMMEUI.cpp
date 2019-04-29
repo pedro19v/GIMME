@@ -3,7 +3,7 @@
 class UpdatePlayerStatesForm : public nana::form {
 
 private:
-	nana::label studentDescriptionLabel;
+	nana::label studentDescriptionLabels;
 	nana::label studentAbilityLabel;
 	nana::label studentEngagementLabel;
 
@@ -17,16 +17,21 @@ public:
 	{}
 
 	void create(std::vector<Student*>* students){
-		this->div("vert <studentDescriptionLabels> <<stateLabels><stateInputs>> <buttons>");
+		
+		
+		this->div("vert <studentDescriptionLabels> <stateLabels> <stateInputs> <buttons>");
 
 		std::vector<nana::textbox> studentAbilityInputs = std::vector<nana::textbox>();
 		std::vector<nana::textbox> studentEngagementInputs = std::vector<nana::textbox>();
 
-		//for (int i = 0; i < students->size(); i++) {
-			Student* currStudent = (*students)[0];
+		for (int i = 0; i < students->size(); i++) {
+			Student* currStudent = (*students)[i];
 
+
+			nana::label studentDescriptionLabel;
 			studentDescriptionLabel.create(*this);
 			studentDescriptionLabel.caption("Student Id: " + std::to_string(currStudent->getId()) + ", name: " + currStudent->getName());
+			//studentDescriptionLabels.push_back(studentDescriptionLabel);
 
 			studentAbilityLabel.create(*this);
 			studentAbilityLabel.caption("Ability: ");
@@ -44,7 +49,7 @@ public:
 			(*this)["stateLabels"] << studentEngagementLabel;
 			(*this)["stateInputs"] << studentAbilityInput;
 			(*this)["stateInputs"] << studentEngagementInput;
-		//}
+		}
 
 		updateStudentsButton.create(*this);
 		updateStudentsButton.caption("Update Students Characteristics");
@@ -54,7 +59,8 @@ public:
 				currStudent->setCharacteristics(PlayerCharacteristics{ std::stod(studentAbilityInputs[i].caption()),std::stod(studentEngagementInputs[i].caption()) });
 			}*/
 		});
-
+		(*this)["buttons"] << updateStudentsButton;
+		this->collocate();
 	}
 
 };
@@ -339,9 +345,9 @@ int main()
 	
 	//generate all of the students models
 	std::vector<Student*>* students = new std::vector<Student*>();
-	/*for (int i = 0; i < numStudentsInClass; i++) {
+	for (int i = 0; i < numStudentsInClass; i++) {
 		students->push_back(new Student(i, "a", 1, 1, 1, utilities));
-	}*/
+	}
 	Adaptation* adapt = NULL;
 	
 	//getchar();
