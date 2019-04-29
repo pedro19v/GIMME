@@ -6,7 +6,7 @@ Adaptation::Adaptation()
 
 Adaptation::Adaptation(
 	std::string name,
-	std::vector<Student*> students,
+	std::vector<Student*>* students,
 	int numberOfConfigChoices,
 	int minNumberOfStudentsPerGroup, int maxNumberOfStudentsPerGroup,
 	int numberOfFitnessNNs, int fitnessCondition,
@@ -20,7 +20,7 @@ Adaptation::Adaptation(
 	this->name = name;
 
 	this->students = students;
-	int studentSize = (int) students.size();
+	int studentSize = (int) students->size();
 
 
 	this->numberOfConfigChoices = numberOfConfigChoices;
@@ -49,7 +49,7 @@ Adaptation::Adaptation(
 
 Adaptation::Adaptation(
 	std::string name,
-	std::vector<Student*> students,
+	std::vector<Student*>* students,
 	int numberOfConfigChoices,
 	int minNumberOfStudentsPerGroup, int maxNumberOfStudentsPerGroup,
 	int numberOfFitnessNNs,
@@ -84,7 +84,7 @@ std::vector<std::pair<AdaptationGroup, AdaptationMechanic>> Adaptation::iterate(
 {
 	std::vector<std::pair<AdaptationGroup, AdaptationMechanic>> groupMechanicPairs = std::vector<std::pair<AdaptationGroup, AdaptationMechanic>>();
 
-	adaptedConfig = organizeStudents(students, currIteration);
+	adaptedConfig = organizeStudents(currIteration);
 	std::vector<AdaptationGroup> groups = adaptedConfig.groups;
 	int groupsSize = (int) groups.size();
 	for (int i = 0; i < groupsSize; i++) {
@@ -119,7 +119,7 @@ int Adaptation::getNumAdaptationCycles() {
 }
 
 
-AdaptationConfiguration Adaptation::organizeStudents(std::vector<Student*> students, int currIteration) {
+AdaptationConfiguration Adaptation::organizeStudents(int currIteration) {
 
 	AdaptationConfiguration bestConfig = AdaptationConfiguration();
 	double currMaxFitness = -INFINITY;
@@ -129,12 +129,12 @@ AdaptationConfiguration Adaptation::organizeStudents(std::vector<Student*> stude
 	for (int j = 0; j < this->numberOfConfigChoices; j++) {
 		bool lastProfile = false;
 		double currFitness = 0.0;
-		std::vector<Student*> studentsWithoutGroup = std::vector<Student*>(students);
-		int studentsSize = (int) students.size();
+		std::vector<Student*> studentsWithoutGroup = std::vector<Student*>(*students);
+		int studentsSize = (int) students->size();
 		AdaptationConfiguration newConfig = AdaptationConfiguration();
 		
-		int minNumGroups = (int) ceil((double) students.size() / (double) maxNumberOfStudentsPerGroup);
-		int maxNumGroups = (int) floor((double) students.size() / (double) minNumberOfStudentsPerGroup);
+		int minNumGroups = (int) ceil((double) students->size() / (double) maxNumberOfStudentsPerGroup);
+		int maxNumGroups = (int) floor((double) students->size() / (double) minNumberOfStudentsPerGroup);
 		int numGroups = utilities->randIntBetween(minNumGroups,maxNumGroups);
 		
 		//generate min groups
@@ -198,6 +198,9 @@ AdaptationConfiguration Adaptation::organizeStudents(std::vector<Student*> stude
 			studentsWithoutGroupSize = (int) studentsWithoutGroup.size();
 		}
 
+		int studentSize = students->size();
+		this->groupSizeFreqs.resize(studentSize + 1);
+		this->configSizeFreqs.resize(studentSize + 1);
 		std::vector<AdaptationGroup>* currGroups = &newConfig.groups;
 		int currGroupsSize = (int)currGroups->size();
 		this->configSizeFreqs[currGroupsSize]++;

@@ -45,7 +45,7 @@ GIMMESim::GIMMESim(
 
 	this->adapt = new Adaptation(
 		"GIMME",
-		students,
+		&students,
 		numConfigurationChoices,
 		minNumStudentsPerGroup, maxNumStudentsPerGroup,
 		numFitnessNNs, 2,
@@ -99,7 +99,7 @@ void GIMMESim::simulateStudentsReaction(int currIteration) {
 void GIMMESim::simulateTrainingPhase() {
 	Adaptation randomClose = Adaptation(
 		"randomClose",
-		students,
+		&students,
 		numConfigurationChoices,
 		minNumStudentsPerGroup, maxNumStudentsPerGroup,
 		numFitnessNNs, 0,
@@ -213,11 +213,6 @@ void GIMMESim::executeAdaptationStep(int currStepIndex, int currRun) {
 		std::vector<Student*> currGroup = groupMechanicPairs[j].first.getStudents();
 		std::vector<AdaptationTask> currMechanic = groupMechanicPairs[j].second.tasks;
 
-
-		*resultsFile << "promote on students:\n";
-		for (int k = 0; k < currGroup.size(); k++) {
-			*resultsFile << "Number: " + std::to_string(currGroup[k]->getId()) + ", Name: " + currGroup[k]->getName() + "\n";
-		}
 
 		*resultsFile << "promote on students:" << std::endl;
 		for (int k = 0; k < currGroup.size(); k++) {

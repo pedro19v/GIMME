@@ -3,6 +3,7 @@
 
 #include "Utilities.h"
 #include <iostream>
+#include <string>
 
 
 struct InteractionsProfile {
@@ -130,4 +131,5 @@ public:
 	
 
 	PlayerState currModelIncreases; //for displaying in the chart
+
 };
