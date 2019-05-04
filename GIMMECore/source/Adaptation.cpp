@@ -9,7 +9,7 @@ Adaptation::Adaptation(
 	std::vector<Student*>* students,
 	int numberOfConfigChoices,
 	int minNumberOfStudentsPerGroup, int maxNumberOfStudentsPerGroup,
-	int numberOfFitnessNNs, int fitnessCondition,
+	IRegressionAlg regAlg, int fitnessCondition,
 	int numAdaptationCycles,
 	Utilities* utilities, int numTasksPerGroup,
 	std::vector<AdaptationTask> possibleCollaborativeTasks,
@@ -28,7 +28,7 @@ Adaptation::Adaptation(
 	this->minNumberOfStudentsPerGroup = minNumberOfStudentsPerGroup;
 
 	this->numTasksPerGroup = numTasksPerGroup;
-	this->numberOfFitnessNNs = numberOfFitnessNNs;
+	this->regAlg = regAlg;
 	this->fitnessCondition = fitnessCondition;
 
 	this->numAdaptationCycles = numAdaptationCycles;
@@ -52,7 +52,7 @@ Adaptation::Adaptation(
 	std::vector<Student*>* students,
 	int numberOfConfigChoices,
 	int minNumberOfStudentsPerGroup, int maxNumberOfStudentsPerGroup,
-	int numberOfFitnessNNs,
+	IRegressionAlg regAlg,
 	Utilities* utilities, 
 	int numTasksPerGroup,
 	std::vector<AdaptationTask> possibleCollaborativeTasks,
@@ -63,7 +63,7 @@ Adaptation::Adaptation(
 		students,
 		numberOfConfigChoices,
 		minNumberOfStudentsPerGroup, maxNumberOfStudentsPerGroup,
-		numberOfFitnessNNs, 0,
+		regAlg, 0,
 		2,
 		utilities, numTasksPerGroup,
 		possibleCollaborativeTasks,
@@ -164,7 +164,7 @@ AdaptationConfiguration Adaptation::organizeStudents(int currIteration) {
 				Student* currStudent = studentsWithoutGroup[currStudentIndex];
 				currGroup.addStudent(currStudent);
 
-				double currStudentFitness = fitness(currStudent, currGroup.getInteractionsProfile(), this->numberOfFitnessNNs, currIteration);
+				double currStudentFitness = fitness(currStudent, currGroup.getInteractionsProfile(), currIteration);
 				currFitness += currStudentFitness;
 
 				studentsWithoutGroup.erase(studentsWithoutGroup.begin() + currStudentIndex);
@@ -191,7 +191,7 @@ AdaptationConfiguration Adaptation::organizeStudents(int currIteration) {
 			Student* currStudent = studentsWithoutGroup[currStudentIndex];
 			currGroup->addStudent(currStudent);
 
-			double currStudentFitness = fitness(currStudent, currGroup->getInteractionsProfile(), this->numberOfFitnessNNs, currIteration);
+			double currStudentFitness = fitness(currStudent, currGroup->getInteractionsProfile(), currIteration);
 			currFitness += currStudentFitness;
 
 			studentsWithoutGroup.erase(studentsWithoutGroup.begin() + currStudentIndex);
@@ -223,7 +223,7 @@ AdaptationConfiguration Adaptation::organizeStudents(int currIteration) {
 }
 
 
-double Adaptation::fitness(Student* student, InteractionsProfile profile, int numberOfFitnessNNs, int currIteration) {
+double Adaptation::fitness(Student* student, InteractionsProfile profile, int currIteration) {
 
 	//this is the optimal simulation condition, therefore the 'wierd' cast...
 	if (fitnessCondition == 1) { 
@@ -236,28 +236,8 @@ double Adaptation::fitness(Student* student, InteractionsProfile profile, int nu
 		return abilityInc;
 	}
 
-	std::vector<PlayerState> pastModelIncs = student->getPastModelIncreases();
-	std::vector<PlayerState> pastModelncsCopy = std::vector<PlayerState>(pastModelIncs);
-	int pastModelIncsSize = (int) pastModelIncs.size();
-
-	PlayerState predictedModel = { profile, 0 , 0 };
-	std::sort(pastModelncsCopy.begin(), pastModelncsCopy.end(), FitnessSort(this, profile));
-
-	if (pastModelIncsSize > numberOfFitnessNNs) {
-		pastModelncsCopy.resize(numberOfFitnessNNs);
-	}
-	int pastModelncsCopySize = (int) pastModelncsCopy.size();
-
-	predictedModel.characteristics.ability = 0;
-	predictedModel.characteristics.engagement = 0;
-	for (int i = 0; i < pastModelncsCopySize; i++) {
-		InteractionsProfile pastProfile = pastModelncsCopy[i].profile;
-		double distance = profile.distanceBetween(pastProfile);
-
-		predictedModel.characteristics.ability += pastModelncsCopy[i].characteristics.ability* (1 - distance) / (double) (pastModelncsCopySize); //* (1 - distance) 
-		predictedModel.characteristics.engagement += pastModelncsCopy[i].characteristics.engagement* (1 - distance) / (double)(pastModelncsCopySize); //* (1 - distance)
-	}
-
+	FitnessSort sort = FitnessSort(this, profile);
+	PlayerState predictedModel = regAlg.predict(profile, student, &sort);
 	return 0.5*(predictedModel.characteristics.ability) + 0.5*predictedModel.characteristics.engagement; //ability must be normalized to [0,1]
 }
 

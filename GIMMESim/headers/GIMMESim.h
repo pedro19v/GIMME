@@ -36,6 +36,8 @@ private:
 	std::fstream* statisticsFile;
 	std::fstream* resultsFile;
 
+	IRegressionAlg regAlg;
+
 	void reset();
 
 	void simulateStudentsReaction(int currIteration);

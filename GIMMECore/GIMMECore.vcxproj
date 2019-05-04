@@ -21,11 +21,13 @@
   <ItemGroup>
     <ClInclude Include="headers\Adaptation.h" />
     <ClInclude Include="headers\GIMMECore.h" />
+    <ClInclude Include="headers\RegressionAlg.h" />
     <ClInclude Include="headers\Student.h" />
     <ClInclude Include="headers\Utilities.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Adaptation.cpp" />
+    <ClCompile Include="source\RegressionAlg.cpp" />
     <ClCompile Include="source\Student.cpp" />
     <ClCompile Include="source\Utilities.cpp" />
   </ItemGroup>

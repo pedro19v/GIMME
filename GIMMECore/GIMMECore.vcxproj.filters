@@ -15,6 +15,9 @@
     <ClCompile Include="source\Student.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="source\RegressionAlg.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="headers">
@@ -35,6 +38,9 @@
       <Filter>headers</Filter>
     </ClInclude>
     <ClInclude Include="headers\GIMMECore.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\RegressionAlg.h">
       <Filter>headers</Filter>
     </ClInclude>
   </ItemGroup>

@@ -6,6 +6,8 @@
 #include "Student.h"
 #include "Utilities.h"
 
+#include "RegressionAlg.h"
+
 #include <string>
 
 #include "../../GIMMESim/headers/SimStudent.h"
@@ -112,11 +114,12 @@ private:
 	int minNumberOfStudentsPerGroup;
 
 	int numTasksPerGroup;
-	int numberOfFitnessNNs;
 	int fitnessCondition;
 	int numAdaptationCycles;
 
 	Utilities* utilities;
+
+	IRegressionAlg regAlg;
 
 	AdaptationConfiguration adaptedConfig;
 	AdaptationConfiguration organizeStudents(int currIteration);
@@ -127,7 +130,7 @@ private:
 		std::vector<AdaptationTask> possibleIndividualTasks);
 	AdaptationTask pickRandTaskInstance(std::vector<AdaptationTask> possibleTasks, PlayerState avgLearningState);
 
-	double fitness(Student* student, InteractionsProfile profile, int numberOfFitnessNNs, int currIteration);
+	double fitness(Student* student, InteractionsProfile profile, int currIteration);
 
 
 	struct FitnessSort {
@@ -160,7 +163,7 @@ public:
 		std::vector<Student*>* students,
 		int numberOfConfigChoices,
 		int minNumberOfStudentsPerGroup, int maxNumberOfStudentsPerGroup,
-		int numberOfFitnessNNs, int fitnessCondition,
+		IRegressionAlg regAlg, int fitnessCondition,
 		int numAdaptationCycles,
 		Utilities* utilities, int numTasksPerGroup,
 		std::vector<AdaptationTask> possibleCollaborativeTasks,
@@ -173,7 +176,7 @@ public:
 		std::vector<Student*>* students,
 		int numberOfConfigChoices,
 		int minNumberOfStudentsPerGroup, int maxNumberOfStudentsPerGroup,
-		int numberOfFitnessNNs,
+		IRegressionAlg regAlg,
 		Utilities* utilities, int numTasksPerGroup,
 		std::vector<AdaptationTask> possibleCollaborativeTasks,
 		std::vector<AdaptationTask> possibleCompetitiveTasks,

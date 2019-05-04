@@ -1,11 +1,11 @@
 #include "../headers/GIMMEUI.h"
 
-class UpdatePlayerStatesForm : public nana::form {
+
+class UpdateSinglePlayerStateForm : public nana::form {
 
 private:
-	nana::label studentDescriptionLabels;
-	nana::label studentAbilityLabel;
-	nana::label studentEngagementLabel;
+	nana::label abilityLabel;
+	nana::label engagementLabel;
 
 	nana::textbox studentAbilityInput;
 	nana::textbox studentEngagementInput;
@@ -13,54 +13,105 @@ private:
 	nana::button updateStudentsButton;
 public:
 
+	UpdateSinglePlayerStateForm()
+	{}
+	void updateTarget(Student* student) {
+		//update event to match new target
+		updateStudentsButton.events().click([this, student] {
+			student->setCharacteristics(PlayerCharacteristics{ std::stod(abilityLabel.caption()),std::stod(engagementLabel.caption()) });
+		});
+	}
+
+	void create() {
+		this->div("vert <stateLabels> <stateInputs> <button>");
+
+		abilityLabel.create(*this);
+		abilityLabel.caption("Ability: ");
+
+		engagementLabel.create(*this);
+		engagementLabel.caption("Engagement: ");
+
+		studentAbilityInput.create(*this);
+		studentEngagementInput.create(*this);
+
+		(*this)["stateLabels"] << abilityLabel;
+		(*this)["stateLabels"] << engagementLabel;
+		(*this)["stateInputs"] << studentAbilityInput;
+		(*this)["stateInputs"] << studentEngagementInput;
+
+		updateStudentsButton.create(*this);
+		updateStudentsButton.caption("Update Student Characteristics");
+		(*this)["button"] << updateStudentsButton;
+
+		(*this).collocate();
+	}
+
+
+
+};
+
+class UpdatePlayerStatesForm : public nana::form {
+
+private:
+	nana::button* studentDescriptionLabels;
+
+	nana::textbox* studentAbilityInputs;
+	nana::textbox* studentEngagementInputs;
+
+	UpdateSinglePlayerStateForm popupForm;
+	
+	
+public:
+
 	UpdatePlayerStatesForm()
 	{}
 
 	void create(std::vector<Student*>* students){
-		
-		
-		this->div("vert <studentDescriptionLabels> <stateLabels> <stateInputs> <buttons>");
+		studentAbilityInputs = new nana::textbox[students->size()];
+		studentEngagementInputs = new nana::textbox[students->size()];
+		studentDescriptionLabels = new nana::button[students->size()];
 
-		std::vector<nana::textbox> studentAbilityInputs = std::vector<nana::textbox>();
-		std::vector<nana::textbox> studentEngagementInputs = std::vector<nana::textbox>();
+		this->div("horizontal <studentDescriptionLabels>");
+
+		//studentDescriptionLabels.create(*this);
+		//auto node = studentDescriptionLabels.insert("root", "Students"); // "Student Id: " + std::to_string(currStudent->getId()) + ", name: " + currStudent->getName());
+		
+		//prevent from unloading on close
+		popupForm.events().unload([this](const nana::arg_unload& arg) {
+			popupForm.hide();
+			arg.cancel = true;
+		});
+		(*this).events().unload([](const nana::arg_unload& arg) {
+			arg.cancel = true;
+		});
+
+		popupForm.create();
+		popupForm.updateTarget((*students)[0]);
 
 		for (int i = 0; i < students->size(); i++) {
 			Student* currStudent = (*students)[i];
 
+			studentDescriptionLabels[i].create(*this);
+			studentDescriptionLabels[i].caption("Student Id: " + std::to_string(currStudent->getId()) + ", name: " + currStudent->getName());
 
-			nana::label studentDescriptionLabel;
-			studentDescriptionLabel.create(*this);
-			studentDescriptionLabel.caption("Student Id: " + std::to_string(currStudent->getId()) + ", name: " + currStudent->getName());
-			//studentDescriptionLabels.push_back(studentDescriptionLabel);
-
-			studentAbilityLabel.create(*this);
-			studentAbilityLabel.caption("Ability: ");
-			studentAbilityInput.create(*this);
-
-			studentEngagementLabel.create(*this);
-			studentEngagementLabel.caption("Engagement: ");
-			studentEngagementInput.create(*this);
-
-			/*studentAbilityInputs.push_back(studentAbilityInput);
-			studentEngagementInputs.push_back(studentEngagementInput);*/
-
-			(*this)["studentDescriptionLabels"] << studentDescriptionLabel;
-			(*this)["stateLabels"] << studentAbilityLabel;
-			(*this)["stateLabels"] << studentEngagementLabel;
-			(*this)["stateInputs"] << studentAbilityInput;
-			(*this)["stateInputs"] << studentEngagementInput;
+			
+			studentDescriptionLabels[i].events().click([this, &currStudent, &i] {
+				studentDescriptionLabels[i].bgcolor(nana::colors::aquamarine);
+				popupForm.updateTarget(currStudent);
+				popupForm.show();
+			});
+			
+			(*this)["studentDescriptionLabels"] << studentDescriptionLabels[i];
 		}
 
-		updateStudentsButton.create(*this);
-		updateStudentsButton.caption("Update Students Characteristics");
-		updateStudentsButton.events().click([this] {
-			/*for (int i = 0; i < students->size(); i++) {
-				Student* currStudent = (*students)[i];
-				currStudent->setCharacteristics(PlayerCharacteristics{ std::stod(studentAbilityInputs[i].caption()),std::stod(studentEngagementInputs[i].caption()) });
-			}*/
-		});
-		(*this)["buttons"] << updateStudentsButton;
+		
 		this->collocate();
+	}
+
+	~UpdatePlayerStatesForm()
+	{
+		delete[] studentAbilityInputs;
+		delete[] studentEngagementInputs;
 	}
 
 };
@@ -80,6 +131,11 @@ public:
 	{}
 
 	void create(Adaptation* adapt){
+		
+		(*this).events().unload([](const nana::arg_unload& arg) {
+			arg.cancel = true;
+		});
+		
 		outputLabel.create(*this);
 
 		iterateButton.create(*this);
@@ -146,6 +202,10 @@ public:
 	{}
 
 	void create(AdaptationForm* adaptationForm, std::vector<Student*>* students, Adaptation* adapt, Utilities* utilities, std::vector<AdaptationTask>* possibleCollaborativeTasks, std::vector<AdaptationTask>* possibleCompetitiveTasks, std::vector<AdaptationTask>* possibleIndividualTasks){
+		(*this).events().unload([](const nana::arg_unload& arg) {
+			arg.cancel = true;
+		});
+		
 		currStudentsDisplay.create(*this);
 		currStudentsDisplay.append("------------ [Registered Players] -------------\n", true);
 		currStudentsDisplay.append("Name: | ID: \n", true);
@@ -210,9 +270,11 @@ public:
 			}
 		});
 
+		IRegressionAlg regAlg = KNNRegression(5);
+
 		startAdaptationButton.create(*this);
 		startAdaptationButton.caption("Start Adaptation");
-		startAdaptationButton.events().click([this, adaptationForm, &students, &adapt, &utilities, &possibleCollaborativeTasks, &possibleCompetitiveTasks, &possibleIndividualTasks] {
+		startAdaptationButton.events().click([this, &regAlg, adaptationForm, &students, &adapt, &utilities, &possibleCollaborativeTasks, &possibleCompetitiveTasks, &possibleIndividualTasks] {
 			if (adapt != NULL) {
 				delete adapt;
 			}
@@ -221,7 +283,7 @@ public:
 				students,
 				100,
 				2, 5,
-				5,
+				regAlg,
 				utilities,
 				5, *possibleCollaborativeTasks, *possibleCompetitiveTasks, *possibleIndividualTasks);
 
@@ -247,6 +309,8 @@ public:
 		return !s.empty() && it == s.end();
 	}
 };
+
+
 
 
 
@@ -364,57 +428,8 @@ int main()
 	updateForm.create(students);
 	updateForm.show();
 
-	//nana::form& playerSetupForm = nana::form_loader<nana::form, true>()();
-	//buildPlayerSetupForm(playerSetupForm, af, students, adapt, utilities, possibleCollaborativeTasks, possibleCompetitiveTasks, possibleIndividualTasks);
-	//playerSetupForm.show();
-
-	//nana::form& setPlayerStateForm = nana::form_loader<nana::form, true>()();
-	//setPlayerStateForm.div("vert <studentDescriptionLabels> <<stateLabels><stateInputs>> <buttons>");
-
-	//std::vector<nana::textbox> studentAbilityInputs = std::vector<nana::textbox>();
-	//std::vector<nana::textbox> studentEngagementInputs = std::vector<nana::textbox>();
-
-	//for (int i = 0; i < students->size(); i++) {
-	//	Student* currStudent = (*students)[i];
-
-	//	nana::label studentDescriptionLabel{ setPlayerStateForm };
-	//	studentDescriptionLabel.caption("Student Id: " + std::to_string(currStudent->getId()) + ", name: " + currStudent->getName());
-
-	//	nana::label studentAbilityLabel{ setPlayerStateForm };
-	//	studentAbilityLabel.caption("Ability: ");
-	//	nana::textbox studentAbilityInput{ setPlayerStateForm };
-
-	//	nana::label studentEngagementLabel{ setPlayerStateForm };
-	//	studentEngagementLabel.caption("Engagement: ");
-	//	nana::textbox studentEngagementInput{ setPlayerStateForm };
-
-	//	/*studentAbilityInputs.push_back(studentAbilityInput);
-	//	studentEngagementInputs.push_back(studentEngagementInput);*/
-
-	//	setPlayerStateForm["studentDescriptionLabels"] << studentDescriptionLabel;
-	//	setPlayerStateForm["stateLabels"] << studentAbilityLabel;
-	//	setPlayerStateForm["stateLabels"] << studentEngagementLabel;
-	//	setPlayerStateForm["stateInputs"] << studentAbilityInput;
-	//	setPlayerStateForm["stateInputs"] << studentEngagementInput;
-	//}
-
-	//nana::button updateStudentsButton{ setPlayerStateForm };
-	//updateStudentsButton.caption("Update Students Characteristics");
-	//updateStudentsButton.events().click([&students, &studentAbilityInputs, &studentEngagementInputs] {
-	//	for (int i = 0; i < students->size(); i++) {
-	//		Student* currStudent = (*students)[i];
-	//		currStudent->setCharacteristics(PlayerCharacteristics{ std::stod(studentAbilityInputs[i].caption()),std::stod(studentEngagementInputs[i].caption()) });
-	//	}
-	//});
-	//setPlayerStateForm["buttons"] << updateStudentsButton;
-
-	//setPlayerStateForm.collocate();
-	//setPlayerStateForm.show();
 
 	
-	//Pass the control of the application to Nana's event
-	//service. It blocks the execution for dispatching user
-	//input until the form is closed.
 	nana::exec();
 
 }

@@ -43,12 +43,15 @@ GIMMESim::GIMMESim(
 	possibleCompetitiveTasks = std::vector<AdaptationTask>();
 	possibleIndividualTasks = std::vector<AdaptationTask>();
 
+
+	regAlg = KNNRegression(5);
+
 	this->adapt = new Adaptation(
 		"GIMME",
 		&students,
 		numConfigurationChoices,
 		minNumStudentsPerGroup, maxNumStudentsPerGroup,
-		numFitnessNNs, 2,
+		regAlg, 2,
 		numIterationsPerRun,
 		utilities, numTasksPerGroup,
 		possibleCollaborativeTasks,
@@ -102,7 +105,7 @@ void GIMMESim::simulateTrainingPhase() {
 		&students,
 		numConfigurationChoices,
 		minNumStudentsPerGroup, maxNumStudentsPerGroup,
-		numFitnessNNs, 0,
+		regAlg, 0,
 		30,
 		utilities, numTasksPerGroup,
 		possibleCollaborativeTasks,
