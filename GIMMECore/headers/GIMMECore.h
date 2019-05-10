@@ -1,3 +1,3 @@
 #pragma once
-#include "RegressionAlg.h"
-#include "Adaptation.h"
+#include "Adaptation\Adaptation.h"
+#include "AuxStructs\RandomGen.h"

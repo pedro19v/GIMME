@@ -2,7 +2,7 @@
 
 #include "../../GIMMECore/headers/GIMMECore.h"
 
-class SimStudent: public Student {
+class SimPlayer: public Player {
 
 private:
 	//for simulation
@@ -11,7 +11,7 @@ private:
 	std::vector<double> iterationReactions;
 public:
 
-	SimStudent(int id, std::string name, int numPastModelIncreasesCells, int maxAmountOfStoredProfilesPerCell, int numStoredPastIterations, Utilities* utilities); //for simulations
+	SimPlayer(int id, std::string name, int numPastModelIncreasesCells, int maxAmountOfStoredProfilesPerCell, int numStoredPastIterations, RandomGen* utilities); //for simulations
 
 	InteractionsProfile getInherentPreference();
 	double getLearningRate();

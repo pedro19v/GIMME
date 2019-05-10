@@ -1,16 +1,14 @@
-#include "../headers/RegressionAlg.h"
-
+#include "../../../headers/Adaptation/AlgDefStructs/RegressionAlg.h"
 
 //---------------------- KNNRegression stuff ---------------------------
-
 KNNRegression::KNNRegression(int numberOfNNs)
 {
 	this->numberOfNNs = numberOfNNs;
 }
 
-PlayerState KNNRegression::predict(InteractionsProfile profile, Student* student, void* sortFunc)
+PlayerState KNNRegression::predict(InteractionsProfile profile, Player* player, void* sortFunc)
 {
-	std::vector<PlayerState> pastModelIncs = student->getPastModelIncreases();
+	std::vector<PlayerState> pastModelIncs = player->getPastModelIncreases();
 	std::vector<PlayerState> pastModelncsCopy = std::vector<PlayerState>(pastModelIncs);
 	int pastModelIncsSize = (int)pastModelIncs.size();
 
@@ -43,7 +41,7 @@ NeuralNetworkRegression::NeuralNetworkRegression()
 {
 }
 
-PlayerState NeuralNetworkRegression::predict(InteractionsProfile profile, Student* student, void* sortFunc)
+PlayerState NeuralNetworkRegression::predict(InteractionsProfile profile, Player* player, void* sortFunc)
 {
 	PlayerState predictedModel = { profile, 0 , 0 };
 
@@ -58,7 +56,7 @@ ReinforcementLearningRegression::ReinforcementLearningRegression()
 {
 }
 
-PlayerState ReinforcementLearningRegression::predict(InteractionsProfile profile, Student* student, void* sortFunc)
+PlayerState ReinforcementLearningRegression::predict(InteractionsProfile profile, Player* player, void* sortFunc)
 {
 	PlayerState predictedModel = { profile, 0 , 0 };
 

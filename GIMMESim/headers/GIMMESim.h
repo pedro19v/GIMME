@@ -3,9 +3,8 @@
 #include <cmath>
 #include <fstream>
 #include <ios>
-#include <string>
 #include "../../GIMMECore/headers/GIMMECore.h"
-#include "../headers/SimStudent.h"
+#include "../headers/SimPlayer.h"
 
 class GIMMESim {
 private:
@@ -24,19 +23,21 @@ private:
 	int numStudentsInClass;
 	int numStudentModelCells;
 	int maxAmountOfStoredProfilesPerCell;
-	std::vector<Student*>  students;
+	std::vector<Player*>  students;
 
 	std::vector<AdaptationTask> possibleCollaborativeTasks;
 	std::vector<AdaptationTask> possibleCompetitiveTasks;
 	std::vector<AdaptationTask> possibleIndividualTasks;
 
 	Adaptation* adapt;
-	Utilities* utilities;
+	RandomGen* utilities;
 
 	std::fstream* statisticsFile;
 	std::fstream* resultsFile;
 
-	IRegressionAlg regAlg;
+	ConfigsGenAlg configsAlg;
+	FitnessAlg fitnessAlg;
+	RegressionAlg regAlg;
 
 	void reset();
 

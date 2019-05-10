@@ -1,11 +1,4 @@
-#pragma once
-#include <algorithm> 
-
-#include "Utilities.h"
-#include <iostream>
-#include <string>
-
-
+//auxiliary structures: Player
 struct InteractionsProfile {
 public:
 	double K_i;
@@ -66,70 +59,12 @@ public:
 	}
 
 };
-
-
 struct PlayerCharacteristics {
 	double engagement; // on vs off task percentage
 	double ability; // score percentage
 };
-
 struct PlayerState {
 	InteractionsProfile profile;
 	PlayerCharacteristics characteristics;
 	double dist;
-};
-
-
-class Student {
-public:
-	class StudentStateGrid {
-		private:
-			std::vector<std::vector<PlayerState>> cells;
-			int numCells;
-			int maxAmountOfStoredProfilesPerCell;
-
-		public:
-			StudentStateGrid();
-			StudentStateGrid(int numCells, int maxAmountOfStoredProfilesPerCell);
-			void pushToGrid(PlayerState model);
-			std::vector<PlayerState> getAllStates();
-	};
-
-protected:
-	int id;
-	std::string name;
-
-	//for simulation
-	InteractionsProfile inherentPreference;
-	double baseLearningRate;
-	std::vector<double> iterationReactions;
-
-	//Adaptation part
-	int numPastModelIncreasesCells;
-	int maxAmountOfStoredProfilesPerCell;
-	StudentStateGrid pastModelIncreasesGrid;
-
-	PlayerState currState;
-	Utilities* utilities;
-
-public:
-
-	Student(int id, std::string name, int numPastModelIncreasesCells, int maxAmountOfStoredProfilesPerCell, int numStoredPastIterations, Utilities* utilities);
-	
-	void reset(int numberOfStudentModelCells, int maxAmountOfStoredProfilesPerCell);
-
-
-	std::vector<PlayerState> getPastModelIncreases();
-	PlayerState getCurrState();
-	void setCharacteristics(PlayerCharacteristics characteristics);
-	void setCurrProfile(InteractionsProfile newProfile);
-
-	int getId();
-	std::string getName();
-
-	InteractionsProfile getCurrProfile();
-	
-
-	PlayerState currModelIncreases; //for displaying in the chart
-
 };

@@ -1,52 +1,89 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="source\Student.cpp" />
-    <ClCompile Include="source\Student.cpp" />
-    <ClCompile Include="source\Adaptation.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Student.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Utilities.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Student.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="source\RegressionAlg.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
+    <Filter Include="headers\Adaptation\AlgDefStructs">
+      <UniqueIdentifier>{cd80bcf0-c970-4d3b-8ee1-a438938d5a69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="headers\Adaptation">
+      <UniqueIdentifier>{4091e773-a851-47fd-9094-232a2c1f6610}</UniqueIdentifier>
+    </Filter>
     <Filter Include="headers">
-      <UniqueIdentifier>{96a334b7-76f8-434f-8084-a5f979eee50a}</UniqueIdentifier>
+      <UniqueIdentifier>{fb7f19f4-d9fb-4122-a318-72d13c779c18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="headers\AuxStructs">
+      <UniqueIdentifier>{48e42bb8-68e2-47f6-8107-1ae413ea05ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="headers\Player">
+      <UniqueIdentifier>{b629a75b-c888-4a4e-8c2b-5e28ad634cbd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\Adaptation\AlgDefStructs">
+      <UniqueIdentifier>{20e01fff-f13c-4f8e-b7c8-0609fee438b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\Adaptation">
+      <UniqueIdentifier>{3d39a1b6-2b35-467e-8215-f28eca965459}</UniqueIdentifier>
     </Filter>
     <Filter Include="source">
-      <UniqueIdentifier>{518abf80-8e54-4ac4-ab48-d1faba657ced}</UniqueIdentifier>
+      <UniqueIdentifier>{751f1a32-d7c6-4df1-8a03-a6ea9d00ec9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\AuxStructs">
+      <UniqueIdentifier>{1de0a5ae-d816-448b-9fa0-15a82ca8f324}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\Player">
+      <UniqueIdentifier>{0a4a45a6-8f07-430c-ae78-c7c89f6089c4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="headers\Utilities.h">
-      <Filter>headers</Filter>
+    <ClInclude Include="headers\Adaptation\AlgDefStructs\ConfigsGenAlg.h">
+      <Filter>headers\Adaptation\AlgDefStructs</Filter>
     </ClInclude>
-    <ClInclude Include="headers\Adaptation.h">
-      <Filter>headers</Filter>
+    <ClInclude Include="headers\Adaptation\AlgDefStructs\FitnessAlg.h">
+      <Filter>headers\Adaptation\AlgDefStructs</Filter>
     </ClInclude>
-    <ClInclude Include="headers\Student.h">
-      <Filter>headers</Filter>
+    <ClInclude Include="headers\Adaptation\AlgDefStructs\RegressionAlg.h">
+      <Filter>headers\Adaptation\AlgDefStructs</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\Adaptation\Adaptation.h">
+      <Filter>headers\Adaptation</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\Adaptation\AdaptationStructs.h">
+      <Filter>headers\Adaptation</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\AuxStructs\RandomGen.h">
+      <Filter>headers\AuxStructs</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\Player\Player.h">
+      <Filter>headers\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\Player\PlayerStructs.h">
+      <Filter>headers\Player</Filter>
     </ClInclude>
     <ClInclude Include="headers\GIMMECore.h">
       <Filter>headers</Filter>
     </ClInclude>
-    <ClInclude Include="headers\RegressionAlg.h">
-      <Filter>headers</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="source\Utilities.inl">
-      <Filter>source</Filter>
+    <ClCompile Include="source\Adaptation\AlgDefStructs\ConfigGenAlg.cpp">
+      <Filter>source\Adaptation\AlgDefStructs</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Adaptation\AlgDefStructs\FitnessAlg.cpp">
+      <Filter>source\Adaptation\AlgDefStructs</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Adaptation\AlgDefStructs\RegressionAlg.cpp">
+      <Filter>source\Adaptation\AlgDefStructs</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Adaptation\Adaptation.cpp">
+      <Filter>source\Adaptation</Filter>
+    </ClCompile>
+    <ClCompile Include="source\AuxStructs\RandomGen.cpp">
+      <Filter>source\AuxStructs</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Player\Player.cpp">
+      <Filter>source\Player</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="source\AuxStructs\RandomGen.inl">
+      <Filter>source\AuxStructs</Filter>
     </None>
   </ItemGroup>
 </Project>

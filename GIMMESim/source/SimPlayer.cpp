@@ -1,6 +1,6 @@
-#include "../headers/SimStudent.h"
+#include "../headers/SimPlayer.h"
 
-SimStudent::SimStudent(int id, std::string name, int numPastModelIncreasesCells, int maxAmountOfStoredProfilesPerCell, int numStoredPastIterations, Utilities* utilities): Student( id, name, numPastModelIncreasesCells, maxAmountOfStoredProfilesPerCell, numStoredPastIterations, utilities) {
+SimPlayer::SimPlayer(int id, std::string name, int numPastModelIncreasesCells, int maxAmountOfStoredProfilesPerCell, int numStoredPastIterations, RandomGen* utilities): Player( id, name, numPastModelIncreasesCells, maxAmountOfStoredProfilesPerCell, numStoredPastIterations, utilities) {
 
 	//generate learning profile
 	double newRand1 = utilities->randBetween(0, 1);
@@ -30,14 +30,14 @@ SimStudent::SimStudent(int id, std::string name, int numPastModelIncreasesCells,
 	}
 }
 
-InteractionsProfile SimStudent::getInherentPreference() {
+InteractionsProfile SimPlayer::getInherentPreference() {
 	return this->inherentPreference;
 }
-double SimStudent::getLearningRate() {
+double SimPlayer::getLearningRate() {
 	return this->baseLearningRate;
 }
 
-void SimStudent::simulateReaction(int currIteration)
+void SimPlayer::simulateReaction(int currIteration)
 {
 	PlayerState increases = PlayerState(currState);
 	this->calcReaction(&currState, currIteration);
@@ -48,7 +48,7 @@ void SimStudent::simulateReaction(int currIteration)
 	this->pastModelIncreasesGrid.pushToGrid(increases);
 }
 
-void SimStudent::calcReaction(PlayerState* state, int currIteration)
+void SimPlayer::calcReaction(PlayerState* state, int currIteration)
 {
 	InteractionsProfile currProfile = this->currState.profile;
 

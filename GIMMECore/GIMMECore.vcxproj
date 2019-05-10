@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -19,20 +19,26 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="headers\Adaptation.h" />
+    <ClInclude Include="headers\Adaptation\Adaptation.h" />
+    <ClInclude Include="headers\Adaptation\AdaptationStructs.h" />
+    <ClInclude Include="headers\Adaptation\AlgDefStructs\ConfigsGenAlg.h" />
+    <ClInclude Include="headers\Adaptation\AlgDefStructs\FitnessAlg.h" />
+    <ClInclude Include="headers\Adaptation\AlgDefStructs\RegressionAlg.h" />
+    <ClInclude Include="headers\AuxStructs\RandomGen.h" />
     <ClInclude Include="headers\GIMMECore.h" />
-    <ClInclude Include="headers\RegressionAlg.h" />
-    <ClInclude Include="headers\Student.h" />
-    <ClInclude Include="headers\Utilities.h" />
+    <ClInclude Include="headers\Player\Player.h" />
+    <ClInclude Include="headers\Player\PlayerStructs.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\Adaptation.cpp" />
-    <ClCompile Include="source\RegressionAlg.cpp" />
-    <ClCompile Include="source\Student.cpp" />
-    <ClCompile Include="source\Utilities.cpp" />
+    <ClCompile Include="source\Adaptation\Adaptation.cpp" />
+    <ClCompile Include="source\Adaptation\AlgDefStructs\ConfigGenAlg.cpp" />
+    <ClCompile Include="source\Adaptation\AlgDefStructs\FitnessAlg.cpp" />
+    <ClCompile Include="source\Adaptation\AlgDefStructs\RegressionAlg.cpp" />
+    <ClCompile Include="source\AuxStructs\RandomGen.cpp" />
+    <ClCompile Include="source\Player\Player.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="source\Utilities.inl" />
+    <None Include="source\AuxStructs\RandomGen.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

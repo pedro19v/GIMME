@@ -7,18 +7,24 @@ private:
 	nana::label abilityLabel;
 	nana::label engagementLabel;
 
-	nana::textbox studentAbilityInput;
-	nana::textbox studentEngagementInput;
+	nana::inputbox::real studentAbilityInput {"Ability(%)", 100, 1, 300, 1 };
+	nana::inputbox::real studentEngagementInput{ "Engagement(%)", 100, 1, 300, 1 };
 
 	nana::button updateStudentsButton;
 public:
 
 	UpdateSinglePlayerStateForm()
-	{}
-	void updateTarget(Student* student) {
+	{
+		
+	}
+	void updateTarget(Player* student) {
 		//update event to match new target
 		updateStudentsButton.events().click([this, student] {
-			student->setCharacteristics(PlayerCharacteristics{ std::stod(abilityLabel.caption()),std::stod(engagementLabel.caption()) });
+			student->setCharacteristics(PlayerCharacteristics{ 
+				studentAbilityInput.value(),
+				studentEngagementInput.value()
+			});
+			this->hide();
 		});
 	}
 
@@ -31,13 +37,13 @@ public:
 		engagementLabel.create(*this);
 		engagementLabel.caption("Engagement: ");
 
-		studentAbilityInput.create(*this);
-		studentEngagementInput.create(*this);
+		/*studentAbilityInput.create(*this);
+		studentEngagementInput.create(*this);*/
 
 		(*this)["stateLabels"] << abilityLabel;
 		(*this)["stateLabels"] << engagementLabel;
-		(*this)["stateInputs"] << studentAbilityInput;
-		(*this)["stateInputs"] << studentEngagementInput;
+		/*(*this)["stateInputs"] << studentAbilityInput;
+		(*this)["stateInputs"] << studentEngagementInput;*/
 
 		updateStudentsButton.create(*this);
 		updateStudentsButton.caption("Update Student Characteristics");
@@ -66,7 +72,7 @@ public:
 	UpdatePlayerStatesForm()
 	{}
 
-	void create(std::vector<Student*>* students){
+	void create(std::vector<Player*>* students){
 		studentAbilityInputs = new nana::textbox[students->size()];
 		studentEngagementInputs = new nana::textbox[students->size()];
 		studentDescriptionLabels = new nana::button[students->size()];
@@ -89,14 +95,15 @@ public:
 		popupForm.updateTarget((*students)[0]);
 
 		for (int i = 0; i < students->size(); i++) {
-			Student* currStudent = (*students)[i];
+			Player* currStudent = (*students)[i];
 
 			studentDescriptionLabels[i].create(*this);
 			studentDescriptionLabels[i].caption("Student Id: " + std::to_string(currStudent->getId()) + ", name: " + currStudent->getName());
 
-			
-			studentDescriptionLabels[i].events().click([this, &currStudent, &i] {
-				studentDescriptionLabels[i].bgcolor(nana::colors::aquamarine);
+			auto currButton = &studentDescriptionLabels[i];
+			//studentDescriptionLabels[i].bgcolor(nana::colors::aquamarine);
+			currButton->events().click([this, currStudent, currButton] {
+				currButton->bgcolor(nana::colors::green);
 				popupForm.updateTarget(currStudent);
 				popupForm.show();
 			});
@@ -147,7 +154,7 @@ public:
 			std::string mechanicsOutput = "";
 
 			for (int j = 0; j < mechanicsSize; j++) {
-				std::vector<Student*> currGroup = groupMechanicPairs[j].first.getStudents();
+				std::vector<Player*> currGroup = groupMechanicPairs[j].first.getPlayers();
 				std::vector<AdaptationTask> currMechanic = groupMechanicPairs[j].second.tasks;
 				InteractionsProfile currProfile = groupMechanicPairs[j].second.profile;
 
@@ -201,7 +208,7 @@ public:
 	PlayerSetupForm()
 	{}
 
-	void create(AdaptationForm* adaptationForm, std::vector<Student*>* students, Adaptation* adapt, Utilities* utilities, std::vector<AdaptationTask>* possibleCollaborativeTasks, std::vector<AdaptationTask>* possibleCompetitiveTasks, std::vector<AdaptationTask>* possibleIndividualTasks){
+	void create(AdaptationForm* adaptationForm, std::vector<Player*>* students, Adaptation* adapt, RandomGen* utilities, std::vector<AdaptationTask>* possibleCollaborativeTasks, std::vector<AdaptationTask>* possibleCompetitiveTasks, std::vector<AdaptationTask>* possibleIndividualTasks){
 		(*this).events().unload([](const nana::arg_unload& arg) {
 			arg.cancel = true;
 		});
@@ -238,7 +245,7 @@ public:
 				warning.show();
 				return;
 			}
-			Student* newStudent = new Student(std::stoi(studentIDInput.caption()), std::string(studentNameInput.caption()), 1, 1, 1, utilities);
+			Player* newStudent = new Player(std::stoi(studentIDInput.caption()), std::string(studentNameInput.caption()), 1, 1, 1, utilities);
 			students->push_back(newStudent);
 			studentIDInput.reset();
 			studentNameInput.reset();
@@ -257,7 +264,7 @@ public:
 			int studentsInitialSize = students->size();
 			std::vector<int> oldStudentsIndexes;
 			for (int i = 0; i < studentsInitialSize; i++) {
-				Student* currStudent = (*students)[i];
+				Player* currStudent = (*students)[i];
 				if (currStudent->getId() == std::stoi(studentIDInput.caption())) {
 					oldStudentsIndexes.push_back(i);
 					continue;
@@ -270,11 +277,13 @@ public:
 			}
 		});
 
-		IRegressionAlg regAlg = KNNRegression(5);
+		RegressionAlg regAlg = KNNRegression(5);
+		ConfigsGenAlg configsAlg = RandomConfigsGen();
+		FitnessAlg fitnessAlg = FundamentedFitness();
 
 		startAdaptationButton.create(*this);
 		startAdaptationButton.caption("Start Adaptation");
-		startAdaptationButton.events().click([this, &regAlg, adaptationForm, &students, &adapt, &utilities, &possibleCollaborativeTasks, &possibleCompetitiveTasks, &possibleIndividualTasks] {
+		startAdaptationButton.events().click([this, &regAlg, &configsAlg, &fitnessAlg, adaptationForm, &students, &adapt, &utilities, &possibleCollaborativeTasks, &possibleCompetitiveTasks, &possibleIndividualTasks] {
 			if (adapt != NULL) {
 				delete adapt;
 			}
@@ -284,6 +293,8 @@ public:
 				100,
 				2, 5,
 				regAlg,
+				configsAlg,
+				fitnessAlg,
 				utilities,
 				5, *possibleCollaborativeTasks, *possibleCompetitiveTasks, *possibleIndividualTasks);
 
@@ -404,13 +415,13 @@ int main()
 	
 	int numStudentsInClass = 23;
 
-	Utilities* utilities = new Utilities();
+	RandomGen* utilities = new RandomGen();
 	utilities->resetRandoms();
 	
 	//generate all of the students models
-	std::vector<Student*>* students = new std::vector<Student*>();
+	std::vector<Player*>* students = new std::vector<Player*>();
 	for (int i = 0; i < numStudentsInClass; i++) {
-		students->push_back(new Student(i, "a", 1, 1, 1, utilities));
+		students->push_back(new Player(i, "a", 1, 1, 1, utilities));
 	}
 	Adaptation* adapt = NULL;
 	

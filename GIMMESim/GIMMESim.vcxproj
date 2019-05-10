@@ -19,18 +19,18 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\GIMMECore\GIMMECore.vcxproj">
+      <Project>{4567ffd8-26aa-4ce4-be6e-8fce975698de}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
     <ClInclude Include="headers\GIMMESim.h" />
-    <ClInclude Include="headers\SimStudent.h" />
+    <ClInclude Include="headers\SimPlayer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\GIMMESim.cpp" />
     <ClCompile Include="source\main.cpp" />
-    <ClCompile Include="source\SimStudent.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\GIMMECore\GIMMECore.vcxproj">
-      <Project>{4567ffd8-26aa-4ce4-be6e-8fce975698de}</Project>
-    </ProjectReference>
+    <ClCompile Include="source\SimPlayer.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

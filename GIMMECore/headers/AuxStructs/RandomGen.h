@@ -6,17 +6,19 @@
 
 #define _USE_MATH_DEFINES
 
-class Utilities {
-	
+
+class RandomGen {
+
 public:
-	
+
 	int defaultRandomSeed;
 	std::normal_distribution<double> normalDistribution;
 	std::uniform_real_distribution<double> uniformDistributionReal;
 	std::uniform_int_distribution<> uniformDistributionInt;
 
-	Utilities();
-	
+
+	RandomGen();
+
 	void resetRandoms();
 	double randBetween(int seed, double min, double max);
 	double randBetween(double min, double max);
@@ -31,4 +33,4 @@ public:
 	double normalRandom(double mu, double var);
 };
 
-#include "../source/Utilities.inl"
+#include "../../source/AuxStructs/RandomGen.inl"

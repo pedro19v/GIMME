@@ -1,15 +1,15 @@
-#include "../headers/Student.h"
+#include "../../headers/Player/Player.h"
 
 
-Student::StudentStateGrid::StudentStateGrid(){}
-Student::StudentStateGrid::StudentStateGrid(int numCells, int maxAmountOfStoredProfilesPerCell)
+Player::PlayerStateGrid::PlayerStateGrid(){}
+Player::PlayerStateGrid::PlayerStateGrid(int numCells, int maxAmountOfStoredProfilesPerCell)
 {
 	this->numCells = numCells;
 	this->maxAmountOfStoredProfilesPerCell = maxAmountOfStoredProfilesPerCell;
 
 	cells = std::vector<std::vector<PlayerState>>(numCells);
 }
-void Student::StudentStateGrid::pushToGrid(PlayerState model) {
+void Player::PlayerStateGrid::pushToGrid(PlayerState model) {
 	double dimSpan = cbrt((double)numCells-1);
 	int currCellInd = (int) (dimSpan * dimSpan * floor(dimSpan * model.profile.K_cl) + dimSpan * floor(dimSpan * model.profile.K_cp) + floor(dimSpan* model.profile.K_i));
 	/*printf("ind: %d\n", currCellInd);
@@ -21,7 +21,7 @@ void Student::StudentStateGrid::pushToGrid(PlayerState model) {
 		currCell->erase(currCell->begin());
 	}
 }
-std::vector<PlayerState> Student::StudentStateGrid::getAllStates() {
+std::vector<PlayerState> Player::PlayerStateGrid::getAllStates() {
 	std::vector<PlayerState> allCells = std::vector<PlayerState>();
 	for (int i = 0; i < cells.size(); i++) {
 		std::vector<PlayerState>* currCell = &cells[i];
@@ -32,7 +32,7 @@ std::vector<PlayerState> Student::StudentStateGrid::getAllStates() {
 
 
 
-Student::Student(int id, std::string name, int numPastModelIncreasesCells, int maxAmountOfStoredProfilesPerCell, int numStoredPastIterations, Utilities* utilities){
+Player::Player(int id, std::string name, int numPastModelIncreasesCells, int maxAmountOfStoredProfilesPerCell, int numStoredPastIterations, RandomGen* utilities){
 	
 	
 
@@ -42,7 +42,7 @@ Student::Student(int id, std::string name, int numPastModelIncreasesCells, int m
 
 	this->id = id;
 	this->name = name;
-	this->pastModelIncreasesGrid = StudentStateGrid(numPastModelIncreasesCells, maxAmountOfStoredProfilesPerCell);
+	this->pastModelIncreasesGrid = PlayerStateGrid(numPastModelIncreasesCells, maxAmountOfStoredProfilesPerCell);
 
 
 	this->numPastModelIncreasesCells = numPastModelIncreasesCells;
@@ -51,29 +51,29 @@ Student::Student(int id, std::string name, int numPastModelIncreasesCells, int m
 	this->utilities = utilities;
 }
 
-void Student::reset(int numberOfStudentModelCells, int maxAmountOfStoredProfilesPerCell) {
+void Player::reset(int numberOfPlayerModelCells, int maxAmountOfStoredProfilesPerCell) {
 	
 	this->currState.profile = { 0,0,0 };
 
 	this->currState.characteristics.engagement = 0;
 	this->currState.characteristics.ability = 0;
 
-	this->pastModelIncreasesGrid = StudentStateGrid(numberOfStudentModelCells, maxAmountOfStoredProfilesPerCell);
+	this->pastModelIncreasesGrid = PlayerStateGrid(numberOfPlayerModelCells, maxAmountOfStoredProfilesPerCell);
 }
 
-PlayerState Student::getCurrState() {
+PlayerState Player::getCurrState() {
 	return this->currState;
 }
-void Student::setCharacteristics(PlayerCharacteristics characteristics) {
+void Player::setCharacteristics(PlayerCharacteristics characteristics) {
 	this->currState.characteristics = characteristics;
 }
 
-std::vector<PlayerState> Student::getPastModelIncreases() {
+std::vector<PlayerState> Player::getPastModelIncreases() {
 	return this->pastModelIncreasesGrid.getAllStates();
 }
 
 
-void Student::setCurrProfile(InteractionsProfile newProfile){
+void Player::setCurrProfile(InteractionsProfile newProfile){
 	
 	//save past profiles
 	PlayerState increases = PlayerState(currState);
@@ -85,15 +85,15 @@ void Student::setCurrProfile(InteractionsProfile newProfile){
 
 	this->currState.profile = newProfile;
 }
-int Student::getId()
+int Player::getId()
 {
 	return this->id;
 }
-std::string Student::getName()
+std::string Player::getName()
 {
 	return this->name;
 }
-InteractionsProfile Student::getCurrProfile() {
+InteractionsProfile Player::getCurrProfile() {
 	return this->currState.profile;
 }
 
