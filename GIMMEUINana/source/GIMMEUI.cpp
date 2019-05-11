@@ -208,7 +208,7 @@ public:
 	PlayerSetupForm()
 	{}
 
-	void create(AdaptationForm* adaptationForm, std::vector<Player*>* students, Adaptation* adapt, RandomGen* utilities, std::vector<AdaptationTask>* possibleCollaborativeTasks, std::vector<AdaptationTask>* possibleCompetitiveTasks, std::vector<AdaptationTask>* possibleIndividualTasks){
+	void create(AdaptationForm* adaptationForm, std::vector<Player*>* players, Adaptation* adapt, RandomGen* randomGen, std::vector<AdaptationTask>* possibleCollaborativeTasks, std::vector<AdaptationTask>* possibleCompetitiveTasks, std::vector<AdaptationTask>* possibleIndividualTasks){
 		(*this).events().unload([](const nana::arg_unload& arg) {
 			arg.cancel = true;
 		});
@@ -240,13 +240,13 @@ public:
 		warning.collocate();
 
 
-		addStudentButton.events().click([this, &students, &utilities] {
+		addStudentButton.events().click([this, &players, &randomGen] {
 			if (!isNumber(studentIDInput.caption())) {
 				warning.show();
 				return;
 			}
-			Player* newStudent = new Player(std::stoi(studentIDInput.caption()), std::string(studentNameInput.caption()), 1, 1, 1, utilities);
-			students->push_back(newStudent);
+			Player* newStudent = new Player(std::stoi(studentIDInput.caption()), std::string(studentNameInput.caption()), 1, 1, 1, randomGen);
+			players->push_back(newStudent);
 			studentIDInput.reset();
 			studentNameInput.reset();
 			currStudentsDisplay.append(newStudent->getName() + "|" + std::to_string(newStudent->getId()) + "\n", true);
@@ -254,17 +254,17 @@ public:
 
 		removeStudentButton.create(*this);
 		removeStudentButton.caption("Remove Student");
-		removeStudentButton.events().click([this, &students, &utilities] {
+		removeStudentButton.events().click([this, &players, &randomGen] {
 			if (!isNumber(studentIDInput.caption())) {
 				warning.show();
 				return;
 			}
 
 			currStudentsDisplay.reset();
-			int studentsInitialSize = students->size();
+			int studentsInitialSize = players->size();
 			std::vector<int> oldStudentsIndexes;
 			for (int i = 0; i < studentsInitialSize; i++) {
-				Player* currStudent = (*students)[i];
+				Player* currStudent = (*players)[i];
 				if (currStudent->getId() == std::stoi(studentIDInput.caption())) {
 					oldStudentsIndexes.push_back(i);
 					continue;
@@ -273,29 +273,26 @@ public:
 			}
 
 			for (int i = oldStudentsIndexes.size()-1; i > -1; i--) {
-				students->erase(students->begin() + oldStudentsIndexes[i]);
+				players->erase(players->begin() + oldStudentsIndexes[i]);
 			}
 		});
 
-		RegressionAlg regAlg = KNNRegression(5);
-		ConfigsGenAlg configsAlg = RandomConfigsGen();
-		FitnessAlg fitnessAlg = FundamentedFitness();
 
 		startAdaptationButton.create(*this);
 		startAdaptationButton.caption("Start Adaptation");
-		startAdaptationButton.events().click([this, &regAlg, &configsAlg, &fitnessAlg, adaptationForm, &students, &adapt, &utilities, &possibleCollaborativeTasks, &possibleCompetitiveTasks, &possibleIndividualTasks] {
+		startAdaptationButton.events().click([this, adaptationForm, &players, &adapt, &randomGen, &possibleCollaborativeTasks, &possibleCompetitiveTasks, &possibleIndividualTasks] {
 			if (adapt != NULL) {
 				delete adapt;
 			}
 			adapt = new Adaptation(
 				"test",
-				students,
+				players,
 				100,
 				2, 5,
-				regAlg,
-				configsAlg,
-				fitnessAlg,
-				utilities,
+				new KNNRegression(5),
+				new RandomConfigsGen(),
+				new FundamentedFitness(),
+				randomGen,
 				5, *possibleCollaborativeTasks, *possibleCompetitiveTasks, *possibleIndividualTasks);
 
 			adaptationForm->create(adapt);
@@ -321,8 +318,20 @@ public:
 	}
 };
 
-
-
+//void onExit() {
+//	if (this->regAlg != NULL) {
+//		delete regAlg;
+//	}
+//	if (this->fitAlg != NULL) {
+//		delete fitAlg;
+//	}
+//	if (this->configsGenAlg != NULL) {
+//		delete configsGenAlg;
+//	}
+//	if (this->randomGen != NULL) {
+//		delete randomGen;
+//	}
+//}
 
 
 

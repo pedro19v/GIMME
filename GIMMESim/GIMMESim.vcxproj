@@ -32,6 +32,9 @@
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\SimPlayer.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{109C0D26-01C3-444E-9AAD-93B09E570CA6}</ProjectGuid>

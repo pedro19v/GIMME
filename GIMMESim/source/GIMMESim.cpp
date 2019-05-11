@@ -43,9 +43,10 @@ GIMMESim::GIMMESim(
 	possibleCompetitiveTasks = std::vector<AdaptationTask>();
 	possibleIndividualTasks = std::vector<AdaptationTask>();
 
-	configsAlg = ConfigsGenAlg();
-	fitnessAlg = FundamentedFitness();
-	regAlg = KNNRegression(5);
+	configsGenAlg = new RandomConfigsGen();
+	fitnessAlg = new FundamentedFitness();
+	randomFitness = new RandomFitness();
+	regAlg = new KNNRegression(5);
 
 
 	this->adapt = new Adaptation(
@@ -54,7 +55,7 @@ GIMMESim::GIMMESim(
 		numConfigurationChoices,
 		minNumStudentsPerGroup, maxNumStudentsPerGroup,
 		regAlg, 
-		configsAlg,
+		configsGenAlg,
 		fitnessAlg,
 		numIterationsPerRun,
 		utilities, numTasksPerGroup,
@@ -88,6 +89,19 @@ GIMMESim::~GIMMESim() {
 		delete students[i];
 	}*/
 
+	if (this->regAlg != NULL) {
+		delete regAlg;
+	}
+	if (this->fitnessAlg != NULL) {
+		delete fitnessAlg;
+	}
+	if (this->configsGenAlg != NULL) {
+		delete configsGenAlg;
+	}
+	if (this->randomFitness != NULL) {
+		delete randomFitness;
+	}
+
 	delete adapt;
 	
 	delete statisticsFile;
@@ -109,7 +123,7 @@ void GIMMESim::simulateTrainingPhase() {
 		&students,
 		numConfigurationChoices,
 		minNumStudentsPerGroup, maxNumStudentsPerGroup,
-		regAlg, configsAlg, RandomFitness(),
+		regAlg, configsGenAlg, randomFitness,
 		30,
 		utilities, numTasksPerGroup,
 		possibleCollaborativeTasks,

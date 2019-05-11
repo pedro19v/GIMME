@@ -9,11 +9,11 @@ Adaptation::Adaptation(
 	std::vector<Player*>* players,
 	int numberOfConfigChoices,
 	int minNumberOfPlayersPerGroup, int maxNumberOfPlayersPerGroup,
-	RegressionAlg regAlg,
-	ConfigsGenAlg configsGenAlg,
-	FitnessAlg fitAlg,
+	RegressionAlg* regAlg,
+	ConfigsGenAlg* configsGenAlg,
+	FitnessAlg* fitAlg,
 	int numAdaptationCycles,
-	RandomGen* utilities, int numTasksPerGroup,
+	RandomGen* randomGen, int numTasksPerGroup,
 	std::vector<AdaptationTask> possibleCollaborativeTasks,
 	std::vector<AdaptationTask> possibleCompetitiveTasks,
 	std::vector<AdaptationTask> possibleIndividualTasks){
@@ -30,20 +30,22 @@ Adaptation::Adaptation(
 
 	this->numTasksPerGroup = numTasksPerGroup;
 	this->regAlg = regAlg;
-	this->fitnessCondition = fitnessCondition;
+	this->fitAlg = fitAlg;
+	this->configsGenAlg = configsGenAlg;
+	this->configsGenAlg->init(players);
+
+	this->randomGen = randomGen;
+
+	this->possibleCollaborativeTasks = possibleCollaborativeTasks;
+	this->possibleCompetitiveTasks = possibleCompetitiveTasks;
+	this->possibleIndividualTasks = possibleIndividualTasks;
+
 
 	this->numAdaptationCycles = numAdaptationCycles;
 	this->avgAbilities = std::vector<double>(numAdaptationCycles+1);
 	this->avgEngagements = std::vector<double>(numAdaptationCycles+1);
 	this->avgPrefDiff = std::vector<double>(numAdaptationCycles+1);
 	this->avgExecutionTime = 0;
-
-
-	this->randomGen = utilities;
-
-	this->possibleCollaborativeTasks = possibleCollaborativeTasks;
-	this->possibleCompetitiveTasks = possibleCompetitiveTasks;
-	this->possibleIndividualTasks = possibleIndividualTasks;
 }
 
 Adaptation::Adaptation(
@@ -51,9 +53,9 @@ Adaptation::Adaptation(
 	std::vector<Player*>* players,
 	int numberOfConfigChoices,
 	int minNumberOfPlayersPerGroup, int maxNumberOfPlayersPerGroup,
-	RegressionAlg regAlg,
-	ConfigsGenAlg configsGenAlg,
-	FitnessAlg fitAlg,
+	RegressionAlg* regAlg,
+	ConfigsGenAlg* configsGenAlg,
+	FitnessAlg* fitAlg,
 	RandomGen* utilities, 
 	int numTasksPerGroup,
 	std::vector<AdaptationTask> possibleCollaborativeTasks,
@@ -71,6 +73,22 @@ Adaptation::Adaptation(
 		possibleCompetitiveTasks,
 		possibleIndividualTasks
 	) {
+}
+
+Adaptation::~Adaptation()
+{
+	/*if (this->regAlg != NULL) {
+		delete regAlg;
+	}
+	if (this->fitAlg != NULL) {
+		delete fitAlg;
+	}
+	if (this->configsGenAlg != NULL) {
+		delete configsGenAlg;
+	}
+	if (this->randomGen != NULL) {
+		delete randomGen;
+	}*/
 }
 
 std::string Adaptation::getName()
@@ -121,7 +139,7 @@ int Adaptation::getNumAdaptationCycles() {
 
 
 AdaptationConfiguration Adaptation::organizePlayers(int currIteration) {
-	return configsGenAlg.organize(players, numberOfConfigChoices, minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup, randomGen, regAlg, fitAlg);
+	return configsGenAlg->organize(players, numberOfConfigChoices, minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup, randomGen, regAlg, fitAlg);
 }
 
 AdaptationMechanic Adaptation::generateMechanic(InteractionsProfile bestConfigProfile,

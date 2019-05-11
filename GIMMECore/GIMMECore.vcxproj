@@ -38,6 +38,7 @@
     <ClCompile Include="source\Player\Player.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram.cd" />
     <None Include="source\AuxStructs\RandomGen.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -35,9 +35,10 @@ private:
 	std::fstream* statisticsFile;
 	std::fstream* resultsFile;
 
-	ConfigsGenAlg configsAlg;
-	FitnessAlg fitnessAlg;
-	RegressionAlg regAlg;
+	ConfigsGenAlg* configsGenAlg;
+	FitnessAlg* fitnessAlg;
+	RandomFitness* randomFitness;
+	RegressionAlg* regAlg;
 
 	void reset();
 

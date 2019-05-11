@@ -85,5 +85,6 @@
     <None Include="source\AuxStructs\RandomGen.inl">
       <Filter>source\AuxStructs</Filter>
     </None>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
 </Project>

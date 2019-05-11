@@ -1,0 +1,168 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Adaptation" Collapsed="true">
+    <Position X="7.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>SAAAAEbIAAQEAIIkJChAAAAAAQAEAAAAIAAEAABgBEA=</HashCode>
+      <FileName>headers\Adaptation\Adaptation.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="fitAlg" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="ConfigsGenAlg" Collapsed="true">
+    <Position X="1.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAACAAAAAAAAAAAEAAAAAACAAAAAAAABA=</HashCode>
+      <FileName>headers\Adaptation\AlgDefStructs\ConfigsGenAlg.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RandomConfigsGen" Collapsed="true">
+    <Position X="0.5" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAA=</HashCode>
+      <FileName>headers\Adaptation\AlgDefStructs\ConfigsGenAlg.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvolutionaryConfigsGen" Collapsed="true">
+    <Position X="2.75" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAA=</HashCode>
+      <FileName>headers\Adaptation\AlgDefStructs\ConfigsGenAlg.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FitnessAlg" Collapsed="true">
+    <Position X="3" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>headers\Adaptation\AlgDefStructs\FitnessAlg.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RandomFitness" Collapsed="true">
+    <Position X="0.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>headers\Adaptation\AlgDefStructs\FitnessAlg.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SimulationsOptimalFitness" Collapsed="true">
+    <Position X="3" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>headers\Adaptation\AlgDefStructs\FitnessAlg.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FundamentedFitness" Collapsed="true">
+    <Position X="5.25" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>headers\Adaptation\AlgDefStructs\FitnessAlg.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RegressionAlg" Collapsed="true">
+    <Position X="3" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAA=</HashCode>
+      <FileName>headers\Adaptation\AlgDefStructs\RegressionAlg.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="KNNRegression" Collapsed="true">
+    <Position X="0.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAACAAAAAA=</HashCode>
+      <FileName>headers\Adaptation\AlgDefStructs\RegressionAlg.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NeuralNetworkRegression" Collapsed="true">
+    <Position X="3" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAA=</HashCode>
+      <FileName>headers\Adaptation\AlgDefStructs\RegressionAlg.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ReinforcementLearningRegression" Collapsed="true">
+    <Position X="5.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAACAAAAAA=</HashCode>
+      <FileName>headers\Adaptation\AlgDefStructs\RegressionAlg.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RandomGen" Collapsed="true">
+    <Position X="11.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACCAAQAAAAACAAAAACAAIAAAAAQAAAAAAAEBAA=</HashCode>
+      <FileName>headers\AuxStructs\RandomGen.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Player" Collapsed="true">
+    <Position X="9.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAEQEAABAEICBAAAACARAAgAEAAAAQCAEAQAAAkA=</HashCode>
+      <FileName>headers\Player\Player.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="AdaptationGroup" Collapsed="true">
+    <Position X="9.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAAAAQAJIAAAAIAAAAACAAAIADAAAAAAAA=</HashCode>
+      <FileName>headers\Adaptation\AdaptationStructs.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="AdaptationConfiguration" Collapsed="true">
+    <Position X="7.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>headers\Adaptation\AdaptationStructs.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="AdaptationTask" Collapsed="true">
+    <Position X="7.75" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEAAABAAAIAAAAAAAAEABAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>headers\Adaptation\AdaptationStructs.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="AdaptationMechanic" Collapsed="true">
+    <Position X="11.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAEAgAAAAAAAAAAAA=</HashCode>
+      <FileName>headers\Adaptation\AdaptationStructs.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="FitnessSort" Collapsed="true">
+    <Position X="9.5" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAAAAAAAEBAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>headers\Adaptation\AlgDefStructs\FitnessAlg.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="InteractionsProfile" Collapsed="true">
+    <Position X="11.25" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAACAAAAAAAAAAAFAAEAABAAAAAAACAAAAAAAAA=</HashCode>
+      <FileName>headers\Player\PlayerStructs.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="PlayerCharacteristics" Collapsed="true">
+    <Position X="7.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>headers\Player\PlayerStructs.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="PlayerState" Collapsed="true">
+    <Position X="9.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAgAAAAAEAAAAAAAAAAAAAA=</HashCode>
+      <FileName>headers\Player\PlayerStructs.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Enum Name="AdaptationTaskType" Collapsed="true">
+    <Position X="7.75" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAQAAAIAAAAAAAAAIAAAAAAAAAAA=</HashCode>
+      <FileName>headers\Adaptation\AdaptationStructs.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

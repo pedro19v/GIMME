@@ -42,9 +42,9 @@ private:
 
 	RandomGen* randomGen;
 
-	RegressionAlg regAlg;
-	ConfigsGenAlg configsGenAlg;
-	FitnessAlg fitAlg;
+	RegressionAlg* regAlg;
+	ConfigsGenAlg* configsGenAlg;
+	FitnessAlg* fitAlg;
 
 	AdaptationConfiguration adaptedConfig;
 	AdaptationConfiguration organizePlayers(int currIteration);
@@ -64,11 +64,11 @@ public:
 		std::vector<Player*>* players,
 		int numberOfConfigChoices,
 		int minNumberOfPlayersPerGroup, int maxNumberOfPlayersPerGroup,
-		RegressionAlg regAlg,
-		ConfigsGenAlg configsGenAlg,
-		FitnessAlg fitAlg,
+		RegressionAlg* regAlg,
+		ConfigsGenAlg* configsGenAlg,
+		FitnessAlg* fitAlg,
 		int numAdaptationCycles,
-		RandomGen* utilities, int numTasksPerGroup,
+		RandomGen* randomGen, int numTasksPerGroup,
 		std::vector<AdaptationTask> possibleCollaborativeTasks,
 		std::vector<AdaptationTask> possibleCompetitiveTasks,
 		std::vector<AdaptationTask> possibleIndividualTasks
@@ -79,14 +79,17 @@ public:
 		std::vector<Player*>* players,
 		int numberOfConfigChoices,
 		int minNumberOfPlayersPerGroup, int maxNumberOfPlayersPerGroup,
-		RegressionAlg regAlg,
-		ConfigsGenAlg configsGenAlg,
-		FitnessAlg fitAlg,
-		RandomGen* utilities, int numTasksPerGroup,
+		RegressionAlg* regAlg,
+		ConfigsGenAlg* configsGenAlg,
+		FitnessAlg* fitAlg,
+		RandomGen* randomGen, int numTasksPerGroup,
 		std::vector<AdaptationTask> possibleCollaborativeTasks,
 		std::vector<AdaptationTask> possibleCompetitiveTasks,
 		std::vector<AdaptationTask> possibleIndividualTasks);
 	
+	~Adaptation();
+
+
 	std::string getName();
 
 	std::vector<std::pair<AdaptationGroup, AdaptationMechanic>> iterate();
@@ -104,4 +107,6 @@ public:
 
 
 	std::string name;
+
+	
 };

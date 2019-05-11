@@ -1,6 +1,6 @@
 #include "../../../headers/Adaptation/AlgDefStructs/ConfigsGenAlg.h"
 
-AdaptationConfiguration RandomConfigsGen::organize(std::vector<Player*>* players, int numberOfConfigChoices, int minNumberOfPlayersPerGroup, int maxNumberOfPlayersPerGroup, RandomGen* randomGen, RegressionAlg regAlg, FitnessAlg fitAlg)
+AdaptationConfiguration RandomConfigsGen::organize(std::vector<Player*>* players, int numberOfConfigChoices, int minNumberOfPlayersPerGroup, int maxNumberOfPlayersPerGroup, RandomGen* randomGen, RegressionAlg* regAlg, FitnessAlg* fitAlg)
 {
 	AdaptationConfiguration bestConfig = AdaptationConfiguration();
 	double currMaxFitness = -INFINITY;
@@ -46,7 +46,7 @@ AdaptationConfiguration RandomConfigsGen::organize(std::vector<Player*>* players
 				currGroup.addPlayer(currPlayer);
 
 				//double currPlayerFitness = fitAlg.calculate(currPlayer, currGroup.getInteractionsProfile());
-				double currPlayerFitness = fitAlg.calculate(currPlayer, currGroup.getInteractionsProfile(), regAlg);
+				double currPlayerFitness = fitAlg->calculate(currPlayer, currGroup.getInteractionsProfile(), regAlg);
 				currFitness += currPlayerFitness;
 
 				playersWithoutGroup.erase(playersWithoutGroup.begin() + currPlayerIndex);
@@ -73,7 +73,7 @@ AdaptationConfiguration RandomConfigsGen::organize(std::vector<Player*>* players
 			Player* currPlayer = playersWithoutGroup[currPlayerIndex];
 			currGroup->addPlayer(currPlayer);
 
-			double currPlayerFitness = fitAlg.calculate(currPlayer, currGroup->getInteractionsProfile(),regAlg);
+			double currPlayerFitness = fitAlg->calculate(currPlayer, currGroup->getInteractionsProfile(), regAlg);
 			//double currPlayerFitness = fitAlg.calculate(currPlayer, currGroup->getInteractionsProfile());
 			currFitness += currPlayerFitness;
 

@@ -8,13 +8,13 @@ public:
 	std::vector<int> groupSizeFreqs;
 	std::vector<int> configSizeFreqs;
 
-	AdaptationConfiguration organize(std::vector<Player*>* players, int numberOfConfigChoices, int minNumberOfStudentsPerGroup, int maxNumberOfStudentsPerGroup, RandomGen* utilities, RegressionAlg regAlg, FitnessAlg fitAlg) {
+	void init(std::vector<Player*>* players) {
 		int playersSize = (int)players->size();
 		this->groupSizeFreqs = std::vector<int>(playersSize + 1);
 		this->configSizeFreqs = std::vector<int>(playersSize + 1);
+	}
 
-		return AdaptationConfiguration();
-	};
+	virtual AdaptationConfiguration organize(std::vector<Player*>* players, int numberOfConfigChoices, int minNumberOfStudentsPerGroup, int maxNumberOfStudentsPerGroup, RandomGen* utilities, RegressionAlg* regAlg, FitnessAlg* fitAlg) = 0;
 
 	void updateMetrics(AdaptationConfiguration generatedConfig) {
 		configSizeFreqs[generatedConfig.groups.size()]++;
@@ -26,10 +26,10 @@ public:
 
 class RandomConfigsGen : public ConfigsGenAlg {
 public:
-	AdaptationConfiguration organize(std::vector<Player*>* players, int numberOfConfigChoices, int minNumberOfStudentsPerGroup, int maxNumberOfStudentsPerGroup, RandomGen* utilities, RegressionAlg regAlg, FitnessAlg fitAlg);
+	AdaptationConfiguration organize(std::vector<Player*>* players, int numberOfConfigChoices, int minNumberOfStudentsPerGroup, int maxNumberOfStudentsPerGroup, RandomGen* randomGen, RegressionAlg* regAlg, FitnessAlg* fitAlg);
 };
 
 class EvolutionaryConfigsGen : public ConfigsGenAlg {
 public:
-	AdaptationConfiguration organize(std::vector<Player*>* players, int numberOfConfigChoices, int minNumberOfStudentsPerGroup, int maxNumberOfStudentsPerGroup, RandomGen* utilities, RegressionAlg regAlg, FitnessAlg fitAlg);
+	AdaptationConfiguration organize(std::vector<Player*>* players, int numberOfConfigChoices, int minNumberOfStudentsPerGroup, int maxNumberOfStudentsPerGroup, RandomGen* randomGen, RegressionAlg* regAlg, FitnessAlg* fitAlg);
 };
