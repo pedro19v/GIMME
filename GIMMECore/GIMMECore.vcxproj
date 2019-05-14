@@ -24,6 +24,7 @@
     <ClInclude Include="headers\Adaptation\AlgDefStructs\ConfigsGenAlg.h" />
     <ClInclude Include="headers\Adaptation\AlgDefStructs\FitnessAlg.h" />
     <ClInclude Include="headers\Adaptation\AlgDefStructs\RegressionAlg.h" />
+    <ClInclude Include="headers\AuxStructs\InteractionsProfile.h" />
     <ClInclude Include="headers\AuxStructs\RandomGen.h" />
     <ClInclude Include="headers\GIMMECore.h" />
     <ClInclude Include="headers\Player\Player.h" />

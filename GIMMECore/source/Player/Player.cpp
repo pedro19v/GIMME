@@ -64,8 +64,12 @@ void Player::reset(int numberOfPlayerModelCells, int maxAmountOfStoredProfilesPe
 PlayerState Player::getCurrState() {
 	return this->currState;
 }
+
 void Player::setCharacteristics(PlayerCharacteristics characteristics) {
 	this->currState.characteristics = characteristics;
+}
+void Player::setCurrProfile(InteractionsProfile profile) {
+	this->currState.profile = profile;
 }
 
 std::vector<PlayerState> Player::getPastModelIncreases() {
@@ -73,18 +77,11 @@ std::vector<PlayerState> Player::getPastModelIncreases() {
 }
 
 
-void Player::setCurrProfile(InteractionsProfile newProfile){
-	
-	//save past profiles
-	PlayerState increases = PlayerState(currState);
-
-	increases.characteristics.ability = currState.characteristics.ability - increases.characteristics.ability;
-	increases.characteristics.engagement = currState.characteristics.engagement; // -increases.engagement;
-
-	this->pastModelIncreasesGrid.pushToGrid(increases);
-
-	this->currState.profile = newProfile;
+void Player::saveIncreases(PlayerState stateIncreases){
+	this->currModelIncreases = stateIncreases;
+	this->pastModelIncreasesGrid.pushToGrid(stateIncreases);
 }
+
 int Player::getId()
 {
 	return this->id;

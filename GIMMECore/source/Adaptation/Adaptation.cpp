@@ -12,17 +12,14 @@ Adaptation::Adaptation(
 	RegressionAlg* regAlg,
 	ConfigsGenAlg* configsGenAlg,
 	FitnessAlg* fitAlg,
-	int numAdaptationCycles,
-	RandomGen* randomGen, int numTasksPerGroup,
+	RandomGen* randomGen,
+	int numTasksPerGroup,
 	std::vector<AdaptationTask> possibleCollaborativeTasks,
 	std::vector<AdaptationTask> possibleCompetitiveTasks,
-	std::vector<AdaptationTask> possibleIndividualTasks){
-
+	std::vector<AdaptationTask> possibleIndividualTasks) {
 
 	this->name = name;
-
 	this->players = players;
-
 
 	this->numberOfConfigChoices = numberOfConfigChoices;
 	this->maxNumberOfPlayersPerGroup = maxNumberOfPlayersPerGroup;
@@ -39,40 +36,6 @@ Adaptation::Adaptation(
 	this->possibleCollaborativeTasks = possibleCollaborativeTasks;
 	this->possibleCompetitiveTasks = possibleCompetitiveTasks;
 	this->possibleIndividualTasks = possibleIndividualTasks;
-
-
-	this->numAdaptationCycles = numAdaptationCycles;
-	this->avgAbilities = std::vector<double>(numAdaptationCycles+1);
-	this->avgEngagements = std::vector<double>(numAdaptationCycles+1);
-	this->avgPrefDiff = std::vector<double>(numAdaptationCycles+1);
-	this->avgExecutionTime = 0;
-}
-
-Adaptation::Adaptation(
-	std::string name,
-	std::vector<Player*>* players,
-	int numberOfConfigChoices,
-	int minNumberOfPlayersPerGroup, int maxNumberOfPlayersPerGroup,
-	RegressionAlg* regAlg,
-	ConfigsGenAlg* configsGenAlg,
-	FitnessAlg* fitAlg,
-	RandomGen* utilities, 
-	int numTasksPerGroup,
-	std::vector<AdaptationTask> possibleCollaborativeTasks,
-	std::vector<AdaptationTask> possibleCompetitiveTasks,
-	std::vector<AdaptationTask> possibleIndividualTasks):
-	Adaptation(
-		name,
-		players,
-		numberOfConfigChoices,
-		minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup,
-		regAlg, configsGenAlg, fitAlg,
-		2,
-		utilities, numTasksPerGroup,
-		possibleCollaborativeTasks,
-		possibleCompetitiveTasks,
-		possibleIndividualTasks
-	) {
 }
 
 Adaptation::~Adaptation()
@@ -108,16 +71,16 @@ std::vector<std::pair<AdaptationGroup, AdaptationMechanic>> Adaptation::iterate(
 	int groupsSize = (int) groups.size();
 	for (int i = 0; i < groupsSize; i++) {
 		AdaptationGroup currGroup = groups[i];
-		std::vector<Player*> groupPlayers = currGroup.getPlayers();
+		std::vector<Player*> groupPlayers = currGroup.players;
 		int groupPlayersSize = (int) groupPlayers.size();
 
 		for (int j = 0; j < groupPlayersSize; j++) {
 			Player* currPlayer = groupPlayers[j];
-			currPlayer->setCurrProfile(currGroup.getInteractionsProfile());
+			currPlayer->setCurrProfile(currGroup.interactionsProfile);
 		}
 
-		InteractionsProfile currGroupProfile = currGroup.getInteractionsProfile();
-		PlayerState currGroupState = currGroup.getAvgLearningState();
+		InteractionsProfile currGroupProfile = currGroup.interactionsProfile;
+		PlayerState currGroupState = currGroup.avgLearningState;
 		groupMechanicPairs.push_back({ currGroup , generateMechanic(currGroupProfile, currGroupState, possibleCollaborativeTasks, possibleCompetitiveTasks, possibleIndividualTasks) });
 	}
 	
@@ -130,11 +93,6 @@ std::vector<std::pair<AdaptationGroup, AdaptationMechanic>> Adaptation::iterate(
 
 AdaptationConfiguration Adaptation::getCurrAdaptedConfig() {
 	return this->adaptedConfig;
-}
-
-
-int Adaptation::getNumAdaptationCycles() {
-	return this->numAdaptationCycles;
 }
 
 
@@ -173,7 +131,7 @@ AdaptationMechanic Adaptation::generateMechanic(InteractionsProfile bestConfigPr
 AdaptationTask Adaptation::pickRandTaskInstance(std::vector<AdaptationTask> possibleTasks, PlayerState avgLearningState)
 {
 	if (possibleTasks.empty()) {
-		return AdaptationTask(AdaptationTaskType::NONE, "default", 0.0f);
+		return AdaptationTask{ AdaptationTaskType::NONE, "default", 0.0f };
 	}
 	int randIndex = randomGen->randIntBetween(0, (int) possibleTasks.size() - 1);
 	AdaptationTask randomTask = possibleTasks[randIndex];

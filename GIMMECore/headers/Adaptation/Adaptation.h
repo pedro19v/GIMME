@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <algorithm>
 #include <numeric>
 #include "../Player/Player.h"
@@ -13,15 +12,9 @@
 #include "AlgDefStructs/FitnessAlg.h"
 
 #include <string>
-
 #include "../../../GIMMESim/headers/SimPlayer.h"
 
-
-
-
-
 class Adaptation {
-
 private:
 
 	//players model refs
@@ -33,12 +26,10 @@ private:
 	std::vector<AdaptationTask> possibleIndividualTasks;
 
 	int numberOfConfigChoices;
-	int maxNumberOfPlayersPerGroup;
 	int minNumberOfPlayersPerGroup;
+	int maxNumberOfPlayersPerGroup;
 
 	int numTasksPerGroup;
-	int fitnessCondition;
-	int numAdaptationCycles;
 
 	RandomGen* randomGen;
 
@@ -55,25 +46,8 @@ private:
 		std::vector<AdaptationTask> possibleIndividualTasks);
 	AdaptationTask pickRandTaskInstance(std::vector<AdaptationTask> possibleTasks, PlayerState avgLearningState);
 
-
 public:
 	Adaptation();
-
-	Adaptation(
-		std::string name,
-		std::vector<Player*>* players,
-		int numberOfConfigChoices,
-		int minNumberOfPlayersPerGroup, int maxNumberOfPlayersPerGroup,
-		RegressionAlg* regAlg,
-		ConfigsGenAlg* configsGenAlg,
-		FitnessAlg* fitAlg,
-		int numAdaptationCycles,
-		RandomGen* randomGen, int numTasksPerGroup,
-		std::vector<AdaptationTask> possibleCollaborativeTasks,
-		std::vector<AdaptationTask> possibleCompetitiveTasks,
-		std::vector<AdaptationTask> possibleIndividualTasks
-	);
-
 	Adaptation(
 		std::string name,
 		std::vector<Player*>* players,
@@ -86,9 +60,7 @@ public:
 		std::vector<AdaptationTask> possibleCollaborativeTasks,
 		std::vector<AdaptationTask> possibleCompetitiveTasks,
 		std::vector<AdaptationTask> possibleIndividualTasks);
-	
 	~Adaptation();
-
 
 	std::string getName();
 
@@ -96,8 +68,6 @@ public:
 	std::vector<std::pair<AdaptationGroup, AdaptationMechanic>> iterate(int currIteration);
 
 	AdaptationConfiguration getCurrAdaptedConfig();
-	int getNumAdaptationCycles();
-
 
 	//adaptation metrics
 	std::vector<double> avgAbilities;
@@ -105,8 +75,5 @@ public:
 	std::vector<double> avgPrefDiff;
 	double avgExecutionTime;
 
-
 	std::string name;
-
-	
 };

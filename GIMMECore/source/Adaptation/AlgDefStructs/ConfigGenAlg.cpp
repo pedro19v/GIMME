@@ -35,7 +35,7 @@ AdaptationConfiguration RandomConfigsGen::organize(std::vector<Player*>* players
 			profile.K_cl = newRand1 / newRandSum;
 			profile.K_cp = newRand2 / newRandSum;
 			profile.K_i = newRand3 / newRandSum;
-			currGroup.setInteractionsProfile(profile);
+			currGroup.interactionsProfile = profile;
 
 
 			for (int s = 0; s < minNumberOfPlayersPerGroup; s++) {
@@ -46,7 +46,7 @@ AdaptationConfiguration RandomConfigsGen::organize(std::vector<Player*>* players
 				currGroup.addPlayer(currPlayer);
 
 				//double currPlayerFitness = fitAlg.calculate(currPlayer, currGroup.getInteractionsProfile());
-				double currPlayerFitness = fitAlg->calculate(currPlayer, currGroup.getInteractionsProfile(), regAlg);
+				double currPlayerFitness = fitAlg->calculate(currPlayer, currGroup.interactionsProfile, regAlg);
 				currFitness += currPlayerFitness;
 
 				playersWithoutGroup.erase(playersWithoutGroup.begin() + currPlayerIndex);
@@ -66,14 +66,14 @@ AdaptationConfiguration RandomConfigsGen::organize(std::vector<Player*>* players
 
 			AdaptationGroup* currGroup = &newConfig.groups[randomGroupIndex];
 			int groupsSize = (int)newConfig.groups.size();
-			while ((int)currGroup->getPlayers().size() > maxNumberOfPlayersPerGroup - 1) {
+			while ((int)currGroup->players.size() > maxNumberOfPlayersPerGroup - 1) {
 				currGroup = &newConfig.groups[randomGroupIndex++%groupsSize];
 			}
 
 			Player* currPlayer = playersWithoutGroup[currPlayerIndex];
 			currGroup->addPlayer(currPlayer);
 
-			double currPlayerFitness = fitAlg->calculate(currPlayer, currGroup->getInteractionsProfile(), regAlg);
+			double currPlayerFitness = fitAlg->calculate(currPlayer, currGroup->interactionsProfile, regAlg);
 			//double currPlayerFitness = fitAlg.calculate(currPlayer, currGroup->getInteractionsProfile());
 			currFitness += currPlayerFitness;
 
@@ -81,7 +81,7 @@ AdaptationConfiguration RandomConfigsGen::organize(std::vector<Player*>* players
 			playersWithoutGroupSize = (int)playersWithoutGroup.size();
 		}
 
-		int PlayerSize = players->size();
+		int PlayerSize = (int) players->size();
 		this->groupSizeFreqs.resize(PlayerSize + 1);
 		this->configSizeFreqs.resize(PlayerSize + 1);
 		std::vector<AdaptationGroup>* currGroups = &newConfig.groups;
@@ -89,7 +89,7 @@ AdaptationConfiguration RandomConfigsGen::organize(std::vector<Player*>* players
 		this->configSizeFreqs[currGroupsSize]++;
 		for (int s = 0; s < currGroupsSize; s++) {
 			AdaptationGroup currGroup = (*currGroups)[s];
-			this->groupSizeFreqs[(int)currGroup.getPlayers().size()]++;
+			this->groupSizeFreqs[(int)currGroup.players.size()]++;
 		}
 
 
@@ -98,6 +98,20 @@ AdaptationConfiguration RandomConfigsGen::organize(std::vector<Player*>* players
 			currMaxFitness = currFitness;
 		}
 	}
+	updateMetrics(bestConfig);
+	return bestConfig;
+}
+
+
+
+AdaptationConfiguration EvolutionaryConfigsGen::organize(std::vector<Player*>* players, int numberOfConfigChoices, int minNumberOfPlayersPerGroup, int maxNumberOfPlayersPerGroup, RandomGen* randomGen, RegressionAlg* regAlg, FitnessAlg* fitAlg)
+{
+	AdaptationConfiguration bestConfig = AdaptationConfiguration();
+	double currMaxFitness = -INFINITY;
+
+
+	//generate several random groups, calculate their fitness and select best one
+	AdaptationGroup adaptG = { InteractionsProfile{ 0.33,0.33,0.33 }, *players };
 	updateMetrics(bestConfig);
 	return bestConfig;
 }

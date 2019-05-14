@@ -60,6 +60,9 @@
     <ClInclude Include="headers\GIMMECore.h">
       <Filter>headers</Filter>
     </ClInclude>
+    <ClInclude Include="headers\AuxStructs\InteractionsProfile.h">
+      <Filter>headers\AuxStructs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Adaptation\AlgDefStructs\ConfigGenAlg.cpp">

@@ -30,7 +30,7 @@ private:
 	std::vector<AdaptationTask> possibleIndividualTasks;
 
 	Adaptation* adapt;
-	RandomGen* utilities;
+	RandomGen* randomGen;
 
 	std::fstream* statisticsFile;
 	std::fstream* resultsFile;

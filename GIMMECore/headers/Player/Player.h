@@ -27,11 +27,6 @@ protected:
 	int id;
 	std::string name;
 
-	//for simulation
-	InteractionsProfile inherentPreference;
-	double baseLearningRate;
-	std::vector<double> iterationReactions;
-
 	//Adaptation part
 	int numPastModelIncreasesCells;
 	int maxAmountOfStoredProfilesPerCell;
@@ -40,6 +35,7 @@ protected:
 	PlayerState currState;
 	RandomGen* utilities;
 
+	void saveIncreases(PlayerState stateIncreases);
 public:
 
 	Player(int id, std::string name, int numPastModelIncreasesCells, int maxAmountOfStoredProfilesPerCell, int numStoredPastIterations, RandomGen* utilities);
@@ -49,9 +45,10 @@ public:
 
 	std::vector<PlayerState> getPastModelIncreases();
 	PlayerState getCurrState();
-	void setCharacteristics(PlayerCharacteristics characteristics);
-	void setCurrProfile(InteractionsProfile newProfile);
 
+	void setCharacteristics(PlayerCharacteristics characteristics);
+	void setCurrProfile(InteractionsProfile profile);
+	
 	int getId();
 	std::string getName();
 

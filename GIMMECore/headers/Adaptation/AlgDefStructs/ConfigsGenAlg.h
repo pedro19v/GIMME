@@ -19,7 +19,7 @@ public:
 	void updateMetrics(AdaptationConfiguration generatedConfig) {
 		configSizeFreqs[generatedConfig.groups.size()]++;
 		for(AdaptationGroup group : generatedConfig.groups) {
-			groupSizeFreqs[group.getPlayers().size()]++;
+			groupSizeFreqs[group.players.size()]++;
 		}
 	};
 };

@@ -42,10 +42,9 @@ void SimPlayer::simulateReaction(int currIteration)
 	PlayerState increases = PlayerState(currState);
 	this->calcReaction(&currState, currIteration);
 
-	increases.characteristics.ability = currState.characteristics.ability - increases.characteristics.ability;
-	increases.characteristics.engagement = currState.characteristics.engagement; // -increases.engagement;
-
-	this->pastModelIncreasesGrid.pushToGrid(increases);
+	increases.characteristics = {(currState.characteristics.ability - increases.characteristics.ability), currState.characteristics.engagement };
+	
+	this->saveIncreases(increases);
 }
 
 void SimPlayer::calcReaction(PlayerState* state, int currIteration)

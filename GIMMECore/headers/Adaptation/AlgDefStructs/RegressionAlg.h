@@ -4,7 +4,7 @@
 class RegressionAlg
 {
 public:
-	PlayerState predict(InteractionsProfile profile, Player* player, void* sortFunc) { return PlayerState(); };
+	virtual PlayerState predict(InteractionsProfile profile, Player* player, void* sortFunc) = 0;
 };
 
 class KNNRegression: public RegressionAlg {
