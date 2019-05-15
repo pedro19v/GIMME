@@ -3,7 +3,7 @@
 AdaptationConfiguration RandomConfigsGen::organize(std::vector<Player*>* players, int numberOfConfigChoices, int minNumberOfPlayersPerGroup, int maxNumberOfPlayersPerGroup, RandomGen* randomGen, RegressionAlg* regAlg, FitnessAlg* fitAlg)
 {
 	AdaptationConfiguration bestConfig = AdaptationConfiguration();
-	double currMaxFitness = -INFINITY;
+	double currMaxFitness = 0.0;
 
 
 	//generate several random groups, calculate their fitness and select best one

@@ -44,11 +44,11 @@ private:
 
 	void simulateStudentsReaction(int currIteration);
 
-	void simulateTrainingPhase();
+	void simulateTrainingPhase(int currRun);
 	void storeSimData(std::string configId, Adaptation* adapt);
 
 	void executeAdaptationStep(int currStepIndex, int currRun);
-	void simulateAdaptationModule(int currRun, Adaptation* adapt, int initialStep);
+	void simulateAdaptationModule(int currRun, Adaptation* adapt, int initialStep, int numIterations);
 public:
 	GIMMESim(
 		int numRuns, int numIterationsPerRun, int numTrainingCycles,

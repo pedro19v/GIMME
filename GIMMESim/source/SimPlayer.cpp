@@ -1,11 +1,11 @@
 #include "../headers/SimPlayer.h"
 
-SimPlayer::SimPlayer(int id, std::string name, int numPastModelIncreasesCells, int maxAmountOfStoredProfilesPerCell, int numStoredPastIterations, RandomGen* utilities): Player( id, name, numPastModelIncreasesCells, maxAmountOfStoredProfilesPerCell, numStoredPastIterations, utilities) {
+SimPlayer::SimPlayer(int id, std::string name, int numPastModelIncreasesCells, int maxAmountOfStoredProfilesPerCell, int numStoredPastIterations, RandomGen* randomGen): Player( id, name, numPastModelIncreasesCells, maxAmountOfStoredProfilesPerCell, numStoredPastIterations, randomGen) {
 
 	//generate learning profile
-	double newRand1 = utilities->randBetween(0, 1);
-	double newRand2 = utilities->randBetween(0, 1);
-	double newRand3 = utilities->randBetween(0, 1);
+	double newRand1 = randomGen->randBetween(0, 1);
+	double newRand2 = randomGen->randBetween(0, 1);
+	double newRand3 = randomGen->randBetween(0, 1);
 
 	double newRandSum = newRand1 + newRand2 + newRand3;
 
@@ -13,21 +13,13 @@ SimPlayer::SimPlayer(int id, std::string name, int numPastModelIncreasesCells, i
 	this->inherentPreference.K_cp = newRand2 / newRandSum;
 	this->inherentPreference.K_i = newRand3 / newRandSum;
 
-	this->baseLearningRate = utilities->randBetween(0.2, 0.6);
+	this->baseLearningRate = randomGen->randBetween(0.2, 0.6);
 	this->iterationReactions = std::vector<double>(numStoredPastIterations);
 	
 	for (int i = 0; i < numStoredPastIterations; i++) {
-		this->iterationReactions[i] = utilities->normalRandom(baseLearningRate, 0.05);
+		this->iterationReactions[i] = randomGen->normalRandom(baseLearningRate, 0.05);
 	}
 
-	
-	this->inherentPreference = inherentPreference;
-	this->baseLearningRate = baseLearningRate;
-	this->iterationReactions = std::vector<double>(numStoredPastIterations);
-
-	for (int i = 0; i < numStoredPastIterations; i++) {
-		this->iterationReactions[i] = utilities->normalRandom(baseLearningRate, 0.05);
-	}
 }
 
 InteractionsProfile SimPlayer::getInherentPreference() {
@@ -43,7 +35,6 @@ void SimPlayer::simulateReaction(int currIteration)
 	this->calcReaction(&currState, currIteration);
 
 	increases.characteristics = {(currState.characteristics.ability - increases.characteristics.ability), currState.characteristics.engagement };
-	
 	this->saveIncreases(increases);
 }
 

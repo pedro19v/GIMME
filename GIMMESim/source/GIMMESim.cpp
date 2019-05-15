@@ -11,7 +11,6 @@ GIMMESim::GIMMESim(
 	std::vector<AdaptationTask> possibleCompetitiveTasks,
 	std::vector<AdaptationTask> possibleIndividualTasks) {
 
-	this->students = students;
 
 	this->numRuns = numRuns;
 	this->numTrainingCycles = numTrainingCycles;
@@ -56,12 +55,17 @@ GIMMESim::GIMMESim(
 		minNumStudentsPerGroup, maxNumStudentsPerGroup,
 		regAlg, 
 		configsGenAlg,
-		fitnessAlg,
+		randomFitness,
 		randomGen, numTasksPerGroup,
 		possibleCollaborativeTasks,
 		possibleCompetitiveTasks,
 		possibleIndividualTasks
 	);
+
+	adapt->avgAbilities = std::vector<double>(numIterationsPerRun);
+	adapt->avgEngagements = std::vector<double>(numIterationsPerRun);
+	adapt->avgPrefDiff = std::vector<double>(numIterationsPerRun);
+	adapt->avgExecutionTime = 0;
 
 	
 	possibleCollaborativeTasks = std::vector<AdaptationTask>();
@@ -116,20 +120,27 @@ void GIMMESim::simulateStudentsReaction(int currIteration) {
 }
 
 
-void GIMMESim::simulateTrainingPhase() {
+void GIMMESim::simulateTrainingPhase(int currRun) {
 	Adaptation randomClose = Adaptation(
-		"randomClose",
+		"RandomTraining",
 		&students,
 		numConfigurationChoices,
 		minNumStudentsPerGroup, maxNumStudentsPerGroup,
-		regAlg, configsGenAlg, randomFitness,
+		regAlg,
+		configsGenAlg,
+		randomFitness,
 		randomGen, numTasksPerGroup,
 		possibleCollaborativeTasks,
 		possibleCompetitiveTasks,
 		possibleIndividualTasks
 	);
 
-	simulateAdaptationModule(0, &randomClose, 0);
+	randomClose.avgAbilities = std::vector<double>(numIterationsPerRun);
+	randomClose.avgEngagements = std::vector<double>(numIterationsPerRun);
+	randomClose.avgPrefDiff = std::vector<double>(numIterationsPerRun);
+	randomClose.avgExecutionTime = 0;
+
+	simulateAdaptationModule(currRun, &randomClose, 0, 30);
 }
 
 void GIMMESim::storeSimData(std::string configId, Adaptation* adapt) {
@@ -249,24 +260,23 @@ void GIMMESim::executeAdaptationStep(int currStepIndex, int currRun) {
 void GIMMESim::simulate() {
 	for (int i = 0; i < numRuns; i++) {
 		reset();
-		simulateTrainingPhase();
-		simulateAdaptationModule(i, adapt, numTrainingCycles);
+		simulateTrainingPhase(i);
+		simulateAdaptationModule(i, adapt, numTrainingCycles, numIterationsPerRun);
 		//destroyGlobals(numStudentsInClass);
 	}
 
 	storeSimData(adapt->getName(), adapt);
 }
-void GIMMESim::simulateAdaptationModule(int currRun, Adaptation* adapt, int initialStep) {
+void GIMMESim::simulateAdaptationModule(int currRun, Adaptation* adapt, int initialStep, int numIterations) {
 	int i = 0;
-
-	adapt->avgAbilities = std::vector<double>(numIterationsPerRun);
-	adapt->avgEngagements = std::vector<double>(numIterationsPerRun);
-	adapt->avgPrefDiff = std::vector<double>(numIterationsPerRun);
-	adapt->avgExecutionTime = 0;
-
 	while (true) {
+
+		if (i > (numIterations - 1)) {
+			break;
+		}
+
 		const clock_t beginTime = clock();
-		printf("\rstep %d of %d of run %d               ", i, numIterationsPerRun, currRun);
+		printf("\rstep %d of %d of run %d               ", i, numIterations, currRun);
 
 		AdaptationConfiguration currAdaptedConfig = adapt->getCurrAdaptedConfig();
 		std::vector<AdaptationGroup> groups = currAdaptedConfig.groups;
@@ -280,9 +290,6 @@ void GIMMESim::simulateAdaptationModule(int currRun, Adaptation* adapt, int init
 		}
 
 		executeAdaptationStep(initialStep + i, currRun);
-		if (i > (numIterationsPerRun - 1)) {
-			break;
-		}
 
 		simulateStudentsReaction(initialStep + i);
 		adapt->avgExecutionTime += (float(clock() - beginTime) / CLOCKS_PER_SEC) / (numIterationsPerRun*numRuns);
