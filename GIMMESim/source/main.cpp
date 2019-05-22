@@ -3,7 +3,7 @@
 int main() {
 	std::vector<AdaptationTask> tasks = std::vector<AdaptationTask>();
 	GIMMESim sim = GIMMESim(
-		30, 200, 30,
+		100, 50, 30,
 		23, 1, 30,
 		100, 5, 30,
 		2, 5,

@@ -33,9 +33,6 @@ std::vector<PlayerState> Player::PlayerStateGrid::getAllStates() {
 
 
 Player::Player(int id, std::string name, int numPastModelIncreasesCells, int maxAmountOfStoredProfilesPerCell, int numStoredPastIterations, RandomGen* utilities){
-	
-	
-
 	this->currState.profile = { 0,0,0 };
 	this->currState.characteristics.engagement = 0;
 	this->currState.characteristics.ability = 0;

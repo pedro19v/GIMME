@@ -2,7 +2,7 @@
 
 double RandomFitness::calculate(Player* player, InteractionsProfile interactionsProfile, RegressionAlg* regAlg)
 {
-	return 1.0;
+	return 0.0;
 }
 
 double SimulationsOptimalFitness::calculate(Player* player, InteractionsProfile interactionsProfile, RegressionAlg* regAlg)
@@ -11,7 +11,7 @@ double SimulationsOptimalFitness::calculate(Player* player, InteractionsProfile 
 		double ability = student->getCurrState().characteristics.ability;*/
 	PlayerState predictedState = PlayerState(player->getCurrState());
 
-	//((SimStudent*)student)->calcReaction(&predictedState, currIteration);
+	//((SimPlayer*)player)->calcReaction(&predictedState, currIteration);
 	double abilityInc = predictedState.characteristics.ability - player->getCurrState().characteristics.ability;
 	return abilityInc;
 }

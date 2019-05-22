@@ -55,7 +55,7 @@ GIMMESim::GIMMESim(
 		minNumStudentsPerGroup, maxNumStudentsPerGroup,
 		regAlg, 
 		configsGenAlg,
-		randomFitness,
+		fitnessAlg,
 		randomGen, numTasksPerGroup,
 		possibleCollaborativeTasks,
 		possibleCompetitiveTasks,
@@ -135,9 +135,9 @@ void GIMMESim::simulateTrainingPhase(int currRun) {
 		possibleIndividualTasks
 	);
 
-	randomClose.avgAbilities = std::vector<double>(numIterationsPerRun);
-	randomClose.avgEngagements = std::vector<double>(numIterationsPerRun);
-	randomClose.avgPrefDiff = std::vector<double>(numIterationsPerRun);
+	randomClose.avgAbilities = std::vector<double>(30);
+	randomClose.avgEngagements = std::vector<double>(30);
+	randomClose.avgPrefDiff = std::vector<double>(30);
 	randomClose.avgExecutionTime = 0;
 
 	simulateAdaptationModule(currRun, &randomClose, 0, 30);
@@ -260,9 +260,10 @@ void GIMMESim::executeAdaptationStep(int currStepIndex, int currRun) {
 void GIMMESim::simulate() {
 	for (int i = 0; i < numRuns; i++) {
 		reset();
-		simulateTrainingPhase(i);
+		//simulateTrainingPhase(i);
 		simulateAdaptationModule(i, adapt, numTrainingCycles, numIterationsPerRun);
 		//destroyGlobals(numStudentsInClass);
+
 	}
 
 	storeSimData(adapt->getName(), adapt);

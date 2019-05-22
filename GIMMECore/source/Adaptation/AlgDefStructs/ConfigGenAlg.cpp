@@ -3,15 +3,13 @@
 AdaptationConfiguration RandomConfigsGen::organize(std::vector<Player*>* players, int numberOfConfigChoices, int minNumberOfPlayersPerGroup, int maxNumberOfPlayersPerGroup, RandomGen* randomGen, RegressionAlg* regAlg, FitnessAlg* fitAlg)
 {
 	AdaptationConfiguration bestConfig = AdaptationConfiguration();
-	double currMaxFitness = 0.0;
-
+	double currMaxFitness = -1.0;
 
 	//generate several random groups, calculate their fitness and select best one
 	for (int j = 0; j < numberOfConfigChoices; j++) {
 		bool lastProfile = false;
 		double currFitness = 0.0;
 		std::vector<Player*> playersWithoutGroup = std::vector<Player*>(*players);
-		int PlayersSize = (int)players->size();
 		AdaptationConfiguration newConfig = AdaptationConfiguration();
 
 		int minNumGroups = (int)ceil((double)players->size() / (double)maxNumberOfPlayersPerGroup);
@@ -91,7 +89,6 @@ AdaptationConfiguration RandomConfigsGen::organize(std::vector<Player*>* players
 			AdaptationGroup currGroup = (*currGroups)[s];
 			this->groupSizeFreqs[(int)currGroup.players.size()]++;
 		}
-
 
 		if (currFitness > currMaxFitness) {
 			bestConfig = newConfig;

@@ -2,8 +2,8 @@
 
 //auxiliary structures: Player
 struct PlayerCharacteristics {
-	double engagement; // on vs off task percentage
 	double ability; // score percentage
+	double engagement; // on vs off task percentage
 };
 struct PlayerState {
 	InteractionsProfile profile;
