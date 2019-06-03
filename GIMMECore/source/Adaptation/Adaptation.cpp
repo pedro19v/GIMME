@@ -38,6 +38,29 @@ Adaptation::Adaptation(
 	this->possibleIndividualTasks = possibleIndividualTasks;
 }
 
+Adaptation::Adaptation(std::string name, std::vector<Player*>* players, int numberOfConfigChoices, int minNumberOfPlayersPerGroup, int maxNumberOfPlayersPerGroup, RegressionAlg * regAlg, ConfigsGenAlg * configsGenAlg, FitnessAlg * fitAlg, RandomGen * randomGen, int numTasksPerGroup)
+{
+	this->name = name;
+	this->players = players;
+
+	this->numberOfConfigChoices = numberOfConfigChoices;
+	this->maxNumberOfPlayersPerGroup = maxNumberOfPlayersPerGroup;
+	this->minNumberOfPlayersPerGroup = minNumberOfPlayersPerGroup;
+
+	this->numTasksPerGroup = numTasksPerGroup;
+	this->regAlg = regAlg;
+	this->fitAlg = fitAlg;
+	this->configsGenAlg = configsGenAlg;
+	this->configsGenAlg->init(players);
+
+	this->randomGen = randomGen;
+
+
+	this->possibleCollaborativeTasks = std::vector<AdaptationTask>();
+	this->possibleCompetitiveTasks = std::vector<AdaptationTask>();
+	this->possibleIndividualTasks = std::vector<AdaptationTask>();
+}
+
 Adaptation::~Adaptation()
 {
 	/*if (this->regAlg != NULL) {

@@ -83,6 +83,9 @@
     <ClCompile Include="source\Player\Player.cpp">
       <Filter>source\Player</Filter>
     </ClCompile>
+    <ClCompile Include="source\GIMMECore.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="source\AuxStructs\RandomGen.inl">

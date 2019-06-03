@@ -60,6 +60,15 @@ public:
 		std::vector<AdaptationTask> possibleCollaborativeTasks,
 		std::vector<AdaptationTask> possibleCompetitiveTasks,
 		std::vector<AdaptationTask> possibleIndividualTasks);
+	Adaptation(
+		std::string name,
+		std::vector<Player*>* players,
+		int numberOfConfigChoices,
+		int minNumberOfPlayersPerGroup, int maxNumberOfPlayersPerGroup,
+		RegressionAlg* regAlg,
+		ConfigsGenAlg* configsGenAlg,
+		FitnessAlg* fitAlg,
+		RandomGen* randomGen, int numTasksPerGroup);
 	~Adaptation();
 
 	std::string getName();
