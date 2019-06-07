@@ -103,7 +103,7 @@ std::vector<std::pair<AdaptationGroup, AdaptationMechanic>> Adaptation::iterate(
 		}
 
 		InteractionsProfile currGroupProfile = currGroup.interactionsProfile;
-		PlayerState currGroupState = currGroup.avgLearningState;
+		PlayerState currGroupState = currGroup.avgPlayerState;
 		groupMechanicPairs.push_back({ currGroup , generateMechanic(currGroupProfile, currGroupState, possibleCollaborativeTasks, possibleCompetitiveTasks, possibleIndividualTasks) });
 	}
 	

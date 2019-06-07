@@ -1,70 +1,50 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="headers\Adaptation\AlgDefStructs">
-      <UniqueIdentifier>{cd80bcf0-c970-4d3b-8ee1-a438938d5a69}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="headers\Adaptation">
-      <UniqueIdentifier>{4091e773-a851-47fd-9094-232a2c1f6610}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="headers">
-      <UniqueIdentifier>{fb7f19f4-d9fb-4122-a318-72d13c779c18}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="headers\AuxStructs">
-      <UniqueIdentifier>{48e42bb8-68e2-47f6-8107-1ae413ea05ee}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="headers\Player">
-      <UniqueIdentifier>{b629a75b-c888-4a4e-8c2b-5e28ad634cbd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="source\Adaptation\AlgDefStructs">
-      <UniqueIdentifier>{20e01fff-f13c-4f8e-b7c8-0609fee438b6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="source\Adaptation">
-      <UniqueIdentifier>{3d39a1b6-2b35-467e-8215-f28eca965459}</UniqueIdentifier>
-    </Filter>
     <Filter Include="source">
-      <UniqueIdentifier>{751f1a32-d7c6-4df1-8a03-a6ea9d00ec9a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="source\AuxStructs">
-      <UniqueIdentifier>{1de0a5ae-d816-448b-9fa0-15a82ca8f324}</UniqueIdentifier>
+      <UniqueIdentifier>{18512973-1a01-4f1a-9385-276a6018a507}</UniqueIdentifier>
     </Filter>
     <Filter Include="source\Player">
-      <UniqueIdentifier>{0a4a45a6-8f07-430c-ae78-c7c89f6089c4}</UniqueIdentifier>
+      <UniqueIdentifier>{7c963a71-deb8-4a59-aafd-6003877eb2dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\Adaptation">
+      <UniqueIdentifier>{596c7000-0321-4e18-b531-0a991026f977}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\Adaptation\AlgDefStructs">
+      <UniqueIdentifier>{a8f94df9-1877-4589-8c4c-93d22564371b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\AuxStructs">
+      <UniqueIdentifier>{2141713c-990a-408e-a14c-2a4a5fa94fd0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="export">
+      <UniqueIdentifier>{eca36ccf-ad51-4f7d-8993-417d4d92868b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="headers">
+      <UniqueIdentifier>{1173706a-6c51-4279-8cfd-64fbaef06922}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="headers\Player">
+      <UniqueIdentifier>{94176baf-4a76-4e12-a9fd-2b1e18eab247}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="headers\Adaptation">
+      <UniqueIdentifier>{ae7c17db-1cc6-4247-bef8-ac1713150244}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="headers\Adaptation\AlgDefStructs">
+      <UniqueIdentifier>{4fb5d345-a707-4520-9691-7a2201928757}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="headers\AuxStructs">
+      <UniqueIdentifier>{84ac70b3-6389-4ea4-90bc-4722254ca2a0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="headers\Adaptation\AlgDefStructs\ConfigsGenAlg.h">
-      <Filter>headers\Adaptation\AlgDefStructs</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\Adaptation\AlgDefStructs\FitnessAlg.h">
-      <Filter>headers\Adaptation\AlgDefStructs</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\Adaptation\AlgDefStructs\RegressionAlg.h">
-      <Filter>headers\Adaptation\AlgDefStructs</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\Adaptation\Adaptation.h">
-      <Filter>headers\Adaptation</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\Adaptation\AdaptationStructs.h">
-      <Filter>headers\Adaptation</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\AuxStructs\RandomGen.h">
-      <Filter>headers\AuxStructs</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\Player\Player.h">
-      <Filter>headers\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\Player\PlayerStructs.h">
-      <Filter>headers\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\GIMMECore.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\AuxStructs\InteractionsProfile.h">
-      <Filter>headers\AuxStructs</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
+    <ClCompile Include="source\GIMMECore.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Player\Player.cpp">
+      <Filter>source\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Adaptation\Adaptation.cpp">
+      <Filter>source\Adaptation</Filter>
+    </ClCompile>
     <ClCompile Include="source\Adaptation\AlgDefStructs\ConfigGenAlg.cpp">
       <Filter>source\Adaptation\AlgDefStructs</Filter>
     </ClCompile>
@@ -74,23 +54,51 @@
     <ClCompile Include="source\Adaptation\AlgDefStructs\RegressionAlg.cpp">
       <Filter>source\Adaptation\AlgDefStructs</Filter>
     </ClCompile>
-    <ClCompile Include="source\Adaptation\Adaptation.cpp">
-      <Filter>source\Adaptation</Filter>
-    </ClCompile>
     <ClCompile Include="source\AuxStructs\RandomGen.cpp">
       <Filter>source\AuxStructs</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Player\Player.cpp">
-      <Filter>source\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="source\GIMMECore.cpp">
-      <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="source\AuxStructs\RandomGen.inl">
       <Filter>source\AuxStructs</Filter>
     </None>
-    <None Include="ClassDiagram.cd" />
+    <None Include="export\GIMMEBridge.cs">
+      <Filter>export</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="headers\GIMMECore.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\Player\Player.h">
+      <Filter>headers\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\Player\PlayerStructs.h">
+      <Filter>headers\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\Adaptation\Adaptation.h">
+      <Filter>headers\Adaptation</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\Adaptation\AdaptationStructs.h">
+      <Filter>headers\Adaptation</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\Adaptation\AlgDefStructs\ConfigsGenAlg.h">
+      <Filter>headers\Adaptation\AlgDefStructs</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\Adaptation\AlgDefStructs\FitnessAlg.h">
+      <Filter>headers\Adaptation\AlgDefStructs</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\Adaptation\AlgDefStructs\RegressionAlg.h">
+      <Filter>headers\Adaptation\AlgDefStructs</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\AuxStructs\InteractionsProfile.h">
+      <Filter>headers\AuxStructs</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\AuxStructs\RandomGen.h">
+      <Filter>headers\AuxStructs</Filter>
+    </ClInclude>
+    <ClInclude Include="export\export.h">
+      <Filter>export</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

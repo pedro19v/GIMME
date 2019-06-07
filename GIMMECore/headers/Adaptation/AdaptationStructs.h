@@ -8,14 +8,14 @@ public:
 	std::vector<Player*> players;
 
 	InteractionsProfile avgPreferences;
-	PlayerState avgLearningState;
+	PlayerState avgPlayerState;
 
 	void addPlayer(Player* player) {
 		players.push_back(player);
 		int playersSize = (int)players.size();
 
 		//recalculate averages
-		avgLearningState = PlayerState();
+		avgPlayerState = PlayerState();
 		avgPreferences.K_cl = 0;
 		avgPreferences.K_cp = 0;
 		avgPreferences.K_i = 0;
@@ -23,8 +23,8 @@ public:
 		for (int i = 0; i < playersSize; i++) {
 			Player* currPlayer = players[i];
 			//InteractionsProfile currPlayerPreference = currPlayer->getInherentPreference();
-			avgLearningState.characteristics.engagement += currPlayer->getCurrState().characteristics.engagement / playersSize;
-			avgLearningState.characteristics.ability += currPlayer->getCurrState().characteristics.ability / playersSize;
+			avgPlayerState.characteristics.engagement += currPlayer->getCurrState().characteristics.engagement / playersSize;
+			avgPlayerState.characteristics.ability += currPlayer->getCurrState().characteristics.ability / playersSize;
 			/*avgPreferences.K_cl += currPlayerPreference.K_cl / PlayersSize;
 			avgPreferences.K_cp += currPlayerPreference.K_cp / PlayersSize;
 			avgPreferences.K_i += currPlayerPreference.K_i / PlayersSize;*/
