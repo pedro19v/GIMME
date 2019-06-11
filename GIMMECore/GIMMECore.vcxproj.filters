@@ -2,37 +2,37 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="source">
-      <UniqueIdentifier>{18512973-1a01-4f1a-9385-276a6018a507}</UniqueIdentifier>
+      <UniqueIdentifier>{b0ac7b89-bd12-42fb-8c9d-a390e410f9c2}</UniqueIdentifier>
     </Filter>
     <Filter Include="source\Player">
-      <UniqueIdentifier>{7c963a71-deb8-4a59-aafd-6003877eb2dd}</UniqueIdentifier>
+      <UniqueIdentifier>{00656123-ee7e-43e6-9240-6b57176cd440}</UniqueIdentifier>
     </Filter>
     <Filter Include="source\Adaptation">
-      <UniqueIdentifier>{596c7000-0321-4e18-b531-0a991026f977}</UniqueIdentifier>
+      <UniqueIdentifier>{833da9b1-f149-4468-aed7-b38ee2cc011c}</UniqueIdentifier>
     </Filter>
     <Filter Include="source\Adaptation\AlgDefStructs">
-      <UniqueIdentifier>{a8f94df9-1877-4589-8c4c-93d22564371b}</UniqueIdentifier>
+      <UniqueIdentifier>{4b9c3b56-7007-4d9b-b4f1-5a4f3266352d}</UniqueIdentifier>
     </Filter>
     <Filter Include="source\AuxStructs">
-      <UniqueIdentifier>{2141713c-990a-408e-a14c-2a4a5fa94fd0}</UniqueIdentifier>
+      <UniqueIdentifier>{8728b146-139c-4469-80f0-3762b168b0f0}</UniqueIdentifier>
     </Filter>
     <Filter Include="export">
-      <UniqueIdentifier>{eca36ccf-ad51-4f7d-8993-417d4d92868b}</UniqueIdentifier>
+      <UniqueIdentifier>{dcd872aa-bde6-49f5-8eef-26ed36ba9ae8}</UniqueIdentifier>
     </Filter>
     <Filter Include="headers">
-      <UniqueIdentifier>{1173706a-6c51-4279-8cfd-64fbaef06922}</UniqueIdentifier>
+      <UniqueIdentifier>{567d1337-6399-4ecd-a807-4f091b17310f}</UniqueIdentifier>
     </Filter>
     <Filter Include="headers\Player">
-      <UniqueIdentifier>{94176baf-4a76-4e12-a9fd-2b1e18eab247}</UniqueIdentifier>
+      <UniqueIdentifier>{99620a44-55be-4fe2-b0f4-642796aeb239}</UniqueIdentifier>
     </Filter>
     <Filter Include="headers\Adaptation">
-      <UniqueIdentifier>{ae7c17db-1cc6-4247-bef8-ac1713150244}</UniqueIdentifier>
+      <UniqueIdentifier>{713eb811-b62a-4e66-869e-3787755e0218}</UniqueIdentifier>
     </Filter>
     <Filter Include="headers\Adaptation\AlgDefStructs">
-      <UniqueIdentifier>{4fb5d345-a707-4520-9691-7a2201928757}</UniqueIdentifier>
+      <UniqueIdentifier>{4bb70afa-2a40-40e3-a454-4092806b9fa2}</UniqueIdentifier>
     </Filter>
     <Filter Include="headers\AuxStructs">
-      <UniqueIdentifier>{84ac70b3-6389-4ea4-90bc-4722254ca2a0}</UniqueIdentifier>
+      <UniqueIdentifier>{90e88c76-d096-493d-82da-a9bd6e49c0e9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -65,6 +65,7 @@
     <None Include="export\GIMMEBridge.cs">
       <Filter>export</Filter>
     </None>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\GIMMECore.h">
@@ -96,9 +97,6 @@
     </ClInclude>
     <ClInclude Include="headers\AuxStructs\RandomGen.h">
       <Filter>headers\AuxStructs</Filter>
-    </ClInclude>
-    <ClInclude Include="export\export.h">
-      <Filter>export</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

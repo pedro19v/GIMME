@@ -1,6 +1,25 @@
 #pragma once
 #include "../Player/Player.h"
 
+enum AdaptationTaskType {
+	COLLABORATION = 0,
+	COMPETITION = 1,
+	SELF_INTERACTION = 2,
+	NONE = 3
+};
+struct AdaptationTask {
+	AdaptationTaskType type;
+	std::string description;
+	float minRequiredAbility;
+	std::vector<AdaptationTask> taskInstances; //maintained in order
+};
+struct AdaptationMechanic {
+public:
+	InteractionsProfile profile;
+	std::vector<AdaptationTask> tasks;
+};
+
+
 //auxiliary structures: Adaptation
 struct AdaptationGroup {
 public:
@@ -9,6 +28,8 @@ public:
 
 	InteractionsProfile avgPreferences;
 	PlayerState avgPlayerState;
+
+	AdaptationMechanic tailoredMechanic;
 
 	void addPlayer(Player* player) {
 		players.push_back(player);
@@ -31,24 +52,7 @@ public:
 		}
 	}
 };
-struct AdaptationConfiguration {
+struct AdaptationConfiguration{
 public:
 	std::vector<AdaptationGroup> groups;
-};
-enum AdaptationTaskType {
-	COLLABORATION = 0,
-	COMPETITION = 1,
-	SELF_INTERACTION = 2,
-	NONE = 3
-};
-struct AdaptationTask {
-	AdaptationTaskType type;
-	std::string description;
-	float minRequiredAbility;
-	std::vector<AdaptationTask> taskInstances; //maintained in order
-};
-struct AdaptationMechanic {
-public:
-	InteractionsProfile profile;
-	std::vector<AdaptationTask> tasks;
 };

@@ -223,15 +223,11 @@ void GIMMESim::storeSimData(std::string configId, Adaptation* adapt) {
 
 void GIMMESim::executeAdaptationStep(int currStepIndex, int currRun) {
 
-	AdaptationConfiguration currAdaptedConfig = adapt->getCurrAdaptedConfig();
+	AdaptationConfiguration currAdaptedConfig = adapt->iterate(currStepIndex);
 	std::vector<AdaptationGroup> groups = currAdaptedConfig.groups;
 
-	//extract adapted mechanics
-	std::vector<std::pair<AdaptationGroup, AdaptationMechanic>> groupMechanicPairs;
 
-	groupMechanicPairs = adapt->iterate(currStepIndex);
-
-	int mechanicsSize = (int) groupMechanicPairs.size();
+	int mechanicsSize = (int) groups.size();
 
 	/**statisticsFile << "currProfile: " << students[0]->getCurrProfile().K_cl << students[0]->getCurrProfile().K_cp << students[0]->getCurrProfile().K_i << std::endl;
 	*statisticsFile << "ability: " << students[0]->getCurrState().characteristics.ability << std::endl;
@@ -239,8 +235,8 @@ void GIMMESim::executeAdaptationStep(int currStepIndex, int currRun) {
 
 	//intervene
 	for (int j = 0; j < mechanicsSize; j++) {
-		std::vector<Player*> currGroup = groupMechanicPairs[j].first.players;
-		std::vector<AdaptationTask> currMechanic = groupMechanicPairs[j].second.tasks;
+		std::vector<Player*> currGroup = groups[j].players;
+		std::vector<AdaptationTask> currMechanic = groups[j].tailoredMechanic.tasks;
 
 
 		*resultsFile << "promote on students:" << std::endl;

@@ -73,8 +73,8 @@ public:
 
 	std::string getName();
 
-	std::vector<std::pair<AdaptationGroup, AdaptationMechanic>> iterate();
-	std::vector<std::pair<AdaptationGroup, AdaptationMechanic>> iterate(int currIteration);
+	AdaptationConfiguration iterate();
+	AdaptationConfiguration iterate(int currIteration);
 
 	AdaptationConfiguration getCurrAdaptedConfig();
 

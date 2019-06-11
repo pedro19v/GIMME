@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="export\export.h" />
     <ClInclude Include="headers\Adaptation\Adaptation.h" />
     <ClInclude Include="headers\Adaptation\AdaptationStructs.h" />
     <ClInclude Include="headers\Adaptation\AlgDefStructs\ConfigsGenAlg.h" />

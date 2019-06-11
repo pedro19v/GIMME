@@ -85,10 +85,8 @@ std::string Adaptation::getName()
 
 
 
-std::vector<std::pair<AdaptationGroup, AdaptationMechanic>> Adaptation::iterate(int currIteration)
+AdaptationConfiguration Adaptation::iterate(int currIteration)
 {
-	std::vector<std::pair<AdaptationGroup, AdaptationMechanic>> groupMechanicPairs = std::vector<std::pair<AdaptationGroup, AdaptationMechanic>>();
-
 	adaptedConfig = organizePlayers(currIteration);
 	std::vector<AdaptationGroup> groups = adaptedConfig.groups;
 	int groupsSize = (int) groups.size();
@@ -104,12 +102,12 @@ std::vector<std::pair<AdaptationGroup, AdaptationMechanic>> Adaptation::iterate(
 
 		InteractionsProfile currGroupProfile = currGroup.interactionsProfile;
 		PlayerState currGroupState = currGroup.avgPlayerState;
-		groupMechanicPairs.push_back({ currGroup , generateMechanic(currGroupProfile, currGroupState, possibleCollaborativeTasks, possibleCompetitiveTasks, possibleIndividualTasks) });
+		currGroup.tailoredMechanic = generateMechanic(currGroupProfile, currGroupState, possibleCollaborativeTasks, possibleCompetitiveTasks, possibleIndividualTasks);
 	}
 	
-	return groupMechanicPairs;
+	return adaptedConfig;
 }
-std::vector<std::pair<AdaptationGroup, AdaptationMechanic>> Adaptation::iterate()
+AdaptationConfiguration Adaptation::iterate()
 {
 	return iterate(0);
 }

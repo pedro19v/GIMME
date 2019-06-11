@@ -148,15 +148,15 @@ public:
 		iterateButton.create(*this);
 		iterateButton.caption("iterate");
 		iterateButton.events().click([this, adapt] {
-			std::vector<std::pair<AdaptationGroup, AdaptationMechanic>> groupMechanicPairs = adapt->iterate();
-			groupMechanicPairs = adapt->iterate();
-			int mechanicsSize = (int)groupMechanicPairs.size();
+			AdaptationConfiguration config = adapt->iterate();
+			std::vector<AdaptationGroup> groups = config.groups;
+			int mechanicsSize = (int) groups.size();
 			std::string mechanicsOutput = "";
 
 			for (int j = 0; j < mechanicsSize; j++) {
-				std::vector<Player*> currGroup = groupMechanicPairs[j].first.players;
-				std::vector<AdaptationTask> currMechanic = groupMechanicPairs[j].second.tasks;
-				InteractionsProfile currProfile = groupMechanicPairs[j].second.profile;
+				std::vector<Player*> currGroup = groups[j].players;
+				std::vector<AdaptationTask> currMechanic = groups[j].tailoredMechanic.tasks;
+				InteractionsProfile currProfile = groups[j].tailoredMechanic.profile;
 
 				mechanicsOutput += "promote on students:\n";
 				for (int k = 0; k < currGroup.size(); k++) {
