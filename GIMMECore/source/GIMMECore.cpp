@@ -8,19 +8,17 @@
 struct ExportedAdaptationGroup {
 public:
 	InteractionsProfile interactionsProfile;
-	int* playerIDs;
+	int playerIDs[20];
 
 	//AdaptationMechanic tailoredMechanic;
 
 	PlayerCharacteristics avgPlayerCharacteristics;
-
 };
 
 struct ExportedAdaptationConfiguration {
 public:
 	ExportedAdaptationGroup* groups;
 };
-
 
 
 extern "C"
@@ -73,7 +71,7 @@ extern "C"
 			5);
 	}
 
-	ExportedAdaptationConfiguration GIMME_EXTERNAL_API iterate() {
+	ExportedAdaptationGroup GIMME_EXTERNAL_API iterate() {
 		AdaptationConfiguration groupMechanicPairs = adapt->iterate();
 
 		ExportedAdaptationConfiguration exportedConfig;
@@ -81,7 +79,7 @@ extern "C"
 		for (int i = 0; i < (groupMechanicPairs.groups).size(); i++) {
 			AdaptationGroup currGroup = (groupMechanicPairs.groups)[i];
 			int size = currGroup.players.size();
-			int* playerIDs = (int*) malloc(sizeof(int)* size);
+			int playerIDs[20];
 			for (int i = 0; i < size; i++) {
 				Player currPlayer = *(currGroup.players[i]);
 				playerIDs[i] = currPlayer.getId();
@@ -93,8 +91,9 @@ extern "C"
 				currGroup.avgPlayerState.characteristics
 			};
 			exportedConfig.groups[i] = exportedGroup;
+			return exportedGroup;
 		}
 
-		return exportedConfig;
+		//return exportedConfig;
 	}
 }
