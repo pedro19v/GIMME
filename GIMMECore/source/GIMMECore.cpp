@@ -5,10 +5,23 @@
 #define GIMME_EXTERNAL_API __declspec(dllexport)
 #endif
 
+extern "C"
+{
+
+
+	RandomGen* randomGen;
+	std::vector<Player*>* players;
+	Adaptation* adapt;
+
+	const int MAX_NUM_GROUPS = 50;
+	const int MAX_GROUPS_SIZE = 5;
+
 struct ExportedAdaptationGroup {
 public:
 	InteractionsProfile interactionsProfile;
-	int playerIDs[20];
+
+	int numPlayers;
+	int playerIDs[MAX_GROUPS_SIZE];
 
 	//AdaptationMechanic tailoredMechanic;
 
@@ -17,15 +30,10 @@ public:
 
 struct ExportedAdaptationConfiguration {
 public:
-	ExportedAdaptationGroup* groups;
+	int numGroups;
+	ExportedAdaptationGroup groups[MAX_NUM_GROUPS];
 };
 
-
-extern "C"
-{
-	RandomGen* randomGen;
-	std::vector<Player*>* players;
-	Adaptation* adapt;
 
 	void GIMME_EXTERNAL_API addPlayer(int id, char* name, int numPastModelIncreasesCells, int maxAmountOfStoredProfilesPerCell, int numStoredPastIterations) {
 		Player* player = new Player(id, name, numPastModelIncreasesCells, maxAmountOfStoredProfilesPerCell, numStoredPastIterations, randomGen);
@@ -63,7 +71,7 @@ extern "C"
 			"test",
 			players,
 			100,
-			2, 5,
+			2, MAX_GROUPS_SIZE,
 			new KNNRegression(5),
 			new RandomConfigsGen(),
 			new FundamentedFitness(),
@@ -71,29 +79,37 @@ extern "C"
 			5);
 	}
 
-	ExportedAdaptationGroup GIMME_EXTERNAL_API iterate() {
+	ExportedAdaptationConfiguration GIMME_EXTERNAL_API iterate() {
 		AdaptationConfiguration groupMechanicPairs = adapt->iterate();
 
 		ExportedAdaptationConfiguration exportedConfig;
-		exportedConfig.groups = (ExportedAdaptationGroup*) malloc(sizeof(ExportedAdaptationGroup)*players->size());
-		for (int i = 0; i < (groupMechanicPairs.groups).size(); i++) {
+		exportedConfig.numGroups = (groupMechanicPairs.groups).size();
+		//exportedConfig.groups = (ExportedAdaptationGroup*) malloc(sizeof(ExportedAdaptationGroup)*players->size());
+		for (int i = 0; i < MAX_NUM_GROUPS; i++) {
+			if (i >= (groupMechanicPairs.groups).size()) {
+				exportedConfig.groups[i] = ExportedAdaptationGroup();
+				continue;
+			}
 			AdaptationGroup currGroup = (groupMechanicPairs.groups)[i];
 			int size = currGroup.players.size();
-			int playerIDs[20];
-			for (int i = 0; i < size; i++) {
+
+			ExportedAdaptationGroup exportedGroup;
+			
+			exportedGroup.interactionsProfile = currGroup.interactionsProfile;
+			exportedGroup.avgPlayerCharacteristics = currGroup.avgPlayerState.characteristics;
+			exportedGroup.numPlayers = size;
+			for (int i = 0; i < MAX_GROUPS_SIZE; i++) {
+				if (i >= size) {
+					exportedGroup.playerIDs[i] = -1;
+					continue;
+				}
 				Player currPlayer = *(currGroup.players[i]);
-				playerIDs[i] = currPlayer.getId();
+				exportedGroup.playerIDs[i] = currPlayer.getId();
 			}
 
-			ExportedAdaptationGroup exportedGroup = {
-				currGroup.interactionsProfile,
-				playerIDs,
-				currGroup.avgPlayerState.characteristics
-			};
 			exportedConfig.groups[i] = exportedGroup;
-			return exportedGroup;
 		}
 
-		//return exportedConfig;
+		return exportedConfig;
 	}
 }
