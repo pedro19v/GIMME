@@ -10,6 +10,11 @@ extern "C"
 
 
 	RandomGen* randomGen;
+
+	RegressionAlg* regAlg;
+	ConfigsGenAlg* configGenAlg;
+	FitnessAlg* fitnessAlg;
+
 	std::vector<Player*>* players;
 	Adaptation* adapt;
 
@@ -64,17 +69,52 @@ public:
 		}
 	}
 
+	void deleteAdatationData() {
+		if (randomGen != NULL) {
+			delete randomGen;
+		}
+		
+		if (regAlg != NULL) {
+			delete regAlg;
+		}
+		if (configGenAlg != NULL) {
+			delete configGenAlg;
+		}
+		if (fitnessAlg != NULL) {
+			delete fitnessAlg;
+		}
+
+		if (adapt != NULL) {
+			delete adapt;
+		}
+
+		if (players != NULL) {
+			for (Player* player : *players) {
+				delete player;
+			}
+			delete players;
+		}
+
+	}
+
 	void GIMME_EXTERNAL_API initAdaptation() {
+		deleteAdatationData();
+		
 		randomGen = new RandomGen();
+		
+		regAlg = new KNNRegression(5);
+		configGenAlg = new RandomConfigsGen();
+		fitnessAlg = new FundamentedFitness();
+
 		players = new std::vector<Player*>();
 		adapt = new Adaptation(
 			"test",
 			players,
 			100,
 			2, MAX_GROUPS_SIZE,
-			new KNNRegression(5),
-			new RandomConfigsGen(),
-			new FundamentedFitness(),
+			regAlg,
+			configGenAlg,
+			fitnessAlg,
 			randomGen,
 			5);
 	}
