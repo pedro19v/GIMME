@@ -1,6 +1,6 @@
 # GIMME
 
-![logo](Images/GIMMELogo.png)
+![logo](Images/GIMMELogo.svg)
 
 GIMME (Group Interactions Management for Multiplayer sErious games) is a research tool which focuses on the management of 
 interactions in groups so that the collective ability improves. In other words, states are collected from each user in a multi-user environment, and then groups are formed and interaction profiles are generated taking in account those states.
