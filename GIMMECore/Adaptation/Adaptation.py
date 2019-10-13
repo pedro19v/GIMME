@@ -1,14 +1,16 @@
-#include "..//..//headers//Adaptation//Adaptation.h"
+import math
 
 class Adaptation(object):
-	def init(self, name="", databaseAdapter, \
+	def init(self, name="", \
 		numberOfConfigChoices=100, \
 		minNumberOfPlayersPerGroup = 2, maxNumberOfPlayersPerGroup = 5, \
 		regAlg = RegressionAlg(), \
 		configsGenAlg = ConfigsGenAlg(), \
 		fitAlg = FitnessAlg(), \
 		randomGen = RandomGen(), \
-		modelsConnector = ModelsConnector()):
+		modelsConnector = ModelsConnector(),
+		difficultyWeight = 0.5, 
+		profileWeight=0.5):
 		
 		self.name = name;
 		self.players = players;
@@ -25,13 +27,15 @@ class Adaptation(object):
 
 		self.randomGen = randomGen;
 
+		self.difficultyWeight = difficultyWeight
+		self.profileWeight = profileWeight
 
 	def getName(self):
 		return self.name;
 
 
-	def iterate(tasks):
-		adaptedConfig = organizePlayers();
+	def iterate(tasks, playerIDs):
+		adaptedConfig = organizePlayers(playerIDs);
 		groups = adaptedConfig.groups;
 		groupsSize = len(groups);
 		for i in range(groupsSize):
@@ -45,62 +49,21 @@ class Adaptation(object):
 
 			currGroupProfile = currGroup.interactionsProfile;
 			currGroupState = currGroup.avgPlayerState;
-			currGroup.tailoredTask = generateMechanic(currGroupProfile, currGroupState, possibleCollaborativeTasks, possibleCompetitiveTasks, possibleIndividualTasks);
-
+			currGroup.tailoredTask = generateMechanic(tasks, currGroupProfile, currGroupState, possibleCollaborativeTasks, possibleCompetitiveTasks, possibleIndividualTasks);
 		return adaptedConfig;
 
 
-	def organizePlayers(int currIteration):
+	def organizePlayers(playerIDs):
 		return self.configsGenAlg.organize(playerIDs, numberOfConfigChoices, minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup, randomGen, regAlg, fitAlg);
 
+	def selectTask(possibleTasks,
+		bestConfigProfile,
+		avgLearningState):
+		lowestCost = math.inf
+		for i in range(len(possibleTasks)):
+			currTask = possibleTasks[i]
+			cost += abs(bestConfigProfile.distanceBetween(currTask.interactionsProfile) *currTask.difficultyWeight)
+			cost += abs(avgLearningState.ability - currTask.minRequiredAbility * currTask.profileWeight)
 
-	def selectMechanic(InteractionsProfile bestConfigProfile,
-	PlayerState avgLearningState,
-	std::vector<AdaptationTask> possibleCollaborativeTasks,
-	std::vector<AdaptationTask> possibleCompetitiveTasks,
-	std::vector<AdaptationTask> possibleIndividualTasks) {
-
-	
-	int collaborativeTaskSize = (int) ceil(bestConfigProfile.K_cl*numTasksPerGroup);
-	int competitiveTaskSize = (int) ceil(bestConfigProfile.K_cp*numTasksPerGroup);
-	int individualTaskSize = (int) ceil(bestConfigProfile.K_i*numTasksPerGroup);
-
-	std::vector<AdaptationTask> mechanicTasks = std::vector<AdaptationTask>();
-	
-	for (int i = 0; i < collaborativeTaskSize; i++) {
-		mechanicTasks.push_back(pickRandTaskInstance(possibleCollaborativeTasks, avgLearningState));
-	}
-	for (int i = 0; i < competitiveTaskSize; i++) {
-		mechanicTasks.push_back(pickRandTaskInstance(possibleCompetitiveTasks, avgLearningState));
-	}
-	for (int i = 0; i < individualTaskSize; i++) {
-		mechanicTasks.push_back(pickRandTaskInstance(possibleIndividualTasks, avgLearningState));
-	}
-	randomGen->randShuffle(mechanicTasks);
-
-	AdaptationMechanic mechanic = { bestConfigProfile, mechanicTasks };
-	return mechanic;
-}
-
-AdaptationTask Adaptation::pickRandTaskInstance(std::vector<AdaptationTask> possibleTasks, PlayerState avgLearningState)
-{
-	if (possibleTasks.empty()) {
-		return AdaptationTask{ AdaptationTaskType::NONE, "default", 0.0f };
-	}
-	int randIndex = randomGen->randIntBetween(0, (int) possibleTasks.size() - 1);
-	AdaptationTask randomTask = possibleTasks[randIndex];
-	std::vector<AdaptationTask> randomTaskInstances = randomTask.taskInstances;
-	int randomTaskInstancesSize = (int) randomTaskInstances.size();
-	
-	//pick the right difficulty
-	AdaptationTask adaptedInstance = randomTaskInstances[0];
-	for (int j = 1; j < randomTaskInstancesSize; j++) {
-		AdaptationTask currInstance = randomTaskInstances[j];
-		float minRequiredAbility = currInstance.minRequiredAbility;
-		if (minRequiredAbility < avgLearningState.characteristics.ability && minRequiredAbility > adaptedInstance.minRequiredAbility) {
-			adaptedInstance = currInstance;
-		}
-	}
-	return adaptedInstance;
-}
- 
+			if cost < lowestCost:
+				lowestCost = cost

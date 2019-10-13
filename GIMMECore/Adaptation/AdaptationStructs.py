@@ -4,7 +4,6 @@ class AdaptationTask(object):
 		self.description = description
 		self.minRequiredAbility = minRequiredAbility
 		self.profile = profile
-		self.tasks = tasks
 
 class ModelsConnector(object):
 	def getPlayersById(self, ids):
