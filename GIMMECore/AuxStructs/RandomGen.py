@@ -12,12 +12,12 @@ class RandomGen(object):
 	def resetRandoms(seed = None):
 		random.seed(self.defaultRandomSeed)
 
-	def randBetween(seed = None, min, max):
+	def randBetween(min, max, seed = None):
 		if(seed):
 			random.seed(self.defaultRandomSeed)
 		return random.randrange(min, max)
 
-	def randIntBetween(seed = None, min, max):
+	def randIntBetween(min, max, seed = None):
 		if(seed):
 			random.seed(self.defaultRandomSeed)
 		return random.randint(min, max)
@@ -25,8 +25,7 @@ class RandomGen(object):
 	def randShuffle(array):
 		return random.shuffle(array)
 
-	def normalRandom(seed=None, mu, var):
+	def normalRandom(mu, var, seed=None):
 		if(seed):
 			random.seed(self.defaultRandomSeed)
 		return random.gauss(mu,var)
-};

@@ -1,15 +1,19 @@
 import math
+from Adaptation.AlgDefStructs.RegressionAlg import *
+from Adaptation.AlgDefStructs.ConfigsGenAlg import *
+from Adaptation.AlgDefStructs.FitnessAlg import *
 
 class Adaptation(object):
-	def init(self, name="", \
+	def init(self, \
+		regAlg, \
+		configsGenAlg, \
+		fitAlg, \
+		modelsConnector = ModelsConnector(), \
+		name="", \
 		numberOfConfigChoices=100, \
 		minNumberOfPlayersPerGroup = 2, maxNumberOfPlayersPerGroup = 5, \
-		regAlg = RegressionAlg(), \
-		configsGenAlg = ConfigsGenAlg(), \
-		fitAlg = FitnessAlg(), \
 		randomGen = RandomGen(), \
-		modelsConnector = ModelsConnector(),
-		difficultyWeight = 0.5, 
+		difficultyWeight = 0.5, \
 		profileWeight=0.5):
 		
 		self.name = name;
@@ -30,18 +34,18 @@ class Adaptation(object):
 		self.difficultyWeight = difficultyWeight
 		self.profileWeight = profileWeight
 
+
 	def getName(self):
 		return self.name;
 
-
 	def iterate(tasks, playerIDs):
-		adaptedConfig = organizePlayers(playerIDs);
+		adaptedConfig = organizePlayers(modelsConnector.getAllPlayers());
 		groups = adaptedConfig.groups;
 		groupsSize = len(groups);
 		for i in range(groupsSize):
 			currGroup = groups[i];
 			groupPlayers = modelsConnector.getPlayersById(currGroup.players);
-			int groupPlayersSize = (int) groupPlayers.size();
+			groupPlayersSize = len(groupPlayers);
 
 			for j in range(groupPlayersSize):
 				currPlayer = modelsConnector.getPlayersById([j]);
@@ -53,8 +57,8 @@ class Adaptation(object):
 		return adaptedConfig;
 
 
-	def organizePlayers(playerIDs):
-		return self.configsGenAlg.organize(playerIDs, numberOfConfigChoices, minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup, randomGen, regAlg, fitAlg);
+	def organizePlayers(players):
+		return self.configsGenAlg.organize(players, numberOfConfigChoices, minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup, randomGen, regAlg, fitAlg);
 
 	def selectTask(possibleTasks,
 		bestConfigProfile,

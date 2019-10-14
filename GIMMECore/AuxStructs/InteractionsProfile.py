@@ -14,7 +14,7 @@ class InteractionsProfile(object):
 		cost.K_cp = abs(profile1.K_cp - profileToTest.K_cp)
 		cost.K_i = abs(profile1.K_i - profileToTest.K_i)
 
-		double totalDiff = cost.K_cl + cost.K_cp + cost.K_i
+		totalDiff = cost.K_cl + cost.K_cp + cost.K_i
 
 		cost.K_cl /= totalDiff
 		cost.K_cp /= totalDiff

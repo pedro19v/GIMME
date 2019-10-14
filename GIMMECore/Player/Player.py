@@ -1,7 +1,7 @@
 import numpy
 from PlayerStructs import *
 
-class Player (object):
+class Player(object):
 	# private:
 	def saveIncreases(stateIncreases):
 		self.currModelIncreases = stateIncreases;
