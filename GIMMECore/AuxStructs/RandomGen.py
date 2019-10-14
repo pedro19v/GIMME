@@ -9,23 +9,23 @@ class RandomGen(object):
 		self.defaultRandomSeed = time.time();
 		random.seed(self.defaultRandomSeed)
 
-	def resetRandoms(seed = None):
+	def resetRandoms(self, seed = None):
 		random.seed(self.defaultRandomSeed)
 
-	def randBetween(min, max, seed = None):
+	def randBetween(self, min, max, seed = None):
 		if(seed):
 			random.seed(self.defaultRandomSeed)
 		return random.randrange(min, max)
 
-	def randIntBetween(min, max, seed = None):
+	def randIntBetween(self, min, max, seed = None):
 		if(seed):
 			random.seed(self.defaultRandomSeed)
 		return random.randint(min, max)
 
-	def randShuffle(array):
+	def randShuffle(self, array):
 		return random.shuffle(array)
 
-	def normalRandom(mu, var, seed=None):
+	def normalRandom(self, mu, var, seed=None):
 		if(seed):
 			random.seed(self.defaultRandomSeed)
 		return random.gauss(mu,var)

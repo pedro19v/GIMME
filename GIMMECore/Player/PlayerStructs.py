@@ -1,5 +1,6 @@
 import numpy
 from collections import namedtuple
+from AuxStructs.InteractionsProfile import InteractionsProfile
 
 class PlayerCharacteristics(object):
 	def __init__(self, ability=0, engagement=0):
@@ -7,8 +8,8 @@ class PlayerCharacteristics(object):
 		self.engagement = engagement
 
 class PlayerState(object):
-	def __init__(self, characteristics=PlayerCharacteristics(), dist = 0):
-		# self.profile = InteractionsProfile()
+	def __init__(self, profile = InteractionsProfile(), characteristics = PlayerCharacteristics(), dist = 0):
+		self.profile = profile
 		self.characteristics = characteristics
 		self.dist = dist
 

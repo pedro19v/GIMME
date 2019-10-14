@@ -19,7 +19,6 @@ class Player(object):
 		# Adaptation part
 		self.numPastModelIncreasesCells = numPastModelIncreasesCells;
 		self.maxAmountOfStoredProfilesPerCell = maxAmountOfStoredProfilesPerCell;
-
 		self.utilities = utilities
 		
 		# for displaying in charts
@@ -39,13 +38,13 @@ class Player(object):
 		self.currState.characteristics = characteristics
 
 	def setCurrProfile(self, profile):
-		self.currState.profile = profile;
-
+		self.currState.profile = profile
+		
 	def getId(self):
-		return self.id;
+		return self.id
 
 	def getName(self):
-		return self.name;
+		return self.name
 
 	def getCurrProfile(self):
 		return self.currState.profile

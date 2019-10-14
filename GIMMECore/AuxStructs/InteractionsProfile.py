@@ -1,4 +1,5 @@
- 
+import math
+
 class InteractionsProfile(object):
 # public:
 	def __init__(self, K_i=0, K_cp=0, K_cl=0):
@@ -24,13 +25,15 @@ class InteractionsProfile(object):
 		cost.K_cp = pow(cost.K_cl, 2)
 		cost.K_i = pow(cost.K_cl, 2)
 
-		return sqrt(cost.K_cl + cost.K_cp + cost.K_i)
+		return math.sqrt(cost.K_cl + cost.K_cp + cost.K_i)
 	
 
 	def distanceBetween(self, profileToTest):
 	
 		profile1 = self
 		cost = InteractionsProfile()
+
+		print(profileToTest)
 		# normalizar cada uma das dims X/X+Y+Z; Y/X+Y+Z, Z/X+Y+Z
 		cost.K_cl = abs(profile1.K_cl - profileToTest.K_cl)
 		cost.K_cp = abs(profile1.K_cp - profileToTest.K_cp)
@@ -40,4 +43,4 @@ class InteractionsProfile(object):
 		cost.K_cp = pow(cost.K_cl, 2)
 		cost.K_i = pow(cost.K_cl, 2)
 
-		return sqrt(cost.K_cl + cost.K_cp + cost.K_i)
+		return math.sqrt(cost.K_cl + cost.K_cp + cost.K_i)
