@@ -29,7 +29,7 @@ class KNNRegression(RegressionAlg):
 		pastModelIncsCopy = copy.deepcopy(pastModelIncs)
 		pastModelIncsSize = len(pastModelIncs)
 
-		predictedState = PlayerState( profile, PlayerCharacteristics() )
+		predictedState = PlayerState(profile, PlayerCharacteristics())
 		# predictedState = sorted(predictedState, key=self.interactionsProfileSort(profile))
 
 		if (pastModelIncsSize > self.numberOfNNs):

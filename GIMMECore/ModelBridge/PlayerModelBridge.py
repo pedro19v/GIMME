@@ -18,27 +18,25 @@ class PlayerModelBridge(ABC):
 
 
 	@abstractmethod
-	def getSelectedPlayerIds(self):
+	def getAllPlayerIds(self):
 		pass
 
 	@abstractmethod
 	def getPlayerName(self, playerId):
 		pass
 
-
 	@abstractmethod
 	def getPlayerCurrProfile(self,  playerId):
 		pass
 
 	@abstractmethod
-	def getPlayerCurrCharacteristics(self, playerId):
-		pass
-		
-
-	@abstractmethod
 	def getPlayerPastModelIncreases(self, playerId):
 		pass
 
+	@abstractmethod
+	def getPlayerCurrState(self, playerId):
+		pass
+		
 	@abstractmethod
 	def getPlayerPersonality(self, playerId):
 		pass

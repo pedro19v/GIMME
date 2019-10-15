@@ -4,7 +4,7 @@ from Player.PlayerStructs import *
 
 # auxiliary structures: Adaptation
 class AdaptationTask(object):
-	def __init__(self, description="", minRequiredAbility=0, profile=InteractionsProfile(), tasks=numpy.empty(0)):
+	def __init__(self, description="", minRequiredAbility=0, profile=InteractionsProfile()):
 		self.description = description
 		self.minRequiredAbility = minRequiredAbility
 		self.profile = profile
@@ -16,7 +16,7 @@ class AdaptationGroup(object):
 		self.avgPreferences = InteractionsProfile()
 		self.avgPlayerState = PlayerState()
 
-		self.tailoredTask = AdaptationTask()
+		self.tailoredTaskId = -1
 
 		self.playerIds = []
 

@@ -33,7 +33,6 @@ class InteractionsProfile(object):
 		profile1 = self
 		cost = InteractionsProfile()
 
-		print(profileToTest)
 		# normalizar cada uma das dims X/X+Y+Z; Y/X+Y+Z, Z/X+Y+Z
 		cost.K_cl = abs(profile1.K_cl - profileToTest.K_cl)
 		cost.K_cp = abs(profile1.K_cp - profileToTest.K_cp)

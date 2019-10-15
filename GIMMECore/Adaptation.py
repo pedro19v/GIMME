@@ -4,7 +4,8 @@ from AlgDefStructs.ConfigsGenAlg import *
 from AlgDefStructs.FitnessAlg import *
 from AdaptationStructs import *
 
-from Player.PlayerModelBridge import PlayerModelBridge
+from ModelBridge.PlayerModelBridge import PlayerModelBridge 
+from ModelBridge.TaskModelBridge import TaskModelBridge 
 
 class Adaptation(object):
 
@@ -13,6 +14,7 @@ class Adaptation(object):
 		configsGenAlg, \
 		fitAlg, \
 		playerModelBridge, \
+		taskModelBridge, \
 		name="", \
 		numberOfConfigChoices=100, \
 		minNumberOfPlayersPerGroup = 2, maxNumberOfPlayersPerGroup = 5, \
@@ -40,13 +42,14 @@ class Adaptation(object):
 		self.profileWeight = profileWeight
 
 		self.playerModelBridge = playerModelBridge
+		self.taskModelBridge = taskModelBridge
 
 	def getName(self):
 		return self.name;
 
 	def iterate(self):
-		self.playerIds = self.playerModelBridge.getAllPlayerIds()
-		self.taskIds = []
+		self.playerIds = self.playerModelBridge.getSelectedPlayerIds()
+		self.taskIds = self.playerModelBridge.getSelectedTaskIds()
 		# self.tasks = taskModelBridge.getAllTaskIds()
 		adaptedConfig = self.organizePlayers(self.playerIds)
 		groups = adaptedConfig.groups
@@ -77,8 +80,8 @@ class Adaptation(object):
 		bestTask = None
 		for i in range(len(possibleTaskIds)):
 			currTask = possibleTaskIds[i]
-			cost += abs(bestConfigProfile.distanceBetween(currTask.interactionsProfile) *currTask.difficultyWeight)
-			cost += abs(avgLearningState.ability - currTask.minRequiredAbility * currTask.profileWeight)
+			cost += abs(bestConfigProfile.distanceBetween(self.taskModelBridge.getTaskInteractionsProfile(currTask)) * self.taskModelBridge.getTaskDifficultyWeight(currTask))
+			cost += abs(avgLearningState.ability - self.taskModelBridge.getTaskMinRequiredAbility(currTask) * self.taskModelBridge.getTaskProfileWeight(currTask))
 
 			if cost < lowestCost:
 				lowestCost = cost

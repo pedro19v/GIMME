@@ -34,12 +34,3 @@ class PlayerStateGrid(object):
 			currCell = currCell[1:]
 
 		self.cells[currCellInd] = currCell
-
-	def getAllStates(self):
-		allCells = numpy.empty(0);
-		for i in range(len(self.cells)):
-			currCell = self.cells[i]
-			allCells = numpy.append(allCells, currCell)
-		
-		return allCells;
-	# public:
