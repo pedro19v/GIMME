@@ -1,6 +1,6 @@
+import random
 import math
 from abc import ABC, abstractmethod
-from AuxStructs.RandomGen import RandomGen 
 from AdaptationStructs import *
 from AuxStructs.InteractionsProfile import InteractionsProfile 
 
@@ -10,23 +10,26 @@ class ConfigsGenAlg(ABC):
 		self.groupSizeFreqs = numpy.empty(0)
 		self.configSizeFreqs = numpy.empty(0)
 
-		self.randomGen = RandomGen()
 		super().__init__()
 
 	@abstractmethod
-	def organize(self, players, numberOfConfigChoices, minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup, utilities, regAlg, fitAlg):
+	def organize(self, playerModelBridge, playerIds, numberOfConfigChoices, minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup, regAlg, fitAlg):
 		pass
 
 	def updateMetrics(self, generatedConfig):
 		self.configSizeFreqs[len(generatedConfig.groups)]+=1
 		for group in generatedConfig.groups:
-			self.groupSizeFreqs[group.players.size()]+=1
+			self.groupSizeFreqs[len(group.playerIds)]+=1
 
 
 
 class RandomConfigsGen(ConfigsGenAlg):
 
-	def organize(self, playerModelBridge, playerIds, numberOfConfigChoices, minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup, utilities, regAlg, fitAlg):
+	def organize(self, playerModelBridge, playerIds, numberOfConfigChoices, minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup, regAlg, fitAlg):
+		
+		self.groupSizeFreqs = numpy.empty(len(playerIds))
+		self.configSizeFreqs = numpy.empty(len(playerIds))
+
 		bestConfig = AdaptationConfiguration()
 		currMaxFitness = -1.0
 
@@ -39,7 +42,7 @@ class RandomConfigsGen(ConfigsGenAlg):
 
 			minNumGroups = math.ceil(len(playerIds) / maxNumberOfPlayersPerGroup);
 			maxNumGroups = math.floor(len(playerIds) / minNumberOfPlayersPerGroup);
-			numGroups = self.randomGen.randIntBetween(minNumGroups, maxNumGroups);
+			numGroups = random.randint(minNumGroups, maxNumGroups);
 
 			# generate min groups
 			playersWithoutGroupSize = 0
@@ -47,9 +50,9 @@ class RandomConfigsGen(ConfigsGenAlg):
 				currGroup = AdaptationGroup();
 
 				# generate learning profile
-				newRand1 = self.randomGen.randBetween(0, 1)
-				newRand2 = self.randomGen.randBetween(0, 1)
-				newRand3 = self.randomGen.randBetween(0, 1)
+				newRand1 = random.uniform(0, 1)
+				newRand2 = random.uniform(0, 1)
+				newRand3 = random.uniform(0, 1)
 
 				newRandSum = newRand1 + newRand2 + newRand3;
 
@@ -63,7 +66,7 @@ class RandomConfigsGen(ConfigsGenAlg):
 
 				for s in range(minNumberOfPlayersPerGroup):
 					playersWithoutGroupSize = len(playersWithoutGroup)
-					currPlayerIndex = self.randomGen.randIntBetween(0, playersWithoutGroupSize - 1)
+					currPlayerIndex = random.randint(0, playersWithoutGroupSize - 1)
 
 					currPlayerID = playersWithoutGroup[currPlayerIndex]
 					currGroup.addPlayer(playerModelBridge, currPlayerID)
@@ -78,11 +81,11 @@ class RandomConfigsGen(ConfigsGenAlg):
 			playersWithoutGroupSize = len(playersWithoutGroup);
 			
 			while playersWithoutGroupSize > 0:
-				randomGroupIndex = self.randomGen.randIntBetween(0, len(newConfig.groups) - 1)
+				randomGroupIndex = random.randint(0, len(newConfig.groups) - 1)
 
 				currPlayerIndex = 0;
 				if (playersWithoutGroupSize > 1):
-					currPlayerIndex = self.randomGen.randIntBetween(0, playersWithoutGroupSize - 1)
+					currPlayerIndex = random.randint(0, playersWithoutGroupSize - 1)
 
 				currGroup = newConfig.groups[randomGroupIndex];
 				groupsSize = len(newConfig.groups);
@@ -111,13 +114,13 @@ class RandomConfigsGen(ConfigsGenAlg):
 				bestConfig = newConfig
 				currMaxFitness = currFitness	
 		
-		# self.updateMetrics(bestConfig)
+		self.updateMetrics(bestConfig)
 		return bestConfig
 
 
 
 class EvolutionaryConfigsGen(ConfigsGenAlg):
-	def organize(self, players, numberOfConfigChoices, minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup, utilities, regAlg, fitAlg):
+	def organize(self, players, numberOfConfigChoices, minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup, regAlg, fitAlg):
 
 		bestConfig = AdaptationConfiguration()
 		currMaxFitness = -math.inf

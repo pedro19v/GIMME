@@ -17,7 +17,7 @@ from ModelMocks import *
 
 
 players = [None for x in range(100)]
-tasks = [None for x in range(100)]
+tasks = [None for x in range(20)]
 
 class CustomTaskModelBridge(TaskModelBridge):
 	
@@ -25,7 +25,7 @@ class CustomTaskModelBridge(TaskModelBridge):
 		tasks[taskId] = TaskModelMock(taskId, description, minRequiredAbility, profile, difficultyWeight, profileWeight)
 
 	def getSelectedTaskIds(self):
-		return [int(i) for i in range(100)]
+		return [int(i) for i in range(20)]
 
 	def getTaskInteractionsProfile(self, taskId):
 		return tasks[taskId].profile
@@ -91,11 +91,13 @@ for x in range(100):
 	playerBridge.registerNewPlayer(int(x), "name", PlayerState(), PlayerStateGrid(1, 30), PlayerCharacteristics(), InteractionsProfile(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1)))
 
 taskBridge = CustomTaskModelBridge()
-for x in range(100):
-	taskBridge.registerNewTask(int(x), "description", 100, InteractionsProfile(0.1,0.3,0.8), 0.5, 0.5)
+for x in range(20):
+	taskBridge.registerNewTask(int(x), "description", random.uniform(0, 1), InteractionsProfile(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1)), 0.5, 0.5)
 
 adaptation = Adaptation()
 adaptation.init(KNNRegression(5), RandomConfigsGen(), WeightedFitness(PlayerCharacteristics(ability=0.5, engagement=0.5)), playerBridge, taskBridge, name="", numberOfConfigChoices=50, maxNumberOfPlayersPerGroup = 3, difficultyWeight = 0.5, profileWeight=0.5)
-adaptation.iterate()
-adaptation.iterate()
-adaptation.iterate()
+
+iteration = adaptation.iterate()
+for i in range(len(iteration.groups)):
+	currGroup = iteration.groups[i]
+	print(currGroup.__dict__)

@@ -18,7 +18,6 @@ class Adaptation(object):
 		name="", \
 		numberOfConfigChoices=100, \
 		minNumberOfPlayersPerGroup = 2, maxNumberOfPlayersPerGroup = 5, \
-		randomGen = RandomGen(), \
 		difficultyWeight = 0.5, \
 		profileWeight=0.5):
 		
@@ -35,8 +34,6 @@ class Adaptation(object):
 		self.regAlg = regAlg
 		self.fitAlg = fitAlg
 		self.configsGenAlg = configsGenAlg
-
-		self.randomGen = randomGen
 
 		self.difficultyWeight = difficultyWeight
 		self.profileWeight = profileWeight
@@ -65,12 +62,12 @@ class Adaptation(object):
 
 			currGroupProfile = currGroup.interactionsProfile
 			currGroupState = currGroup.avgPlayerState
-			currGroup.tailoredTask = self.selectTask(self.taskIds, currGroupProfile, currGroupState)
+			currGroup.tailoredTaskId = self.selectTask(self.taskIds, currGroupProfile, currGroupState)
 		return adaptedConfig
 
 
 	def organizePlayers(self, playerIds):
-		return self.configsGenAlg.organize(self.playerModelBridge, playerIds, self.numberOfConfigChoices, self.minNumberOfPlayersPerGroup, self.maxNumberOfPlayersPerGroup, self.randomGen, self.regAlg, self.fitAlg);
+		return self.configsGenAlg.organize(self.playerModelBridge, playerIds, self.numberOfConfigChoices, self.minNumberOfPlayersPerGroup, self.maxNumberOfPlayersPerGroup, self.regAlg, self.fitAlg);
 
 	def selectTask(self,
 		possibleTaskIds,
@@ -78,12 +75,15 @@ class Adaptation(object):
 		avgLearningState):
 		lowestCost = math.inf
 		bestTask = None
+
 		for i in range(len(possibleTaskIds)):
-			currTask = possibleTaskIds[i]
-			cost = abs(bestConfigProfile.distanceBetween(self.taskModelBridge.getTaskInteractionsProfile(currTask)) * self.taskModelBridge.getTaskDifficultyWeight(currTask))
-			cost += abs(avgLearningState.characteristics.ability - self.taskModelBridge.getTaskMinRequiredAbility(currTask) * self.taskModelBridge.getTaskProfileWeight(currTask))
+			currTaskId = possibleTaskIds[i]
+
+			cost = abs(bestConfigProfile.distanceBetween(self.taskModelBridge.getTaskInteractionsProfile(currTaskId)) * self.taskModelBridge.getTaskDifficultyWeight(currTaskId))
+			cost += abs(avgLearningState.characteristics.ability - self.taskModelBridge.getTaskMinRequiredAbility(currTaskId) * self.taskModelBridge.getTaskProfileWeight(currTaskId))
 
 			if cost < lowestCost:
 				lowestCost = cost
-				bestTask = currTask
-		return bestTask
+				bestTaskId = currTaskId
+				
+		return bestTaskId
