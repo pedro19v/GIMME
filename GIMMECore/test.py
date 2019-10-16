@@ -1,18 +1,7 @@
 import numpy
 import random
 
-from Adaptation import Adaptation
-from AlgDefStructs.RegressionAlg import *
-from AlgDefStructs.ConfigsGenAlg import *
-from AlgDefStructs.FitnessAlg import *
-
-from PlayerStructs import PlayerCharacteristics
-from AuxStructs.InteractionsProfile import InteractionsProfile
-
-from ModelBridge.PlayerModelBridge import PlayerModelBridge 
-from ModelBridge.TaskModelBridge import TaskModelBridge 
-
-
+from GIMMECore import *
 from ModelMocks import *
 
 
@@ -95,7 +84,7 @@ for x in range(20):
 	taskBridge.registerNewTask(int(x), "description", random.uniform(0, 1), InteractionsProfile(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1)), 0.5, 0.5)
 
 adaptation = Adaptation()
-adaptation.init(KNNRegression(5), RandomConfigsGen(), WeightedFitness(PlayerCharacteristics(ability=0.5, engagement=0.5)), playerBridge, taskBridge, name="", numberOfConfigChoices=50, maxNumberOfPlayersPerGroup = 3, difficultyWeight = 0.5, profileWeight=0.5)
+adaptation.init(KNNRegression(5), RandomConfigsGen(), WeightedFitness(PlayerCharacteristics(ability=0.5, engagement=0.5)), playerBridge, taskBridge, name="", numberOfConfigChoices=50, maxNumberOfPlayersPerGroup = 5, difficultyWeight = 0.5, profileWeight=0.5)
 
 iteration = adaptation.iterate()
 for i in range(len(iteration.groups)):
