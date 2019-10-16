@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from Player.PlayerStructs import *
+from PlayerStructs import *
 
 class PlayerModelBridge(ABC):
 
@@ -18,11 +18,16 @@ class PlayerModelBridge(ABC):
 
 
 	@abstractmethod
-	def getAllPlayerIds(self):
+	def getSelectedPlayerIds(self):
 		pass
 
 	@abstractmethod
 	def getPlayerName(self, playerId):
+		pass
+
+
+	@abstractmethod
+	def getPlayerCurrState(self,  playerId):
 		pass
 
 	@abstractmethod
@@ -30,13 +35,14 @@ class PlayerModelBridge(ABC):
 		pass
 
 	@abstractmethod
+	def getPlayerCurrCharacteristics(self, playerId):
+		pass
+		
+
+	@abstractmethod
 	def getPlayerPastModelIncreases(self, playerId):
 		pass
 
-	@abstractmethod
-	def getPlayerCurrState(self, playerId):
-		pass
-		
 	@abstractmethod
 	def getPlayerPersonality(self, playerId):
 		pass

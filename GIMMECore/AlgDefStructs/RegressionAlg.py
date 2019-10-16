@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 import copy
-from Player.PlayerStructs import *
+from PlayerStructs import *
 
 class RegressionAlg(ABC):
 
@@ -38,11 +38,12 @@ class KNNRegression(RegressionAlg):
 		pastModelIncsCopySize = len(pastModelIncsCopy)
 
 		for i in range(pastModelIncsCopySize):
-			pastProfile = pastModelIncsCopy[i].profile;
+			pastProfile = playerModelBridge.getPlayerCurrProfile(i);
+			pastCharacteristics = playerModelBridge.getPlayerCurrCharacteristics(i);
 			distance = profile.distanceBetween(pastProfile)
 
-			predictedState.characteristics.ability += (pastModelIncsCopy[i].characteristics.ability* (1 - distance)) / pastModelIncsCopySize #* (1 - distance) 
-			predictedState.characteristics.engagement += (pastModelIncsCopy[i].characteristics.engagement* (1 - distance)) / pastModelIncsCopySize #* (1 - distance)
+			predictedState.characteristics.ability += (pastCharacteristics.ability* (1 - distance)) / pastModelIncsCopySize #* (1 - distance) 
+			predictedState.characteristics.engagement += (pastCharacteristics.engagement* (1 - distance)) / pastModelIncsCopySize #* (1 - distance)
 		
 		return predictedState;
 

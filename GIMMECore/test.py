@@ -1,90 +1,98 @@
 import numpy
+import random
 
 from Adaptation import Adaptation
 from AlgDefStructs.RegressionAlg import *
 from AlgDefStructs.ConfigsGenAlg import *
 from AlgDefStructs.FitnessAlg import *
 
-from Player.PlayerStructs import PlayerCharacteristics
+from PlayerStructs import PlayerCharacteristics
 from AuxStructs.InteractionsProfile import InteractionsProfile
 
 from ModelBridge.PlayerModelBridge import PlayerModelBridge 
 from ModelBridge.TaskModelBridge import TaskModelBridge 
 
-players = numpy.empty(100)
-tasks = numpy.empty(100)
+
+from ModelMocks import *
+
+
+players = [None for x in range(100)]
+tasks = [None for x in range(100)]
 
 class CustomTaskModelBridge(TaskModelBridge):
 	
-	def registerNewTask(self, taskId, description, minRequiredAbility, profile):
-		pass
+	def registerNewTask(self, taskId, description, minRequiredAbility, profile, difficultyWeight, profileWeight):
+		tasks[taskId] = TaskModelMock(taskId, description, minRequiredAbility, profile, difficultyWeight, profileWeight)
 
 	def getSelectedTaskIds(self):
-		pass
+		return [int(i) for i in range(100)]
 
-	def getTaskInteractionsProfile(taskId):
-		pass
+	def getTaskInteractionsProfile(self, taskId):
+		return tasks[taskId].profile
 
-	def getTaskMinRequiredAbility(taskId):
-		pass
+	def getTaskMinRequiredAbility(self, taskId):
+		return tasks[taskId].minRequiredAbility
 
-	def getTaskDifficultyWeight(taskId):
-		pass
+	def getTaskDifficultyWeight(self, taskId):
+		return tasks[taskId].difficultyWeight
 
-	def getTaskProfileWeight(taskId):
-		pass
+	def getTaskProfileWeight(self, taskId):
+		return tasks[taskId].profileWeight
 
 
 class CustomPlayerModelBridge(PlayerModelBridge):
 	
 	def registerNewPlayer(self, playerId, name, currState, pastModelIncreasesGrid, currModelIncreases, personality):
-		players[playerId] = Player(playerId, name, currState, pastModelIncreasesGrid, currModelIncreases, personality)
-		pass
-	
+		players[int(playerId)] = PlayerModelMock(playerId, name, currState, pastModelIncreasesGrid, currModelIncreases, personality)	
 
 	def saveplayerIncreases(self, playerId, stateIncreases):
-		players[playerId].pastModelIncreasesGrid.pushToGrid(stateIncreases)
+		players[int(playerId)].pastModelIncreasesGrid.pushToGrid(stateIncreases)
 
 	def resetPlayer(self, playerId):
 		return 0
 
 
 	def getSelectedPlayerIds(self):
-		playerIds = numpy.empty(100)
-		for i in range(100):
-			playerIds[i]=i
-		return playerIds
-	
+		return [int(i) for i in range(100)]
+
 
 	def getPlayerName(self, playerId):
-		return players[playerId].name
+		return players[int(playerId)].name
+
+	def getPlayerCurrState(self,  playerId):
+		return players[int(playerId)].currState
 
 	def getPlayerCurrProfile(self,  playerId):
-		return players[playerId].currState.profile
+		return players[int(playerId)].currState.profile
 
 	def getPlayerPastModelIncreases(self, playerId):
-		return players[playerId].pastModelIncreasesGrid.cells
+		return players[int(playerId)].pastModelIncreasesGrid.cells
 
 	def getPlayerCurrCharacteristics(self, playerId):
-		return players[playerId].currState.characteristics
+		return players[int(playerId)].currState.characteristics
 	
 	def getPlayerPersonality(self, playerId):
-		return players[playerId].personality
+		return players[int(playerId)].personality
+
+	def setPlayerPersonality(self, playerId, personality):
+		players[int(playerId)].personality = personality
 
 
 	def setPlayerCharacteristics(self, playerId, characteristics):
-		players[playerId].currState.characteristics = characteristics
+		players[int(playerId)].currState.characteristics = characteristics
 
 	def setPlayerCurrProfile(self, playerId, profile):
-		players[playerId].currState.profile = profile
+		players[int(playerId)].currState.profile = profile
+
+
 
 playerBridge = CustomPlayerModelBridge()
 for x in range(100):
-	playerBridge.registerNewPlayer(x, "name", PlayerState(), PlayerStateGrid(numPastModelIncreasesCells, maxAmountOfStoredProfilesPerCell), PlayerCharacteristics(), None)
+	playerBridge.registerNewPlayer(int(x), "name", PlayerState(), PlayerStateGrid(1, 30), PlayerCharacteristics(), InteractionsProfile(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1)))
 
 taskBridge = CustomTaskModelBridge()
 for x in range(100):
-	taskBridge.registerNewTask(x, "description", 100, InteractionsProfile(0.1,0.3,0.8))
+	taskBridge.registerNewTask(int(x), "description", 100, InteractionsProfile(0.1,0.3,0.8), 0.5, 0.5)
 
 adaptation = Adaptation()
 adaptation.init(KNNRegression(5), RandomConfigsGen(), WeightedFitness(PlayerCharacteristics(ability=0.5, engagement=0.5)), playerBridge, taskBridge, name="", numberOfConfigChoices=50, maxNumberOfPlayersPerGroup = 3, difficultyWeight = 0.5, profileWeight=0.5)

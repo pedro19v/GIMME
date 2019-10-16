@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
-from Player.PlayerStructs import *
+from PlayerStructs import *
 
 class TaskModelBridge(ABC):
 
 	@abstractmethod
-	def registerNewTask(self, taskId, description, minRequiredAbility, profile, tasks):
+	def registerNewTask(self, taskId, description, minRequiredAbility, profile, tasks, difficultyWeight, profileWeight):
 		pass
 
 	@abstractmethod

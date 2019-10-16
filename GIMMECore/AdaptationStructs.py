@@ -1,19 +1,14 @@
 import numpy
 from AuxStructs.InteractionsProfile import InteractionsProfile
-from Player.PlayerStructs import *
+from PlayerStructs import *
 
 # auxiliary structures: Adaptation
-class AdaptationTask(object):
-	def __init__(self, description="", minRequiredAbility=0, profile=InteractionsProfile()):
-		self.description = description
-		self.minRequiredAbility = minRequiredAbility
-		self.profile = profile
 
 class AdaptationGroup(object):
 	def __init__(self, interactionsProfile = InteractionsProfile()):
 		self.interactionsProfile = interactionsProfile
 
-		self.avgPreferences = InteractionsProfile()
+		self.avgPersonality = InteractionsProfile()
 		self.avgPlayerState = PlayerState()
 
 		self.tailoredTaskId = -1
@@ -34,10 +29,10 @@ class AdaptationGroup(object):
 			self.avgPlayerState.characteristics.engagement += currPlayerState.characteristics.engagement / playersSize;
 			self.avgPlayerState.characteristics.ability += currPlayerState.characteristics.ability / playersSize;
 			
-			currPlayerPreference = playerModelBridge.getPlayerPersonality(currPlayerId);
-			self.avgPreferences.K_i  += currPlayerPreference.K_i / playersSize;
-			self.avgPreferences.K_cp  += currPlayerPreference.K_cp / playersSize;
-			self.avgPreferences.K_cl  += currPlayerPreference.K_cl / playersSize;
+			currPlayerPersonality = playerModelBridge.getPlayerPersonality(currPlayerId);
+			self.avgPersonality.K_i  += currPlayerPersonality.K_i / playersSize;
+			self.avgPersonality.K_cp  += currPlayerPersonality.K_cp / playersSize;
+			self.avgPersonality.K_cl  += currPlayerPersonality.K_cl / playersSize;
 		
 		
 

@@ -49,7 +49,7 @@ class Adaptation(object):
 
 	def iterate(self):
 		self.playerIds = self.playerModelBridge.getSelectedPlayerIds()
-		self.taskIds = self.playerModelBridge.getSelectedTaskIds()
+		self.taskIds = self.taskModelBridge.getSelectedTaskIds()
 		# self.tasks = taskModelBridge.getAllTaskIds()
 		adaptedConfig = self.organizePlayers(self.playerIds)
 		groups = adaptedConfig.groups
@@ -80,8 +80,8 @@ class Adaptation(object):
 		bestTask = None
 		for i in range(len(possibleTaskIds)):
 			currTask = possibleTaskIds[i]
-			cost += abs(bestConfigProfile.distanceBetween(self.taskModelBridge.getTaskInteractionsProfile(currTask)) * self.taskModelBridge.getTaskDifficultyWeight(currTask))
-			cost += abs(avgLearningState.ability - self.taskModelBridge.getTaskMinRequiredAbility(currTask) * self.taskModelBridge.getTaskProfileWeight(currTask))
+			cost = abs(bestConfigProfile.distanceBetween(self.taskModelBridge.getTaskInteractionsProfile(currTask)) * self.taskModelBridge.getTaskDifficultyWeight(currTask))
+			cost += abs(avgLearningState.characteristics.ability - self.taskModelBridge.getTaskMinRequiredAbility(currTask) * self.taskModelBridge.getTaskProfileWeight(currTask))
 
 			if cost < lowestCost:
 				lowestCost = cost
