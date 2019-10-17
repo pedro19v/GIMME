@@ -40,9 +40,16 @@ class RandomConfigsGen(ConfigsGenAlg):
 			playersWithoutGroup = playerIds
 			newConfig = AdaptationConfiguration()
 
-			minNumGroups = math.ceil(len(playerIds) / maxNumberOfPlayersPerGroup);
-			maxNumGroups = math.floor(len(playerIds) / minNumberOfPlayersPerGroup);
-			numGroups = random.randint(minNumGroups, maxNumGroups);
+			minNumGroups = math.ceil(len(playerIds) / maxNumberOfPlayersPerGroup)
+			maxNumGroups = math.floor(len(playerIds) / minNumberOfPlayersPerGroup)
+
+			print("minNumGroups: "+ str(minNumGroups))
+			print("maxNumGroups: "+ str(maxNumGroups))
+			if(minNumGroups < maxNumGroups):
+				numGroups = random.randint(minNumGroups, maxNumGroups)
+			else: # players length is 1
+				numGroups = minNumGroups
+			
 
 			# generate min groups
 			playersWithoutGroupSize = 0

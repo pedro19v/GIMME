@@ -20,6 +20,10 @@ class Adaptation(object):
 		minNumberOfPlayersPerGroup = 2, maxNumberOfPlayersPerGroup = 5, \
 		difficultyWeight = 0.5, \
 		profileWeight=0.5):
+
+		if(minNumberOfPlayersPerGroup > maxNumberOfPlayersPerGroup):
+			raise ValueError('The min number of players per group cannot be higher than the max!') 
+
 		
 		self.playerIds = []
 		self.taskIds = []
