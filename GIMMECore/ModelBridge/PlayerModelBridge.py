@@ -4,12 +4,7 @@ from PlayerStructs import *
 class PlayerModelBridge(ABC):
 
 	@abstractmethod
-	def registerNewPlayer(self, playerId, currState, name, numPastModelIncreasesCells, maxAmountOfStoredProfilesPerCell, pastModelIncreasesGrid, currModelIncreases):
-		pass
-
-
-	@abstractmethod
-	def saveplayerIncreases(self, playerId, stateIncreases):
+	def savePlayerState(self, playerId, newState):
 		pass
 
 	@abstractmethod

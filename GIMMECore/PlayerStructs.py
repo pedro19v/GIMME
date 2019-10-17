@@ -14,14 +14,10 @@ class PlayerState(object):
 		self.dist = dist
 
 class PlayerStateGrid(object):
-	def __init__(self):
-		pass
-
-	def __init__(self, numCells, maxAmountOfStoredProfilesPerCell):
-	# private:
+	def __init__(self, numCells=1, maxAmountOfStoredProfilesPerCell=30):
 		self.numCells = numCells;
 		self.maxAmountOfStoredProfilesPerCell = maxAmountOfStoredProfilesPerCell;
-		self.cells =  numpy.empty(numCells)
+		self.cells =  [-1]*numCells
 
 	def pushToGrid(self, playerState):
 		dimSpan = cbrt(numCells-1);

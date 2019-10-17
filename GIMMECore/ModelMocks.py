@@ -24,4 +24,3 @@ class TaskModelMock(object):
 		self.profile = profile
 		self.difficultyWeight = difficultyWeight
 		self.profileWeight = profileWeight
-		self.profile = profile

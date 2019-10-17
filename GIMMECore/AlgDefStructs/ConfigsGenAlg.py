@@ -7,8 +7,8 @@ from AuxStructs.InteractionsProfile import InteractionsProfile
 class ConfigsGenAlg(ABC):
 
 	def __init__(self):
-		self.groupSizeFreqs = numpy.empty(0)
-		self.configSizeFreqs = numpy.empty(0)
+		self.groupSizeFreqs = []
+		self.configSizeFreqs = []
 
 		super().__init__()
 
