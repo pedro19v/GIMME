@@ -1,4 +1,3 @@
-import numpy
 from collections import namedtuple
 from AuxStructs.InteractionsProfile import InteractionsProfile
 
@@ -17,16 +16,16 @@ class PlayerStateGrid(object):
 	def __init__(self, numCells=1, maxAmountOfStoredProfilesPerCell=30):
 		self.numCells = numCells;
 		self.maxAmountOfStoredProfilesPerCell = maxAmountOfStoredProfilesPerCell;
-		self.cells =  [-1]*numCells
+		self.cells = [[]]
 
 	def pushToGrid(self, playerState):
 		dimSpan = cbrt(numCells-1);
-		currCellInd = (dimSpan * dimSpan * floor(dimSpan * model.profile.K_cl) + dimSpan * floor(dimSpan * model.profile.K_cp) + floor(dimSpan* model.profile.K_i));
+		currCellInd = (dimSpan * dimSpan * floor(dimSpan * model.profile.K_cl) + dimSpan * floor(dimSpan * model.profile.K_cp) + floor(dimSpan* model.profile.K_i))
 		
-		currCell = self.cells[currCellInd];
-		currCell = numpy.append(currCell, playerState);
-		cellsSize = len(cells[currCellInd]);
+		currCell = self.cells[currCellInd]
+		currCell.append(playerState)
+		cellsSize = len(cells[currCellInd])
 		if (cellsSize > maxAmountOfStoredProfilesPerCell):
-			currCell = currCell[1:]
+			currCell = currCell[maxAmountOfStoredProfilesPerCell:]
 
 		self.cells[currCellInd] = currCell

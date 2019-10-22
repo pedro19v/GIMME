@@ -2,10 +2,10 @@ import math
 
 class InteractionsProfile(object):
 # public:
-	def __init__(self, K_i=0, K_cp=0, K_cl=0):
-		self.K_i = K_i
-		self.K_cp = K_cp
+	def __init__(self, K_cl=0, K_cp=0, K_i=0):
 		self.K_cl = K_cl
+		self.K_cp = K_cp
+		self.K_i = K_i
 
 	def normalizedDistanceBetween(self, profileToTest):
 		profile1 = self
@@ -29,7 +29,6 @@ class InteractionsProfile(object):
 	
 
 	def distanceBetween(self, profileToTest):
-	
 		profile1 = self
 		cost = InteractionsProfile()
 

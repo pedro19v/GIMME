@@ -78,7 +78,7 @@ class Adaptation(object):
 		bestConfigProfile,
 		avgLearningState):
 		lowestCost = math.inf
-		bestTask = None
+		bestTaskId = None
 
 		for i in range(len(possibleTaskIds)):
 			currTaskId = possibleTaskIds[i]

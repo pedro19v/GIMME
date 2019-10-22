@@ -7,8 +7,8 @@ from AuxStructs.InteractionsProfile import InteractionsProfile
 class ConfigsGenAlg(ABC):
 
 	def __init__(self):
-		self.groupSizeFreqs = []
-		self.configSizeFreqs = []
+		self.groupSizeFreqs = {}
+		self.configSizeFreqs = {}
 
 		super().__init__()
 
@@ -17,39 +17,39 @@ class ConfigsGenAlg(ABC):
 		pass
 
 	def updateMetrics(self, generatedConfig):
-		self.configSizeFreqs[len(generatedConfig.groups)]+=1
+		if(self.configSizeFreqs.get(len(generatedConfig.groups))):
+			self.configSizeFreqs[len(generatedConfig.groups)]+=1
+		else:
+			self.configSizeFreqs[len(generatedConfig.groups)]=1
+
 		for group in generatedConfig.groups:
-			self.groupSizeFreqs[len(group.playerIds)]+=1
+			if(self.configSizeFreqs.get(len(group.playerIds))):
+				self.configSizeFreqs[len(group.playerIds)]+=1
+			else:
+				self.configSizeFreqs[len(group.playerIds)]=1
 
 
 
 class RandomConfigsGen(ConfigsGenAlg):
 
 	def organize(self, playerModelBridge, playerIds, numberOfConfigChoices, minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup, regAlg, fitAlg):
-		
-		self.groupSizeFreqs = numpy.empty(len(playerIds))
-		self.configSizeFreqs = numpy.empty(len(playerIds))
-
 		bestConfig = AdaptationConfiguration()
 		currMaxFitness = -1.0
 
+		minNumGroups = math.ceil(len(playerIds) / maxNumberOfPlayersPerGroup)
+		maxNumGroups = math.floor(len(playerIds) / minNumberOfPlayersPerGroup)
+		
 		# generate several random groups, calculate their fitness and select the best one
-		for j in range(numberOfConfigChoices):
+		for i in range(numberOfConfigChoices):
 			lastProfile = False
 			currFitness = 0.0
-			playersWithoutGroup = playerIds
+			playersWithoutGroup = playerIds.copy()
 			newConfig = AdaptationConfiguration()
 
-			minNumGroups = math.ceil(len(playerIds) / maxNumberOfPlayersPerGroup)
-			maxNumGroups = math.floor(len(playerIds) / minNumberOfPlayersPerGroup)
-
-			print("minNumGroups: "+ str(minNumGroups))
-			print("maxNumGroups: "+ str(maxNumGroups))
 			if(minNumGroups < maxNumGroups):
 				numGroups = random.randint(minNumGroups, maxNumGroups)
 			else: # players length is 1
 				numGroups = minNumGroups
-			
 
 			# generate min groups
 			playersWithoutGroupSize = 0
@@ -70,9 +70,10 @@ class RandomConfigsGen(ConfigsGenAlg):
 					profile.K_i = newRand3 / newRandSum;
 				currGroup.interactionsProfile = profile;
 
-
+				# add min number of players to the group
 				for s in range(minNumberOfPlayersPerGroup):
 					playersWithoutGroupSize = len(playersWithoutGroup)
+
 					currPlayerIndex = random.randint(0, playersWithoutGroupSize - 1)
 
 					currPlayerID = playersWithoutGroup[currPlayerIndex]
@@ -81,11 +82,12 @@ class RandomConfigsGen(ConfigsGenAlg):
 					currPlayerFitness = fitAlg.calculate(playerModelBridge, currPlayerID, currGroup.interactionsProfile, regAlg)
 					currFitness += currPlayerFitness
 
-					playersWithoutGroup = numpy.delete(playersWithoutGroup, currPlayerIndex)
+					del playersWithoutGroup[currPlayerIndex]
 				
-				newConfig.groups = numpy.append(newConfig.groups, currGroup)
+				newConfig.groups.append(currGroup)
 
 			playersWithoutGroupSize = len(playersWithoutGroup);
+			
 			
 			while playersWithoutGroupSize > 0:
 				randomGroupIndex = random.randint(0, len(newConfig.groups) - 1)
@@ -93,6 +95,8 @@ class RandomConfigsGen(ConfigsGenAlg):
 				currPlayerIndex = 0;
 				if (playersWithoutGroupSize > 1):
 					currPlayerIndex = random.randint(0, playersWithoutGroupSize - 1)
+				else:
+					currPlayerIndex = 0
 
 				currGroup = newConfig.groups[randomGroupIndex];
 				groupsSize = len(newConfig.groups);
@@ -106,22 +110,20 @@ class RandomConfigsGen(ConfigsGenAlg):
 				currPlayerFitness = fitAlg.calculate(playerModelBridge, currPlayer, currGroup.interactionsProfile, regAlg)
 				currFitness += currPlayerFitness
 
-				playersWithoutGroup = numpy.delete(playersWithoutGroup, currPlayerIndex)
+				del playersWithoutGroup[currPlayerIndex]
 				playersWithoutGroupSize = len(playersWithoutGroup)
 
 			playerSize = len(playerIds)
 			currGroups = newConfig.groups
 			currGroupsSize = len(currGroups)
-			# self.configSizeFreqs[currGroupsSize]+=1
-			for s in range(currGroupsSize):
-				currGroup = currGroups[s]
-				# self.groupSizeFreqs[len(currGroup.players)]+=1
 
 			if (currFitness > currMaxFitness):
 				bestConfig = newConfig
 				currMaxFitness = currFitness	
 		
-		self.updateMetrics(bestConfig)
+			# print("c" + str(self.configSizeFreqs))
+
+			self.updateMetrics(bestConfig)
 		return bestConfig
 
 
@@ -133,7 +135,7 @@ class EvolutionaryConfigsGen(ConfigsGenAlg):
 		currMaxFitness = -math.inf
 
 		# generate several random groups, calculate their fitness and select best one
-		adaptG = AdaptationGroup(InteractionsProfile(0.33, 0.33, 0.33), players )
+		adaptG = AdaptationGroup(InteractionsProfile(0.33, 0.33, 0.33), players)
 		updateMetrics(bestConfig)
 		return bestConfig
 

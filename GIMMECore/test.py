@@ -1,11 +1,13 @@
 import numpy
 import random
+import json
 
 from GIMMECore import *
 from ModelMocks import *
 
+numPlayers = 10
 
-players = [None for x in range(100)]
+players = [None for x in range(numPlayers)]
 tasks = [None for x in range(20)]
 
 class CustomTaskModelBridge(TaskModelBridge):
@@ -42,7 +44,7 @@ class CustomPlayerModelBridge(PlayerModelBridge):
 
 
 	def getSelectedPlayerIds(self):
-		return [int(i) for i in range(100)]
+		return [int(i) for i in range(numPlayers)]
 
 
 	def getPlayerName(self, playerId):
@@ -76,7 +78,7 @@ class CustomPlayerModelBridge(PlayerModelBridge):
 
 
 playerBridge = CustomPlayerModelBridge()
-for x in range(100):
+for x in range(numPlayers):
 	playerBridge.registerNewPlayer(int(x), "name", PlayerState(), PlayerStateGrid(1, 30), PlayerCharacteristics(), InteractionsProfile(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1)))
 
 taskBridge = CustomTaskModelBridge()
@@ -85,6 +87,10 @@ for x in range(20):
 
 adaptation = Adaptation()
 adaptation.init(KNNRegression(5), RandomConfigsGen(), WeightedFitness(PlayerCharacteristics(ability=0.5, engagement=0.5)), playerBridge, taskBridge, name="", numberOfConfigChoices=50, maxNumberOfPlayersPerGroup = 5, difficultyWeight = 0.5, profileWeight=0.5)
+
+iteration = adaptation.iterate()
+print(json.dumps(iteration, default=lambda o: o.__dict__, sort_keys=True))
+
 
 iteration = adaptation.iterate()
 for i in range(len(iteration.groups)):

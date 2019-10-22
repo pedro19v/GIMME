@@ -1,4 +1,3 @@
-import numpy
 from PlayerStructs import *
 
 class PlayerModelMock(object):
