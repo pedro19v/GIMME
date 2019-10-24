@@ -1,3 +1,5 @@
+import numpy
+import math
 from collections import namedtuple
 from AuxStructs.InteractionsProfile import InteractionsProfile
 
@@ -13,19 +15,19 @@ class PlayerState(object):
 		self.dist = dist
 
 class PlayerStateGrid(object):
-	def __init__(self, numCells=1, maxAmountOfStoredProfilesPerCell=30):
-		self.numCells = numCells;
-		self.maxAmountOfStoredProfilesPerCell = maxAmountOfStoredProfilesPerCell;
-		self.cells = [[]]
+	def __init__(self, cells=[], numCells=1, maxAmountOfStoredProfilesPerCell=30):
+		self.numCells = numCells
+		self.maxAmountOfStoredProfilesPerCell = maxAmountOfStoredProfilesPerCell
+		self.cells = cells
 
 	def pushToGrid(self, playerState):
-		dimSpan = cbrt(numCells-1);
-		currCellInd = (dimSpan * dimSpan * floor(dimSpan * model.profile.K_cl) + dimSpan * floor(dimSpan * model.profile.K_cp) + floor(dimSpan* model.profile.K_i))
-		
+		dimSpan = numpy.cbrt(self.numCells-1);
+		currCellInd = (dimSpan * dimSpan * math.floor(dimSpan * playerState.profile.K_cl) + dimSpan * math.floor(dimSpan * playerState.profile.K_cp) + math.floor(dimSpan* playerState.profile.K_i))
+		currCellInd = int(currCellInd)
 		currCell = self.cells[currCellInd]
 		currCell.append(playerState)
-		cellsSize = len(cells[currCellInd])
-		if (cellsSize > maxAmountOfStoredProfilesPerCell):
-			currCell = currCell[maxAmountOfStoredProfilesPerCell:]
+		cellsSize = len(self.cells[currCellInd])
+		if (cellsSize > self.maxAmountOfStoredProfilesPerCell):
+			currCell = currCell[self.maxAmountOfStoredProfilesPerCell:]
 
 		self.cells[currCellInd] = currCell

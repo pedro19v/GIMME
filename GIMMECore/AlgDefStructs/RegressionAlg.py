@@ -26,7 +26,7 @@ class KNNRegression(RegressionAlg):
 
 	def predict(self, profile, playerModelBridge, playerId):
 
-		pastModelIncs = playerModelBridge.getPlayerPastModelIncreases(playerId)
+		pastModelIncs = playerModelBridge.getPlayerPastModelIncreases(playerId).cells
 		pastModelIncsCopy = copy.deepcopy(pastModelIncs)
 		pastModelIncsSize = len(pastModelIncs)
 
@@ -39,14 +39,13 @@ class KNNRegression(RegressionAlg):
 		pastModelIncsCopySize = len(pastModelIncsCopy)
 
 		for i in pastModelIncsCopy:
-			for j in i:
-				pastProfile = j.interactionsProfile
-				pastCharacteristics = j.characteristics
-				distance = profile.distanceBetween(pastProfile)
+			pastProfile = i.profile
+			pastCharacteristics = i.characteristics
+			distance = profile.distanceBetween(pastProfile)
 
-				predictedState.characteristics.ability += (pastCharacteristics.ability* (1 - distance)) / pastModelIncsCopySize #* (1 - distance) 
-				predictedState.characteristics.engagement += (pastCharacteristics.engagement* (1 - distance)) / pastModelIncsCopySize #* (1 - distance)
-			
+			predictedState.characteristics.ability += (pastCharacteristics.ability* (1 - distance)) / pastModelIncsCopySize #* (1 - distance) 
+			predictedState.characteristics.engagement += (pastCharacteristics.engagement* (1 - distance)) / pastModelIncsCopySize #* (1 - distance)
+		
 		return predictedState;
 
 

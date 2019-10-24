@@ -34,6 +34,11 @@ class RandomConfigsGen(ConfigsGenAlg):
 
 	def organize(self, playerModelBridge, playerIds, numberOfConfigChoices, minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup, regAlg, fitAlg):
 		bestConfig = AdaptationConfiguration()
+
+
+		if(len(playerIds) < minNumberOfPlayersPerGroup):
+			return bestConfig
+
 		currMaxFitness = -1.0
 
 		minNumGroups = math.ceil(len(playerIds) / maxNumberOfPlayersPerGroup)
@@ -50,6 +55,7 @@ class RandomConfigsGen(ConfigsGenAlg):
 				numGroups = random.randint(minNumGroups, maxNumGroups)
 			else: # players length is 1
 				numGroups = minNumGroups
+
 
 			# generate min groups
 			playersWithoutGroupSize = 0
@@ -69,6 +75,7 @@ class RandomConfigsGen(ConfigsGenAlg):
 					profile.K_cp = newRand2 / newRandSum;
 					profile.K_i = newRand3 / newRandSum;
 				currGroup.interactionsProfile = profile;
+
 
 				# add min number of players to the group
 				for s in range(minNumberOfPlayersPerGroup):
