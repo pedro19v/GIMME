@@ -14,15 +14,8 @@ class KNNRegression(RegressionAlg):
 	def __init__(self, numberOfNNs):
 		self.numberOfNNs = numberOfNNs;
 
-	def interactionsProfileSort(self, pState1, pState2):
-
-		dist1 = testedProfile.distanceBetween(pState1.profile)
-		dist2 = testedProfile.distanceBetween(pState2.profile)
-
-		pState1.dist = dist1
-		pState2.dist = dist2
-
-		return dist1 < dist2
+	def interactionsProfileSort(self, elem):
+		return elem.dist
 
 	def predict(self, profile, playerModelBridge, playerId):
 
@@ -31,7 +24,11 @@ class KNNRegression(RegressionAlg):
 		pastModelIncsSize = len(pastModelIncs)
 
 		predictedState = PlayerState(profile, PlayerCharacteristics())
-		# predictedState = sorted(predictedState, key=self.interactionsProfileSort(profile))
+
+		for modelInc in pastModelIncsCopy:
+			modelInc.dist = profile.distanceBetween(modelInc.profile)
+
+		pastModelIncsCopy = sorted(pastModelIncsCopy, key=self.interactionsProfileSort)
 
 		if (pastModelIncsSize > self.numberOfNNs):
 			pastModelIncsCopy = numpy.resize(pastModelIncsCopy, self.numberOfNNs)
