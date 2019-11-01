@@ -18,7 +18,8 @@ class PlayerStateGrid(object):
 	def __init__(self, cells=[], numCells=1, maxAmountOfStoredProfilesPerCell=30):
 		self.numCells = numCells
 		self.maxAmountOfStoredProfilesPerCell = maxAmountOfStoredProfilesPerCell
-		self.cells = cells
+		self.cells = [[]*maxAmountOfStoredProfilesPerCell]*numCells
+		print(cells)
 
 	def pushToGrid(self, playerState):
 		dimSpan = numpy.cbrt(self.numCells-1);
@@ -31,3 +32,10 @@ class PlayerStateGrid(object):
 			currCell = currCell[self.maxAmountOfStoredProfilesPerCell:]
 
 		self.cells[currCellInd] = currCell
+
+	def getAllCells(self):
+		allCells = []
+		for cell in self.cells:
+			for item in cell:
+				allCells.append(cell) 
+		return allCells
