@@ -7,6 +7,11 @@ class InteractionsProfile(object):
 		self.K_cp = K_cp
 		self.K_i = K_i
 
+	def reset(self):
+		self.K_cl = 0
+		self.K_cp = 0
+		self.K_i = 0
+
 	def normalizedDistanceBetween(self, profileToTest):
 		profile1 = self
 		cost = InteractionsProfile()

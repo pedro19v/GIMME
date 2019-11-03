@@ -7,19 +7,32 @@ class PlayerCharacteristics(object):
 	def __init__(self, ability=0, engagement=0):
 		self.ability = ability
 		self.engagement = engagement
+	def reset(self):
+		self.ability = 0
+		self.engagement = 0
 
 class PlayerState(object):
 	def __init__(self, profile = InteractionsProfile(), characteristics = PlayerCharacteristics(), dist = 0):
 		self.profile = profile
 		self.characteristics = characteristics
 		self.dist = dist
+	def reset(self):
+		self.profile = InteractionsProfile()
+		self.characteristics = PlayerCharacteristics()
+		self.dist = 0
 
 class PlayerStateGrid(object):
-	def __init__(self, cells=[], numCells=1, maxAmountOfStoredProfilesPerCell=30):
+	def __init__(self, cells=None, numCells=1, maxAmountOfStoredProfilesPerCell=30):
 		self.numCells = numCells
 		self.maxAmountOfStoredProfilesPerCell = maxAmountOfStoredProfilesPerCell
-		self.cells = [[]*maxAmountOfStoredProfilesPerCell]*numCells
+		if(cells == None):
+			self.cells = [[]*maxAmountOfStoredProfilesPerCell]*numCells
+		else:
+			self.cells = cells
 		print(cells)
+
+	def reset(self):
+		self.cells = [[]*maxAmountOfStoredProfilesPerCell]*numCells
 
 	def pushToGrid(self, playerState):
 		dimSpan = numpy.cbrt(self.numCells-1);
@@ -33,9 +46,10 @@ class PlayerStateGrid(object):
 
 		self.cells[currCellInd] = currCell
 
-	def getAllCells(self):
-		allCells = []
+	def getAllStates(self):
+		# serialize multi into single dimensional array
+		allStates = []
 		for cell in self.cells:
-			for item in cell:
-				allCells.append(cell) 
-		return allCells
+			for state in cell:
+				allStates.append(state) 
+		return allStates

@@ -1,3 +1,4 @@
+import json
 from AuxStructs.InteractionsProfile import InteractionsProfile
 from PlayerStructs import *
 
@@ -19,9 +20,14 @@ class AdaptationGroup(object):
 		playersSize = len(self.playerIds);
 
 		# recalculate averages
-		self.avgPlayerState = PlayerState();
+		self.avgPersonality.reset()
+		self.avgPlayerState.reset()
+
+		print("avgggg: ")
+		print(json.dumps(self.avgPlayerState, default=lambda o: o.__dict__, sort_keys=True))
 
 		for i in range(playersSize):
+			playersSize = float(playersSize)
 			currPlayerId = self.playerIds[i];
 
 			currPlayerCharacteristics = playerModelBridge.getPlayerCurrCharacteristics(currPlayerId)
