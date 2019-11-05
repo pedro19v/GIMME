@@ -40,7 +40,8 @@ class AdaptationGroup(object):
 			# print(currPlayerPersonality.K_cl)
 			self.avgPersonality.K_i  += currPlayerPersonality.K_i / playersSize;
 			self.avgPersonality.K_cp  += currPlayerPersonality.K_cp / playersSize;
-			self.avgPersonality.K_cl  += currPlayerPersonality.K_cl / playersSize;
+			self.avgPersonality.K_mh  += currPlayerPersonality.K_mh / playersSize;
+			self.avgPersonality.K_pa  += currPlayerPersonality.K_pa / playersSize;
 		
 		
 

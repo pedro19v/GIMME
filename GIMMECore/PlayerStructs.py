@@ -22,22 +22,22 @@ class PlayerState(object):
 		self.dist = 0
 
 class PlayerStateGrid(object):
-	def __init__(self, cells=None, numCells=1, maxAmountOfStoredProfilesPerCell=30):
+	def __init__(self, numCells=1, maxAmountOfStoredProfilesPerCell=30,  cells=None):
 		self.numCells = numCells
 		self.maxAmountOfStoredProfilesPerCell = maxAmountOfStoredProfilesPerCell
 		if(cells == None):
 			self.cells = [[]*maxAmountOfStoredProfilesPerCell]*numCells
 		else:
 			self.cells = cells
-		print(cells)
 
 	def reset(self):
 		self.cells = [[]*maxAmountOfStoredProfilesPerCell]*numCells
 
 	def pushToGrid(self, playerState):
-		dimSpan = numpy.cbrt(self.numCells-1);
-		currCellInd = (dimSpan * dimSpan * math.floor(dimSpan * playerState.profile.K_cl) + dimSpan * math.floor(dimSpan * playerState.profile.K_cp) + math.floor(dimSpan* playerState.profile.K_i))
+		dimSpan = (self.numCells-1)**(1/float(4)) #root 4
+		currCellInd = (dimSpan *dimSpan*dimSpan * math.floor(dimSpan * playerState.profile.K_cp) + dimSpan*dimSpan*  math.floor(dimSpan * playerState.profile.K_i) + dimSpan * math.floor(dimSpan* playerState.profile.K_mh) + math.floor(dimSpan* playerState.profile.K_pa))
 		currCellInd = int(currCellInd)
+		print(self.cells)
 		currCell = self.cells[currCellInd]
 		currCell.append(playerState)
 		cellsSize = len(self.cells[currCellInd])

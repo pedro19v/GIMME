@@ -66,14 +66,16 @@ class RandomConfigsGen(ConfigsGenAlg):
 				newRand1 = random.uniform(0, 1)
 				newRand2 = random.uniform(0, 1)
 				newRand3 = random.uniform(0, 1)
+				newRand4 = random.uniform(0, 1)
 
-				newRandSum = newRand1 + newRand2 + newRand3;
+				newRandSum = newRand1 + newRand2 + newRand3 + newRand4
 
 				profile = InteractionsProfile();
 				if(newRandSum > 0):
-					profile.K_cl = newRand1 / newRandSum;
-					profile.K_cp = newRand2 / newRandSum;
-					profile.K_i = newRand3 / newRandSum;
+					profile.K_cp = newRand1 / newRandSum;
+					profile.K_i = newRand2 / newRandSum;
+					profile.K_mh = newRand3 / newRandSum;
+					profile.K_pa = newRand4 / newRandSum;
 				currGroup.interactionsProfile = profile;
 
 

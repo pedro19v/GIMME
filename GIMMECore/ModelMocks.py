@@ -1,7 +1,8 @@
+import random
 from PlayerStructs import *
 
 class PlayerModelMock(object):
-	def __init__(self, id, name, currState, pastModelIncreasesGrid, currModelIncreases, personality):
+	def __init__(self, id, name, currState, pastModelIncreasesGrid, currModelIncreases, personality, numIterationsPerRun):
 		self.currState = currState
 
 		self.id = id
@@ -12,6 +13,12 @@ class PlayerModelMock(object):
 		
 		# for displaying in charts
 		self.currModelIncreases = currModelIncreases; 
+
+		# for simulations
+		self.inherentPreference = None
+		self.baseLearningRate = None
+		self.iterationReactions = None
+
 
 class TaskModelMock(object):
 	def __init__(self, id, description, minRequiredAbility, profile, difficultyWeight, profileWeight):
