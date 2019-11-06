@@ -5,23 +5,18 @@ import copy
 
 import time
 
-
-# to make it less untolerably slow
-from joblib import Parallel, delayed
-
 import matplotlib.pyplot as plt
 import math
-
 
 
 from GIMMECore import *
 from ModelMocks import *
 
 
-t0= time.clock()
+t0 = time.clock()
 
 
-numRuns = 2
+numRuns = 1
 numIterationsPerRun = 30
 numTrainingCyclesPerRun = 30
 
@@ -126,18 +121,16 @@ class CustomPlayerModelBridge(PlayerModelBridge):
 
 def simulateReaction(currIteration, playerBridge, playerId):
 	currState = playerBridge.getPlayerCurrState(playerId)
-	newState = calcReaction(copy.deepcopy(currState), playerBridge, playerId, currIteration)
+	newState = calcReaction(copy.deepcopy(currState), playerBridge, playerId, currState.profile, currIteration)
 
 	newState.characteristics = PlayerCharacteristics(ability=(newState.characteristics.ability - currState.characteristics.ability), engagement=newState.characteristics.engagement)
 	# print(json.dumps(currState.characteristics, default=lambda o: o.__dict__, sort_keys=True))
 	# print(json.dumps(newState.characteristics, default=lambda o: o.__dict__, sort_keys=True))
 	playerBridge.savePlayerState(playerId, newState)
 
-def calcReaction(state, playerBridge, playerId, currIteration):
+def calcReaction(state, playerBridge, playerId, interactionsProfile, currIteration):
 	inherentPreference = playerBridge.getInherentPreference(playerId)
-	newState = state
-
-	state.characteristics.engagement = 0.5* (state.characteristics.engagement) + 0.5* (1.0 - inherentPreference.distanceBetween(state.profile))
+	state.characteristics.engagement = 0.5* (state.characteristics.engagement) + 0.5* (1.0 - inherentPreference.distanceBetween(interactionsProfile))
 
 	currTaskReaction = playerBridge.getIterationReactions(playerId, currIteration)
 	abilityIncreaseSim = (currTaskReaction * state.characteristics.engagement) #between 0 and 1
@@ -205,7 +198,7 @@ def executeSimulations(adaptation,abilityArray,engagementArray,profDiffArray, is
 				simulateReaction(i, playerBridge, x) 
 
 		for i in range(numIterationsPerRun):
-			if isOptimalRun:
+			if isOptimalRun == True:
 				simOptimalFitness.updateCurrIteration(i)
 
 

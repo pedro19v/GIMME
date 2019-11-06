@@ -46,7 +46,6 @@ class RandomConfigsGen(ConfigsGenAlg):
 		
 		# generate several random groups, calculate their fitness and select the best one
 		for i in range(numberOfConfigChoices):
-			lastProfile = False
 			currFitness = 0.0
 			playersWithoutGroup = playerIds.copy()
 			newConfig = AdaptationConfiguration()
