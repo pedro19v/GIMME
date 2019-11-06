@@ -18,19 +18,26 @@ from GIMMECore import *
 from ModelMocks import *
 
 
+
 t0= time.clock()
 
 
-numRuns = 2
+
+numThreads = 16
+
+
+numRuns = 1
 numIterationsPerRun = 30
 numTrainingCyclesPerRun = 30
 
 playerWindow = 30
 
 numPlayers = 23
+numTasks = 20
+
 
 players = [None for x in range(numPlayers)]
-tasks = [None for x in range(20)]
+tasks = [None for x in range(numTasks)]
 
 class CustomTaskModelBridge(TaskModelBridge):
 	
@@ -148,23 +155,29 @@ def calcReaction(state, playerBridge, playerId, currIteration):
 
 # create players, tasks and adaptation
 playerBridge = CustomPlayerModelBridge()
-for x in range(numPlayers):
-	playerBridge.registerNewPlayer(int(x), "name", PlayerState(), PlayerStateGrid(1, playerWindow), PlayerCharacteristics(), InteractionsProfile(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1)), numIterationsPerRun)
+# for x in range(numPlayers):
+# 	playerBridge.registerNewPlayer(int(x), "name", PlayerState(), PlayerStateGrid(1, playerWindow), PlayerCharacteristics(), InteractionsProfile(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1)), numIterationsPerRun)
+def parallelLoop1(x):
+	playerBridge.registerNewPlayer(x, "name", PlayerState(), PlayerStateGrid(1, playerWindow), PlayerCharacteristics(), InteractionsProfile(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1)), numIterationsPerRun)
+Parallel(n_jobs=numThreads, require='sharedmem')(delayed(parallelLoop1)(x) for x in range(numPlayers))
+
 
 # print(json.dumps(players, default=lambda o: o.__dict__, sort_keys=True))
 
 taskBridge = CustomTaskModelBridge()
-for x in range(20):
+# for x in range(20):
+# 	taskBridge.registerNewTask(int(x), "description", random.uniform(0, 1), InteractionsProfile(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1)), 0.5, 0.5)
+def parallelLoop2(x):
 	taskBridge.registerNewTask(int(x), "description", random.uniform(0, 1), InteractionsProfile(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1)), 0.5, 0.5)
+Parallel(n_jobs=numThreads, require='sharedmem')(delayed(parallelLoop2)(x) for x in range(numTasks))
 
-adaptationGIMME = Adaptation()
-adaptationRandom = Adaptation()
-adaptationOptimal = Adaptation()
+
+adaptation = Adaptation()
 
 
 
 # init players
-for x in range(numPlayers):
+def parallelLoop3(x):
 	playerBridge.saveInherentPreference(x, InteractionsProfile(K_i=numpy.random.uniform(0, 1), K_cp=numpy.random.uniform(0, 1), K_mh=numpy.random.uniform(0, 1), K_pa=numpy.random.uniform(0, 1)))
 	playerBridge.saveBaseLearningRate(x, numpy.random.uniform(0.2, 0.6))
 	playerBridge.initIterationReactions(x, [0]*numIterationsPerRun)
@@ -172,55 +185,37 @@ for x in range(numPlayers):
 	for p in range(playerWindow):
 		playerBridge.saveIterationReaction(x, p, numpy.random.normal(playerBridge.getBaseLearningRate(x), 0.05))
 
+Parallel(n_jobs=numThreads, require='sharedmem')(delayed(parallelLoop3)(x) for x in range(numPlayers))
 
 
-simOptimalFitness = SimulationsOptimalFitness(calcReaction, PlayerCharacteristics(ability=1.0, engagement=0.0)) #needed for currIteration updates
-
-adaptationGIMME.init(KNNRegression(5), RandomConfigsGen(), WeightedFitness(PlayerCharacteristics(ability=0.5, engagement=0.5)), playerBridge, taskBridge, name="", numberOfConfigChoices=100, maxNumberOfPlayersPerGroup = 5, difficultyWeight = 0.5, profileWeight=0.5)
-adaptationRandom.init(KNNRegression(5), RandomConfigsGen(), RandomFitness(), playerBridge, taskBridge, name="", numberOfConfigChoices=100, maxNumberOfPlayersPerGroup = 5, difficultyWeight = 0.5, profileWeight=0.5)
-adaptationOptimal.init(KNNRegression(5), RandomConfigsGen(), simOptimalFitness, playerBridge, taskBridge, name="", numberOfConfigChoices=100, maxNumberOfPlayersPerGroup = 5, difficultyWeight = 0.5, profileWeight=0.5)
+adaptation.init(KNNRegression(5), RandomConfigsGen(), WeightedFitness(PlayerCharacteristics(ability=0.5, engagement=0.5)), playerBridge, taskBridge, name="", numberOfConfigChoices=100, maxNumberOfPlayersPerGroup = 5, difficultyWeight = 0.5, profileWeight=0.5)
 
 
 GIMMEAbilities = [0 for i in range(numIterationsPerRun)]
 GIMMEEngagements = [0 for i in range(numIterationsPerRun)]
 GIMMEPrefProfDiff = [0 for i in range(numIterationsPerRun)]
 
+for r in range(numRuns):
 
-randomAbilities = [0 for i in range(numIterationsPerRun)]
-randomEngagements = [0 for i in range(numIterationsPerRun)]
-randomPrefProfDiff = [0 for i in range(numIterationsPerRun)]
+	def parallelLoop4(x):
+		playerBridge.resetPlayerPastModelIncreases(x)
+	Parallel(n_jobs=numThreads, require='sharedmem')(delayed(parallelLoop4)(x) for x in range(numPlayers))
 
+	for i in range(numTrainingCyclesPerRun):
+		def parallelLoop5(x):
+			simulateReaction(i, playerBridge, x) 
+		Parallel(n_jobs=numThreads, require='sharedmem')(delayed(parallelLoop5)(x) for x in range(numPlayers))
 
-optimalAbilities = [0 for i in range(numIterationsPerRun)]
-optimalEngagements = [0 for i in range(numIterationsPerRun)]
-optimalPrefProfDiff = [0 for i in range(numIterationsPerRun)]
+	for i in range(numIterationsPerRun):
+		print("step " +str(i)+ " of "+str(numIterationsPerRun)+" of run "+str(r)+"						", end="\r")
+		iteration = adaptation.iterate()
 
-def executeSimulations(adaptation,abilityArray,engagementArray,profDiffArray, isOptimalRun):
-	for r in range(numRuns):
-		for x in range(numPlayers):
-			playerBridge.resetPlayerPastModelIncreases(x)
-
-		for i in range(numTrainingCyclesPerRun):
-			for x in range(numPlayers):
-				simulateReaction(i, playerBridge, x) 
-
-		for i in range(numIterationsPerRun):
-			if isOptimalRun:
-				simOptimalFitness.updateCurrIteration(i)
-
-
-			print("step " +str(i)+ " of "+str(numIterationsPerRun)+" of run "+str(r)+"						", end="\r")
-			iteration = adaptation.iterate()
-
-			for x in range(numPlayers):
-				abilityArray[i] += playerBridge.getPlayerCurrCharacteristics(x).ability / (numIterationsPerRun*numRuns)
-				engagementArray[i] += playerBridge.getPlayerCurrCharacteristics(x).engagement / (numIterationsPerRun*numRuns)
-				profDiffArray[i] += playerBridge.getInherentPreference(x).distanceBetween(playerBridge.getPlayerCurrProfile(x)) / (numIterationsPerRun*numRuns)
-				simulateReaction(i, playerBridge, x)
-
-executeSimulations(adaptationGIMME,GIMMEAbilities,GIMMEEngagements,GIMMEPrefProfDiff, False)
-executeSimulations(adaptationRandom,randomAbilities,randomEngagements,randomPrefProfDiff, False)
-executeSimulations(adaptationOptimal,optimalAbilities,optimalEngagements,optimalPrefProfDiff,True)
+		def parallelLoop6(x):
+			GIMMEAbilities[i] += playerBridge.getPlayerCurrCharacteristics(x).ability / (numIterationsPerRun*numRuns)
+			GIMMEEngagements[i] += playerBridge.getPlayerCurrCharacteristics(x).engagement / (numIterationsPerRun*numRuns)
+			GIMMEPrefProfDiff[i] += playerBridge.getInherentPreference(x).distanceBetween(playerBridge.getPlayerCurrProfile(x)) / (numIterationsPerRun*numRuns)
+			simulateReaction(i, playerBridge, x)
+		Parallel(n_jobs=numThreads, require='sharedmem')(delayed(parallelLoop6)(x) for x in range(numPlayers))
 
 
 # GIMMEAbilities = [0] + GIMMEAbilities
@@ -232,11 +227,13 @@ t1 = time.clock() - t0
 print("Time elapsed: ", t1 - t0) # CPU seconds elapsed (floating point)
 
 
+
 timesteps=[i for i in range(numIterationsPerRun)]
 
 plt.plot(timesteps, GIMMEAbilities, label=r'$GIMME\ group\ formation\ strategy$')
-plt.plot(timesteps, randomAbilities, label=r'$Random\ group\ formation\ strategy$')
-plt.plot(timesteps, optimalAbilities, label=r'$Optimal\ group\ formation\ strategy$')
+# plt.plot(timesteps, optimalAbilities, label=r'$Optimal\ group\ formation\ strategy$')
+# plt.plot(timesteps, IALAbilities, label=r'$IAL\ group\ formation\ strategy$')
+# plt.plot(timesteps, IALAbilities2, label=r'$IAL\ group\ formation\ strategy\ 100\ profiles$')
 
 plt.xlabel("Iteration")
 plt.ylabel("Ability Increase")
@@ -247,8 +244,9 @@ plt.show()
 
 
 plt.plot(timesteps, GIMMEEngagements, label=r'$GIMME\ group\ formation\ strategy$')
-plt.plot(timesteps, randomEngagements, label=r'$Random\ group\ formation\ strategy$')
-plt.plot(timesteps, optimalEngagements, label=r'$Optimal\ group\ formation\ strategy$')
+# plt.plot(timesteps, optimalAbilities, label=r'$Optimal\ group\ formation\ strategy$')
+# plt.plot(timesteps, IALAbilities, label=r'$IAL\ group\ formation\ strategy$')
+# plt.plot(timesteps, IALAbilities2, label=r'$IAL\ group\ formation\ strategy\ 100\ profiles$')
 
 plt.xlabel("Iteration")
 plt.ylabel("Engagement Increase")
@@ -256,10 +254,10 @@ plt.ylabel("Engagement Increase")
 plt.legend(loc='best')
 plt.show()
 
-
 plt.plot(timesteps, GIMMEPrefProfDiff, label=r'$GIMME\ group\ formation\ strategy$')
-plt.plot(timesteps, randomPrefProfDiff, label=r'$Random\ group\ formation\ strategy$')
-plt.plot(timesteps, optimalPrefProfDiff, label=r'$Optimal\ group\ formation\ strategy$')
+# plt.plot(timesteps, optimalAbilities, label=r'$Optimal\ group\ formation\ strategy$')
+# plt.plot(timesteps, IALAbilities, label=r'$IAL\ group\ formation\ strategy$')
+# plt.plot(timesteps, IALAbilities2, label=r'$IAL\ group\ formation\ strategy\ 100\ profiles$')
 
 plt.xlabel("Iteration")
 plt.ylabel("prof diff Increase")

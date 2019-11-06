@@ -14,10 +14,20 @@ class RandomFitness(FitnessAlg):
 
 
 class SimulationsOptimalFitness(FitnessAlg):
+	def __init__(self, simulationFunc, stateWeights):
+		self.stateWeights = stateWeights
+		self.simulationFunc = simulationFunc
+		self.currIteration = 0
+
+	def updateCurrIteration(self, newCurrIteration):
+		self.currIteration = newCurrIteration
+
 	def calculate(self, playerModelBridge, playerId, interactionsProfile, regAlg):
-		predictedState = copy.deepcopy(playerModelBridge.getCurrState(playerId))
-		abilityInc = predictedState.characteristics.ability - playerModelBridge.getCurrState(playerId).characteristics.ability
-		return abilityInc;
+		currState = copy.deepcopy(playerModelBridge.getPlayerCurrState(playerId))
+		newState = self.simulationFunc(copy.deepcopy(currState), playerModelBridge, playerId, self.currIteration)
+
+		newState.characteristics = PlayerCharacteristics(ability=(newState.characteristics.ability - currState.characteristics.ability), engagement=newState.characteristics.engagement)
+		return self.stateWeights.ability*newState.characteristics.ability + self.stateWeights.engagement*newState.characteristics.engagement
 
 class WeightedFitness(FitnessAlg):
 	def __init__(self, stateWeights):
