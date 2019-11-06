@@ -23,9 +23,6 @@ class AdaptationGroup(object):
 		self.avgPersonality.reset()
 		self.avgPlayerState.reset()
 
-		print("avgggg: ")
-		print(json.dumps(self.avgPlayerState, default=lambda o: o.__dict__, sort_keys=True))
-
 		for i in range(playersSize):
 			playersSize = float(playersSize)
 			currPlayerId = self.playerIds[i];

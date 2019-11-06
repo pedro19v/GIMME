@@ -3,11 +3,18 @@ import random
 import json
 import copy
 
+# to make it less untolerably slow
+from joblib import Parallel, delayed
+
+import matplotlib.pyplot as plt
+import math
+
+
 
 from GIMMECore import *
 from ModelMocks import *
 
-numRuns = 100
+numRuns = 1
 numIterationsPerRun = 30
 numTrainingCyclesPerRun = 30
 
@@ -43,6 +50,9 @@ class CustomPlayerModelBridge(PlayerModelBridge):
 	
 	def registerNewPlayer(self, playerId, name, currState, pastModelIncreasesGrid, currModelIncreases, personality, numIterationsPerRun):
 		players[int(playerId)] = PlayerModelMock(playerId, name, currState, pastModelIncreasesGrid, currModelIncreases, personality, numIterationsPerRun)	
+
+	def resetPlayerPastModelIncreases(self, playerId):
+		players[int(playerId)].pastModelIncreasesGrid.reset()
 
 	def savePlayerState(self, playerId, newState):
 		players[int(playerId)].currState = newState
@@ -108,21 +118,24 @@ class CustomPlayerModelBridge(PlayerModelBridge):
 
 
 def simulateReaction(currIteration, playerBridge, playerId):
-	currState = copy.deepcopy(playerBridge.getPlayerCurrState(playerId))
-	increases = calcReaction(currState, playerBridge, playerId, currIteration)
+	currState = playerBridge.getPlayerCurrState(playerId)
+	newState = calcReaction(copy.deepcopy(currState), playerBridge, playerId, currIteration)
 
-	increases.characteristics = PlayerCharacteristics(ability=(currState.characteristics.ability - increases.characteristics.ability), engagement=currState.characteristics.engagement)
-	playerBridge.savePlayerState(playerId, increases)
+	newState.characteristics = PlayerCharacteristics(ability=(newState.characteristics.ability - currState.characteristics.ability), engagement=newState.characteristics.engagement)
+	# print(json.dumps(currState.characteristics, default=lambda o: o.__dict__, sort_keys=True))
+	# print(json.dumps(newState.characteristics, default=lambda o: o.__dict__, sort_keys=True))
+	playerBridge.savePlayerState(playerId, newState)
 
 def calcReaction(state, playerBridge, playerId, currIteration):
-	currProfile = copy.deepcopy(state.profile)
 	inherentPreference = playerBridge.getInherentPreference(playerId)
+	newState = state
 
 	state.characteristics.engagement = 0.5* (state.characteristics.engagement) + 0.5* (1.0 - inherentPreference.distanceBetween(state.profile))
 
 	currTaskReaction = playerBridge.getIterationReactions(playerId, currIteration)
-	abilityIncreaseSim = (currTaskReaction * state.characteristics.engagement); #between 0 and 1
-	state.characteristics.ability += abilityIncreaseSim;
+	abilityIncreaseSim = (currTaskReaction * state.characteristics.engagement) #between 0 and 1
+	state.characteristics.ability = state.characteristics.ability + abilityIncreaseSim
+	
 	return state
 
 
@@ -130,6 +143,8 @@ def calcReaction(state, playerBridge, playerId, currIteration):
 playerBridge = CustomPlayerModelBridge()
 for x in range(numPlayers):
 	playerBridge.registerNewPlayer(int(x), "name", PlayerState(), PlayerStateGrid(1, playerWindow), PlayerCharacteristics(), InteractionsProfile(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1)), numIterationsPerRun)
+
+print(json.dumps(players, default=lambda o: o.__dict__, sort_keys=True))
 
 taskBridge = CustomTaskModelBridge()
 for x in range(20):
@@ -152,16 +167,67 @@ for x in range(numPlayers):
 adaptation.init(KNNRegression(5), RandomConfigsGen(), WeightedFitness(PlayerCharacteristics(ability=0.5, engagement=0.5)), playerBridge, taskBridge, name="", numberOfConfigChoices=100, maxNumberOfPlayersPerGroup = 5, difficultyWeight = 0.5, profileWeight=0.5)
 
 
+GIMMEAbilities = [0 for i in range(numIterationsPerRun)]
+GIMMEEngagements = [0 for i in range(numIterationsPerRun)]
+GIMMEPrefProfDiff = [0 for i in range(numIterationsPerRun)]
+
 for r in range(numRuns):
+	for x in range(numPlayers):
+		playerBridge.resetPlayerPastModelIncreases(x)
 
 	for i in range(numTrainingCyclesPerRun):
 		for x in range(numPlayers):
 			simulateReaction(i, playerBridge, x) 
 
 	for i in range(numIterationsPerRun):
+		print("step " +str(i)+ " of "+str(numIterationsPerRun)+" of run "+str(r)+"						", end="\r")
 		iteration = adaptation.iterate()
 
 		for x in range(numPlayers):
-			simulateReaction(i, playerBridge, x) 
+			GIMMEAbilities[i] += playerBridge.getPlayerCurrCharacteristics(x).ability / (numIterationsPerRun*numRuns)
+			GIMMEEngagements[i] += playerBridge.getPlayerCurrCharacteristics(x).engagement / (numIterationsPerRun*numRuns)
+			GIMMEPrefProfDiff[i] += playerBridge.getInherentPreference(x).distanceBetween(playerBridge.getPlayerCurrProfile(x)) / (numIterationsPerRun*numRuns)
+			simulateReaction(i, playerBridge, x)
 
+
+# GIMMEAbilities = [0] + GIMMEAbilities
+# GIMMEEngagements = [0] + GIMMEEngagements
+# GIMMEPrefProfDiff = [0] + GIMMEPrefProfDiff
+
+timesteps=[i for i in range(numIterationsPerRun)]
+
+plt.plot(timesteps, GIMMEAbilities, label=r'$GIMME\ group\ formation\ strategy$')
+# plt.plot(timesteps, optimalAbilities, label=r'$Optimal\ group\ formation\ strategy$')
+# plt.plot(timesteps, IALAbilities, label=r'$IAL\ group\ formation\ strategy$')
+# plt.plot(timesteps, IALAbilities2, label=r'$IAL\ group\ formation\ strategy\ 100\ profiles$')
+
+plt.xlabel("Iteration")
+plt.ylabel("Ability Increase")
+
+plt.legend(loc='best')
+plt.show()
+
+
+
+plt.plot(timesteps, GIMMEEngagements, label=r'$GIMME\ group\ formation\ strategy$')
+# plt.plot(timesteps, optimalAbilities, label=r'$Optimal\ group\ formation\ strategy$')
+# plt.plot(timesteps, IALAbilities, label=r'$IAL\ group\ formation\ strategy$')
+# plt.plot(timesteps, IALAbilities2, label=r'$IAL\ group\ formation\ strategy\ 100\ profiles$')
+
+plt.xlabel("Iteration")
+plt.ylabel("Engagement Increase")
+
+plt.legend(loc='best')
+plt.show()
+
+plt.plot(timesteps, GIMMEPrefProfDiff, label=r'$GIMME\ group\ formation\ strategy$')
+# plt.plot(timesteps, optimalAbilities, label=r'$Optimal\ group\ formation\ strategy$')
+# plt.plot(timesteps, IALAbilities, label=r'$IAL\ group\ formation\ strategy$')
+# plt.plot(timesteps, IALAbilities2, label=r'$IAL\ group\ formation\ strategy\ 100\ profiles$')
+
+plt.xlabel("Iteration")
+plt.ylabel("prof diff Increase")
+
+plt.legend(loc='best')
+plt.show()
 

@@ -20,7 +20,7 @@ class KNNRegression(RegressionAlg):
 	def predict(self, profile, playerModelBridge, playerId):
 
 		pastModelIncs = playerModelBridge.getPlayerPastModelIncreases(playerId).getAllStates()
-		print(pastModelIncs)
+		# print(pastModelIncs)
 		pastModelIncsCopy = copy.deepcopy(pastModelIncs)
 		pastModelIncsSize = len(pastModelIncs)
 

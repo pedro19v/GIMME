@@ -17,27 +17,31 @@ class PlayerState(object):
 		self.characteristics = characteristics
 		self.dist = dist
 	def reset(self):
-		self.profile = InteractionsProfile()
-		self.characteristics = PlayerCharacteristics()
+		self.profile.reset()
+		self.characteristics.reset()
 		self.dist = 0
 
 class PlayerStateGrid(object):
 	def __init__(self, numCells=1, maxAmountOfStoredProfilesPerCell=30,  cells=None):
 		self.numCells = numCells
 		self.maxAmountOfStoredProfilesPerCell = maxAmountOfStoredProfilesPerCell
-		if(cells == None):
-			self.cells = [[]*maxAmountOfStoredProfilesPerCell]*numCells
+		self.initialCells = cells
+		if(self.initialCells == None):
+			self.cells = [[]*self.maxAmountOfStoredProfilesPerCell]*self.numCells
 		else:
 			self.cells = cells
 
 	def reset(self):
-		self.cells = [[]*maxAmountOfStoredProfilesPerCell]*numCells
+		if(self.initialCells == None):
+			self.cells = [[]*self.maxAmountOfStoredProfilesPerCell]*self.numCells
+		else:
+			self.cells = cells
 
 	def pushToGrid(self, playerState):
 		dimSpan = (self.numCells-1)**(1/float(4)) #root 4
 		currCellInd = (dimSpan *dimSpan*dimSpan * math.floor(dimSpan * playerState.profile.K_cp) + dimSpan*dimSpan*  math.floor(dimSpan * playerState.profile.K_i) + dimSpan * math.floor(dimSpan* playerState.profile.K_mh) + math.floor(dimSpan* playerState.profile.K_pa))
 		currCellInd = int(currCellInd)
-		print(self.cells)
+		# print(self.cells)
 		currCell = self.cells[currCellInd]
 		currCell.append(playerState)
 		cellsSize = len(self.cells[currCellInd])
