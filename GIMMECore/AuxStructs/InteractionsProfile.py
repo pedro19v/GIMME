@@ -26,20 +26,21 @@ class InteractionsProfile(object):
 
 		totalDiff = cost.K_cp + cost.K_i + cost.K_mh + cost.K_pa
 
-		cost.K_cp /= totalDiff
-		cost.K_i /= totalDiff
-		cost.K_mh /= totalDiff
-		cost.K_pa /= totalDiff
+		if(totalDiff > 0):
+			cost.K_cp /= totalDiff
+			cost.K_i /= totalDiff
+			cost.K_mh /= totalDiff
+			cost.K_pa /= totalDiff
 
-		cost.K_cp = pow(cost.K_cp, 2)
-		cost.K_i = pow(cost.K_i, 2)
-		cost.K_mh = pow(cost.K_mh, 2)
-		cost.K_pa = pow(cost.K_pa, 2)
+			cost.K_cp = pow(cost.K_cp, 2)
+			cost.K_i = pow(cost.K_i, 2)
+			cost.K_mh = pow(cost.K_mh, 2)
+			cost.K_pa = pow(cost.K_pa, 2)
 
 		return math.sqrt(cost.K_cp + cost.K_i + cost.K_mh + cost.K_pa)
 	
 
-	def distanceBetween(self, profileToTest):
+	def sqrDistanceBetween(self, profileToTest):
 		thisProfile = self
 		cost = InteractionsProfile()
 
@@ -54,4 +55,8 @@ class InteractionsProfile(object):
 		cost.K_mh = pow(cost.K_mh, 2)
 		cost.K_pa = pow(cost.K_pa, 2)
 
-		return math.sqrt(cost.K_cp + cost.K_i + cost.K_mh + cost.K_pa)
+		return cost.K_cp + cost.K_i + cost.K_mh + cost.K_pa
+
+
+	def distanceBetween(self, profileToTest):
+		return math.sqrt(self.sqrDistanceBetween(profileToTest))

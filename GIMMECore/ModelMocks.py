@@ -9,10 +9,10 @@ class PlayerModelMock(object):
 		self.name = name
 		self.pastModelIncreasesGrid = pastModelIncreasesGrid
 
-		self.personality = personality; 
+		self.personality = personality
 		
 		# for displaying in charts
-		self.currModelIncreases = currModelIncreases; 
+		self.currModelIncreases = currModelIncreases
 
 		# for simulations
 		self.inherentPreference = None

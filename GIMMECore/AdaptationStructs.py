@@ -6,7 +6,7 @@ from PlayerStructs import *
 
 class AdaptationGroup(object):
 	def __init__(self):
-		self.interactionsProfile = InteractionsProfile()
+		self.profile = InteractionsProfile()
 
 		self.avgPersonality = InteractionsProfile()
 		self.avgPlayerState = PlayerState()

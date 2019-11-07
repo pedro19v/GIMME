@@ -32,14 +32,34 @@ class ConfigsGenAlg(ABC):
 
 class RandomConfigsGen(ConfigsGenAlg):
 
+	def randomProfileGenerator(self, group):
+		# generate learning profile
+		profile = InteractionsProfile()
+		profile.K_cp = random.uniform(0, 1)
+		profile.K_i = random.uniform(0, 1)
+		profile.K_mh = random.uniform(0, 1)
+		profile.K_pa = random.uniform(0, 1)
+
+		# total = profile.K_cp +profile.K_i +profile.K_mh +profile.K_pa 
+
+		# profile.K_cp /= total
+		# profile.K_i /= total
+		# profile.K_mh /= total
+		# profile.K_pa /= total
+
+		return profile
+
+	def __init__(self):
+		ConfigsGenAlg.__init__(self)
+		self.profileGenerator = self.randomProfileGenerator
+
 	def organize(self, playerModelBridge, playerIds, numberOfConfigChoices, minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup, regAlg, fitAlg):
 		bestConfig = AdaptationConfiguration()
-
 
 		if(len(playerIds) < minNumberOfPlayersPerGroup):
 			return bestConfig
 
-		currMaxFitness = -1.0
+		currMaxFitness = -float("inf")
 
 		minNumGroups = math.ceil(len(playerIds) / maxNumberOfPlayersPerGroup)
 		maxNumGroups = math.floor(len(playerIds) / minNumberOfPlayersPerGroup)
@@ -55,48 +75,25 @@ class RandomConfigsGen(ConfigsGenAlg):
 			else: # players length is 1
 				numGroups = minNumGroups
 
-
 			# generate min groups
 			playersWithoutGroupSize = 0
 			for j in range(numGroups):
-				currGroup = AdaptationGroup();
-
-				# generate learning profile
-				newRand1 = random.uniform(0, 1)
-				newRand2 = random.uniform(0, 1)
-				newRand3 = random.uniform(0, 1)
-				newRand4 = random.uniform(0, 1)
-
-				newRandSum = newRand1 + newRand2 + newRand3 + newRand4
-
-				profile = InteractionsProfile();
-				if(newRandSum > 0):
-					profile.K_cp = newRand1 / newRandSum;
-					profile.K_i = newRand2 / newRandSum;
-					profile.K_mh = newRand3 / newRandSum;
-					profile.K_pa = newRand4 / newRandSum;
-				currGroup.interactionsProfile = profile;
-
+				currGroup = AdaptationGroup()
 
 				# add min number of players to the group
 				for s in range(minNumberOfPlayersPerGroup):
 					playersWithoutGroupSize = len(playersWithoutGroup)
-
 					currPlayerIndex = random.randint(0, playersWithoutGroupSize - 1)
 
 					currPlayerID = playersWithoutGroup[currPlayerIndex]
 					currGroup.addPlayer(playerModelBridge, currPlayerID)
 
-					currPlayerFitness = fitAlg.calculate(playerModelBridge, currPlayerID, currGroup.interactionsProfile, regAlg)
-					currFitness += currPlayerFitness
-
 					del playersWithoutGroup[currPlayerIndex]
 				
 				newConfig.groups.append(currGroup)
 
+			# append the rest
 			playersWithoutGroupSize = len(playersWithoutGroup);
-			
-			
 			while playersWithoutGroupSize > 0:
 				randomGroupIndex = random.randint(0, len(newConfig.groups) - 1)
 
@@ -115,9 +112,6 @@ class RandomConfigsGen(ConfigsGenAlg):
 				currPlayer = playersWithoutGroup[currPlayerIndex];
 				currGroup.addPlayer(playerModelBridge, currPlayer);
 
-				currPlayerFitness = fitAlg.calculate(playerModelBridge, currPlayer, currGroup.interactionsProfile, regAlg)
-				currFitness += currPlayerFitness
-
 				del playersWithoutGroup[currPlayerIndex]
 				playersWithoutGroupSize = len(playersWithoutGroup)
 
@@ -125,15 +119,38 @@ class RandomConfigsGen(ConfigsGenAlg):
 			currGroups = newConfig.groups
 			currGroupsSize = len(currGroups)
 
+			# generate profiles
+			for group in currGroups:
+				# generate learning profile
+				group.profile = self.profileGenerator(group)
+				for currPlayer in group.playerIds:
+					currPlayerFitness = fitAlg.calculate(playerModelBridge, currPlayer, group.profile, regAlg)
+					currFitness += currPlayerFitness
+
+			# print(json.dumps(group, default=lambda o: o.__dict__, sort_keys=True))
 			if (currFitness > currMaxFitness):
 				bestConfig = newConfig
-				currMaxFitness = currFitness	
-		
-			# print("c" + str(self.configSizeFreqs))
-
-			self.updateMetrics(bestConfig)
+				currMaxFitness = currFitness
+				
+		# print(json.dumps(bestConfig, default=lambda o: o.__dict__, sort_keys=True))
+		self.updateMetrics(bestConfig)
 		return bestConfig
 
+
+class PersonalityBasedConfigsGen(RandomConfigsGen):
+	def personalityBasedProfileGenerator(self, group):
+		# generate learning profile
+		profile = InteractionsProfile()
+		profile.K_cp = random.normal(group.avgPersonality.K_cp, self.variation)
+		profile.K_i = random.normal(group.avgPersonality.K_i, self.variation)
+		profile.K_mh = random.normal(group.avgPersonality.K_mh, self.variation)
+		profile.K_pa = random.normal(group.avgPersonality.K_pa, self.variation)
+		return profile
+
+	def __init__(self, variation):
+		RandomConfigsGen.__init__(self)
+		self.profileGenerator = self.personalityBasedProfileGenerator
+		self.variation = variation
 
 
 class EvolutionaryConfigsGen(ConfigsGenAlg):

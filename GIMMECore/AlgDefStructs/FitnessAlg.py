@@ -25,7 +25,6 @@ class SimulationsOptimalFitness(FitnessAlg):
 	def calculate(self, playerModelBridge, playerId, interactionsProfile, regAlg):
 		currState = copy.deepcopy(playerModelBridge.getPlayerCurrState(playerId))
 		newState = self.simulationFunc(copy.deepcopy(currState), playerModelBridge, playerId, interactionsProfile, self.currIteration)
-		# newState.characteristics = PlayerCharacteristics(ability=(newState.characteristics.ability - currState.characteristics.ability), engagement=newState.characteristics.engagement)
 		return self.stateWeights.ability*newState.characteristics.ability + self.stateWeights.engagement*newState.characteristics.engagement
 
 class WeightedFitness(FitnessAlg):

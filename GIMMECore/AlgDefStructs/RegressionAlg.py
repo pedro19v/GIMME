@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import copy
 from PlayerStructs import *
+import json
 
 class RegressionAlg(ABC):
 
@@ -26,25 +27,26 @@ class KNNRegression(RegressionAlg):
 
 		predictedState = PlayerState(profile, PlayerCharacteristics())
 
-		for modelInc in pastModelIncsCopy:
-			modelInc.dist = profile.distanceBetween(modelInc.profile)
-
-		pastModelIncsCopy = sorted(pastModelIncsCopy, key=self.interactionsProfileSort)
-
 		if (pastModelIncsSize > self.numberOfNNs):
 			pastModelIncsCopy = numpy.resize(pastModelIncsCopy, self.numberOfNNs)
 	
+		for modelInc in pastModelIncsCopy:
+			modelInc.dist = profile.sqrDistanceBetween(modelInc.profile)
+
+		pastModelIncsCopy = sorted(pastModelIncsCopy, key=self.interactionsProfileSort)
+		# print(json.dumps(pastModelIncsCopy, default=lambda o: o.__dict__, sort_keys=True))
+		# quit()
 		pastModelIncsCopySize = len(pastModelIncsCopy)
 
 		for i in pastModelIncsCopy:
 			pastProfile = i.profile
 			pastCharacteristics = i.characteristics
-			distance = profile.distanceBetween(pastProfile)
+			distance = profile.sqrDistanceBetween(pastProfile)
 
-			predictedState.characteristics.ability += (pastCharacteristics.ability* (1 - distance)) / pastModelIncsCopySize #* (1 - distance) 
-			predictedState.characteristics.engagement += (pastCharacteristics.engagement* (1 - distance)) / pastModelIncsCopySize #* (1 - distance)
+			predictedState.characteristics.ability += (pastCharacteristics.ability* (2 - distance)/2) / pastModelIncsCopySize #* (1 - distance) 
+			predictedState.characteristics.engagement += (pastCharacteristics.engagement* (2 - distance)/2) / pastModelIncsCopySize #* (1 - distance)
 		
-		return predictedState;
+		return predictedState
 
 
 # ---------------------- NeuralNetworkRegression stuff ---------------------------

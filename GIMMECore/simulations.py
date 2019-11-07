@@ -14,8 +14,10 @@ from ModelMocks import *
 
 from numpy import array
 
+import random
+random.seed(time.clock())
 
-numRuns = 1
+numRuns = 10
 numIterationsPerRun = 50
 numTrainingCyclesPerRun = 30
 
@@ -52,8 +54,11 @@ class CustomPlayerModelBridge(PlayerModelBridge):
 	def registerNewPlayer(self, playerId, name, currState, pastModelIncreasesGrid, currModelIncreases, personality, numIterationsPerRun):
 		players[int(playerId)] = PlayerModelMock(playerId, name, currState, pastModelIncreasesGrid, currModelIncreases, personality, numIterationsPerRun)	
 
-	def resetPlayerPastModelIncreases(self, playerId):
+	def resetPlayer(self, playerId):
+		print(json.dumps(players[int(playerId)], default=lambda o: o.__dict__, sort_keys=True))
+		players[int(playerId)].currState.reset()
 		players[int(playerId)].pastModelIncreasesGrid.reset()
+		print(json.dumps(players[int(playerId)], default=lambda o: o.__dict__, sort_keys=True))
 
 	def savePlayerState(self, playerId, newState):
 		players[int(playerId)].currState = newState
@@ -79,9 +84,6 @@ class CustomPlayerModelBridge(PlayerModelBridge):
 
 	def getBaseLearningRate(self, playerId):
 		return players[int(playerId)].baseLearningRate
-
-	def resetPlayer(self, playerId):
-		return 0
 
 
 	def getSelectedPlayerIds(self):
@@ -125,11 +127,13 @@ def simulateReaction(currIteration, playerBridge, playerId):
 	newState.characteristics = PlayerCharacteristics(ability=(newState.characteristics.ability - currState.characteristics.ability), engagement=newState.characteristics.engagement)
 	# print(json.dumps(currState.characteristics, default=lambda o: o.__dict__, sort_keys=True))
 	# print(json.dumps(newState.characteristics, default=lambda o: o.__dict__, sort_keys=True))
+
 	playerBridge.savePlayerState(playerId, newState)
 
 def calcReaction(state, playerBridge, playerId, interactionsProfile, currIteration):
+	# print(len(playerBridge.getPlayerPastModelIncreases(playerId).cells[0]))
 	inherentPreference = playerBridge.getInherentPreference(playerId)
-	state.characteristics.engagement = 0.5* (state.characteristics.engagement) + 0.5* (1.0 - inherentPreference.distanceBetween(interactionsProfile))
+	state.characteristics.engagement = 0.5* (state.characteristics.engagement) + 0.5* (2.0 - inherentPreference.sqrDistanceBetween(interactionsProfile))/2.0
 
 	currTaskReaction = playerBridge.getIterationReactions(playerId, currIteration)
 	abilityIncreaseSim = (currTaskReaction * state.characteristics.engagement) #between 0 and 1
@@ -175,7 +179,6 @@ for x in range(numPlayers):
 
 
 
-simOptimalFitness = SimulationsOptimalFitness(calcReaction, PlayerCharacteristics(ability=1.0, engagement=0.0)) #needed for currIteration updates
 
 adaptationGIMME10.init(KNNRegression(5), RandomConfigsGen(), WeightedFitness(PlayerCharacteristics(ability=0.5, engagement=0.5)), playerBridge, taskBridge, name="", numberOfConfigChoices=10, maxNumberOfPlayersPerGroup = 5, difficultyWeight = 0.5, profileWeight=0.5)
 adaptationGIMME.init(KNNRegression(5), RandomConfigsGen(), WeightedFitness(PlayerCharacteristics(ability=0.5, engagement=0.5)), playerBridge, taskBridge, name="", numberOfConfigChoices=100, maxNumberOfPlayersPerGroup = 5, difficultyWeight = 0.5, profileWeight=0.5)
@@ -189,6 +192,8 @@ adaptationGIMMEK30.init(KNNRegression(30), RandomConfigsGen(), WeightedFitness(P
 
 
 adaptationRandom.init(KNNRegression(5), RandomConfigsGen(), RandomFitness(), playerBridge, taskBridge, name="", numberOfConfigChoices=100, maxNumberOfPlayersPerGroup = 5, difficultyWeight = 0.5, profileWeight=0.5)
+
+simOptimalFitness = SimulationsOptimalFitness(calcReaction, PlayerCharacteristics(ability=1.0, engagement=0.0)) #needed for currIteration updates
 adaptationOptimal.init(KNNRegression(5), RandomConfigsGen(), simOptimalFitness, playerBridge, taskBridge, name="", numberOfConfigChoices=100, maxNumberOfPlayersPerGroup = 5, difficultyWeight = 0.5, profileWeight=0.5)
 
 
@@ -246,13 +251,19 @@ randomExecTime = 0.0
 optimalExecTime = 0.0
 
 def executeSimulations(adaptation,abilityArray,engagementArray,profDiffArray, avgItExecTime, isOptimalRun, algorithmNum, numAlgorithms):
+
+
 	for r in range(numRuns):
 		for x in range(numPlayers):
-			playerBridge.resetPlayerPastModelIncreases(x)
+			playerBridge.resetPlayer(x)
+
+		# if isOptimalRun == True:
+		# 	print(json.dumps(players, default=lambda o: o.__dict__, sort_keys=True))
+		# 	quit()
 
 		for i in range(numTrainingCyclesPerRun):
 			for x in range(numPlayers):
-				simulateReaction(i, playerBridge, x) 
+				simulateReaction(i, playerBridge, x)
 
 		for i in range(numIterationsPerRun):
 			if isOptimalRun == True:
@@ -266,25 +277,28 @@ def executeSimulations(adaptation,abilityArray,engagementArray,profDiffArray, av
 			t1 = time.clock() - t0
 			avgItExecTime += (t1 - t0)/(numRuns*numIterationsPerRun) # CPU seconds elapsed (floating point)
 
-
 			for x in range(numPlayers):
 				abilityArray[i] += playerBridge.getPlayerCurrCharacteristics(x).ability / (numIterationsPerRun*numRuns)
 				engagementArray[i] += playerBridge.getPlayerCurrCharacteristics(x).engagement / (numIterationsPerRun*numRuns)
 				profDiffArray[i] += playerBridge.getInherentPreference(x).distanceBetween(playerBridge.getPlayerCurrProfile(x)) / (numIterationsPerRun*numRuns)
 				simulateReaction(i, playerBridge, x)
 
-executeSimulations(adaptationGIMME10,GIMME10Abilities,GIMME10Engagements,GIMME10PrefProfDiff,GIMME10ExecTime, False, 1, 8)
-executeSimulations(adaptationGIMME,GIMMEAbilities,GIMMEEngagements,GIMMEPrefProfDiff,GIMMEExecTime, False, 1, 8)
-executeSimulations(adaptationGIMME1000,GIMME1000Abilities,GIMME1000Engagements,GIMME1000PrefProfDiff,GIMME1000ExecTime, False, 2, 8)
-executeSimulations(adaptationGIMME2000,GIMME2000Abilities,GIMME2000Engagements,GIMME2000PrefProfDiff,GIMME2000ExecTime, False, 3, 8)
-executeSimulations(adaptationGIMMEK1,GIMMEK1Abilities,GIMMEK1Engagements,GIMMEK1PrefProfDiff,GIMMEK1ExecTime, False, 4, 8)
-executeSimulations(adaptationGIMMEK24,GIMMEK24Abilities,GIMMEK24Engagements,GIMMEK24PrefProfDiff,GIMMEK24ExecTime, False, 5, 8)
-executeSimulations(adaptationGIMMEK30,GIMMEK30Abilities,GIMMEK30Engagements,GIMMEK30PrefProfDiff,GIMMEK30ExecTime, False, 6, 8)
 
-executeSimulations(adaptationRandom,randomAbilities,randomEngagements,randomPrefProfDiff, randomExecTime, False, 7, 8)
-executeSimulations(adaptationOptimal,optimalAbilities,optimalEngagements,optimalPrefProfDiff, optimalExecTime, True, 8, 8)
+executeSimulations(adaptationOptimal,optimalAbilities,optimalEngagements,optimalPrefProfDiff, optimalExecTime, True, 9, 9)
+executeSimulations(adaptationRandom,randomAbilities,randomEngagements,randomPrefProfDiff, randomExecTime, False, 8, 9)
+
+# executeSimulations(adaptationGIMME10,GIMME10Abilities,GIMME10Engagements,GIMME10PrefProfDiff,GIMME10ExecTime, False, 1, 9)
+executeSimulations(adaptationGIMME,GIMMEAbilities,GIMMEEngagements,GIMMEPrefProfDiff,GIMMEExecTime, False, 2, 9)
+# executeSimulations(adaptationGIMME1000,GIMME1000Abilities,GIMME1000Engagements,GIMME1000PrefProfDiff,GIMME1000ExecTime, False, 3, 9)
+# executeSimulations(adaptationGIMME2000,GIMME2000Abilities,GIMME2000Engagements,GIMME2000PrefProfDiff,GIMME2000ExecTime, False, 4, 9)
+# executeSimulations(adaptationGIMMEK1,GIMMEK1Abilities,GIMMEK1Engagements,GIMMEK1PrefProfDiff,GIMMEK1ExecTime, False, 5, 9)
+# executeSimulations(adaptationGIMMEK24,GIMMEK24Abilities,GIMMEK24Engagements,GIMMEK24PrefProfDiff,GIMMEK24ExecTime, False, 6, 9)
+# executeSimulations(adaptationGIMMEK30,GIMMEK30Abilities,GIMMEK30Engagements,GIMMEK30PrefProfDiff,GIMMEK30ExecTime, False, 7, 9)
 
 
+f = open("demofile3.txt", "w")
+f.write("Woops! I have deleted the content!")
+f.close()
 
 timesteps=[i for i in range(numIterationsPerRun)]
 

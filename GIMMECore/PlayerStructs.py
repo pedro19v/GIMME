@@ -41,12 +41,12 @@ class PlayerStateGrid(object):
 		dimSpan = (self.numCells-1)**(1/float(4)) #root 4
 		currCellInd = (dimSpan *dimSpan*dimSpan * math.floor(dimSpan * playerState.profile.K_cp) + dimSpan*dimSpan*  math.floor(dimSpan * playerState.profile.K_i) + dimSpan * math.floor(dimSpan* playerState.profile.K_mh) + math.floor(dimSpan* playerState.profile.K_pa))
 		currCellInd = int(currCellInd)
-		# print(self.cells)
 		currCell = self.cells[currCellInd]
 		currCell.append(playerState)
+		
 		cellsSize = len(self.cells[currCellInd])
 		if (cellsSize > self.maxAmountOfStoredProfilesPerCell):
-			currCell = currCell[self.maxAmountOfStoredProfilesPerCell:]
+			currCell = currCell[-self.maxAmountOfStoredProfilesPerCell:]
 
 		self.cells[currCellInd] = currCell
 
