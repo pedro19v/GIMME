@@ -63,7 +63,8 @@ class RandomConfigsGen(ConfigsGenAlg):
 
 		minNumGroups = math.ceil(len(playerIds) / maxNumberOfPlayersPerGroup)
 		maxNumGroups = math.floor(len(playerIds) / minNumberOfPlayersPerGroup)
-		
+
+
 		# generate several random groups, calculate their fitness and select the best one
 		for i in range(numberOfConfigChoices):
 			currFitness = 0.0
@@ -73,7 +74,7 @@ class RandomConfigsGen(ConfigsGenAlg):
 			if(minNumGroups < maxNumGroups):
 				numGroups = random.randint(minNumGroups, maxNumGroups)
 			else: # players length is 1
-				numGroups = minNumGroups
+				numGroups = maxNumGroups + 1
 
 			# generate min groups
 			playersWithoutGroupSize = 0
@@ -81,20 +82,20 @@ class RandomConfigsGen(ConfigsGenAlg):
 				currGroup = AdaptationGroup()
 
 				# add min number of players to the group
-				for s in range(minNumberOfPlayersPerGroup):
+				for s in range(min(playersWithoutGroupSize, minNumberOfPlayersPerGroup)):
 					playersWithoutGroupSize = len(playersWithoutGroup)
 					currPlayerIndex = random.randint(0, playersWithoutGroupSize - 1)
-
 					currPlayerID = playersWithoutGroup[currPlayerIndex]
 					currGroup.addPlayer(playerModelBridge, currPlayerID)
 
 					del playersWithoutGroup[currPlayerIndex]
-				
+		
 				newConfig.groups.append(currGroup)
 
 			# append the rest
-			playersWithoutGroupSize = len(playersWithoutGroup);
+			playersWithoutGroupSize = len(playersWithoutGroup)
 			while playersWithoutGroupSize > 0:
+
 				randomGroupIndex = random.randint(0, len(newConfig.groups) - 1)
 
 				currPlayerIndex = 0;
@@ -103,17 +104,19 @@ class RandomConfigsGen(ConfigsGenAlg):
 				else:
 					currPlayerIndex = 0
 
-				currGroup = newConfig.groups[randomGroupIndex];
-				groupsSize = len(newConfig.groups);
-				while (len(currGroup.playerIds) > maxNumberOfPlayersPerGroup - 1):
-					randomGroupIndex+=1
+				currGroup = newConfig.groups[randomGroupIndex]
+				groupsSize = len(newConfig.groups)
+
+				while (len(currGroup.playerIds) > (maxNumberOfPlayersPerGroup - 1)):
+					randomGroupIndex += 1
 					currGroup = newConfig.groups[randomGroupIndex%groupsSize]
 
-				currPlayer = playersWithoutGroup[currPlayerIndex];
-				currGroup.addPlayer(playerModelBridge, currPlayer);
+				currPlayer = playersWithoutGroup[currPlayerIndex]
+				currGroup.addPlayer(playerModelBridge, currPlayer)
 
 				del playersWithoutGroup[currPlayerIndex]
 				playersWithoutGroupSize = len(playersWithoutGroup)
+
 
 			playerSize = len(playerIds)
 			currGroups = newConfig.groups
@@ -135,6 +138,60 @@ class RandomConfigsGen(ConfigsGenAlg):
 		# print(json.dumps(bestConfig, default=lambda o: o.__dict__, sort_keys=True))
 		self.updateMetrics(bestConfig)
 		return bestConfig
+
+
+class RandomConfigsGenOld(RandomConfigsGen):
+	
+	def __init__(self):
+		RandomConfigsGen.__init__(self)
+
+	def organize(self, playerModelBridge, playerIds, numberOfConfigChoices, minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup, regAlg, fitAlg):
+		
+		bestConfig = AdaptationConfiguration();
+		currMaxFitness = 0.0;
+
+		# generate several random groups, calculate their fitness and select best one
+		for j in range(numberOfConfigChoices):
+			currFitness = 0.0
+			studentsWithoutGroup = []
+			newConfig = AdaptationConfiguration();
+
+			while (len(studentsWithoutGroup) > 0):
+				currGroup = AdaptationGroup()
+
+				# generate learning profile
+				currGroup.profile = self.profileGenerator(currGroup)
+
+				# generate group for profile
+				studentsWithoutGroupSize = len(studentsWithoutGroup)
+				currGroupSize = 0;
+				if (studentsWithoutGroupSize > minNumberOfStudentsPerGroup):
+					currGroupSize = 1 + random.uniform(0, min(studentsWithoutGroupSize, maxNumberOfStudentsPerGroup))
+				else:
+					currGroupSize = minNumberOfPlayersPerGroup
+				
+				for k in range(currGroupSize):
+					currPlayerIndex = 0
+					studentsWithoutGroupSize = len(studentsWithoutGroup)
+					if (studentsWithoutGroupSize > 1):
+						currPlayerIndex = random.uniform(0, studentsWithoutGroupSize - 1);
+					
+					currPlayer = studentsWithoutGroup[currPlayerIndex]
+					currGroup.addPlayer(playerModelBridge, currPlayer)
+
+					currPlayerFitness = fitAlg.calculate(playerModelBridge, currPlayer, group.profile, regAlg)
+					currFitness += currPlayerFitness
+
+					del playersWithoutGroup[currPlayerIndex]
+				
+				newConfig.groups.append(currGroup);
+			
+
+			if (currFitness > currMaxFitness):
+				bestConfig = newConfig
+				currMaxFitness = currFitness
+		
+			return bestConfig
 
 
 class PersonalityBasedConfigsGen(RandomConfigsGen):

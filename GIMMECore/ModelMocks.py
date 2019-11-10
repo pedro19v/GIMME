@@ -10,12 +10,9 @@ class PlayerModelMock(object):
 		self.pastModelIncreasesGrid = pastModelIncreasesGrid
 
 		self.personality = personality
-		
-		# for displaying in charts
-		self.currModelIncreases = currModelIncreases
 
 		# for simulations
-		self.inherentPreference = None
+		# self.inherentPreference = None
 		self.baseLearningRate = None
 		self.iterationReactions = None
 
