@@ -9,7 +9,6 @@ class ConfigsGenAlg(ABC):
 	def __init__(self):
 		self.groupSizeFreqs = {}
 		self.configSizeFreqs = {}
-
 		super().__init__()
 
 	@abstractmethod
@@ -128,6 +127,7 @@ class RandomConfigsGen(ConfigsGenAlg):
 				group.profile = self.profileGenerator(group)
 				for currPlayer in group.playerIds:
 					currPlayerFitness = fitAlg.calculate(playerModelBridge, currPlayer, group.profile, regAlg)
+					group.fitness += currPlayerFitness
 					currFitness += currPlayerFitness
 
 			# print(json.dumps(group, default=lambda o: o.__dict__, sort_keys=True))
@@ -135,6 +135,9 @@ class RandomConfigsGen(ConfigsGenAlg):
 				bestConfig = newConfig
 				currMaxFitness = currFitness
 				
+		# print("---------------------------")
+		# for group in bestConfig.groups:
+		# 	print(group.playerIds)
 		# print(json.dumps(bestConfig, default=lambda o: o.__dict__, sort_keys=True))
 		self.updateMetrics(bestConfig)
 		return bestConfig
@@ -211,13 +214,12 @@ class PersonalityBasedConfigsGen(RandomConfigsGen):
 
 
 class EvolutionaryConfigsGen(ConfigsGenAlg):
+	def __init__(self):
+		ConfigsGen.__init__(self)
+		self.currBestConfig = AdaptationConfiguration()
+
 	def organize(self, players, numberOfConfigChoices, minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup, regAlg, fitAlg):
+		pass
+		
 
-		bestConfig = AdaptationConfiguration()
-		currMaxFitness = -math.inf
-
-		# generate several random groups, calculate their fitness and select best one
-		adaptG = AdaptationGroup(InteractionsProfile(0.33, 0.33, 0.33), players)
-		updateMetrics(bestConfig)
-		return bestConfig
 

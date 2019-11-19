@@ -2,7 +2,7 @@ import random
 from PlayerStructs import *
 
 class PlayerModelMock(object):
-	def __init__(self, id, name, currState, pastModelIncreasesGrid, currModelIncreases, personality, numIterationsPerRun):
+	def __init__(self, id, name, currState, pastModelIncreasesGrid, currModelIncreases, personality):
 		self.currState = currState
 
 		self.id = id

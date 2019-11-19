@@ -15,6 +15,8 @@ class AdaptationGroup(object):
 
 		self.playerIds = []
 
+		self.fitness = 0
+
 	def addPlayer(self, playerModelBridge, playerId):
 		self.playerIds.append(playerId);
 		playersSize = len(self.playerIds);

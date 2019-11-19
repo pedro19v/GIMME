@@ -17,6 +17,7 @@ class Adaptation(object):
 		taskModelBridge, \
 		name="", \
 		numberOfConfigChoices=100, \
+		preferredNumberOfPlayersPerGroup = None,\
 		minNumberOfPlayersPerGroup = 2, maxNumberOfPlayersPerGroup = 5, \
 		difficultyWeight = 0.5, \
 		profileWeight=0.5):
@@ -31,8 +32,12 @@ class Adaptation(object):
 		self.name = name
 
 		self.numberOfConfigChoices = numberOfConfigChoices
-		self.maxNumberOfPlayersPerGroup = maxNumberOfPlayersPerGroup
-		self.minNumberOfPlayersPerGroup = minNumberOfPlayersPerGroup
+		if preferredNumberOfPlayersPerGroup == None:
+			self.maxNumberOfPlayersPerGroup = maxNumberOfPlayersPerGroup
+			self.minNumberOfPlayersPerGroup = minNumberOfPlayersPerGroup
+		else:
+			self.maxNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup
+			self.minNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup
 
 		# self.numTasksPerGroup = numTasksPerGroup;
 		self.regAlg = regAlg

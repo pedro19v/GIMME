@@ -1,7 +1,10 @@
 import numpy
 import math
+import time
 from collections import namedtuple
 from AuxStructs.InteractionsProfile import InteractionsProfile
+
+import json
 
 class PlayerCharacteristics(object):
 	def __init__(self, ability=0, engagement=0):
@@ -16,6 +19,7 @@ class PlayerState(object):
 		self.profile = profile
 		self.characteristics = characteristics
 		self.dist = dist
+		self.creationTime = time.time()
 	def reset(self):
 		self.profile.reset()
 		self.characteristics.reset()
@@ -49,6 +53,7 @@ class PlayerStateGrid(object):
 			currCell = currCell[-self.maxAmountOfStoredProfilesPerCell:]
 
 		self.cells[currCellInd] = currCell
+		# print(json.dumps(self.cells, default=lambda o: o.__dict__, sort_keys=True))
 
 	def getAllStates(self):
 		# serialize multi into single dimensional array
