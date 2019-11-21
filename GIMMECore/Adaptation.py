@@ -10,22 +10,21 @@ from ModelBridge.TaskModelBridge import TaskModelBridge
 class Adaptation(object):
 
 	def init(self, \
-		regAlg, \
-		configsGenAlg, \
-		fitAlg, \
 		playerModelBridge, \
 		taskModelBridge, \
+		regAlg = None, \
+		configsGenAlg = None, \
+		fitAlg = None, \
 		name="", \
 		numberOfConfigChoices=100, \
 		preferredNumberOfPlayersPerGroup = None,\
-		minNumberOfPlayersPerGroup = 2, maxNumberOfPlayersPerGroup = 5, \
-		difficultyWeight = 0.5, \
-		profileWeight=0.5):
+		minNumberOfPlayersPerGroup = 2, maxNumberOfPlayersPerGroup = 5):
 
 		if(minNumberOfPlayersPerGroup > maxNumberOfPlayersPerGroup):
 			raise ValueError('The min number of players per group cannot be higher than the max!') 
 
-		
+		self.initialized = True
+
 		self.playerIds = []
 		self.taskIds = []
 
@@ -44,9 +43,6 @@ class Adaptation(object):
 		self.fitAlg = fitAlg
 		self.configsGenAlg = configsGenAlg
 
-		self.difficultyWeight = difficultyWeight
-		self.profileWeight = profileWeight
-
 		self.playerModelBridge = playerModelBridge
 		self.taskModelBridge = taskModelBridge
 
@@ -54,9 +50,13 @@ class Adaptation(object):
 		return self.name;
 
 	def iterate(self):
+		if not self.initialized:
+			raise ValueError('Adaptation not Initialized! Core not executed.') 
+			return
+
+
 		self.playerIds = self.playerModelBridge.getSelectedPlayerIds()
 		self.taskIds = self.taskModelBridge.getSelectedTaskIds()
-		# self.tasks = taskModelBridge.getAllTaskIds()
 
 		adaptedConfig = self.organizePlayers(self.playerIds)
 		groups = adaptedConfig.groups

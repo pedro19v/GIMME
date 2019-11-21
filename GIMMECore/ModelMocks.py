@@ -14,7 +14,7 @@ class PlayerModelMock(object):
 		# for simulations
 		# self.inherentPreference = None
 		self.baseLearningRate = None
-		self.iterationReactions = None
+		# self.iterationReactions = None
 
 
 class TaskModelMock(object):

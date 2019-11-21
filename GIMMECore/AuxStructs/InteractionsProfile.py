@@ -45,10 +45,10 @@ class InteractionsProfile(object):
 		cost = InteractionsProfile()
 
 		# normalizar cada uma das dims X/X+Y+Z; Y/X+Y+Z, Z/X+Y+Z
-		cost.K_cp = abs(thisProfile.K_cp - profileToTest.K_cp)
-		cost.K_i = abs(thisProfile.K_i - profileToTest.K_i)
-		cost.K_mh = abs(thisProfile.K_mh - profileToTest.K_mh)
-		cost.K_pa = abs(thisProfile.K_pa - profileToTest.K_pa)
+		cost.K_cp = thisProfile.K_cp - profileToTest.K_cp
+		cost.K_i = thisProfile.K_i - profileToTest.K_i
+		cost.K_mh = thisProfile.K_mh - profileToTest.K_mh
+		cost.K_pa = thisProfile.K_pa - profileToTest.K_pa
 
 		cost.K_cp = pow(cost.K_cp, 2)
 		cost.K_i = pow(cost.K_i, 2)

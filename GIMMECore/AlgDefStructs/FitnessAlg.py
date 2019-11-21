@@ -8,11 +8,6 @@ class FitnessAlg(ABC):
 		pass
 
 
-class RandomFitness(FitnessAlg):
-	def calculate(self, playerModelBridge, playerId, interactionsProfile, regAlg):
-		return 0.0
-
-
 class SimulationsOptimalFitness(FitnessAlg):
 	def __init__(self, simulationFunc, stateWeights):
 		self.stateWeights = stateWeights
@@ -23,9 +18,9 @@ class SimulationsOptimalFitness(FitnessAlg):
 		self.currIteration = newCurrIteration
 
 	def calculate(self, playerModelBridge, playerId, interactionsProfile, regAlg):
-		currState = copy.deepcopy(playerModelBridge.getPlayerCurrState(playerId))
+		currState = playerModelBridge.getPlayerCurrState(playerId)
 		newState = self.simulationFunc(copy.deepcopy(currState), playerModelBridge, playerId, interactionsProfile, self.currIteration)
-		return self.stateWeights.ability*newState.characteristics.ability + self.stateWeights.engagement*newState.characteristics.engagement
+		return self.stateWeights.ability*(newState.characteristics.ability - currState.characteristics.ability) + self.stateWeights.engagement*newState.characteristics.engagement
 
 class WeightedFitness(FitnessAlg):
 	def __init__(self, stateWeights):

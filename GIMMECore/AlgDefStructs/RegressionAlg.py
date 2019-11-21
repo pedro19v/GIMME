@@ -9,6 +9,7 @@ class RegressionAlg(ABC):
 	def predict(self, profile, playerModelBridge, playerId):
 		pass
 
+
 # ---------------------- KNNRegression stuff ---------------------------
 class KNNRegression(RegressionAlg):
 
