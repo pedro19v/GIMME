@@ -270,8 +270,8 @@ def executeSimulations(adaptation, abilityArray, engagementArray, profDiffArray,
 		f.write("\nprofDiffArray: "+json.dumps(profDiffArray))
 		f.close()
 
-# executeSimulations(adaptationOptimal, optimalAbilities, optimalEngagements, optimalPrefProfDiff, [], [], optimalExecTime, "optimal", "adaptationOptimal", True, 9, 9)
-# executeSimulations(adaptationRandom, randomAbilities, randomEngagements, randomPrefProfDiff, [], [], randomExecTime, "random", "adaptationRandom", True,  8, 9)
+executeSimulations(adaptationOptimal, optimalAbilities, optimalEngagements, optimalPrefProfDiff, [], [], optimalExecTime, "optimal", "adaptationOptimal", True, 9, 9)
+executeSimulations(adaptationRandom, randomAbilities, randomEngagements, randomPrefProfDiff, [], [], randomExecTime, "random", "adaptationRandom", True,  8, 9)
 
 executeSimulations(adaptationGIMMEEv, GIMMEEvAbilities, GIMMEEvEngagements, GIMMEEvPrefProfDiff, GIMMEEvGroupSizeFreqs, GIMMEEvConfigsSizeFreqs, GIMMEExecTime, "GIMME", "adaptationGIMME", True,  2, 9)
 # executeSimulations(adaptationGIMME, GIMMEAbilities, GIMMEEngagements, GIMMEPrefProfDiff, GIMMEGroupSizeFreqs, GIMMEConfigsSizeFreqs, GIMMEExecTime, "GIMME", "adaptationGIMME", True,  2, 9)
@@ -308,7 +308,8 @@ timesteps=[i for i in range(maxNumTrainingIterations + numRealIterations + 1)]
 
 
 # -------------------------------------------------------
-plt.plot(timesteps, GIMMEAbilities, label=r'$GIMME\ strategy$')
+# plt.plot(timesteps, GIMMEAbilities, label=r'$GIMME\ strategy$'))
+plt.plot(timesteps, GIMMEEvAbilities, label=r'$GIMME\ Ev\ strategy$')
 plt.plot(timesteps, randomAbilities, label=r'$Random\ strategy$')
 plt.plot(timesteps, optimalAbilities, label=r'$Optimal\ strategy$')
 

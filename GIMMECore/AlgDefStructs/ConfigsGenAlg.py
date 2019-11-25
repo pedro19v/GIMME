@@ -114,27 +114,28 @@ class EvolutionaryConfigsGen(ConfigsGenAlg):
 		
 
 		for config in range(numberOfConfigChoices):
-			if(random.uniform(0,1) < 0.2):
+			if(random.uniform(0,1) < 0.5):
 				#mutation (exploration)
 				for i in range(numMutations):
 					# alter random individual's group
 					self.currPopulation[config]["config"][random.randint(0, numPlayers-1)][1] = random.randint(0, maxNumGroups-1)
 					
 					# alter random group's GIP
-					# for profile in range(maxNumGroups):
-					# 	intProfileToChange = self.currProfiles[config][random.randint(0, maxNumGroups-1)][1]
+					for profile in range(maxNumGroups):
+						randomGroup = random.randint(0, maxNumGroups-1)
+						intProfileToChange = self.currProfiles[config]["config"][randomGroup]
 
-					# 	randomNum = random.randint(0, 3)
-					# 	if(randomNum==0):
-					# 		intProfileToChange.K_cp = random.uniform(0, 1)
-					# 	elif(randomNum==1):
-					# 		intProfileToChange.K_pa = random.uniform(0, 1)
-					# 	elif(randomNum==2):
-					# 		intProfileToChange.K_mh = random.uniform(0, 1)
-					# 	elif(randomNum==3):
-					# 		intProfileToChange.K_i = random.uniform(0, 1)
+						randomNum = random.randint(0, 3)
+						if(randomNum==0):
+							intProfileToChange.K_cp = random.uniform(0, 1)
+						elif(randomNum==1):
+							intProfileToChange.K_pa = random.uniform(0, 1)
+						elif(randomNum==2):
+							intProfileToChange.K_mh = random.uniform(0, 1)
+						elif(randomNum==3):
+							intProfileToChange.K_i = random.uniform(0, 1)
 						
-					# 	self.currProfiles[config][random.randint(0, maxNumGroups-1)][1] = intProfileToChange
+						self.currProfiles[config]["config"][randomGroup] = intProfileToChange
 			else:
 				#crossover (exploitation)
 				# 2 different crossovers - config and GIP 
@@ -152,9 +153,10 @@ class EvolutionaryConfigsGen(ConfigsGenAlg):
 
 				# GIP or inside of GIP crossover
 				# crossoverPoint = random.randint(0, numPlayers-1)
-				# self.currProfiles[config] = numpy.concatenate((self.currProfiles[config][:crossoverPoint],self.currProfiles[mate][crossoverPoint:]))
-				# self.currProfiles[mate] = numpy.concatenate((self.currProfiles[mate][:crossoverPoint],self.currProfiles[config][crossoverPoint:]))
-		
+				tempConfig = (self.currProfiles[config]["config"][:crossoverPoint] + self.currProfiles[mate]["config"][crossoverPoint:])
+				self.currProfiles[mate]["config"] = (self.currProfiles[mate]["config"][:crossoverPoint] + self.currProfiles[config]["config"][crossoverPoint:])
+				self.currProfiles[config]["config"] = tempConfig
+				
 
 		#calc fitness after KNN for regression
 		for c in range(numberOfConfigChoices):
@@ -187,9 +189,6 @@ class EvolutionaryConfigsGen(ConfigsGenAlg):
 		# print(self.currPopulation)
 		# input()
 
-		print(self.currProfiles)
-		input()
-
 		#selection by elitition
 		fitSurvivorsPop = self.currPopulation[numFitSurvivors:]
 		self.currPopulation = fitSurvivorsPop + fitSurvivorsPop
@@ -205,12 +204,16 @@ class EvolutionaryConfigsGen(ConfigsGenAlg):
 		bestConfigGenotype = self.currPopulation[-1]
 		bestProfiles = self.currProfiles[-1]["config"]
 
+
 		for gene in bestConfigGenotype["config"]:
 			bestConfig.groups[gene[1]].addPlayer(playerModelBridge, gene[0])
 			bestConfig.groups[gene[1]].profile = bestProfiles[gene[1]]
 
-		print(json.dumps(bestConfig, default=lambda o: o.__dict__, sort_keys=True))
-		input()
+			# print(json.dumps(bestConfig.groups[gene[1]].profile, default=lambda o: o.__dict__, sort_keys=True))
+			# input()
+
+		# print(json.dumps(bestConfig, default=lambda o: o.__dict__, sort_keys=True))
+		# input()
 		return bestConfig
 
 
