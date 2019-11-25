@@ -1,5 +1,6 @@
-import numpy
+import random
 import math
+import copy
 from abc import ABC, abstractmethod
 from AdaptationStructs import *
 from InteractionsProfile import InteractionsProfile 
@@ -14,10 +15,10 @@ class ConfigsGenAlg(ABC):
 	def randomProfileGenerator(self, group):
 		# generate learning profile
 		profile = InteractionsProfile()
-		profile.K_cp = numpy.random.uniform(0, 1)
-		profile.K_i = numpy.random.uniform(0, 1)
-		profile.K_mh = numpy.random.uniform(0, 1)
-		profile.K_pa = numpy.random.uniform(0, 1)
+		profile.K_cp = random.uniform(0, 1)
+		profile.K_i = random.uniform(0, 1)
+		profile.K_mh = random.uniform(0, 1)
+		profile.K_pa = random.uniform(0, 1)
 
 		# total = profile.K_cp +profile.K_i +profile.K_mh +profile.K_pa 
 
@@ -76,17 +77,24 @@ class EvolutionaryConfigsGen(ConfigsGenAlg):
 	def __init__(self):
 		super().__init__()
 		self.populationInited = False
-		
-	def updatePopulation(self, playerIds, numPlayers, maxNumGroups, numberOfConfigChoices):
-		# represented as genotypes (index 0 of first array represents the id)
-		self.currPopulation = numpy.array([[ [playerIds[x], numpy.random.random_integers(0, maxNumGroups-1)] for x in range(numPlayers)] for y in range(numberOfConfigChoices)])
-		self.currProfiles = numpy.array([[ [x, numpy.random.uniform(0, 1), numpy.random.uniform(0, 1), numpy.random.uniform(0, 1), numpy.random.uniform(0, 1)] for x in range(maxNumGroups)] for y in range(numberOfConfigChoices)])
-		self.currPopulationFitnesses = numpy.array([ [x, 0.0] for x in range(numberOfConfigChoices)])
+	
+	def fitnessSort(self, elem):
+		return elem[0]["fitness"]
 
+	def updatePopulation(self, playerIds, numPlayers, maxNumGroups, numberOfConfigChoices):
+		# represented as simple genotypes
+		self.currPopulation = [ {'config': [], 'fitness': 0.0}  for y in range(numberOfConfigChoices)]
+		for individual in self.currPopulation:
+			individual["config"] = [[playerIds[x], random.randint(0, maxNumGroups-1)] for x in range(numPlayers)]
+
+		self.currProfiles = [ {'config': [], 'fitness': 0.0} for y in range(numberOfConfigChoices)]
+		for individual in self.currProfiles:
+			individual["config"] = [InteractionsProfile(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1)) for x in range(maxNumGroups)]
 
 	def organize(self, playerModelBridge, playerIds, numberOfConfigChoices, minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup, regAlg, fitAlg):
 
 		numMutations = 4
+		numFitSurvivors = math.ceil(numberOfConfigChoices/2)
 		
 		bestConfig = AdaptationConfiguration()
 		numPlayers = len(playerIds)
@@ -106,64 +114,104 @@ class EvolutionaryConfigsGen(ConfigsGenAlg):
 		
 
 		for config in range(numberOfConfigChoices):
-			if(numpy.random.uniform(0,1) < 0.1):
+			if(random.uniform(0,1) < 0.2):
 				#mutation (exploration)
-				# for i in range(self.numMutations):
 				for i in range(numMutations):
-					self.currPopulation[config][numpy.random.random_integers(0, numPlayers-1)] = numpy.random.random_integers(0, maxNumGroups-1)
-					for profile in range(maxNumGroups):
-						self.currProfiles[config][numpy.random.random_integers(0, maxNumGroups-1)][numpy.random.random_integers(1, 4)] = numpy.random.uniform(0, 1)
+					# alter random individual's group
+					self.currPopulation[config]["config"][random.randint(0, numPlayers-1)][1] = random.randint(0, maxNumGroups-1)
+					
+					# alter random group's GIP
+					# for profile in range(maxNumGroups):
+					# 	intProfileToChange = self.currProfiles[config][random.randint(0, maxNumGroups-1)][1]
+
+					# 	randomNum = random.randint(0, 3)
+					# 	if(randomNum==0):
+					# 		intProfileToChange.K_cp = random.uniform(0, 1)
+					# 	elif(randomNum==1):
+					# 		intProfileToChange.K_pa = random.uniform(0, 1)
+					# 	elif(randomNum==2):
+					# 		intProfileToChange.K_mh = random.uniform(0, 1)
+					# 	elif(randomNum==3):
+					# 		intProfileToChange.K_i = random.uniform(0, 1)
+						
+					# 	self.currProfiles[config][random.randint(0, maxNumGroups-1)][1] = intProfileToChange
 			else:
 				#crossover (exploitation)
-				# 2 crossovers differentes 
+				# 2 different crossovers - config and GIP 
 
 				# determine mate
-				mate = numpy.random.random_integers(0, numberOfConfigChoices-1)
+				mate = random.randint(0, numberOfConfigChoices-1)
 
-				# group crossovers
-				crossoverPoint = numpy.random.random_integers(0, numPlayers-1)
+				# config crossovers
+				crossoverPoint = random.randint(0, numPlayers-1)
+
 				parentConfig = config
-				self.currPopulation[config] = numpy.concatenate((self.currPopulation[parentConfig][:crossoverPoint],self.currPopulation[mate][crossoverPoint:]))
-				self.currPopulation[mate] = numpy.concatenate((self.currPopulation[mate][:crossoverPoint],self.currPopulation[parentConfig][crossoverPoint:]))
+				tempConfig = self.currPopulation[parentConfig]["config"][:crossoverPoint]+self.currPopulation[mate]["config"][crossoverPoint:]
+				self.currPopulation[mate]["config"] = self.currPopulation[mate]["config"][:crossoverPoint]+self.currPopulation[parentConfig]["config"][crossoverPoint:]
+				self.currPopulation[config]["config"] = tempConfig
 
 				# GIP or inside of GIP crossover
-				crossoverPoint = numpy.random.random_integers(0, numPlayers-1)
-				self.currProfiles[config] = numpy.concatenate((self.currProfiles[config][:crossoverPoint],self.currProfiles[mate][crossoverPoint:]))
-				self.currProfiles[mate] = numpy.concatenate((self.currProfiles[mate][:crossoverPoint],self.currProfiles[config][crossoverPoint:]))
+				# crossoverPoint = random.randint(0, numPlayers-1)
+				# self.currProfiles[config] = numpy.concatenate((self.currProfiles[config][:crossoverPoint],self.currProfiles[mate][crossoverPoint:]))
+				# self.currProfiles[mate] = numpy.concatenate((self.currProfiles[mate][:crossoverPoint],self.currProfiles[config][crossoverPoint:]))
+		
 
-		# print(self.currPopulation)
-
-		#fitness
+		#calc fitness after KNN for regression
 		for c in range(numberOfConfigChoices):
-			config = self.currPopulation[c][0]
+			config = self.currPopulation[c]["config"]
 			for p in range(numPlayers):
 				group = config[p][1]
-				currProfile = self.currProfiles[config][group][0:]
+				currProfile = self.currProfiles[c]["config"][group]
 				predictedState = regAlg.predict(playerModelBridge, currProfile, p)
 				currPlayerFitness = fitAlg.calculate(playerModelBridge, predictedState)
 				
-				currFitness = self.currPopulationFitnesses[config][1]
-				currFitness += currPlayerFitness
+				self.currPopulation[c]["fitness"] += currPlayerFitness
+				self.currProfiles[c]["fitness"] = self.currPopulation[c]["fitness"]
+
 				# if(currFitness > currMaxFitness):
 				# 	currMaxFitness = currFitness
 				# 	if(bestConfig != c):
 				# 		bestConfig = c
 
-		print(self.currFitnesses)
-		numpy.sort(self.currFitnesses, order=["f1"]) #sort by column 1 which os the actual fitness
-		print(self.currFitnesses)
-		quit()
+				# print(p)
+				# print(playerModelBridge)
+				# print(json.dumps(currProfile, default=lambda o: o.__dict__, sort_keys=True))
+				# print(json.dumps(predictedState, default=lambda o: o.__dict__, sort_keys=True))
+				# input()
 
-		#selection
+		# print(self.currPopulation)
+		# input()
+		self.currPopulation, self.currProfiles = zip(*sorted(zip(self.currPopulation, self.currProfiles), key=self.fitnessSort))
+		self.currPopulation = [a for a in self.currPopulation] #sort by column 1 which is the actual fitness
+		self.currProfiles = [a for a in self.currProfiles] #sort by column 1 which is the actual fitness
+		# print(self.currPopulation)
+		# input()
 
-
-
-		#Genotype->Phenotype of best coalition and return
-		print(self.currPopulation)
+		print(self.currProfiles)
 		input()
 
+		#selection by elitition
+		fitSurvivorsPop = self.currPopulation[numFitSurvivors:]
+		self.currPopulation = fitSurvivorsPop + fitSurvivorsPop
 
-		pass
+		fitSurvivorsProf = self.currProfiles[numFitSurvivors:]
+		self.currProfiles = fitSurvivorsProf + fitSurvivorsProf
+
+
+		# calc Genotype->Phenotype of best config(coalition) and return
+		bestConfig = AdaptationConfiguration()
+		bestConfig.groups = [AdaptationGroup() for i in range(maxNumGroups)]
+
+		bestConfigGenotype = self.currPopulation[-1]
+		bestProfiles = self.currProfiles[-1]["config"]
+
+		for gene in bestConfigGenotype["config"]:
+			bestConfig.groups[gene[1]].addPlayer(playerModelBridge, gene[0])
+			bestConfig.groups[gene[1]].profile = bestProfiles[gene[1]]
+
+		print(json.dumps(bestConfig, default=lambda o: o.__dict__, sort_keys=True))
+		input()
+		return bestConfig
 
 
 class OptimalPracticalConfigsGen(ConfigsGenAlg):
@@ -216,7 +264,8 @@ class OptimalPracticalConfigsGen(ConfigsGenAlg):
 
 					del playersWithoutGroup[currPlayerIndex]
 
-				newConfig.groups.append(currGroup)
+				newConfig.groups = numpy.append(newConfig.groups,currGroup)
+				# newConfig.groups.append(currGroup)
 
 			# append the rest
 			playersWithoutGroupSize = len(playersWithoutGroup)
@@ -263,8 +312,8 @@ class OptimalPracticalConfigsGen(ConfigsGenAlg):
 
 				for currPlayer in group.playerIds:
 
-					currState = playerModelBridge.getPlayerCurrState(playerId)
-					newState = self.simulationFunc(copy.deepcopy(currState), playerModelBridge, playerId, group.profile, self.currIteration)
+					currState = playerModelBridge.getPlayerCurrState(currPlayer)
+					newState = self.simulationFunc(copy.deepcopy(currState), playerModelBridge, currPlayer, group.profile, self.currIteration)
 		
 					currPlayerFitness = fitAlg.calculate(playerModelBridge, newState)
 					currFitness += currPlayerFitness
@@ -323,10 +372,10 @@ class GIMMEConfigsGen(ConfigsGenAlg):
 					currPlayerIndex = numpy.random.randint(0, playersWithoutGroupSize - 1)
 					currPlayerID = playersWithoutGroup[currPlayerIndex]
 					currGroup.addPlayer(playerModelBridge, currPlayerID)
-
 					del playersWithoutGroup[currPlayerIndex]
 
-				newConfig.groups.append(currGroup)
+				newConfig.groups = numpy.append(newConfig.groups,currGroup)
+				# newConfig.groups.append(currGroup)
 
 			# append the rest
 			playersWithoutGroupSize = len(playersWithoutGroup)
@@ -415,7 +464,8 @@ class RandomConfigsGen(ConfigsGenAlg):
 
 				del playersWithoutGroup[currPlayerIndex]
 	
-			randomConfig.groups.append(currGroup)
+			randomConfig.groups = numpy.append(randomConfig.groups,currGroup)
+			# randomConfig.groups.append(currGroup)
 
 		# append the rest
 		playersWithoutGroupSize = len(playersWithoutGroup)

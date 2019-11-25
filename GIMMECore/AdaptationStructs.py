@@ -14,13 +14,12 @@ class AdaptationGroup(object):
 
 		self.tailoredTaskId = -1
 
-		self.playerIds = numpy.empty()
-
-		self.fitness = 0
+		self.playerIds = []
 
 	def addPlayer(self, playerModelBridge, playerId):
-		self.playerIds.append(playerId);
-		playersSize = len(self.playerIds);
+		self.playerIds.append(playerId)
+		# self.playerIds = numpy.append(self.playerIds, playerId)
+		playersSize = len(self.playerIds)
 
 		# recalculate averages
 		self.avgPersonality.reset()
@@ -47,4 +46,4 @@ class AdaptationGroup(object):
 
 class AdaptationConfiguration(object):	
 	def __init__(self):
-		self.groups = []
+		self.groups = numpy.array([])

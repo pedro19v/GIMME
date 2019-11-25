@@ -34,17 +34,20 @@ class PlayerStateGrid(object):
 		
 		self.initialCells = cells
 		if(self.initialCells == None):
-			self.cells = numpy.array([[]*self.maxAmountOfStoredProfilesPerCell]*self.numCells)
+			self.cells = [[]*self.maxAmountOfStoredProfilesPerCell]*self.numCells
+			# self.cells = numpy.ndarray(shape=(self.numCells,self.maxAmountOfStoredProfilesPerCell))
 		else:
 			self.cells = cells
 
 	def reset(self):
 		if(self.initialCells == None):
-			self.cells = numpy.array([[]*self.maxAmountOfStoredProfilesPerCell]*self.numCells)
+			self.cells = [[]*self.maxAmountOfStoredProfilesPerCell]*self.numCells
+			# self.cells = numpy.ndarray(shape=(self.numCells,self.maxAmountOfStoredProfilesPerCell))
 		else:
 			self.cells = cells
 
 	def pushToGrid(self, playerState):
+
 
 		cpPadding = math.ceil(playerState.profile.K_cp * self.dimSpan) - 1
 		iPadding = math.ceil(playerState.profile.K_i * self.dimSpan) - 1
@@ -53,17 +56,13 @@ class PlayerStateGrid(object):
 
 		currCellInd = (self.dimSpan**3)*cpPadding + (self.dimSpan**2)*iPadding + self.dimSpan*mhPadding + paPadding
 		currCell = self.cells[currCellInd]
+		
 		currCell.append(playerState)
-
+		
 		cellsSize = len(self.cells[currCellInd])
-		if (cellsSize > self.maxAmountOfStoredProfilesPerCell):
+		if (cellsSize > (self.maxAmountOfStoredProfilesPerCell - 1)):
 			currCell = currCell[-self.maxAmountOfStoredProfilesPerCell:]
 		self.cells[currCellInd] = currCell
-
-		# for cell in self.cells:
-		# 	print(json.dumps(cell, default=lambda o: o.__dict__, sort_keys=True)) 
-
-		# input("Press Enter to continue...")
 
 	def getAllStates(self):
 		# serialize multi into single dimensional array

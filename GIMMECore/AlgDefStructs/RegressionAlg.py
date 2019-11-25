@@ -37,7 +37,6 @@ class KNNRegression(RegressionAlg):
 
 		pastModelIncsCopy = sorted(pastModelIncsCopy, key=self.interactionsProfileSort)
 
-		# print(self.numberOfNNs)
 		# print(json.dumps(pastModelIncsCopy, default=lambda o: o.__dict__, sort_keys=True))
 		numberOfIterations = min(self.numberOfNNs, len(pastModelIncsCopy))
 		pastModelIncsCopy = pastModelIncsCopy[:numberOfIterations]
@@ -45,9 +44,7 @@ class KNNRegression(RegressionAlg):
 
 		for i in range(numberOfIterations):
 			currState = pastModelIncsCopy[i]
-			# pastProfile = currState.profile
 			pastCharacteristics = currState.characteristics
-			# distance = profile.sqrDistanceBetween(pastProfile)
 
 			predictedState.characteristics.ability += pastCharacteristics.ability / numberOfIterations * ((numberOfIterations - i)/numberOfIterations)
 			predictedState.characteristics.engagement += pastCharacteristics.engagement/ numberOfIterations * ((numberOfIterations - i)/numberOfIterations)

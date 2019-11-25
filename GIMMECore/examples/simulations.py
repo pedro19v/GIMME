@@ -9,7 +9,6 @@ import datetime
 import os
 import sys
 sys.path.append(os.path.join(sys.path[0],'..'))
-print(sys.path)
 
 from GIMMECore import *
 from ModelMocks import *
@@ -127,9 +126,6 @@ def simulateReaction(currIteration, playerBridge, playerId):
 def calcReaction(state, playerBridge, playerId, interactionsProfile, currIteration):
 	personality = playerBridge.getPlayerPersonality(playerId)
 
-	# if(playerId==0):
-	# 	print(json.dumps(personality, default=lambda o: o.__dict__, sort_keys=True))
-
 	# engagement varies from 0 to 1
 	state.characteristics.engagement = 0.2* (state.characteristics.engagement) + 0.8* (4.0 - personality.sqrDistanceBetween(interactionsProfile))/4.0
 
@@ -168,9 +164,6 @@ for x in range(numPlayers):
 	# print(numpy.clip(numpy.random.normal(0.5, 0.5),0.1,0.9))
 
 
-# input("Press Enter to continue...")
-
-
 # ------------------------------------------------------------------------------------------------------------------------------------------
 preferredNumberOfPlayersPerGroup = 4
 
@@ -181,7 +174,7 @@ adaptationOptimal.init(playerBridge, taskBridge, configsGenAlg = simOptimalConfi
 # adaptationOptimal.init(KNNRegression(5), EvolutionaryConfigsGen(), simOptimalFitness, playerBridge, taskBridge, name="", numberOfConfigChoices=100, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, difficultyWeight = 0.5, profileWeight=0.5)
 
 adaptationGIMME.init(playerBridge, taskBridge, regAlg = KNNRegression(5), configsGenAlg = GIMMEConfigsGen(), fitAlg = WeightedFitness(PlayerCharacteristics(ability=0.5, engagement=0.5)), name="", numberOfConfigChoices=100, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup)
-adaptationGIMMEEv.init(playerBridge, taskBridge, regAlg = KNNRegression(5), configsGenAlg = EvolutionaryConfigsGen(), fitAlg = WeightedFitness(PlayerCharacteristics(ability=0.5, engagement=0.5)), name="", numberOfConfigChoices=100, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup)
+adaptationGIMMEEv.init(playerBridge, taskBridge, regAlg = KNNRegression(5), configsGenAlg = EvolutionaryConfigsGen(), fitAlg = WeightedFitness(PlayerCharacteristics(ability=0.5, engagement=0.5)), name="", numberOfConfigChoices=10, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup)
 
 # ------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -277,11 +270,11 @@ def executeSimulations(adaptation, abilityArray, engagementArray, profDiffArray,
 		f.write("\nprofDiffArray: "+json.dumps(profDiffArray))
 		f.close()
 
-executeSimulations(adaptationGIMMEEv, GIMMEEvAbilities, GIMMEEvEngagements, GIMMEEvPrefProfDiff, GIMMEEvGroupSizeFreqs, GIMMEEvConfigsSizeFreqs, GIMMEExecTime, "GIMME", "adaptationGIMME", True,  2, 9)
-executeSimulations(adaptationGIMME, GIMMEAbilities, GIMMEEngagements, GIMMEPrefProfDiff, GIMMEGroupSizeFreqs, GIMMEConfigsSizeFreqs, GIMMEExecTime, "GIMME", "adaptationGIMME", True,  2, 9)
+# executeSimulations(adaptationOptimal, optimalAbilities, optimalEngagements, optimalPrefProfDiff, [], [], optimalExecTime, "optimal", "adaptationOptimal", True, 9, 9)
+# executeSimulations(adaptationRandom, randomAbilities, randomEngagements, randomPrefProfDiff, [], [], randomExecTime, "random", "adaptationRandom", True,  8, 9)
 
-executeSimulations(adaptationOptimal, optimalAbilities, optimalEngagements, optimalPrefProfDiff, [], [], optimalExecTime, "optimal", "adaptationOptimal", True, 9, 9)
-executeSimulations(adaptationRandom, randomAbilities, randomEngagements, randomPrefProfDiff, [], [], randomExecTime, "random", "adaptationRandom", True,  8, 9)
+executeSimulations(adaptationGIMMEEv, GIMMEEvAbilities, GIMMEEvEngagements, GIMMEEvPrefProfDiff, GIMMEEvGroupSizeFreqs, GIMMEEvConfigsSizeFreqs, GIMMEExecTime, "GIMME", "adaptationGIMME", True,  2, 9)
+# executeSimulations(adaptationGIMME, GIMMEAbilities, GIMMEEngagements, GIMMEPrefProfDiff, GIMMEGroupSizeFreqs, GIMMEConfigsSizeFreqs, GIMMEExecTime, "GIMME", "adaptationGIMME", True,  2, 9)
 
 
 timesteps=[i for i in range(maxNumTrainingIterations + numRealIterations + 1)]
