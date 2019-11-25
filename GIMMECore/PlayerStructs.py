@@ -2,7 +2,7 @@ import numpy
 import math
 import time
 from collections import namedtuple
-from AuxStructs.InteractionsProfile import InteractionsProfile
+from InteractionsProfile import InteractionsProfile
 
 import json
 
@@ -34,13 +34,13 @@ class PlayerStateGrid(object):
 		
 		self.initialCells = cells
 		if(self.initialCells == None):
-			self.cells = [[]*self.maxAmountOfStoredProfilesPerCell]*self.numCells
+			self.cells = numpy.array([[]*self.maxAmountOfStoredProfilesPerCell]*self.numCells)
 		else:
 			self.cells = cells
 
 	def reset(self):
 		if(self.initialCells == None):
-			self.cells = [[] for x in range(self.numCells)]
+			self.cells = numpy.array([[]*self.maxAmountOfStoredProfilesPerCell]*self.numCells)
 		else:
 			self.cells = cells
 

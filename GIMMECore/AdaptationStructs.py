@@ -1,5 +1,6 @@
+import numpy
 import json
-from AuxStructs.InteractionsProfile import InteractionsProfile
+from InteractionsProfile import InteractionsProfile
 from PlayerStructs import *
 
 # auxiliary structures: Adaptation
@@ -13,7 +14,7 @@ class AdaptationGroup(object):
 
 		self.tailoredTaskId = -1
 
-		self.playerIds = []
+		self.playerIds = numpy.empty()
 
 		self.fitness = 0
 

@@ -2,27 +2,25 @@ import numpy
 import random
 import json
 import copy
-
 import time
-
 import matplotlib.pyplot as plt
 import math
-
 import datetime
 import os
+import sys
+sys.path.append(os.path.join(sys.path[0],'..'))
+print(sys.path)
 
 from GIMMECore import *
 from ModelMocks import *
 
-import numpy
 
-import random
+
 random.seed(time.perf_counter())
 
-numRuns = 100
-maxNumTrainingIterations = 50
-numRealIterations = 0
-numTrainingCyclesPerRun = 0
+numRuns = 10
+maxNumTrainingIterations = 30
+numRealIterations = 10
 
 playerWindow = 30
 
@@ -35,7 +33,7 @@ tasks = [None for x in range(20)]
 
 
 startTime = str(datetime.datetime.now())
-newpath = "./simulationResults/" + startTime
+newpath = "./simulationResults/" + startTime +" numRuns:" + str(numRuns) + ",maxNumTrainingIterations: " + str(maxNumTrainingIterations) + ", numRealIterations: " + str(numRealIterations)
 if not os.path.exists(newpath):
     os.makedirs(newpath)
     os.makedirs(newpath+"/charts/")
@@ -144,8 +142,8 @@ def calcReaction(state, playerBridge, playerId, interactionsProfile, currIterati
 # create players, tasks and adaptation
 playerBridge = CustomPlayerModelBridge()
 for x in range(numPlayers):
-	playerBridge.registerNewPlayer(int(x), "name", PlayerState(), PlayerStateGrid(10, 3), PlayerCharacteristics(), InteractionsProfile())
-	# playerBridge.registerNewPlayer(int(x), "name", PlayerState(), PlayerStateGrid(1, playerWindow), PlayerCharacteristics(), InteractionsProfile())
+	# playerBridge.registerNewPlayer(int(x), "name", PlayerState(), PlayerStateGrid(10, 3), PlayerCharacteristics(), InteractionsProfile())
+	playerBridge.registerNewPlayer(int(x), "name", PlayerState(), PlayerStateGrid(1, playerWindow), PlayerCharacteristics(), InteractionsProfile())
 
 # print(json.dumps(players, default=lambda o: o.__dict__, sort_keys=True))
 taskBridge = CustomTaskModelBridge()
@@ -155,14 +153,7 @@ for x in range(20):
 
 adaptationGIMME = Adaptation()
 adaptationGIMMEOld = Adaptation()
-
-adaptationGIMME10 = Adaptation()
-adaptationGIMME1000 = Adaptation()
-adaptationGIMME2000  = Adaptation()
-adaptationGIMMEK1 = Adaptation()
-adaptationGIMMEK24 = Adaptation()
-adaptationGIMMEK30 = Adaptation()
-
+adaptationGIMMEEv = Adaptation()
 
 
 adaptationRandom = Adaptation()
@@ -172,8 +163,8 @@ adaptationOptimal = Adaptation()
 # init players
 for x in range(numPlayers):
 	playerBridge.setPlayerPersonality(x, InteractionsProfile(K_i=numpy.random.uniform(0, 1), K_cp=numpy.random.uniform(0, 1), K_mh=numpy.random.uniform(0, 1), K_pa=numpy.random.uniform(0, 1)))
-	# playerBridge.setBaseLearningRate(x, numpy.random.normal(0.5, 0.16))
-	playerBridge.setBaseLearningRate(x, numpy.clip(numpy.random.normal(0.5, 0.3),0.1,0.9))
+	playerBridge.setBaseLearningRate(x, numpy.random.normal(0.5, 0.16))
+	# playerBridge.setBaseLearningRate(x, numpy.clip(numpy.random.normal(0.5, 0.3),0.1,0.9))
 	# print(numpy.clip(numpy.random.normal(0.5, 0.5),0.1,0.9))
 
 
@@ -185,11 +176,12 @@ preferredNumberOfPlayersPerGroup = 4
 
 adaptationRandom.init(playerBridge, taskBridge, configsGenAlg = RandomConfigsGen(), name="", preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup)
 
-simOptimalFitness = SimulationsOptimalFitness(calcReaction, PlayerCharacteristics(ability=1.0, engagement=0.0)) #needed for currIteration updates
-adaptationOptimal.init(playerBridge, taskBridge, configsGenAlg = OptimalPracticalConfigsGen(), fitAlg = simOptimalFitness, name="", numberOfConfigChoices=100, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup)
+simOptimalConfigsAlg = OptimalPracticalConfigsGen(calcReaction) #needed for currIteration updates
+adaptationOptimal.init(playerBridge, taskBridge, configsGenAlg = simOptimalConfigsAlg, fitAlg = WeightedFitness(PlayerCharacteristics(ability=1.0, engagement=0.0)), name="", numberOfConfigChoices=100, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup)
 # adaptationOptimal.init(KNNRegression(5), EvolutionaryConfigsGen(), simOptimalFitness, playerBridge, taskBridge, name="", numberOfConfigChoices=100, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, difficultyWeight = 0.5, profileWeight=0.5)
 
 adaptationGIMME.init(playerBridge, taskBridge, regAlg = KNNRegression(5), configsGenAlg = GIMMEConfigsGen(), fitAlg = WeightedFitness(PlayerCharacteristics(ability=0.5, engagement=0.5)), name="", numberOfConfigChoices=100, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup)
+adaptationGIMMEEv.init(playerBridge, taskBridge, regAlg = KNNRegression(5), configsGenAlg = EvolutionaryConfigsGen(), fitAlg = WeightedFitness(PlayerCharacteristics(ability=0.5, engagement=0.5)), name="", numberOfConfigChoices=100, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup)
 
 # ------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -198,21 +190,27 @@ GIMMEEngagements = [0 for i in range(maxNumTrainingIterations + numRealIteration
 GIMMEPrefProfDiff = [0 for i in range(maxNumTrainingIterations + numRealIterations + 1)]
 GIMMEGroupSizeFreqs = [0 for i in range(preferredNumberOfPlayersPerGroup)]
 GIMMEConfigsSizeFreqs = [0 for i in range(numPlayers)]
+GIMMEExecTime = 0.0
+
+
+GIMMEEvAbilities = [0 for i in range(maxNumTrainingIterations + numRealIterations + 1)]
+GIMMEEvEngagements = [0 for i in range(maxNumTrainingIterations + numRealIterations + 1)]
+GIMMEEvPrefProfDiff = [0 for i in range(maxNumTrainingIterations + numRealIterations + 1)]
+GIMMEEvGroupSizeFreqs = [0 for i in range(preferredNumberOfPlayersPerGroup)]
+GIMMEEvConfigsSizeFreqs = [0 for i in range(numPlayers)]
+GIMMEEvExecTime = 0.0
 
 randomAbilities = [0 for i in range(maxNumTrainingIterations + numRealIterations + 1)]
 randomEngagements = [0 for i in range(maxNumTrainingIterations + numRealIterations + 1)]
 randomPrefProfDiff = [0 for i in range(maxNumTrainingIterations + numRealIterations + 1)]
+randomExecTime = 0.0
 
 
 optimalAbilities = [0 for i in range(maxNumTrainingIterations + numRealIterations + 1)]
 optimalEngagements = [0 for i in range(maxNumTrainingIterations + numRealIterations + 1)]
 optimalPrefProfDiff = [0 for i in range(maxNumTrainingIterations + numRealIterations + 1)]
-
-
-GIMMEExecTime = 0.0
-
-randomExecTime = 0.0
 optimalExecTime = 0.0
+
 
 def executionPhase(maxNumIterations, startingI, currRun, adaptation, abilityArray, engagementArray, profDiffArray, groupSizeFreqsArray, configSizeFreqsArray, avgItExecTime, algType, algorithmFilename, canExport, algorithmNum, numAlgorithms):
 	# for i in range(numIterationsPerRun):
@@ -220,7 +218,7 @@ def executionPhase(maxNumIterations, startingI, currRun, adaptation, abilityArra
 	lastCurrAbilityArray = []
 	while(i < maxNumIterations + startingI):
 		if algType == "optimal":
-			simOptimalFitness.updateCurrIteration(i)
+			simOptimalConfigsAlg.updateCurrIteration(i)
 
 		t0 = time.perf_counter()
 
@@ -249,10 +247,9 @@ def executeSimulations(adaptation, abilityArray, engagementArray, profDiffArray,
 	for r in range(numRuns):
 		for x in range(numPlayers):
 			playerBridge.resetPlayer(x)
-			
-			currPersonality = InteractionsProfile(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1))
-			playerBridge.setPlayerPersonality(x, currPersonality)
-			# playerBridge.setPlayerPersonality(x, initialPersonalities[r][x])
+			playerBridge.setPlayerPersonality(x, InteractionsProfile(K_i=numpy.random.uniform(0, 1), K_cp=numpy.random.uniform(0, 1), K_mh=numpy.random.uniform(0, 1), K_pa=numpy.random.uniform(0, 1)))
+			playerBridge.setBaseLearningRate(x, numpy.random.normal(0.5, 0.16))
+			# playerBridge.setBaseLearningRate(x, numpy.clip(numpy.random.normal(0.5, 0.3),0.1,0.9))
 
 		# algorithm training simulation 
 		executionPhase(maxNumTrainingIterations, 1, r, adaptation, abilityArray, engagementArray, profDiffArray, groupSizeFreqsArray, configSizeFreqsArray, avgItExecTime, algType, algorithmFilename, canExport, algorithmNum, numAlgorithms)
@@ -280,12 +277,12 @@ def executeSimulations(adaptation, abilityArray, engagementArray, profDiffArray,
 		f.write("\nprofDiffArray: "+json.dumps(profDiffArray))
 		f.close()
 
-# executeSimulations(adaptationGIMME, GIMMEAbilities, GIMMEEngagements, GIMMEPrefProfDiff, GIMMEGroupSizeFreqs, GIMMEConfigsSizeFreqs, GIMMEExecTime, "GIMME", "adaptationGIMME", True,  2, 9)
+executeSimulations(adaptationGIMMEEv, GIMMEEvAbilities, GIMMEEvEngagements, GIMMEEvPrefProfDiff, GIMMEEvGroupSizeFreqs, GIMMEEvConfigsSizeFreqs, GIMMEExecTime, "GIMME", "adaptationGIMME", True,  2, 9)
+executeSimulations(adaptationGIMME, GIMMEAbilities, GIMMEEngagements, GIMMEPrefProfDiff, GIMMEGroupSizeFreqs, GIMMEConfigsSizeFreqs, GIMMEExecTime, "GIMME", "adaptationGIMME", True,  2, 9)
 
 executeSimulations(adaptationOptimal, optimalAbilities, optimalEngagements, optimalPrefProfDiff, [], [], optimalExecTime, "optimal", "adaptationOptimal", True, 9, 9)
-# executeSimulations(adaptationRandom, randomAbilities, randomEngagements, randomPrefProfDiff, [], [], randomExecTime, "random", "adaptationRandom", True,  8, 9)
+executeSimulations(adaptationRandom, randomAbilities, randomEngagements, randomPrefProfDiff, [], [], randomExecTime, "random", "adaptationRandom", True,  8, 9)
 
-# quit()
 
 timesteps=[i for i in range(maxNumTrainingIterations + numRealIterations + 1)]
 # # -------------------------------------------------------
@@ -324,10 +321,9 @@ plt.plot(timesteps, optimalAbilities, label=r'$Optimal\ strategy$')
 
 plt.xlabel("Iteration")
 plt.ylabel("avg Ability Increase")
+plt.legend(loc='best')
 
 plt.savefig(newpath+'/charts/simulationsResultsAbility_old.png')
-
-plt.legend(loc='best')
 plt.show()
 
 
@@ -337,10 +333,9 @@ plt.plot(timesteps, numpy.array(optimalAbilities) - numpy.array(randomAbilities)
 
 plt.xlabel("Iteration")
 plt.ylabel("Distance from Optimal avg Ability Increase")
+plt.legend(loc='best')
 
 plt.savefig(newpath+'/charts/simulationsResultsAbility.png')
-
-plt.legend(loc='best')
 plt.show()
 
 
@@ -352,10 +347,9 @@ plt.plot(timesteps, optimalEngagements, label=r'$Optimal\ strategy$')
 
 plt.xlabel("Iteration")
 plt.ylabel("Engagement Increase")
+plt.legend(loc='best')
 
 plt.savefig(newpath+'/charts/simulationsResultsEngagement.png')
-
-plt.legend(loc='best')
 plt.show()
 
 
@@ -366,9 +360,8 @@ plt.plot(timesteps, optimalPrefProfDiff, label=r'$Optimal\ strategy$')
 
 plt.xlabel("Iteration")
 plt.ylabel("avg Preference Differences")
+plt.legend(loc='best')
 
 plt.savefig(newpath+'/charts/simulationsResultsProfileDist.png')
-
-plt.legend(loc='best')
 plt.show()
 

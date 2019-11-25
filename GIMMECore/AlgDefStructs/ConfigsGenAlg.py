@@ -2,7 +2,7 @@ import numpy
 import math
 from abc import ABC, abstractmethod
 from AdaptationStructs import *
-from AuxStructs.InteractionsProfile import InteractionsProfile 
+from InteractionsProfile import InteractionsProfile 
 
 class ConfigsGenAlg(ABC):
 
@@ -77,18 +77,18 @@ class EvolutionaryConfigsGen(ConfigsGenAlg):
 		super().__init__()
 		self.populationInited = False
 		
-	def updatePopulation(self, numPlayers, maxNumGroups, numberOfConfigChoices):
-		self.currPopulation = [[numpy.random.uniform(0, maxNumGroups) for x in range(numPlayers)] for y in range(numberOfConfigChoices)]
-		self.currPopulationFitnesses = [0 for x in range(numPlayers)]
-
-		self.currProfiles = [[ [numpy.random.uniform(0, 1), numpy.random.uniform(0, 1), numpy.random.uniform(0, 1), numpy.random.uniform(0, 1)] for x in range(maxNumGroups)] for y in range(numberOfConfigChoices)]
+	def updatePopulation(self, playerIds, numPlayers, maxNumGroups, numberOfConfigChoices):
+		# represented as genotypes (index 0 of first array represents the id)
+		self.currPopulation = numpy.array([[ [playerIds[x], numpy.random.random_integers(0, maxNumGroups-1)] for x in range(numPlayers)] for y in range(numberOfConfigChoices)])
+		self.currProfiles = numpy.array([[ [x, numpy.random.uniform(0, 1), numpy.random.uniform(0, 1), numpy.random.uniform(0, 1), numpy.random.uniform(0, 1)] for x in range(maxNumGroups)] for y in range(numberOfConfigChoices)])
+		self.currPopulationFitnesses = numpy.array([ [x, 0.0] for x in range(numberOfConfigChoices)])
 
 
 	def organize(self, playerModelBridge, playerIds, numberOfConfigChoices, minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup, regAlg, fitAlg):
-		print("Here4")
+
+		numMutations = 4
 		
 		bestConfig = AdaptationConfiguration()
-
 		numPlayers = len(playerIds)
 
 		if(numPlayers < minNumberOfPlayersPerGroup):
@@ -101,59 +101,83 @@ class EvolutionaryConfigsGen(ConfigsGenAlg):
 
 		#build first population
 		if(self.populationInited == False):
-			self.updatePopulation(numPlayers, maxNumGroups, numberOfConfigChoices)
+			self.updatePopulation(playerIds, numPlayers, maxNumGroups, numberOfConfigChoices)
 			self.populationInited = True
 		
 
 		for config in range(numberOfConfigChoices):
 			if(numpy.random.uniform(0,1) < 0.1):
-				#mutation
-				for i in range(self.numMutations):
-					self.currPopulation[config][numpy.random.random_integers(0, numPlayers)] = numpy.random.random_integers(0, maxNumGroups)
+				#mutation (exploration)
+				# for i in range(self.numMutations):
+				for i in range(numMutations):
+					self.currPopulation[config][numpy.random.random_integers(0, numPlayers-1)] = numpy.random.random_integers(0, maxNumGroups-1)
 					for profile in range(maxNumGroups):
-						self.currProfiles[config][numpy.random.random_integers(0, maxNumGroups)][random(0, 4)] = numpy.random.uniform(0, 1)
+						self.currProfiles[config][numpy.random.random_integers(0, maxNumGroups-1)][numpy.random.random_integers(1, 4)] = numpy.random.uniform(0, 1)
 			else:
-				#crossover
+				#crossover (exploitation)
 				# 2 crossovers differentes 
 
 				# determine mate
-				mate = numpy.random.random_integers(0, numberOfConfigChoices)
+				mate = numpy.random.random_integers(0, numberOfConfigChoices-1)
 
 				# group crossovers
-				crossoverPoint = numpy.random.random_integers(0, numPlayers)
-				print(self.currPopulation[config][:crossoverPoint])
+				crossoverPoint = numpy.random.random_integers(0, numPlayers-1)
 				parentConfig = config
-				self.currPopulation[config] = self.currPopulation[parentConfig][:crossoverPoint].append(self.currPopulation[mate][crossoverPoint:])
-				self.currPopulation[mate] = self.currPopulation[mate][:crossoverPoint].append(self.currPopulation[parentConfig][crossoverPoint:])
+				self.currPopulation[config] = numpy.concatenate((self.currPopulation[parentConfig][:crossoverPoint],self.currPopulation[mate][crossoverPoint:]))
+				self.currPopulation[mate] = numpy.concatenate((self.currPopulation[mate][:crossoverPoint],self.currPopulation[parentConfig][crossoverPoint:]))
 
 				# GIP or inside of GIP crossover
-				crossoverPoint = numpy.random.random_integers(0, numPlayers)
-				self.currProfiles[config][group] = self.currProfiles[config][group][:crossoverPoint].append(self.currProfiles[config][group][crossoverPoint:])
+				crossoverPoint = numpy.random.random_integers(0, numPlayers-1)
+				self.currProfiles[config] = numpy.concatenate((self.currProfiles[config][:crossoverPoint],self.currProfiles[mate][crossoverPoint:]))
+				self.currProfiles[mate] = numpy.concatenate((self.currProfiles[mate][:crossoverPoint],self.currProfiles[config][crossoverPoint:]))
 
-
-		#G->P
-		print(currPopulation, default=lambda o: o.__dict__, sort_keys=True)
-
+		# print(self.currPopulation)
 
 		#fitness
 		for c in range(numberOfConfigChoices):
-			config = self.currPopulation[c]
+			config = self.currPopulation[c][0]
 			for p in range(numPlayers):
-				group = config[p]
-				currProfile = self.currProfiles[c][group]
-				currPlayerFitness = fitAlg.calculate(playerModelBridge, p, currProfile, regAlg)
-				currPopulationFitnesses[currPlayer] += currPlayerFitness
+				group = config[p][1]
+				currProfile = self.currProfiles[config][group][0:]
+				predictedState = regAlg.predict(playerModelBridge, currProfile, p)
+				currPlayerFitness = fitAlg.calculate(playerModelBridge, predictedState)
+				
+				currFitness = self.currPopulationFitnesses[config][1]
+				currFitness += currPlayerFitness
+				# if(currFitness > currMaxFitness):
+				# 	currMaxFitness = currFitness
+				# 	if(bestConfig != c):
+				# 		bestConfig = c
+
+		print(self.currFitnesses)
+		numpy.sort(self.currFitnesses, order=["f1"]) #sort by column 1 which os the actual fitness
+		print(self.currFitnesses)
+		quit()
 
 		#selection
+
+
+
+		#Genotype->Phenotype of best coalition and return
+		print(self.currPopulation)
+		input()
+
 
 		pass
 
 
 class OptimalPracticalConfigsGen(ConfigsGenAlg):
 
-	def __init__(self):
+	def __init__(self, simulationFunc):
 		super().__init__()
 		self.profileGenerator = self.randomProfileGenerator
+
+		self.simulationFunc = simulationFunc
+		self.currIteration = 0
+
+
+	def updateCurrIteration(self, newCurrIteration):
+		self.currIteration = newCurrIteration
 
 	def organize(self, playerModelBridge, playerIds, numberOfConfigChoices, minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup, regAlg, fitAlg):
 		bestConfig = AdaptationConfiguration()
@@ -238,7 +262,11 @@ class OptimalPracticalConfigsGen(ConfigsGenAlg):
 				group.profile = profile
 
 				for currPlayer in group.playerIds:
-					currPlayerFitness = fitAlg.calculate(playerModelBridge, currPlayer, group.profile, regAlg)
+
+					currState = playerModelBridge.getPlayerCurrState(playerId)
+					newState = self.simulationFunc(copy.deepcopy(currState), playerModelBridge, playerId, group.profile, self.currIteration)
+		
+					currPlayerFitness = fitAlg.calculate(playerModelBridge, newState)
 					currFitness += currPlayerFitness
 
 			# print(json.dumps(group, default=lambda o: o.__dict__, sort_keys=True))
@@ -335,7 +363,9 @@ class GIMMEConfigsGen(ConfigsGenAlg):
 				# generate learning profile
 				group.profile = self.profileGenerator(group)
 				for currPlayer in group.playerIds:
-					currPlayerFitness = fitAlg.calculate(playerModelBridge, currPlayer, group.profile, regAlg)
+					predictedState = regAlg.predict(playerModelBridge, group.profile, currPlayer)
+
+					currPlayerFitness = fitAlg.calculate(playerModelBridge, predictedState)
 					currFitness += currPlayerFitness
 
 			# print(json.dumps(group, default=lambda o: o.__dict__, sort_keys=True))
@@ -370,13 +400,6 @@ class RandomConfigsGen(ConfigsGenAlg):
 			numGroups = numpy.random.randint(minNumGroups, maxNumGroups)
 		else: # players length is 1
 			numGroups = maxNumGroups + 1
-
-
-		if(minNumGroups < maxNumGroups):
-			numGroups = numpy.random.randint(minNumGroups, maxNumGroups)
-		else: # players length is 1
-			numGroups = maxNumGroups + 1
-
 
 		# generate min groups
 		for j in range(numGroups):

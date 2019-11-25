@@ -4,7 +4,7 @@ from AlgDefStructs.ConfigsGenAlg import *
 from AlgDefStructs.FitnessAlg import *
 
 from PlayerStructs import PlayerCharacteristics
-from AuxStructs.InteractionsProfile import InteractionsProfile
+from InteractionsProfile import InteractionsProfile
 
 
 from ModelBridge.PlayerModelBridge import PlayerModelBridge 

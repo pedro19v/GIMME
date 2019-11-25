@@ -1,4 +1,3 @@
-import random
 from PlayerStructs import *
 
 class PlayerModelMock(object):

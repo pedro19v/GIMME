@@ -6,7 +6,7 @@ import json
 class RegressionAlg(ABC):
 
 	@abstractmethod
-	def predict(self, profile, playerModelBridge, playerId):
+	def predict(self, playerModelBridge, profile, playerId):
 		pass
 
 
@@ -21,10 +21,12 @@ class KNNRegression(RegressionAlg):
 	def interactionsProfileSort(self, elem):
 		return elem.dist
 
-	def predict(self, profile, playerModelBridge, playerId):
+	def creationTimeSort(self, elem):
+		return elem.creationTime
+
+	def predict(self, playerModelBridge, profile, playerId):
 
 		pastModelIncs = playerModelBridge.getPlayerPastModelIncreases(playerId).getAllStates()
-		# print(pastModelIncs)
 		pastModelIncsCopy = copy.deepcopy(pastModelIncs)
 		pastModelIncsSize = len(pastModelIncs)
 
@@ -38,6 +40,9 @@ class KNNRegression(RegressionAlg):
 		# print(self.numberOfNNs)
 		# print(json.dumps(pastModelIncsCopy, default=lambda o: o.__dict__, sort_keys=True))
 		numberOfIterations = min(self.numberOfNNs, len(pastModelIncsCopy))
+		pastModelIncsCopy = pastModelIncsCopy[:numberOfIterations]
+		pastModelIncsCopy = sorted(pastModelIncsCopy, key=self.creationTimeSort)
+
 		for i in range(numberOfIterations):
 			currState = pastModelIncsCopy[i]
 			# pastProfile = currState.profile
@@ -53,13 +58,13 @@ class KNNRegression(RegressionAlg):
 # ---------------------- NeuralNetworkRegression stuff ---------------------------
 class NeuralNetworkRegression(RegressionAlg):
 
-	def predict(self, profile, playerModelBridge, playerId):
+	def predict(self, playerModelBridge, profile, playerId):
 		pass
 
 
 # ---------------------- ReinforcementLearningRegression stuff ---------------------------
 class ReinforcementLearningRegression(RegressionAlg):
 
-	def predict(self, profile, playerModelBridge, playerId):
+	def predict(self, playerModelBridge, profile, playerId):
 		pass
 
