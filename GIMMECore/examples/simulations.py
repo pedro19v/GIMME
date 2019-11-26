@@ -17,7 +17,7 @@ from ModelMocks import *
 
 random.seed(time.perf_counter())
 
-numRuns = 10
+numRuns = 50
 maxNumTrainingIterations = 30
 numRealIterations = 10
 
@@ -117,7 +117,7 @@ def simulateReaction(currIteration, playerBridge, playerId):
 	currState = playerBridge.getPlayerCurrState(playerId)
 	newState = calcReaction(copy.deepcopy(currState), playerBridge, playerId, currState.profile, currIteration)
 	
-	increases = PlayerState()
+	increases = PlayerState(time.time())
 	increases.profile = currState.profile
 	increases.characteristics = PlayerCharacteristics(ability=(newState.characteristics.ability - currState.characteristics.ability), engagement=newState.characteristics.engagement)
 	playerBridge.savePlayerState(playerId, increases, newState)		
@@ -131,7 +131,6 @@ def calcReaction(state, playerBridge, playerId, interactionsProfile, currIterati
 
 	abilityIncreaseSim = (playerBridge.getBaseLearningRate(x) * state.characteristics.engagement) #between 0 and 1
 	state.characteristics.ability = state.characteristics.ability + abilityIncreaseSim
-	
 	return state
 
 
@@ -139,7 +138,7 @@ def calcReaction(state, playerBridge, playerId, interactionsProfile, currIterati
 playerBridge = CustomPlayerModelBridge()
 for x in range(numPlayers):
 	# playerBridge.registerNewPlayer(int(x), "name", PlayerState(), PlayerStateGrid(10, 3), PlayerCharacteristics(), InteractionsProfile())
-	playerBridge.registerNewPlayer(int(x), "name", PlayerState(), PlayerStateGrid(1, playerWindow), PlayerCharacteristics(), InteractionsProfile())
+	playerBridge.registerNewPlayer(int(x), "name", PlayerState(time.time()), PlayerStateGrid(1, playerWindow), PlayerCharacteristics(), InteractionsProfile())
 
 # print(json.dumps(players, default=lambda o: o.__dict__, sort_keys=True))
 taskBridge = CustomTaskModelBridge()
@@ -174,7 +173,7 @@ adaptationOptimal.init(playerBridge, taskBridge, configsGenAlg = simOptimalConfi
 # adaptationOptimal.init(KNNRegression(5), EvolutionaryConfigsGen(), simOptimalFitness, playerBridge, taskBridge, name="", numberOfConfigChoices=100, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, difficultyWeight = 0.5, profileWeight=0.5)
 
 adaptationGIMME.init(playerBridge, taskBridge, regAlg = KNNRegression(5), configsGenAlg = GIMMEConfigsGen(), fitAlg = WeightedFitness(PlayerCharacteristics(ability=0.5, engagement=0.5)), name="", numberOfConfigChoices=100, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup)
-adaptationGIMMEEv.init(playerBridge, taskBridge, regAlg = KNNRegression(5), configsGenAlg = EvolutionaryConfigsGen(), fitAlg = WeightedFitness(PlayerCharacteristics(ability=0.5, engagement=0.5)), name="", numberOfConfigChoices=10, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup)
+adaptationGIMMEEv.init(playerBridge, taskBridge, regAlg = KNNRegression(5), configsGenAlg = EvolutionaryConfigsGen(numMutations=20), fitAlg = WeightedFitness(PlayerCharacteristics(ability=0.5, engagement=0.5)), name="", numberOfConfigChoices=10, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup)
 
 # ------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -270,11 +269,12 @@ def executeSimulations(adaptation, abilityArray, engagementArray, profDiffArray,
 		f.write("\nprofDiffArray: "+json.dumps(profDiffArray))
 		f.close()
 
+executeSimulations(adaptationGIMMEEv, GIMMEEvAbilities, GIMMEEvEngagements, GIMMEEvPrefProfDiff, GIMMEEvGroupSizeFreqs, GIMMEEvConfigsSizeFreqs, GIMMEExecTime, "GIMME", "adaptationGIMME", True,  2, 9)
+
 executeSimulations(adaptationOptimal, optimalAbilities, optimalEngagements, optimalPrefProfDiff, [], [], optimalExecTime, "optimal", "adaptationOptimal", True, 9, 9)
 executeSimulations(adaptationRandom, randomAbilities, randomEngagements, randomPrefProfDiff, [], [], randomExecTime, "random", "adaptationRandom", True,  8, 9)
 
-executeSimulations(adaptationGIMMEEv, GIMMEEvAbilities, GIMMEEvEngagements, GIMMEEvPrefProfDiff, GIMMEEvGroupSizeFreqs, GIMMEEvConfigsSizeFreqs, GIMMEExecTime, "GIMME", "adaptationGIMME", True,  2, 9)
-# executeSimulations(adaptationGIMME, GIMMEAbilities, GIMMEEngagements, GIMMEPrefProfDiff, GIMMEGroupSizeFreqs, GIMMEConfigsSizeFreqs, GIMMEExecTime, "GIMME", "adaptationGIMME", True,  2, 9)
+executeSimulations(adaptationGIMME, GIMMEAbilities, GIMMEEngagements, GIMMEPrefProfDiff, GIMMEGroupSizeFreqs, GIMMEConfigsSizeFreqs, GIMMEExecTime, "GIMME", "adaptationGIMME", True,  2, 9)
 
 
 timesteps=[i for i in range(maxNumTrainingIterations + numRealIterations + 1)]
@@ -308,7 +308,7 @@ timesteps=[i for i in range(maxNumTrainingIterations + numRealIterations + 1)]
 
 
 # -------------------------------------------------------
-# plt.plot(timesteps, GIMMEAbilities, label=r'$GIMME\ strategy$'))
+plt.plot(timesteps, GIMMEAbilities, label=r'$GIMME\ strategy$')
 plt.plot(timesteps, GIMMEEvAbilities, label=r'$GIMME\ Ev\ strategy$')
 plt.plot(timesteps, randomAbilities, label=r'$Random\ strategy$')
 plt.plot(timesteps, optimalAbilities, label=r'$Optimal\ strategy$')
@@ -323,6 +323,7 @@ plt.show()
 
 # -------------------------------------------------------
 plt.plot(timesteps, numpy.array(optimalAbilities) - numpy.array(GIMMEAbilities), label=r'$GIMME\ strategy$')
+plt.plot(timesteps, numpy.array(optimalAbilities) - numpy.array(GIMMEEvAbilities), label=r'$GIMME\ Ev\ strategy$')
 plt.plot(timesteps, numpy.array(optimalAbilities) - numpy.array(randomAbilities), label=r'$Random\ strategy$')
 
 plt.xlabel("Iteration")
@@ -336,6 +337,7 @@ plt.show()
 
 # -------------------------------------------------------
 plt.plot(timesteps, GIMMEEngagements, label=r'$GIMME\ strategy$')
+plt.plot(timesteps, GIMMEEvEngagements, label=r'$GIMME\ Ev\ strategy$')
 plt.plot(timesteps, randomEngagements, label=r'$Random\ strategy$')
 plt.plot(timesteps, optimalEngagements, label=r'$Optimal\ strategy$')
 
@@ -349,6 +351,7 @@ plt.show()
 
 # -------------------------------------------------------
 plt.plot(timesteps, GIMMEPrefProfDiff, label=r'$GIMME\ strategy$')
+plt.plot(timesteps, GIMMEEvPrefProfDiff, label=r'$GIMME\ Ev\ strategy$')
 plt.plot(timesteps, randomPrefProfDiff, label=r'$Random\ strategy$')
 plt.plot(timesteps, optimalPrefProfDiff, label=r'$Optimal\ strategy$')
 

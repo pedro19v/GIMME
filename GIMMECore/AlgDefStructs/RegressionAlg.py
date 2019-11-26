@@ -15,10 +15,8 @@ class KNNRegression(RegressionAlg):
 
 	def __init__(self, numberOfNNs):
 		self.numberOfNNs = numberOfNNs
-		# print(self.numberOfNNs)
 
-
-	def interactionsProfileSort(self, elem):
+	def distSort(self, elem):
 		return elem.dist
 
 	def creationTimeSort(self, elem):
@@ -30,17 +28,19 @@ class KNNRegression(RegressionAlg):
 		pastModelIncsCopy = copy.deepcopy(pastModelIncs)
 		pastModelIncsSize = len(pastModelIncs)
 
-		predictedState = PlayerState(profile, PlayerCharacteristics())
+		predictedState = PlayerState(0, profile = profile, characteristics = PlayerCharacteristics())
 	
 		for modelInc in pastModelIncsCopy:
 			modelInc.dist = profile.sqrDistanceBetween(modelInc.profile)
 
-		pastModelIncsCopy = sorted(pastModelIncsCopy, key=self.interactionsProfileSort)
 
-		# print(json.dumps(pastModelIncsCopy, default=lambda o: o.__dict__, sort_keys=True))
+		pastModelIncsCopy = sorted(pastModelIncsCopy, key=self.distSort)
+
 		numberOfIterations = min(self.numberOfNNs, len(pastModelIncsCopy))
 		pastModelIncsCopy = pastModelIncsCopy[:numberOfIterations]
 		pastModelIncsCopy = sorted(pastModelIncsCopy, key=self.creationTimeSort)
+		
+		# print(json.dumps(pastModelIncsCopy, default=lambda o: o.__dict__["dist"], sort_keys=True))
 
 		for i in range(numberOfIterations):
 			currState = pastModelIncsCopy[i]
@@ -49,6 +49,7 @@ class KNNRegression(RegressionAlg):
 			predictedState.characteristics.ability += pastCharacteristics.ability / numberOfIterations * ((numberOfIterations - i)/numberOfIterations)
 			predictedState.characteristics.engagement += pastCharacteristics.engagement/ numberOfIterations * ((numberOfIterations - i)/numberOfIterations)
 		
+		# print(json.dumps(predictedState, default=lambda o: o.__dict__, sort_keys=True))
 		return predictedState
 
 

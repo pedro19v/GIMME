@@ -10,7 +10,7 @@ class AdaptationGroup(object):
 		self.profile = InteractionsProfile()
 
 		self.avgPersonality = InteractionsProfile()
-		self.avgPlayerState = PlayerState()
+		self.avgPlayerState = PlayerState(time.time())
 
 		self.tailoredTaskId = -1
 

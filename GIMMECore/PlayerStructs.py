@@ -15,11 +15,11 @@ class PlayerCharacteristics(object):
 		self.engagement = 0
 
 class PlayerState(object):
-	def __init__(self, profile = InteractionsProfile(), characteristics = PlayerCharacteristics(), dist = 0):
+	def __init__(self, creationTime, profile = InteractionsProfile(), characteristics = PlayerCharacteristics(), dist = 0):
 		self.profile = profile
 		self.characteristics = characteristics
 		self.dist = dist
-		self.creationTime = time.time()
+		self.creationTime = creationTime
 	def reset(self):
 		self.profile.reset()
 		self.characteristics.reset()

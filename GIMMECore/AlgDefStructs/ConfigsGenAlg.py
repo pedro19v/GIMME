@@ -74,9 +74,11 @@ class ConfigsGenAlg(ABC):
 		
 
 class EvolutionaryConfigsGen(ConfigsGenAlg):
-	def __init__(self):
+	def __init__(self, numMutations=4, numFitSurvivors=None):
 		super().__init__()
 		self.populationInited = False
+		self.numMutations = numMutations
+		self.numFitSurvivors = numFitSurvivors
 	
 	def fitnessSort(self, elem):
 		return elem[0]["fitness"]
@@ -93,8 +95,8 @@ class EvolutionaryConfigsGen(ConfigsGenAlg):
 
 	def organize(self, playerModelBridge, playerIds, numberOfConfigChoices, minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup, regAlg, fitAlg):
 
-		numMutations = 4
-		numFitSurvivors = math.ceil(numberOfConfigChoices/2)
+		if(self.numFitSurvivors == None):
+			self.numFitSurvivors = math.ceil(numberOfConfigChoices/2)
 		
 		bestConfig = AdaptationConfiguration()
 		numPlayers = len(playerIds)
@@ -114,9 +116,9 @@ class EvolutionaryConfigsGen(ConfigsGenAlg):
 		
 
 		for config in range(numberOfConfigChoices):
-			if(random.uniform(0,1) < 0.5):
+			if(random.uniform(0,1) < 0.1):
 				#mutation (exploration)
-				for i in range(numMutations):
+				for i in range(self.numMutations):
 					# alter random individual's group
 					self.currPopulation[config]["config"][random.randint(0, numPlayers-1)][1] = random.randint(0, maxNumGroups-1)
 					
@@ -157,9 +159,12 @@ class EvolutionaryConfigsGen(ConfigsGenAlg):
 				self.currProfiles[mate]["config"] = (self.currProfiles[mate]["config"][:crossoverPoint] + self.currProfiles[config]["config"][crossoverPoint:])
 				self.currProfiles[config]["config"] = tempConfig
 				
+		# print(json.dumps(self.currProfiles, default=lambda o: o.__dict__, sort_keys=True))
+		# input()
 
 		#calc fitness after KNN for regression
 		for c in range(numberOfConfigChoices):
+			totalFitness = 0
 			config = self.currPopulation[c]["config"]
 			for p in range(numPlayers):
 				group = config[p][1]
@@ -167,9 +172,18 @@ class EvolutionaryConfigsGen(ConfigsGenAlg):
 				predictedState = regAlg.predict(playerModelBridge, currProfile, p)
 				currPlayerFitness = fitAlg.calculate(playerModelBridge, predictedState)
 				
+				# print(json.dumps(group, default=lambda o: o.__dict__, sort_keys=True))
+				# print(json.dumps(currProfile, default=lambda o: o.__dict__, sort_keys=True))
+				totalFitness += currPlayerFitness
+
+				
 				self.currPopulation[c]["fitness"] += currPlayerFitness
 				self.currProfiles[c]["fitness"] = self.currPopulation[c]["fitness"]
 
+			# 	print("-----------------------------")
+			# print(self.currPopulation[c]["fitness"])
+			# print("----------------------------------------------------------")
+				
 				# if(currFitness > currMaxFitness):
 				# 	currMaxFitness = currFitness
 				# 	if(bestConfig != c):
@@ -181,6 +195,8 @@ class EvolutionaryConfigsGen(ConfigsGenAlg):
 				# print(json.dumps(predictedState, default=lambda o: o.__dict__, sort_keys=True))
 				# input()
 
+			
+		
 		# print(self.currPopulation)
 		# input()
 		self.currPopulation, self.currProfiles = zip(*sorted(zip(self.currPopulation, self.currProfiles), key=self.fitnessSort))
@@ -190,24 +206,29 @@ class EvolutionaryConfigsGen(ConfigsGenAlg):
 		# input()
 
 		#selection by elitition
-		fitSurvivorsPop = self.currPopulation[numFitSurvivors:]
+		fitSurvivorsPop = self.currPopulation[self.numFitSurvivors:]
 		self.currPopulation = fitSurvivorsPop + fitSurvivorsPop
 
-		fitSurvivorsProf = self.currProfiles[numFitSurvivors:]
+		fitSurvivorsProf = self.currProfiles[self.numFitSurvivors:]
 		self.currProfiles = fitSurvivorsProf + fitSurvivorsProf
 
+
+		# print(self.currPopulation)
+		for c in range(numberOfConfigChoices):
+			self.currPopulation[c]["fitness"] = 0.0
+			self.currProfiles[c]["fitness"] = 0.0
 
 		# calc Genotype->Phenotype of best config(coalition) and return
 		bestConfig = AdaptationConfiguration()
 		bestConfig.groups = [AdaptationGroup() for i in range(maxNumGroups)]
 
-		bestConfigGenotype = self.currPopulation[-1]
-		bestProfiles = self.currProfiles[-1]["config"]
+		bestConfigGenotype = self.currPopulation[-1]["config"]
+		bestProfilesGenotype = self.currProfiles[-1]["config"]
 
 
-		for gene in bestConfigGenotype["config"]:
+		for gene in bestConfigGenotype:
 			bestConfig.groups[gene[1]].addPlayer(playerModelBridge, gene[0])
-			bestConfig.groups[gene[1]].profile = bestProfiles[gene[1]]
+			bestConfig.groups[gene[1]].profile = bestProfilesGenotype[gene[1]]
 
 			# print(json.dumps(bestConfig.groups[gene[1]].profile, default=lambda o: o.__dict__, sort_keys=True))
 			# input()
