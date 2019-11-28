@@ -6,6 +6,8 @@ from InteractionsProfile import InteractionsProfile
 
 import json
 
+
+
 class PlayerCharacteristics(object):
 	def __init__(self, ability=0, engagement=0):
 		self.ability = ability
@@ -15,15 +17,24 @@ class PlayerCharacteristics(object):
 		self.engagement = 0
 
 class PlayerState(object):
-	def __init__(self, creationTime = time.time(), profile = InteractionsProfile(), characteristics = PlayerCharacteristics(), dist = 0):
-		self.profile = profile
+	def __init__(self, creationTime = time.time(), profile = InteractionsProfile(), characteristics = PlayerCharacteristics(), dist = -1):
 		self.characteristics = characteristics
-		self.dist = dist
 		self.creationTime = creationTime
+
+		self.profile = profile
+		self.dist = dist
+		self.groupId = -1
+		
+		self.tailoredTaskId = -1
+
 	def reset(self):
-		self.profile.reset()
 		self.characteristics.reset()
-		self.dist = 0
+
+		self.profile.reset()
+		self.dist = -1
+
+		self.groupId = -1
+
 
 class PlayerStateGrid(object):
 	def __init__(self, numCells=1, maxAmountOfStoredProfilesPerCell=30,  cells=None):

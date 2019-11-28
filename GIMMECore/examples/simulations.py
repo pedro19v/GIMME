@@ -17,8 +17,8 @@ from ModelMocks import *
 
 random.seed(time.perf_counter())
 
-numRuns = 100
-maxNumTrainingIterations = 20
+numRuns = 30
+maxNumTrainingIterations = 30
 numRealIterations = 10
 
 playerWindow = 30
@@ -68,6 +68,9 @@ class CustomPlayerModelBridge(PlayerModelBridge):
 		players[int(playerId)].pastModelIncreasesGrid.reset()
 		# print(json.dumps(players[int(playerId)], default=lambda o: o.__dict__, sort_keys=True))
 
+	def updatePlayerState(self, playerId, newState):
+		players[int(playerId)].currState = newState
+
 	def savePlayerState(self, playerId, increases, newState):
 		players[int(playerId)].currState = newState
 		players[int(playerId)].pastModelIncreasesGrid.pushToGrid(increases)
@@ -114,9 +117,6 @@ class CustomPlayerModelBridge(PlayerModelBridge):
 	def setPlayerCharacteristics(self, playerId, characteristics):
 		players[int(playerId)].currState.characteristics = characteristics
 
-	def setPlayerCurrProfile(self, playerId, profile):
-		players[int(playerId)].currState.profile = profile
-
 
 
 
@@ -128,12 +128,10 @@ def simulateReaction(currIteration, playerBridge, playerId):
 	increases.profile = currState.profile
 	increases.characteristics = PlayerCharacteristics(ability=(newState.characteristics.ability - currState.characteristics.ability), engagement=newState.characteristics.engagement)
 	playerBridge.savePlayerState(playerId, increases, newState)	
-
 	return increases
 
 def calcReaction(state, playerBridge, playerId, interactionsProfile, currIteration):
 	personality = playerBridge.getPlayerPersonality(playerId)
-
 	newState = PlayerState(characteristics = PlayerCharacteristics(ability=state.characteristics.ability, engagement=state.characteristics.engagement), profile=state.profile)
 
 	# engagement varies from 0 to 1
@@ -183,7 +181,7 @@ adaptationRandom.init(playerBridge, taskBridge, configsGenAlg = RandomConfigsGen
 
 simOptimalConfigsAlg = OptimalPracticalConfigsGen(calcReaction) #needed for currIteration updates
 adaptationOptimal.init(playerBridge, taskBridge, configsGenAlg = simOptimalConfigsAlg, fitAlg = WeightedFitness(PlayerCharacteristics(ability=1.0, engagement=0.0)), name="", numberOfConfigChoices=100, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup)
-# adaptationOptimal.init(KNNRegression(5), EvolutionaryConfigsGen(), simOptimalFitness, playerBridge, taskBridge, name="", numberOfConfigChoices=100, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, difficultyWeight = 0.5, profileWeight=0.5)
+# adaptationOptimal.init(playerBridge, taskBridge, configsGenAlg = simOptimalConfigsAlg, fitAlg = WeightedFitness(PlayerCharacteristics(ability=1.0, engagement=0.0)), name="", numberOfConfigChoices=100, minNumberOfPlayersPerGroup = 2, maxNumberOfPlayersPerGroup = 5,)
 
 # ------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -229,7 +227,7 @@ def executionPhase(maxNumIterations, startingI, currRun, adaptation, abilityArra
 		t0 = time.perf_counter()
 
 		print("step (" +str(i - startingI)+ " of "+str(maxNumIterations)+") of run ("+str(currRun)+" of "+str(numRuns)+") of algorithm ("+str(algorithmNum)+" of "+str(numAlgorithms)+")						", end="\r")
-		iteration = adaptation.iterate()
+		adaptation.iterate()
 
 		t1 = time.perf_counter() - t0
 		avgItExecTime += (t1 - t0)/(numRuns) # CPU seconds elapsed (floating point)
@@ -290,13 +288,13 @@ def executeSimulations(adaptation, abilityArray, engagementArray, profDiffArray,
 # plt.ylim(ymin=0, ymax=1)
 # plt.legend(loc='best')
 # plt.show()
+# executeSimulations(adaptationGIMMEEv, GIMMEEvAbilities, GIMMEEvEngagements, GIMMEEvPrefProfDiff, GIMMEEvGroupSizeFreqs, GIMMEEvConfigsSizeFreqs, GIMMEExecTime, "GIMME", "adaptationGIMME", True,  2, 9)
 
 executeSimulations(adaptationGIMME, GIMMEAbilities, GIMMEEngagements, GIMMEPrefProfDiff, GIMMEGroupSizeFreqs, GIMMEConfigsSizeFreqs, GIMMEExecTime, "GIMME", "adaptationGIMME", True,  2, 9)
-executeSimulations(adaptationGIMMEEv, GIMMEEvAbilities, GIMMEEvEngagements, GIMMEEvPrefProfDiff, GIMMEEvGroupSizeFreqs, GIMMEEvConfigsSizeFreqs, GIMMEExecTime, "GIMME", "adaptationGIMME", True,  2, 9)
+executeSimulations(adaptationOptimal, optimalAbilities, optimalEngagements, optimalPrefProfDiff, [], [], optimalExecTime, "optimal", "adaptationOptimal", True, 9, 9)
 
 executeSimulations(adaptationRandom, randomAbilities, randomEngagements, randomPrefProfDiff, [], [], randomExecTime, "random", "adaptationRandom", True,  8, 9)
 
-executeSimulations(adaptationOptimal, optimalAbilities, optimalEngagements, optimalPrefProfDiff, [], [], optimalExecTime, "optimal", "adaptationOptimal", True, 9, 9)
 
 
 

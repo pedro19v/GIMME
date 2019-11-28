@@ -40,16 +40,16 @@ class ConfigsGenAlg(ABC):
 		pass
 
 	def updateMetrics(self, generatedConfig):
-		if(self.configSizeFreqs.get(len(generatedConfig.groups))):
-			self.configSizeFreqs[len(generatedConfig.groups)]+=1
+		if(self.configSizeFreqs.get(len(generatedConfig))):
+			self.configSizeFreqs[len(generatedConfig)]+=1
 		else:
-			self.configSizeFreqs[len(generatedConfig.groups)]=1
+			self.configSizeFreqs[len(generatedConfig)]=1
 
-		for group in generatedConfig.groups:
-			if(self.configSizeFreqs.get(len(group.playerIds))):
-				self.configSizeFreqs[len(group.playerIds)]+=1
+		for group in generatedConfig:
+			if(self.configSizeFreqs.get(len(group))):
+				self.configSizeFreqs[len(group)]+=1
 			else:
-				self.configSizeFreqs[len(group.playerIds)]=1
+				self.configSizeFreqs[len(group)]=1
 
 
 
@@ -228,23 +228,29 @@ class EvolutionaryConfigsGen(ConfigsGenAlg):
 			self.currProfiles[c]["fitness"] = 0.0
 
 		# calc Genotype->Phenotype of best config(coalition) and return
-		bestConfig = AdaptationConfiguration()
-		bestConfig.groups = [AdaptationGroup() for i in range(maxNumGroups)]
+		bestGroups = [[] for i in range(maxNumGroups)]
+		bestConfigProfiles = [0 for i in range(maxNumGroups)]
 
 		bestConfigGenotype = self.currPopulation[-1]["config"]
 		bestProfilesGenotype = self.currProfiles[-1]["config"]
 
 
 		for gene in bestConfigGenotype:
-			bestConfig.groups[gene[1]].addPlayer(playerModelBridge, gene[0])
-			bestConfig.groups[gene[1]].profile = bestProfilesGenotype[gene[1]]
+			bestGroups[gene[1]].append(gene[0])
+			bestConfigProfiles[gene[1]] = bestProfilesGenotype[gene[1]]
 
+		if [] in bestGroups:  bestGroups.remove([])
+		if 0 in bestConfigProfiles: bestConfigProfiles.remove(0)
+		
+
+		print(bestGroups)
+		print(bestConfigProfiles)
 			# print(json.dumps(bestConfig.groups[gene[1]].profile, default=lambda o: o.__dict__, sort_keys=True))
 			# input()
 
 		# print(json.dumps(bestConfig, default=lambda o: o.__dict__, sort_keys=True))
 		# input()
-		return bestConfig
+		return {"groups": bestGroups, "profiles": bestConfigProfiles, "avgStates": [PlayerState() for i in range(maxNumGroups)]}
 
 
 class OptimalPracticalConfigsGen(ConfigsGenAlg):
@@ -261,22 +267,27 @@ class OptimalPracticalConfigsGen(ConfigsGenAlg):
 		self.currIteration = newCurrIteration
 
 	def organize(self, playerModelBridge, playerIds, numberOfConfigChoices, minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup, regAlg, fitAlg):
-		bestConfig = AdaptationConfiguration()
+		bestGroups = []
+		bestConfigProfiles = []
+		bestAvgStates = []
 
 		if(len(playerIds) < minNumberOfPlayersPerGroup):
-			return bestConfig
+			print("number of players is lower than the minimum number of players per group!")
+			input()
+			return bestGroups
 
 		currMaxFitness = -float("inf")
-
+		
 		minNumGroups = math.ceil(len(playerIds) / maxNumberOfPlayersPerGroup)
 		maxNumGroups = math.floor(len(playerIds) / minNumberOfPlayersPerGroup)
 
-
 		# generate several random groups, calculate their fitness and select the best one
 		for i in range(numberOfConfigChoices):
-			currFitness = 0.0
+			
 			playersWithoutGroup = playerIds.copy()
-			newConfig = AdaptationConfiguration()
+			newGroups = []
+			newConfigProfiles = []
+			newAvgStates = []
 
 			if(minNumGroups < maxNumGroups):
 				numGroups = numpy.random.randint(minNumGroups, maxNumGroups)
@@ -284,84 +295,101 @@ class OptimalPracticalConfigsGen(ConfigsGenAlg):
 				numGroups = maxNumGroups + 1
 
 			# generate min groups
-			playersWithoutGroupSize = 0
-			for j in range(numGroups):
-				currGroup = AdaptationGroup()
-
+			playersWithoutGroupSize = len(playersWithoutGroup)
+			for g in range(numGroups):
+				currGroup = []
 				# add min number of players to the group
-				for s in range(min(playersWithoutGroupSize, minNumberOfPlayersPerGroup)):
-					playersWithoutGroupSize = len(playersWithoutGroup)
-					currPlayerIndex = numpy.random.randint(0, playersWithoutGroupSize - 1)
+				for p in range(min(len(playersWithoutGroup), minNumberOfPlayersPerGroup)):
+					currPlayerIndex = random.randint(0, len(playersWithoutGroup) - 1)
 					currPlayerID = playersWithoutGroup[currPlayerIndex]
-					currGroup.addPlayer(playerModelBridge, currPlayerID)
-
+					currGroup.append(currPlayerID)
 					del playersWithoutGroup[currPlayerIndex]
+				
+				# to not add empty groups
+				if(len(currGroup)>0):
+					newGroups.append(currGroup)
 
-				newConfig.groups = numpy.append(newConfig.groups,currGroup)
-				# newConfig.groups.append(currGroup)
 
 			# append the rest
 			playersWithoutGroupSize = len(playersWithoutGroup)
 			while playersWithoutGroupSize > 0:
-
-				randomGroupIndex = numpy.random.randint(0, len(newConfig.groups) - 1)
-
+				randomGroupIndex = random.randint(0, len(newGroups) - 1)
 				currPlayerIndex = 0;
 				if (playersWithoutGroupSize > 1):
-					currPlayerIndex = numpy.random.randint(0, playersWithoutGroupSize - 1)
+					currPlayerIndex = random.randint(0, playersWithoutGroupSize - 1)
 				else:
 					currPlayerIndex = 0
 
-				currGroup = newConfig.groups[randomGroupIndex]
-				groupsSize = len(newConfig.groups)
+				currGroup = newGroups[randomGroupIndex]
+				groupsSize = len(newGroups)
 
-				while (len(currGroup.playerIds) > (maxNumberOfPlayersPerGroup - 1)):
+				while (len(currGroup) > (maxNumberOfPlayersPerGroup - 1)):
 					randomGroupIndex += 1
-					currGroup = newConfig.groups[randomGroupIndex%groupsSize]
+					currGroup = newGroups[randomGroupIndex%groupsSize]
 
-				currPlayer = playersWithoutGroup[currPlayerIndex]
-				currGroup.addPlayer(playerModelBridge, currPlayer)
+				currPlayerID = playersWithoutGroup[currPlayerIndex]
+				currGroup.append(currPlayerID)
 
 				del playersWithoutGroup[currPlayerIndex]
 				playersWithoutGroupSize = len(playersWithoutGroup)
 
 
-			playerSize = len(playerIds)
-			currGroups = newConfig.groups
-			currGroupsSize = len(currGroups)
-
+			newConfigSize = len(newGroups)
+			
+			currFitness = 0.0
 			# generate profiles
-			for group in currGroups:
-				# generate learning profile
+			for groupI in range(newConfigSize):
+				group = newGroups[groupI]
+				groupSize = len(group)
+
+				# generate profile as average of the personalities
 				profile = InteractionsProfile()
-				for currPlayer in group.playerIds:
+				for currPlayer in group:
 					personality = playerModelBridge.getPlayerPersonality(currPlayer)
-					profile.K_cp += personality.K_cp/currGroupsSize
-					profile.K_i += personality.K_i/currGroupsSize
-					profile.K_mh += personality.K_mh/currGroupsSize
-					profile.K_pa += personality.K_pa/currGroupsSize
+					profile.K_cp += personality.K_cp/newConfigSize
+					profile.K_i += personality.K_i/newConfigSize
+					profile.K_mh += personality.K_mh/newConfigSize
+					profile.K_pa += personality.K_pa/newConfigSize
+				newConfigProfiles.append(profile)
 
-				group.profile = profile
 
-				for currPlayer in group.playerIds:
-
+				# calculate fitness and average state
+				for currPlayer in group:
 					currState = playerModelBridge.getPlayerCurrState(currPlayer)
-					newState = self.simulationFunc(currState, playerModelBridge, currPlayer, group.profile, self.currIteration)
+					currState.profile = profile
+
+					newAvgState = PlayerState()
+					newAvgState.characteristics.ability += currState.characteristics.ability / groupSize
+					newAvgState.characteristics.engagement += currState.characteristics.engagement / groupSize
+					newAvgState.profile = profile
+					newAvgStates.append(newAvgState)
+
+					newState = self.simulationFunc(currState, playerModelBridge, currPlayer, profile, self.currIteration)
 		
-					currPlayerFitness = fitAlg.calculate(playerModelBridge, newState)
+					increases = PlayerState()
+					increases.profile = currState.profile
+					increases.characteristics = PlayerCharacteristics(ability=(newState.characteristics.ability - currState.characteristics.ability), engagement=newState.characteristics.engagement)
+				
+					currPlayerFitness = fitAlg.calculate(playerModelBridge, increases)
 					currFitness += currPlayerFitness
 
 			# print(json.dumps(group, default=lambda o: o.__dict__, sort_keys=True))
 			if (currFitness > currMaxFitness):
-				bestConfig = newConfig
+				bestGroups = newGroups
+				bestConfigProfiles = newConfigProfiles
+				bestAvgStates = newAvgStates
 				currMaxFitness = currFitness
-				
+			
+		# print(bestGroups)
+		# print(bestConfigProfiles)
+		# print(json.dumps(bestAvgStates, default=lambda o: o.__dict__, sort_keys=True))
+		# input()
 		# print("---------------------------")
 		# for group in bestConfig.groups:
 		# 	print(group.playerIds)
 		# print(json.dumps(bestConfig, default=lambda o: o.__dict__, sort_keys=True))
-		self.updateMetrics(bestConfig)
-		return bestConfig
+		self.updateMetrics(bestGroups)
+		return {"groups": bestGroups, "profiles": bestConfigProfiles, "avgStates": bestAvgStates}
 
 
 
@@ -372,21 +400,28 @@ class GIMMEConfigsGen(ConfigsGenAlg):
 		self.profileGenerator = self.randomProfileGenerator
 
 	def organize(self, playerModelBridge, playerIds, numberOfConfigChoices, minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup, regAlg, fitAlg):
-		bestConfig = AdaptationConfiguration()
+		
+		bestGroups = []
+		bestConfigProfiles = []
+		bestAvgStates = []
 
 		if(len(playerIds) < minNumberOfPlayersPerGroup):
-			return bestConfig
+			print("number of players is lower than the minimum number of players per group!")
+			input()
+			return bestGroups
 
 		currMaxFitness = -float("inf")
-
+		
 		minNumGroups = math.ceil(len(playerIds) / maxNumberOfPlayersPerGroup)
 		maxNumGroups = math.floor(len(playerIds) / minNumberOfPlayersPerGroup)
 
 		# generate several random groups, calculate their fitness and select the best one
 		for i in range(numberOfConfigChoices):
-			currFitness = 0.0
+			
 			playersWithoutGroup = playerIds.copy()
-			newConfig = AdaptationConfiguration()
+			newGroups = []
+			newConfigProfiles = []
+			newAvgStates = []
 
 			if(minNumGroups < maxNumGroups):
 				numGroups = numpy.random.randint(minNumGroups, maxNumGroups)
@@ -394,73 +429,88 @@ class GIMMEConfigsGen(ConfigsGenAlg):
 				numGroups = maxNumGroups + 1
 
 			# generate min groups
-			playersWithoutGroupSize = 0
-			for j in range(numGroups):
-				currGroup = AdaptationGroup()
-
+			playersWithoutGroupSize = len(playersWithoutGroup)
+			for g in range(numGroups):
+				currGroup = []
 				# add min number of players to the group
-				for s in range(min(playersWithoutGroupSize, minNumberOfPlayersPerGroup)):
-					playersWithoutGroupSize = len(playersWithoutGroup)
-					currPlayerIndex = numpy.random.randint(0, playersWithoutGroupSize - 1)
+				for p in range(min(len(playersWithoutGroup), minNumberOfPlayersPerGroup)):
+					currPlayerIndex = random.randint(0, len(playersWithoutGroup) - 1)
 					currPlayerID = playersWithoutGroup[currPlayerIndex]
-					currGroup.addPlayer(playerModelBridge, currPlayerID)
+					currGroup.append(currPlayerID)
 					del playersWithoutGroup[currPlayerIndex]
+				
+				# to not add empty groups
+				if(len(currGroup)>0):
+					newGroups.append(currGroup)
 
-				newConfig.groups = numpy.append(newConfig.groups,currGroup)
-				# newConfig.groups.append(currGroup)
 
 			# append the rest
 			playersWithoutGroupSize = len(playersWithoutGroup)
 			while playersWithoutGroupSize > 0:
-
-				randomGroupIndex = numpy.random.randint(0, len(newConfig.groups) - 1)
-
+				randomGroupIndex = random.randint(0, len(newGroups) - 1)
 				currPlayerIndex = 0;
 				if (playersWithoutGroupSize > 1):
-					currPlayerIndex = numpy.random.randint(0, playersWithoutGroupSize - 1)
+					currPlayerIndex = random.randint(0, playersWithoutGroupSize - 1)
 				else:
 					currPlayerIndex = 0
 
-				currGroup = newConfig.groups[randomGroupIndex]
-				groupsSize = len(newConfig.groups)
+				currGroup = newGroups[randomGroupIndex]
+				groupsSize = len(newGroups)
 
-				while (len(currGroup.playerIds) > (maxNumberOfPlayersPerGroup - 1)):
+				while (len(currGroup) > (maxNumberOfPlayersPerGroup - 1)):
 					randomGroupIndex += 1
-					currGroup = newConfig.groups[randomGroupIndex%groupsSize]
+					currGroup = newGroups[randomGroupIndex%groupsSize]
 
-				currPlayer = playersWithoutGroup[currPlayerIndex]
-				currGroup.addPlayer(playerModelBridge, currPlayer)
+				currPlayerID = playersWithoutGroup[currPlayerIndex]
+				currGroup.append(currPlayerID)
 
 				del playersWithoutGroup[currPlayerIndex]
 				playersWithoutGroupSize = len(playersWithoutGroup)
 
 
-			playerSize = len(playerIds)
-			currGroups = newConfig.groups
-			currGroupsSize = len(currGroups)
-
+			newConfigSize = len(newGroups)
+			
+			currFitness = 0.0
 			# generate profiles
-			for group in currGroups:
-				# generate learning profile
-				group.profile = self.profileGenerator(group)
-				
-				for currPlayer in group.playerIds:
-					predictedState = regAlg.predict(playerModelBridge, group.profile, currPlayer)
-					
-					currPlayerFitness = fitAlg.calculate(playerModelBridge, predictedState)
+			for groupI in range(newConfigSize):
+				group = newGroups[groupI]
+				groupSize = len(group)
+
+				# generate profile as average of the personalities
+				profile = InteractionsProfile()
+				for currPlayer in group:
+					personality = playerModelBridge.getPlayerPersonality(currPlayer)
+					profile.K_cp += personality.K_cp/newConfigSize
+					profile.K_i += personality.K_i/newConfigSize
+					profile.K_mh += personality.K_mh/newConfigSize
+					profile.K_pa += personality.K_pa/newConfigSize
+				newConfigProfiles.append(profile)
+
+
+				# calculate fitness and average state
+				for currPlayer in group:
+					currState = playerModelBridge.getPlayerCurrState(currPlayer)
+					currState.profile = profile
+
+					newAvgState = PlayerState()
+					newAvgState.characteristics.ability += currState.characteristics.ability / groupSize
+					newAvgState.characteristics.engagement += currState.characteristics.engagement / groupSize
+					newAvgState.profile = profile
+					newAvgStates.append(newAvgState)
+
+					predictedIncreases = regAlg.predict(playerModelBridge, profile, currPlayer)
+					currPlayerFitness = fitAlg.calculate(playerModelBridge, predictedIncreases)
 					currFitness += currPlayerFitness
 
 			# print(json.dumps(group, default=lambda o: o.__dict__, sort_keys=True))
 			if (currFitness > currMaxFitness):
-				bestConfig = newConfig
+				bestGroups = newGroups
+				bestConfigProfiles = newConfigProfiles
+				bestAvgStates = newAvgStates
 				currMaxFitness = currFitness
-				
-		# print("---------------------------")
-		# for group in bestConfig.groups:
-		# 	print(group.playerIds)
-		# print(json.dumps(bestConfig, default=lambda o: o.__dict__, sort_keys=True))
-		self.updateMetrics(bestConfig)
-		return bestConfig
+		
+		self.updateMetrics(bestGroups)
+		return {"groups": bestGroups, "profiles": bestConfigProfiles, "avgStates": bestAvgStates}
 
 
 class RandomConfigsGen(ConfigsGenAlg):
@@ -470,63 +520,116 @@ class RandomConfigsGen(ConfigsGenAlg):
 		self.profileGenerator = self.randomProfileGenerator
 
 	def organize(self, playerModelBridge, playerIds, numberOfConfigChoices, minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup, regAlg, fitAlg):
-		playersWithoutGroup = playerIds.copy()
-		playersWithoutGroupSize = 0
-		randomConfig = AdaptationConfiguration()
+		bestGroups = []
+		bestConfigProfiles = []
+		bestAvgStates = []
 
+		if(len(playerIds) < minNumberOfPlayersPerGroup):
+			print("number of players is lower than the minimum number of players per group!")
+			input()
+			return bestGroups
+
+		currMaxFitness = -float("inf")
 
 		minNumGroups = math.ceil(len(playerIds) / maxNumberOfPlayersPerGroup)
 		maxNumGroups = math.floor(len(playerIds) / minNumberOfPlayersPerGroup)
 
-		if(minNumGroups < maxNumGroups):
-			numGroups = numpy.random.randint(minNumGroups, maxNumGroups)
-		else: # players length is 1
-			numGroups = maxNumGroups + 1
+		# generate several random groups, calculate their fitness and select the best one
+		for i in range(1):
+			currFitness = 0.0
+			playersWithoutGroup = playerIds.copy()
+			newGroups = []
+			newConfigProfiles = []
+			newAvgStates = []
 
-		# generate min groups
-		for j in range(numGroups):
-			currGroup = AdaptationGroup()
-			currGroup.profile = self.profileGenerator(currGroup)
+			if(minNumGroups < maxNumGroups):
+				numGroups = numpy.random.randint(minNumGroups, maxNumGroups)
+			else: # players length is 1
+				numGroups = maxNumGroups + 1
 
-			# add min number of players to the group
-			for s in range(min(playersWithoutGroupSize, minNumberOfPlayersPerGroup)):
-				playersWithoutGroupSize = len(playersWithoutGroup)
-				currPlayerIndex = numpy.random.randint(0, playersWithoutGroupSize - 1)
+			# generate min groups
+			playersWithoutGroupSize = len(playersWithoutGroup)
+			for g in range(numGroups):
+				currGroup = []
+				# add min number of players to the group
+				for p in range(min(len(playersWithoutGroup), minNumberOfPlayersPerGroup)):
+					currPlayerIndex = random.randint(0, len(playersWithoutGroup) - 1)
+					currPlayerID = playersWithoutGroup[currPlayerIndex]
+					currGroup.append(currPlayerID)
+					del playersWithoutGroup[currPlayerIndex]
+				
+				# to not add empty groups
+				if(len(currGroup)>0):
+					newGroups.append(currGroup)
+
+
+			# append the rest
+			playersWithoutGroupSize = len(playersWithoutGroup)
+			while playersWithoutGroupSize > 0:
+				randomGroupIndex = random.randint(0, len(newGroups) - 1)
+				currPlayerIndex = 0;
+				if (playersWithoutGroupSize > 1):
+					currPlayerIndex = random.randint(0, playersWithoutGroupSize - 1)
+				else:
+					currPlayerIndex = 0
+
+				currGroup = newGroups[randomGroupIndex]
+				groupsSize = len(newGroups)
+
+				while (len(currGroup) > (maxNumberOfPlayersPerGroup - 1)):
+					randomGroupIndex += 1
+					currGroup = newGroups[randomGroupIndex%groupsSize]
+
 				currPlayerID = playersWithoutGroup[currPlayerIndex]
-				currGroup.addPlayer(playerModelBridge, currPlayerID)
+				currGroup.append(currPlayerID)
 
 				del playersWithoutGroup[currPlayerIndex]
-	
-			randomConfig.groups = numpy.append(randomConfig.groups,currGroup)
-			# randomConfig.groups.append(currGroup)
-
-		# append the rest
-		playersWithoutGroupSize = len(playersWithoutGroup)
-		while playersWithoutGroupSize > 0:
-
-			randomGroupIndex = numpy.random.randint(0, len(randomConfig.groups) - 1)
-
-			currPlayerIndex = 0;
-			if (playersWithoutGroupSize > 1):
-				currPlayerIndex = numpy.random.randint(0, playersWithoutGroupSize - 1)
-			else:
-				currPlayerIndex = 0
-
-			currGroup = randomConfig.groups[randomGroupIndex]
-			groupsSize = len(randomConfig.groups)
-
-			while (len(currGroup.playerIds) > (maxNumberOfPlayersPerGroup - 1)):
-				randomGroupIndex += 1
-				currGroup = randomConfig.groups[randomGroupIndex%groupsSize]
-
-			currPlayer = playersWithoutGroup[currPlayerIndex]
-			currGroup.addPlayer(playerModelBridge, currPlayer)
-
-			del playersWithoutGroup[currPlayerIndex]
-			playersWithoutGroupSize = len(playersWithoutGroup)
+				playersWithoutGroupSize = len(playersWithoutGroup)
 
 
+			newConfigSize = len(newGroups)
+			
+			# generate profiles
+			for groupI in range(newConfigSize):
+				group = newGroups[groupI]
+				groupSize = len(group)
+				# generate learning profile
+				profile = InteractionsProfile()
+				for currPlayer in group:
+					personality = playerModelBridge.getPlayerPersonality(currPlayer)
+					profile.K_cp += personality.K_cp/newConfigSize
+					profile.K_i += personality.K_i/newConfigSize
+					profile.K_mh += personality.K_mh/newConfigSize
+					profile.K_pa += personality.K_pa/newConfigSize
 
 
-		# print(json.dumps(randomConfig, default=lambda o: o.__dict__, sort_keys=True))
-		return randomConfig
+				newConfigProfiles.append(profile)
+				for currPlayer in group:
+					currState = playerModelBridge.getPlayerCurrState(currPlayer)
+
+					newAvgState = PlayerState()
+					newAvgState.characteristics.ability += currState.characteristics.ability / groupSize
+					newAvgState.characteristics.engagement += currState.characteristics.engagement / groupSize
+					newAvgState.profile = profile
+					newAvgStates.append(newAvgState)
+
+					currPlayerFitness = random.randrange(0,1)
+
+
+			# print(json.dumps(group, default=lambda o: o.__dict__, sort_keys=True))
+			if (currFitness > currMaxFitness):
+				bestGroups = newGroups
+				bestConfigProfiles = newConfigProfiles
+				bestAvgStates = newAvgStates
+				currMaxFitness = currFitness
+		
+		# print(bestGroups)
+		# print(bestConfigProfiles)
+		# print(json.dumps(bestAvgStates, default=lambda o: o.__dict__, sort_keys=True))
+		# input()
+		# print("---------------------------")
+		# for group in bestConfig.groups:
+		# 	print(group.playerIds)
+		# print(json.dumps(bestConfig, default=lambda o: o.__dict__, sort_keys=True))
+		self.updateMetrics(bestGroups)
+		return {"groups": bestGroups, "profiles": bestConfigProfiles, "avgStates": bestAvgStates}

@@ -26,10 +26,6 @@ class PlayerModelBridge(ABC):
 		pass
 
 	@abstractmethod
-	def getPlayerCurrProfile(self,  playerId):
-		pass
-
-	@abstractmethod
 	def getPlayerCurrCharacteristics(self, playerId):
 		pass
 		
@@ -46,8 +42,3 @@ class PlayerModelBridge(ABC):
 	@abstractmethod
 	def setPlayerCharacteristics(self, playerId, characteristics):
 		pass
-
-	@abstractmethod
-	def setPlayerCurrProfile(self, playerId, profile):
-		pass
-
