@@ -17,8 +17,8 @@ from ModelMocks import *
 
 random.seed(time.perf_counter())
 
-numRuns = 50
-maxNumTrainingIterations = 30
+numRuns = 100
+maxNumTrainingIterations = 20
 numRealIterations = 10
 
 playerWindow = 30
@@ -72,6 +72,12 @@ class CustomPlayerModelBridge(PlayerModelBridge):
 		players[int(playerId)].currState = newState
 		players[int(playerId)].pastModelIncreasesGrid.pushToGrid(increases)
 
+		# if(playerId==0):
+		# 	print(players[int(playerId)].pastModelIncreasesGrid.cells)
+		# 	print(players[int(playerId)].pastModelIncreasesGrid.serializedCells)
+		# 	input()
+
+
 	def setBaseLearningRate(self, playerId, blr):
 		players[int(playerId)].baseLearningRate = blr
 
@@ -113,25 +119,29 @@ class CustomPlayerModelBridge(PlayerModelBridge):
 
 
 
+
 def simulateReaction(currIteration, playerBridge, playerId):
 	currState = playerBridge.getPlayerCurrState(playerId)
-	newState = calcReaction(copy.deepcopy(currState), playerBridge, playerId, currState.profile, currIteration)
+	newState = calcReaction(currState, playerBridge, playerId, currState.profile, currIteration)
 	
-	increases = PlayerState(time.time())
+	increases = PlayerState()
 	increases.profile = currState.profile
 	increases.characteristics = PlayerCharacteristics(ability=(newState.characteristics.ability - currState.characteristics.ability), engagement=newState.characteristics.engagement)
-	playerBridge.savePlayerState(playerId, increases, newState)		
+	playerBridge.savePlayerState(playerId, increases, newState)	
+
 	return increases
 
 def calcReaction(state, playerBridge, playerId, interactionsProfile, currIteration):
 	personality = playerBridge.getPlayerPersonality(playerId)
 
-	# engagement varies from 0 to 1
-	state.characteristics.engagement = 0.2* (state.characteristics.engagement) + 0.8* (4.0 - personality.sqrDistanceBetween(interactionsProfile))/4.0
+	newState = PlayerState(characteristics = PlayerCharacteristics(ability=state.characteristics.ability, engagement=state.characteristics.engagement), profile=state.profile)
 
-	abilityIncreaseSim = (playerBridge.getBaseLearningRate(x) * state.characteristics.engagement) #between 0 and 1
-	state.characteristics.ability = state.characteristics.ability + abilityIncreaseSim
-	return state
+	# engagement varies from 0 to 1
+	newState.characteristics.engagement = 0.2* (newState.characteristics.engagement) + 0.8* (4.0 - personality.sqrDistanceBetween(interactionsProfile))/4.0
+
+	abilityIncreaseSim = (playerBridge.getBaseLearningRate(x) * newState.characteristics.engagement) #between 0 and 1
+	newState.characteristics.ability = newState.characteristics.ability + abilityIncreaseSim
+	return newState
 
 
 # create players, tasks and adaptation
@@ -166,14 +176,14 @@ for x in range(numPlayers):
 # ------------------------------------------------------------------------------------------------------------------------------------------
 preferredNumberOfPlayersPerGroup = 4
 
+adaptationGIMME.init(playerBridge, taskBridge, regAlg = KNNRegression(5), configsGenAlg = GIMMEConfigsGen(), fitAlg = WeightedFitness(PlayerCharacteristics(ability=0.5, engagement=0.5)), name="", numberOfConfigChoices=100, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup)
+adaptationGIMMEEv.init(playerBridge, taskBridge, regAlg = KNNRegression(5), configsGenAlg = EvolutionaryConfigsGen(numMutations=20), fitAlg = WeightedFitness(PlayerCharacteristics(ability=0.5, engagement=0.5)), name="", numberOfConfigChoices=10, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup)
+
 adaptationRandom.init(playerBridge, taskBridge, configsGenAlg = RandomConfigsGen(), name="", preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup)
 
 simOptimalConfigsAlg = OptimalPracticalConfigsGen(calcReaction) #needed for currIteration updates
 adaptationOptimal.init(playerBridge, taskBridge, configsGenAlg = simOptimalConfigsAlg, fitAlg = WeightedFitness(PlayerCharacteristics(ability=1.0, engagement=0.0)), name="", numberOfConfigChoices=100, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup)
 # adaptationOptimal.init(KNNRegression(5), EvolutionaryConfigsGen(), simOptimalFitness, playerBridge, taskBridge, name="", numberOfConfigChoices=100, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, difficultyWeight = 0.5, profileWeight=0.5)
-
-adaptationGIMME.init(playerBridge, taskBridge, regAlg = KNNRegression(5), configsGenAlg = GIMMEConfigsGen(), fitAlg = WeightedFitness(PlayerCharacteristics(ability=0.5, engagement=0.5)), name="", numberOfConfigChoices=100, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup)
-adaptationGIMMEEv.init(playerBridge, taskBridge, regAlg = KNNRegression(5), configsGenAlg = EvolutionaryConfigsGen(numMutations=20), fitAlg = WeightedFitness(PlayerCharacteristics(ability=0.5, engagement=0.5)), name="", numberOfConfigChoices=10, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup)
 
 # ------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -204,6 +214,10 @@ optimalPrefProfDiff = [0 for i in range(maxNumTrainingIterations + numRealIterat
 optimalExecTime = 0.0
 
 
+# maxNummmIterations = maxNumTrainingIterations + numRealIterations
+# timesteps=[i for i in range(numRuns*maxNummmIterations*numPlayers)]
+# engs=[0 for i in range(numRuns*maxNummmIterations*numPlayers)]
+
 def executionPhase(maxNumIterations, startingI, currRun, adaptation, abilityArray, engagementArray, profDiffArray, groupSizeFreqsArray, configSizeFreqsArray, avgItExecTime, algType, algorithmFilename, canExport, algorithmNum, numAlgorithms):
 	# for i in range(numIterationsPerRun):
 	i = startingI
@@ -228,7 +242,8 @@ def executionPhase(maxNumIterations, startingI, currRun, adaptation, abilityArra
 			abilityArray[i] += increases.characteristics.ability
 			engagementArray[i] += increases.characteristics.engagement
 			profDiffArray[i] += playerBridge.getPlayerPersonality(x).distanceBetween(playerBridge.getPlayerCurrProfile(x))
-	
+		
+			# engs[currRun*maxNumIterations*numRuns + i*maxNumIterations + x]=increases.characteristics.engagement
 		i+=1
 
 
@@ -238,6 +253,7 @@ def executeSimulations(adaptation, abilityArray, engagementArray, profDiffArray,
 	totalNumIterations = (maxNumTrainingIterations + numRealIterations)
 	for r in range(numRuns):
 		for x in range(numPlayers):
+			adaptation.configsGenAlg.reset()
 			playerBridge.resetPlayer(x)
 			playerBridge.setPlayerPersonality(x, InteractionsProfile(K_i=numpy.random.uniform(0, 1), K_cp=numpy.random.uniform(0, 1), K_mh=numpy.random.uniform(0, 1), K_pa=numpy.random.uniform(0, 1)))
 			playerBridge.setBaseLearningRate(x, numpy.random.normal(0.5, 0.16))
@@ -269,12 +285,19 @@ def executeSimulations(adaptation, abilityArray, engagementArray, profDiffArray,
 		f.write("\nprofDiffArray: "+json.dumps(profDiffArray))
 		f.close()
 
-executeSimulations(adaptationGIMMEEv, GIMMEEvAbilities, GIMMEEvEngagements, GIMMEEvPrefProfDiff, GIMMEEvGroupSizeFreqs, GIMMEEvConfigsSizeFreqs, GIMMEExecTime, "GIMME", "adaptationGIMME", True,  2, 9)
 
-executeSimulations(adaptationOptimal, optimalAbilities, optimalEngagements, optimalPrefProfDiff, [], [], optimalExecTime, "optimal", "adaptationOptimal", True, 9, 9)
-executeSimulations(adaptationRandom, randomAbilities, randomEngagements, randomPrefProfDiff, [], [], randomExecTime, "random", "adaptationRandom", True,  8, 9)
+# plt.scatter(timesteps, engs, label=r'$engagement$')
+# plt.ylim(ymin=0, ymax=1)
+# plt.legend(loc='best')
+# plt.show()
 
 executeSimulations(adaptationGIMME, GIMMEAbilities, GIMMEEngagements, GIMMEPrefProfDiff, GIMMEGroupSizeFreqs, GIMMEConfigsSizeFreqs, GIMMEExecTime, "GIMME", "adaptationGIMME", True,  2, 9)
+executeSimulations(adaptationGIMMEEv, GIMMEEvAbilities, GIMMEEvEngagements, GIMMEEvPrefProfDiff, GIMMEEvGroupSizeFreqs, GIMMEEvConfigsSizeFreqs, GIMMEExecTime, "GIMME", "adaptationGIMME", True,  2, 9)
+
+executeSimulations(adaptationRandom, randomAbilities, randomEngagements, randomPrefProfDiff, [], [], randomExecTime, "random", "adaptationRandom", True,  8, 9)
+
+executeSimulations(adaptationOptimal, optimalAbilities, optimalEngagements, optimalPrefProfDiff, [], [], optimalExecTime, "optimal", "adaptationOptimal", True, 9, 9)
+
 
 
 timesteps=[i for i in range(maxNumTrainingIterations + numRealIterations + 1)]

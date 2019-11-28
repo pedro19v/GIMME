@@ -25,25 +25,23 @@ class KNNRegression(RegressionAlg):
 	def predict(self, playerModelBridge, profile, playerId):
 
 		pastModelIncs = playerModelBridge.getPlayerPastModelIncreases(playerId).getAllStates()
-		pastModelIncsCopy = copy.deepcopy(pastModelIncs)
 		pastModelIncsSize = len(pastModelIncs)
 
-		predictedState = PlayerState(0, profile = profile, characteristics = PlayerCharacteristics())
+		predictedState = PlayerState(profile = profile, characteristics = PlayerCharacteristics())
 	
-		for modelInc in pastModelIncsCopy:
+		for modelInc in pastModelIncs:
 			modelInc.dist = profile.sqrDistanceBetween(modelInc.profile)
 
+		pastModelIncs = sorted(pastModelIncs, key=self.distSort)
 
-		pastModelIncsCopy = sorted(pastModelIncsCopy, key=self.distSort)
-
-		numberOfIterations = min(self.numberOfNNs, len(pastModelIncsCopy))
-		pastModelIncsCopy = pastModelIncsCopy[:numberOfIterations]
-		pastModelIncsCopy = sorted(pastModelIncsCopy, key=self.creationTimeSort)
+		numberOfIterations = min(self.numberOfNNs, len(pastModelIncs))
+		pastModelIncs = pastModelIncs[:numberOfIterations]
+		pastModelIncs = sorted(pastModelIncs, key=self.creationTimeSort)
 		
 		# print(json.dumps(pastModelIncsCopy, default=lambda o: o.__dict__["dist"], sort_keys=True))
 
 		for i in range(numberOfIterations):
-			currState = pastModelIncsCopy[i]
+			currState = pastModelIncs[i]
 			pastCharacteristics = currState.characteristics
 
 			predictedState.characteristics.ability += pastCharacteristics.ability / numberOfIterations * ((numberOfIterations - i)/numberOfIterations)

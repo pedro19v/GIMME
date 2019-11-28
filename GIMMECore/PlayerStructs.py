@@ -15,7 +15,7 @@ class PlayerCharacteristics(object):
 		self.engagement = 0
 
 class PlayerState(object):
-	def __init__(self, creationTime, profile = InteractionsProfile(), characteristics = PlayerCharacteristics(), dist = 0):
+	def __init__(self, creationTime = time.time(), profile = InteractionsProfile(), characteristics = PlayerCharacteristics(), dist = 0):
 		self.profile = profile
 		self.characteristics = characteristics
 		self.dist = dist
@@ -35,16 +35,24 @@ class PlayerStateGrid(object):
 		self.initialCells = cells
 		if(self.initialCells == None):
 			self.cells = [[]*self.maxAmountOfStoredProfilesPerCell]*self.numCells
-			# self.cells = numpy.ndarray(shape=(self.numCells,self.maxAmountOfStoredProfilesPerCell))
+			self.serializedCells = []
 		else:
 			self.cells = cells
+			self.serializedCells = []
+			for cell in self.cells:
+				for state in cell:
+					self.serializedCells.append(state) 
 
 	def reset(self):
 		if(self.initialCells == None):
 			self.cells = [[]*self.maxAmountOfStoredProfilesPerCell]*self.numCells
-			# self.cells = numpy.ndarray(shape=(self.numCells,self.maxAmountOfStoredProfilesPerCell))
+			self.serializedCells = []
 		else:
 			self.cells = cells
+			self.serializedCells = []
+			for cell in self.cells:
+				for state in cell:
+					self.serializedCells.append(state) 
 
 	def pushToGrid(self, playerState):
 
@@ -58,16 +66,16 @@ class PlayerStateGrid(object):
 		currCell = self.cells[currCellInd]
 		
 		currCell.append(playerState)
+		self.serializedCells.append(playerState)
 		
 		cellsSize = len(self.cells[currCellInd])
-		if (cellsSize > (self.maxAmountOfStoredProfilesPerCell - 1)):
-			currCell = currCell[-self.maxAmountOfStoredProfilesPerCell:]
+		if (cellsSize > self.maxAmountOfStoredProfilesPerCell):
+			stateToDelete = currCell[0]
+			self.serializedCells.remove(stateToDelete)
+			currCell = currCell[-(self.maxAmountOfStoredProfilesPerCell):]
+
 		self.cells[currCellInd] = currCell
 
 	def getAllStates(self):
 		# serialize multi into single dimensional array
-		allStates = []
-		for cell in self.cells:
-			for state in cell:
-				allStates.append(state) 
-		return allStates
+		return self.serializedCells

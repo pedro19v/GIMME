@@ -5,12 +5,18 @@ from abc import ABC, abstractmethod
 from AdaptationStructs import *
 from InteractionsProfile import InteractionsProfile 
 
+import matplotlib.pyplot as plt
+
+
 class ConfigsGenAlg(ABC):
 
 	def __init__(self):
 		self.groupSizeFreqs = {}
 		self.configSizeFreqs = {}
 		super().__init__()
+
+	def reset(self):
+		pass
 
 	def randomProfileGenerator(self, group):
 		# generate learning profile
@@ -47,8 +53,6 @@ class ConfigsGenAlg(ABC):
 
 
 
-
-
 # class PersonalityBasedConfigsGen(RandomConfigsGen):
 # 	def personalityBasedProfileGenerator(self, group):
 # 		# generate learning profile
@@ -79,7 +83,12 @@ class EvolutionaryConfigsGen(ConfigsGenAlg):
 		self.populationInited = False
 		self.numMutations = numMutations
 		self.numFitSurvivors = numFitSurvivors
-	
+
+	def reset(self):
+		self.currPopulation = []
+		self.currProfiles = []
+		self.populationInited = False
+
 	def fitnessSort(self, elem):
 		return elem[0]["fitness"]
 
@@ -337,7 +346,7 @@ class OptimalPracticalConfigsGen(ConfigsGenAlg):
 				for currPlayer in group.playerIds:
 
 					currState = playerModelBridge.getPlayerCurrState(currPlayer)
-					newState = self.simulationFunc(copy.deepcopy(currState), playerModelBridge, currPlayer, group.profile, self.currIteration)
+					newState = self.simulationFunc(currState, playerModelBridge, currPlayer, group.profile, self.currIteration)
 		
 					currPlayerFitness = fitAlg.calculate(playerModelBridge, newState)
 					currFitness += currPlayerFitness
@@ -372,7 +381,6 @@ class GIMMEConfigsGen(ConfigsGenAlg):
 
 		minNumGroups = math.ceil(len(playerIds) / maxNumberOfPlayersPerGroup)
 		maxNumGroups = math.floor(len(playerIds) / minNumberOfPlayersPerGroup)
-
 
 		# generate several random groups, calculate their fitness and select the best one
 		for i in range(numberOfConfigChoices):
@@ -435,9 +443,10 @@ class GIMMEConfigsGen(ConfigsGenAlg):
 			for group in currGroups:
 				# generate learning profile
 				group.profile = self.profileGenerator(group)
+				
 				for currPlayer in group.playerIds:
 					predictedState = regAlg.predict(playerModelBridge, group.profile, currPlayer)
-
+					
 					currPlayerFitness = fitAlg.calculate(playerModelBridge, predictedState)
 					currFitness += currPlayerFitness
 
@@ -515,6 +524,8 @@ class RandomConfigsGen(ConfigsGenAlg):
 
 			del playersWithoutGroup[currPlayerIndex]
 			playersWithoutGroupSize = len(playersWithoutGroup)
+
+
 
 
 		# print(json.dumps(randomConfig, default=lambda o: o.__dict__, sort_keys=True))
