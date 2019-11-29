@@ -2,9 +2,8 @@ import random
 import math
 import copy
 from abc import ABC, abstractmethod
-from AdaptationStructs import *
 from InteractionsProfile import InteractionsProfile 
-
+from PlayerStructs import *
 import matplotlib.pyplot as plt
 
 
@@ -21,10 +20,12 @@ class ConfigsGenAlg(ABC):
 	def randomProfileGenerator(self, group):
 		# generate learning profile
 		profile = InteractionsProfile()
-		profile.K_cp = random.uniform(0, 1)
-		profile.K_i = random.uniform(0, 1)
-		profile.K_mh = random.uniform(0, 1)
-		profile.K_pa = random.uniform(0, 1)
+		profile.K_cp = random.uniform(0.0, 1.0)
+		profile.K_i = random.uniform(0.0, 1.0)
+		profile.K_mh = random.uniform(0.0, 1.0)
+		profile.K_pa = random.uniform(0.0, 1.0)
+
+		print(json.dumps(profile, default=lambda o: o.__dict__, sort_keys=True))
 
 		# total = profile.K_cp +profile.K_i +profile.K_mh +profile.K_pa 
 
@@ -53,36 +54,13 @@ class ConfigsGenAlg(ABC):
 
 
 
-# class PersonalityBasedConfigsGen(RandomConfigsGen):
-# 	def personalityBasedProfileGenerator(self, group):
-# 		# generate learning profile
-# 		profile = InteractionsProfile()
-# 		profile.K_cp = numpy.random.normal(group.avgPersonality.K_cp, self.variation)
-# 		profile.K_i = numpy.random.normal(group.avgPersonality.K_i, self.variation)
-# 		profile.K_mh = numpy.random.normal(group.avgPersonality.K_mh, self.variation)
-# 		profile.K_pa = numpy.random.normal(group.avgPersonality.K_pa, self.variation)
-# 		return profile
-
-# 	def __init__(self, variation):
-# 		RandomConfigsGen.__init__(self)
-# 		self.profileGenerator = self.personalityBasedProfileGenerator
-# 		self.variation = variation
-
-# class SimOptimalConfigsGen(RandomConfigsGen):
-# 	def organize(self, playerModelBridge, playerIds, numberOfConfigChoices, minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup, regAlg, fitAlg):
-		
-# 		bestConfig = AdaptationConfiguration()
-# 		currMaxFitness = 0.0
-
-# 		for j in range(numberOfConfigChoices):
-		
-
 class EvolutionaryConfigsGen(ConfigsGenAlg):
-	def __init__(self, numMutations=4, numFitSurvivors=None):
+	def __init__(self, numMutations=4, probOfMutation=0.1, numFitSurvivors=None):
 		super().__init__()
 		self.populationInited = False
 		self.numMutations = numMutations
 		self.numFitSurvivors = numFitSurvivors
+		self.probOfMutation = probOfMutation
 
 	def reset(self):
 		self.currPopulation = []
@@ -125,7 +103,7 @@ class EvolutionaryConfigsGen(ConfigsGenAlg):
 		
 
 		for config in range(numberOfConfigChoices):
-			if(random.uniform(0,1) < 0.1):
+			if(random.uniform(0.0,1.0) < self.probOfMutation):
 				#mutation (exploration)
 				for i in range(self.numMutations):
 					# alter random individual's group
@@ -168,26 +146,21 @@ class EvolutionaryConfigsGen(ConfigsGenAlg):
 				self.currProfiles[mate]["config"] = (self.currProfiles[mate]["config"][:crossoverPoint] + self.currProfiles[config]["config"][crossoverPoint:])
 				self.currProfiles[config]["config"] = tempConfig
 				
-		# print(json.dumps(self.currProfiles, default=lambda o: o.__dict__, sort_keys=True))
+		# print(self.currPopulation)
 		# input()
-
 		#calc fitness after KNN for regression
 		for c in range(numberOfConfigChoices):
 			totalFitness = 0
 			config = self.currPopulation[c]["config"]
-			for p in range(numPlayers):
-				group = config[p][1]
-				currProfile = self.currProfiles[c]["config"][group]
-				predictedState = regAlg.predict(playerModelBridge, currProfile, p)
-				currPlayerFitness = fitAlg.calculate(playerModelBridge, predictedState)
+			for p in config:
+				group = p[1]
+				playerId = p[0]
+				profile = self.currProfiles[c]["config"][group]
 				
-				# print(json.dumps(group, default=lambda o: o.__dict__, sort_keys=True))
-				# print(json.dumps(currProfile, default=lambda o: o.__dict__, sort_keys=True))
-				totalFitness += currPlayerFitness
+				predictedIncreases = regAlg.predict(playerModelBridge, profile, playerId)
+				self.currPopulation[c]["fitness"] += fitAlg.calculate(playerModelBridge, predictedIncreases)
 
-				
-				self.currPopulation[c]["fitness"] += currPlayerFitness
-				self.currProfiles[c]["fitness"] = self.currPopulation[c]["fitness"]
+			self.currProfiles[c]["fitness"] = self.currPopulation[c]["fitness"]
 
 			# 	print("-----------------------------")
 			# print(self.currPopulation[c]["fitness"])
@@ -204,13 +177,13 @@ class EvolutionaryConfigsGen(ConfigsGenAlg):
 				# print(json.dumps(predictedState, default=lambda o: o.__dict__, sort_keys=True))
 				# input()
 
-			
-		
 		# print(self.currPopulation)
 		# input()
+		
 		self.currPopulation, self.currProfiles = zip(*sorted(zip(self.currPopulation, self.currProfiles), key=self.fitnessSort))
 		self.currPopulation = [a for a in self.currPopulation] #sort by column 1 which is the actual fitness
 		self.currProfiles = [a for a in self.currProfiles] #sort by column 1 which is the actual fitness
+		
 		# print(self.currPopulation)
 		# input()
 
@@ -221,6 +194,9 @@ class EvolutionaryConfigsGen(ConfigsGenAlg):
 		fitSurvivorsProf = self.currProfiles[self.numFitSurvivors:]
 		self.currProfiles = fitSurvivorsProf + fitSurvivorsProf
 
+
+		print(self.currPopulation)
+		# input()
 
 		# print(self.currPopulation)
 		for c in range(numberOfConfigChoices):
@@ -239,12 +215,11 @@ class EvolutionaryConfigsGen(ConfigsGenAlg):
 			bestGroups[gene[1]].append(gene[0])
 			bestConfigProfiles[gene[1]] = bestProfilesGenotype[gene[1]]
 
-		if [] in bestGroups:  bestGroups.remove([])
-		if 0 in bestConfigProfiles: bestConfigProfiles.remove(0)
-		
+		while(True):
+			if [] in bestGroups:  bestGroups.remove([])
+			elif 0 in bestConfigProfiles: bestConfigProfiles.remove(0)
+			else: break
 
-		print(bestGroups)
-		print(bestConfigProfiles)
 			# print(json.dumps(bestConfig.groups[gene[1]].profile, default=lambda o: o.__dict__, sort_keys=True))
 			# input()
 
@@ -336,7 +311,11 @@ class OptimalPracticalConfigsGen(ConfigsGenAlg):
 
 			newConfigSize = len(newGroups)
 			
+			
 			currFitness = 0.0
+			newConfigProfiles = [0 for i in range(newConfigSize)]
+			newAvgState = [0 for i in range(newConfigSize)]
+
 			# generate profiles
 			for groupI in range(newConfigSize):
 				group = newGroups[groupI]
@@ -350,7 +329,7 @@ class OptimalPracticalConfigsGen(ConfigsGenAlg):
 					profile.K_i += personality.K_i/newConfigSize
 					profile.K_mh += personality.K_mh/newConfigSize
 					profile.K_pa += personality.K_pa/newConfigSize
-				newConfigProfiles.append(profile)
+				newConfigProfiles[groupI] = profile
 
 
 				# calculate fitness and average state
@@ -370,8 +349,7 @@ class OptimalPracticalConfigsGen(ConfigsGenAlg):
 					increases.profile = currState.profile
 					increases.characteristics = PlayerCharacteristics(ability=(newState.characteristics.ability - currState.characteristics.ability), engagement=newState.characteristics.engagement)
 				
-					currPlayerFitness = fitAlg.calculate(playerModelBridge, increases)
-					currFitness += currPlayerFitness
+					currFitness += fitAlg.calculate(playerModelBridge, increases)
 
 			# print(json.dumps(group, default=lambda o: o.__dict__, sort_keys=True))
 			if (currFitness > currMaxFitness):
@@ -499,8 +477,7 @@ class GIMMEConfigsGen(ConfigsGenAlg):
 					newAvgStates.append(newAvgState)
 
 					predictedIncreases = regAlg.predict(playerModelBridge, profile, currPlayer)
-					currPlayerFitness = fitAlg.calculate(playerModelBridge, predictedIncreases)
-					currFitness += currPlayerFitness
+					currFitness += fitAlg.calculate(playerModelBridge, predictedIncreases)
 
 			# print(json.dumps(group, default=lambda o: o.__dict__, sort_keys=True))
 			if (currFitness > currMaxFitness):
@@ -529,99 +506,92 @@ class RandomConfigsGen(ConfigsGenAlg):
 			input()
 			return bestGroups
 
-		currMaxFitness = -float("inf")
-
 		minNumGroups = math.ceil(len(playerIds) / maxNumberOfPlayersPerGroup)
 		maxNumGroups = math.floor(len(playerIds) / minNumberOfPlayersPerGroup)
 
 		# generate several random groups, calculate their fitness and select the best one
-		for i in range(1):
-			currFitness = 0.0
-			playersWithoutGroup = playerIds.copy()
-			newGroups = []
-			newConfigProfiles = []
-			newAvgStates = []
+		currFitness = 0.0
+		playersWithoutGroup = playerIds.copy()
+		newGroups = []
+		newConfigProfiles = []
+		newAvgStates = []
 
-			if(minNumGroups < maxNumGroups):
-				numGroups = numpy.random.randint(minNumGroups, maxNumGroups)
-			else: # players length is 1
-				numGroups = maxNumGroups + 1
+		if(minNumGroups < maxNumGroups):
+			numGroups = numpy.random.randint(minNumGroups, maxNumGroups)
+		else: # players length is 1
+			numGroups = maxNumGroups + 1
 
-			# generate min groups
-			playersWithoutGroupSize = len(playersWithoutGroup)
-			for g in range(numGroups):
-				currGroup = []
-				# add min number of players to the group
-				for p in range(min(len(playersWithoutGroup), minNumberOfPlayersPerGroup)):
-					currPlayerIndex = random.randint(0, len(playersWithoutGroup) - 1)
-					currPlayerID = playersWithoutGroup[currPlayerIndex]
-					currGroup.append(currPlayerID)
-					del playersWithoutGroup[currPlayerIndex]
-				
-				# to not add empty groups
-				if(len(currGroup)>0):
-					newGroups.append(currGroup)
-
-
-			# append the rest
-			playersWithoutGroupSize = len(playersWithoutGroup)
-			while playersWithoutGroupSize > 0:
-				randomGroupIndex = random.randint(0, len(newGroups) - 1)
-				currPlayerIndex = 0;
-				if (playersWithoutGroupSize > 1):
-					currPlayerIndex = random.randint(0, playersWithoutGroupSize - 1)
-				else:
-					currPlayerIndex = 0
-
-				currGroup = newGroups[randomGroupIndex]
-				groupsSize = len(newGroups)
-
-				while (len(currGroup) > (maxNumberOfPlayersPerGroup - 1)):
-					randomGroupIndex += 1
-					currGroup = newGroups[randomGroupIndex%groupsSize]
-
+		# generate min groups
+		playersWithoutGroupSize = len(playersWithoutGroup)
+		for g in range(numGroups):
+			currGroup = []
+			# add min number of players to the group
+			for p in range(min(len(playersWithoutGroup), minNumberOfPlayersPerGroup)):
+				currPlayerIndex = random.randint(0, len(playersWithoutGroup) - 1)
 				currPlayerID = playersWithoutGroup[currPlayerIndex]
 				currGroup.append(currPlayerID)
-
 				del playersWithoutGroup[currPlayerIndex]
-				playersWithoutGroupSize = len(playersWithoutGroup)
-
-
-			newConfigSize = len(newGroups)
 			
-			# generate profiles
-			for groupI in range(newConfigSize):
-				group = newGroups[groupI]
-				groupSize = len(group)
-				# generate learning profile
-				profile = InteractionsProfile()
-				for currPlayer in group:
-					personality = playerModelBridge.getPlayerPersonality(currPlayer)
-					profile.K_cp += personality.K_cp/newConfigSize
-					profile.K_i += personality.K_i/newConfigSize
-					profile.K_mh += personality.K_mh/newConfigSize
-					profile.K_pa += personality.K_pa/newConfigSize
+			# to not add empty groups
+			if(len(currGroup)>0):
+				newGroups.append(currGroup)
 
 
-				newConfigProfiles.append(profile)
-				for currPlayer in group:
-					currState = playerModelBridge.getPlayerCurrState(currPlayer)
+		# append the rest
+		playersWithoutGroupSize = len(playersWithoutGroup)
+		while playersWithoutGroupSize > 0:
+			randomGroupIndex = random.randint(0, len(newGroups) - 1)
+			currPlayerIndex = 0;
+			if (playersWithoutGroupSize > 1):
+				currPlayerIndex = random.randint(0, playersWithoutGroupSize - 1)
+			else:
+				currPlayerIndex = 0
 
-					newAvgState = PlayerState()
-					newAvgState.characteristics.ability += currState.characteristics.ability / groupSize
-					newAvgState.characteristics.engagement += currState.characteristics.engagement / groupSize
-					newAvgState.profile = profile
-					newAvgStates.append(newAvgState)
+			currGroup = newGroups[randomGroupIndex]
+			groupsSize = len(newGroups)
 
-					currPlayerFitness = random.randrange(0,1)
+			while (len(currGroup) > (maxNumberOfPlayersPerGroup - 1)):
+				randomGroupIndex += 1
+				currGroup = newGroups[randomGroupIndex%groupsSize]
+
+			currPlayerID = playersWithoutGroup[currPlayerIndex]
+			currGroup.append(currPlayerID)
+
+			del playersWithoutGroup[currPlayerIndex]
+			playersWithoutGroupSize = len(playersWithoutGroup)
 
 
-			# print(json.dumps(group, default=lambda o: o.__dict__, sort_keys=True))
-			if (currFitness > currMaxFitness):
-				bestGroups = newGroups
-				bestConfigProfiles = newConfigProfiles
-				bestAvgStates = newAvgStates
-				currMaxFitness = currFitness
+		newConfigSize = len(newGroups)
+		
+		# generate profiles
+		for groupI in range(newConfigSize):
+			group = newGroups[groupI]
+			groupSize = len(group)
+			# generate learning profile
+			profile = InteractionsProfile()
+			for currPlayer in group:
+				personality = playerModelBridge.getPlayerPersonality(currPlayer)
+				profile.K_cp += personality.K_cp/newConfigSize
+				profile.K_i += personality.K_i/newConfigSize
+				profile.K_mh += personality.K_mh/newConfigSize
+				profile.K_pa += personality.K_pa/newConfigSize
+
+
+			newConfigProfiles.append(profile)
+			for currPlayer in group:
+				currState = playerModelBridge.getPlayerCurrState(currPlayer)
+
+				newAvgState = PlayerState()
+				newAvgState.characteristics.ability += currState.characteristics.ability / groupSize
+				newAvgState.characteristics.engagement += currState.characteristics.engagement / groupSize
+				newAvgState.profile = profile
+				newAvgStates.append(newAvgState)
+
+
+			# if (currFitness > currMaxFitness):
+		bestGroups = newGroups
+		bestConfigProfiles = newConfigProfiles
+		bestAvgStates = newAvgStates
 		
 		# print(bestGroups)
 		# print(bestConfigProfiles)

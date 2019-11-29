@@ -2,7 +2,6 @@ import math
 from AlgDefStructs.RegressionAlg import *
 from AlgDefStructs.ConfigsGenAlg import *
 from AlgDefStructs.FitnessAlg import *
-from AdaptationStructs import *
 
 from ModelBridge.PlayerModelBridge import PlayerModelBridge 
 from ModelBridge.TaskModelBridge import TaskModelBridge 
