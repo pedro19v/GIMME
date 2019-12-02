@@ -156,13 +156,13 @@ class RandomConfigsGen(ConfigsGenAlg):
 
 class SimpleConfigsGen(ConfigsGenAlg):
 
-	def __init__(self, playerModelBridge, regAlg = None, numberOfConfigChoices = 100, preferredNumberOfPlayersPerGroup = None, minNumberOfPlayersPerGroup = 2, maxNumberOfPlayersPerGroup = 5, fitnessWeights = PlayerCharacteristics(ability = 0.5, engagement = 0.5)):
+	def __init__(self, playerModelBridge, regAlg = None, numberOfConfigChoices = 100, preferredNumberOfPlayersPerGroup = None, minNumberOfPlayersPerGroup = 2, maxNumberOfPlayersPerGroup = 5, qualityWeights = PlayerCharacteristics(ability = 0.5, engagement = 0.5)):
 		super().__init__(playerModelBridge, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, minNumberOfPlayersPerGroup = minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup = maxNumberOfPlayersPerGroup)
 		self.regAlg = regAlg
 		self.numberOfConfigChoices = numberOfConfigChoices
 		self.profileGenerator = self.randomProfileGenerator
 		
-		self.fitnessWeights = fitnessWeights
+		self.qualityWeights = qualityWeights
 
 		if(regAlg==None):
 			regAlg = KNNRegression(playerModelBridge, 5)
@@ -261,7 +261,7 @@ class SimpleConfigsGen(ConfigsGenAlg):
 					newAvgStates.append(newAvgState)
 
 					predictedIncreases = self.regAlg.predict(profile, currPlayer)
-					currFitness += self.fitnessWeights.ability*predictedIncreases.characteristics.ability + self.fitnessWeights.engagement*predictedIncreases.characteristics.engagement
+					currFitness += self.qualityWeights.ability*predictedIncreases.characteristics.ability + self.qualityWeights.engagement*predictedIncreases.characteristics.engagement
 
 			if (currFitness > currMaxFitness):
 				bestGroups = newGroups
@@ -276,14 +276,14 @@ class SimpleConfigsGen(ConfigsGenAlg):
 
 class AccurateConfigsGen(ConfigsGenAlg):
 
-	def __init__(self, playerModelBridge, simulationFunc, numberOfConfigChoices = 100, preferredNumberOfPlayersPerGroup = None, minNumberOfPlayersPerGroup = 2, maxNumberOfPlayersPerGroup = 5, fitnessWeights = PlayerCharacteristics(ability = 0.5, engagement = 0.5)):
+	def __init__(self, playerModelBridge, simulationFunc, numberOfConfigChoices = 100, preferredNumberOfPlayersPerGroup = None, minNumberOfPlayersPerGroup = 2, maxNumberOfPlayersPerGroup = 5, qualityWeights = PlayerCharacteristics(ability = 0.5, engagement = 0.5)):
 		super().__init__(playerModelBridge, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, minNumberOfPlayersPerGroup = minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup = maxNumberOfPlayersPerGroup)
 		self.profileGenerator = self.randomProfileGenerator
 		self.numberOfConfigChoices = numberOfConfigChoices
 		self.simulationFunc = simulationFunc
 		self.currIteration = 0
 
-		self.fitnessWeights = fitnessWeights
+		self.qualityWeights = qualityWeights
 
 
 	def updateCurrIteration(self, newCurrIteration):
@@ -393,7 +393,7 @@ class AccurateConfigsGen(ConfigsGenAlg):
 					increases.profile = currState.profile
 					increases.characteristics = PlayerCharacteristics(ability=(newState.characteristics.ability - currState.characteristics.ability), engagement=newState.characteristics.engagement)
 				
-					currFitness += self.fitnessWeights.ability*increases.characteristics.ability + self.fitnessWeights.engagement*increases.characteristics.engagement
+					currFitness += self.qualityWeights.ability*increases.characteristics.ability + self.qualityWeights.engagement*increases.characteristics.engagement
 
 			if (currFitness > currMaxFitness):
 				bestGroups = newGroups
