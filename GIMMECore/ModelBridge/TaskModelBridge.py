@@ -16,6 +16,10 @@ class TaskModelBridge(ABC):
 		pass
 
 	@abstractmethod
+	def getTaskMinDuration(self, taskId):
+		pass
+
+	@abstractmethod
 	def getTaskDifficultyWeight(self, taskId):
 		pass
 

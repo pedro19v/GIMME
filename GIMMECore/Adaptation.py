@@ -11,37 +11,16 @@ class Adaptation(object):
 	def init(self, \
 		playerModelBridge, \
 		taskModelBridge, \
-		regAlg = None, \
 		configsGenAlg = None, \
-		fitAlg = None, \
-		name="", \
-		numberOfConfigChoices=100, \
-		preferredNumberOfPlayersPerGroup = None,\
-		minNumberOfPlayersPerGroup = 2, maxNumberOfPlayersPerGroup = 5):
-
-		if(minNumberOfPlayersPerGroup > maxNumberOfPlayersPerGroup):
-			raise ValueError('The min number of players per group cannot be higher than the max!') 
+		name=""):
 
 		self.initialized = True
-
 		self.playerIds = []
 		self.taskIds = []
-
 		self.name = name
 
-		self.numberOfConfigChoices = numberOfConfigChoices
-		if preferredNumberOfPlayersPerGroup == None:
-			self.maxNumberOfPlayersPerGroup = maxNumberOfPlayersPerGroup
-			self.minNumberOfPlayersPerGroup = minNumberOfPlayersPerGroup
-		else:
-			self.maxNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup
-			self.minNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup
-
 		# self.numTasksPerGroup = numTasksPerGroup;
-		self.regAlg = regAlg
-		self.fitAlg = fitAlg
 		self.configsGenAlg = configsGenAlg
-
 		self.playerModelBridge = playerModelBridge
 		self.taskModelBridge = taskModelBridge
 
@@ -56,10 +35,12 @@ class Adaptation(object):
 		self.playerIds = self.playerModelBridge.getAllPlayerIds()
 		self.taskIds = self.taskModelBridge.getAllTaskIds()
 
-		adaptedConfig = self.organizePlayers(self.playerIds)
+		adaptedConfig = self.configsGenAlg.organize()
+
 		adaptedGroups = adaptedConfig["groups"]
 		adaptedProfiles = adaptedConfig["profiles"]
 		adaptedAvgStates = adaptedConfig["avgStates"]
+
 		for groupIndex in range(len(adaptedGroups)):
 			currGroup = adaptedGroups[groupIndex]
 			groupProfile = adaptedProfiles[groupIndex]
@@ -74,9 +55,6 @@ class Adaptation(object):
 				self.playerModelBridge.updatePlayerState(playerId, currState)
 
 		return adaptedConfig
-
-	def organizePlayers(self, playerIds):
-		return self.configsGenAlg.organize(self.playerModelBridge, playerIds, self.numberOfConfigChoices, self.minNumberOfPlayersPerGroup, self.maxNumberOfPlayersPerGroup, self.regAlg, self.fitAlg);
 
 	def selectTask(self,
 		possibleTaskIds,

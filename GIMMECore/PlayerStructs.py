@@ -19,19 +19,15 @@ class PlayerState(object):
 	def __init__(self, creationTime = time.time(), profile = InteractionsProfile(), characteristics = PlayerCharacteristics(), dist = -1):
 		self.characteristics = characteristics
 		self.creationTime = creationTime
-
 		self.profile = profile
 		self.dist = dist
 		self.groupId = -1
-		
 		self.tailoredTaskId = -1
 
 	def reset(self):
 		self.characteristics.reset()
-
 		self.profile.reset()
 		self.dist = -1
-
 		self.groupId = -1
 
 
@@ -71,17 +67,12 @@ class PlayerStateGrid(object):
 		paPadding = math.ceil(playerState.profile.K_pa * self.dimSpan) - 1
 
 		currCellInd = (self.dimSpan**3)*cpPadding + (self.dimSpan**2)*iPadding + self.dimSpan*mhPadding + paPadding
-
-		print(currCellInd)
-		print(json.dumps(playerState, default=lambda o: o.__dict__, sort_keys=True))
-
 		currCell = self.cells[currCellInd]
 		
 		currCell.append(playerState)
 		self.serializedCells.append(playerState)
 		
 		cellsSize = len(self.cells[currCellInd])
-
 		if (cellsSize > self.maxProfilesPerCell):
 			stateToDelete = currCell[0]
 			self.serializedCells.remove(stateToDelete)
