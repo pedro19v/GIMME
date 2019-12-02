@@ -8,12 +8,16 @@ class PlayerModelBridge(ABC):
 		pass
 
 	@abstractmethod
+	def setPlayerCharacteristics(self, playerId, characteristics):
+		pass
+
+	@abstractmethod
 	def resetPlayer(self, playerId):
 		pass
 
 
 	@abstractmethod
-	def getSelectedPlayerIds(self):
+	def getAllPlayerIds(self):
 		pass
 
 	@abstractmethod
@@ -31,14 +35,10 @@ class PlayerModelBridge(ABC):
 		
 
 	@abstractmethod
-	def getPlayerPastModelIncreases(self, playerId):
+	def getPlayerStateGrid(self, playerId):
 		pass
 
 	@abstractmethod
 	def getPlayerPersonality(self, playerId):
 		pass
-
-
-	@abstractmethod
-	def setPlayerCharacteristics(self, playerId, characteristics):
-		pass
+		

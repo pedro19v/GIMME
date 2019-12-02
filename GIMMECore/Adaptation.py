@@ -53,8 +53,8 @@ class Adaptation(object):
 			raise ValueError('Adaptation not Initialized! Core not executed.') 
 			return
 
-		self.playerIds = self.playerModelBridge.getSelectedPlayerIds()
-		self.taskIds = self.taskModelBridge.getSelectedTaskIds()
+		self.playerIds = self.playerModelBridge.getAllPlayerIds()
+		self.taskIds = self.taskModelBridge.getAllTaskIds()
 
 		adaptedConfig = self.organizePlayers(self.playerIds)
 		adaptedGroups = adaptedConfig["groups"]
@@ -73,6 +73,7 @@ class Adaptation(object):
 				currState.tailoredTaskId = tailoredTaskId	
 				self.playerModelBridge.updatePlayerState(playerId, currState)
 
+		return adaptedConfig
 
 	def organizePlayers(self, playerIds):
 		return self.configsGenAlg.organize(self.playerModelBridge, playerIds, self.numberOfConfigChoices, self.minNumberOfPlayersPerGroup, self.maxNumberOfPlayersPerGroup, self.regAlg, self.fitAlg);

@@ -25,15 +25,6 @@ class ConfigsGenAlg(ABC):
 		profile.K_mh = random.uniform(0.0, 1.0)
 		profile.K_pa = random.uniform(0.0, 1.0)
 
-		print(json.dumps(profile, default=lambda o: o.__dict__, sort_keys=True))
-
-		# total = profile.K_cp +profile.K_i +profile.K_mh +profile.K_pa 
-
-		# profile.K_cp /= total
-		# profile.K_i /= total
-		# profile.K_mh /= total
-		# profile.K_pa /= total
-
 		return profile
 
 	@abstractmethod
@@ -228,7 +219,7 @@ class EvolutionaryConfigsGen(ConfigsGenAlg):
 		return {"groups": bestGroups, "profiles": bestConfigProfiles, "avgStates": [PlayerState() for i in range(maxNumGroups)]}
 
 
-class OptimalPracticalConfigsGen(ConfigsGenAlg):
+class AccurateConfigsGen(ConfigsGenAlg):
 
 	def __init__(self, simulationFunc):
 		super().__init__()
@@ -371,7 +362,7 @@ class OptimalPracticalConfigsGen(ConfigsGenAlg):
 
 
 
-class GIMMEConfigsGen(ConfigsGenAlg):
+class SimpleConfigsGen(ConfigsGenAlg):
 
 	def __init__(self):
 		super().__init__()

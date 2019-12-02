@@ -4,7 +4,7 @@ from PlayerStructs import *
 class TaskModelBridge(ABC):
 
 	@abstractmethod
-	def getSelectedTaskIds(self):
+	def getAllTaskIds(self):
 		pass
 
 	@abstractmethod

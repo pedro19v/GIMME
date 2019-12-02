@@ -1,11 +1,6 @@
 from GIMMECore import *
 from PlayerStructs import *
 
-numPlayers = 23
-
-players = [None for x in range(numPlayers)]
-playersGrid = [None for x in range(numPlayers)]
-tasks = [None for x in range(20)]
 
 class PlayerModelMock(object):
 	def __init__(self, id, name, currState, pastModelIncreasesGrid, currModelIncreases, personality):
@@ -26,92 +21,61 @@ class TaskModelMock(object):
 		self.profileWeight = profileWeight
 
 class CustomTaskModelBridge(TaskModelBridge):
+	def __init__(self, tasks):
+		self.tasks = tasks
+
 	def registerNewTask(self, taskId, description, minRequiredAbility, profile, difficultyWeight, profileWeight):
-		tasks[taskId] = TaskModelMock(taskId, description, minRequiredAbility, profile, difficultyWeight, profileWeight)
-	def getSelectedTaskIds(self):
+		self.tasks[taskId] = TaskModelMock(taskId, description, minRequiredAbility, profile, difficultyWeight, profileWeight)
+	def getAllTaskIds(self):
 		return [int(i) for i in range(20)]
 	def getTaskInteractionsProfile(self, taskId):
-		return tasks[taskId].profile
+		return self.tasks[taskId].profile
 	def getTaskMinRequiredAbility(self, taskId):
-		return tasks[taskId].minRequiredAbility
+		return self.tasks[taskId].minRequiredAbility
 	def getTaskDifficultyWeight(self, taskId):
-		return tasks[taskId].difficultyWeight
+		return self.tasks[taskId].difficultyWeight
 	def getTaskProfileWeight(self, taskId):
-		return tasks[taskId].profileWeight
+		return self.tasks[taskId].profileWeight
 
 
 class CustomPlayerModelBridge(PlayerModelBridge):
+	def __init__(self, players):
+		self.players = players
+		self.numPlayers = len(players)
+
 	def registerNewPlayer(self, playerId, name, currState, pastModelIncreasesGrid, currModelIncreases, personality):
-		players[int(playerId)] = PlayerModelMock(playerId, name, currState, pastModelIncreasesGrid, currModelIncreases, personality)	
+		self.players[int(playerId)] = PlayerModelMock(playerId, name, currState, pastModelIncreasesGrid, currModelIncreases, personality)	
 	def resetPlayer(self, playerId):
-		players[int(playerId)].currState.reset()
-		players[int(playerId)].pastModelIncreasesGrid.reset()
+		self.players[int(playerId)].currState.reset()
+		self.players[int(playerId)].pastModelIncreasesGrid.reset()
 	def updatePlayerState(self, playerId, newState):
-		players[int(playerId)].currState = newState
+		self.players[int(playerId)].currState = newState
 	def savePlayerState(self, playerId, increases, newState):
-		players[int(playerId)].currState = newState
-		players[int(playerId)].pastModelIncreasesGrid.pushToGrid(increases)
+		self.players[int(playerId)].currState = newState
+		self.players[int(playerId)].pastModelIncreasesGrid.pushToGrid(increases)
 
 	def setBaseLearningRate(self, playerId, blr):
-		players[int(playerId)].baseLearningRate = blr
+		self.players[int(playerId)].baseLearningRate = blr
 	def getBaseLearningRate(self, playerId):
-		return players[int(playerId)].baseLearningRate
+		return self.players[int(playerId)].baseLearningRate
 
-	def getSelectedPlayerIds(self):
-		return [int(i) for i in range(numPlayers)]
+	def getAllPlayerIds(self):
+		return [int(i) for i in range(self.numPlayers)]
 
 	def getPlayerName(self, playerId):
-		return players[int(playerId)].name
+		return self.players[int(playerId)].name
 	def getPlayerCurrState(self,  playerId):
-		return players[int(playerId)].currState
+		return self.players[int(playerId)].currState
 	def getPlayerCurrProfile(self,  playerId):
-		return players[int(playerId)].currState.profile
-	def getPlayerPastModelIncreases(self, playerId):
-		return players[int(playerId)].pastModelIncreasesGrid
+		return self.players[int(playerId)].currState.profile
+	def getPlayerStateGrid(self, playerId):
+		return self.players[int(playerId)].pastModelIncreasesGrid
 	def getPlayerCurrCharacteristics(self, playerId):
-		return players[int(playerId)].currState.characteristics
+		return self.players[int(playerId)].currState.characteristics
 	def getPlayerPersonality(self, playerId):
-		return players[int(playerId)].personality
+		return self.players[int(playerId)].personality
 
 	def setPlayerPersonality(self, playerId, personality):
-		players[int(playerId)].personality = personality
+		self.players[int(playerId)].personality = personality
 	def setPlayerCharacteristics(self, playerId, characteristics):
-		players[int(playerId)].currState.characteristics = characteristics
-
-
-class CustomPlayerModelBridgeGrid(PlayerModelBridge):
-	def registerNewPlayer(self, playerId, name, currState, pastModelIncreasesGrid, currModelIncreases, personality):
-		playersGrid[int(playerId)] = PlayerModelMock(playerId, name, currState, pastModelIncreasesGrid, currModelIncreases, personality)	
-	def resetPlayer(self, playerId):
-		playersGrid[int(playerId)].currState.reset()
-		playersGrid[int(playerId)].pastModelIncreasesGrid.reset()
-	def updatePlayerState(self, playerId, newState):
-		playersGrid[int(playerId)].currState = newState
-	def savePlayerState(self, playerId, increases, newState):
-		playersGrid[int(playerId)].currState = newState
-		playersGrid[int(playerId)].pastModelIncreasesGrid.pushToGrid(increases)
-	def setBaseLearningRate(self, playerId, blr):
-		playersGrid[int(playerId)].baseLearningRate = blr
-	def getBaseLearningRate(self, playerId):
-		return playersGrid[int(playerId)].baseLearningRate
-
-	def getSelectedPlayerIds(self):
-		return [int(i) for i in range(numPlayers)]
-
-	def getPlayerName(self, playerId):
-		return playersGrid[int(playerId)].name
-	def getPlayerCurrState(self,  playerId):
-		return playersGrid[int(playerId)].currState
-	def getPlayerCurrProfile(self,  playerId):
-		return playersGrid[int(playerId)].currState.profile
-	def getPlayerPastModelIncreases(self, playerId):
-		return playersGrid[int(playerId)].pastModelIncreasesGrid
-	def getPlayerCurrCharacteristics(self, playerId):
-		return playersGrid[int(playerId)].currState.characteristics
-	def getPlayerPersonality(self, playerId):
-		return playersGrid[int(playerId)].personality
-
-	def setPlayerPersonality(self, playerId, personality):
-		playersGrid[int(playerId)].personality = personality
-	def setPlayerCharacteristics(self, playerId, characteristics):
-		playersGrid[int(playerId)].currState.characteristics = characteristics
+		self.players[int(playerId)].currState.characteristics = characteristics

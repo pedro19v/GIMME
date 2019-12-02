@@ -7,7 +7,6 @@ from InteractionsProfile import InteractionsProfile
 import json
 
 
-
 class PlayerCharacteristics(object):
 	def __init__(self, ability=0, engagement=0):
 		self.ability = ability
@@ -37,15 +36,15 @@ class PlayerState(object):
 
 
 class PlayerStateGrid(object):
-	def __init__(self, numCells=1, maxAmountOfStoredProfilesPerCell=30,  cells=None):
-		self.maxAmountOfStoredProfilesPerCell = maxAmountOfStoredProfilesPerCell
+	def __init__(self, numCells=1, maxProfilesPerCell=30,  cells=None):
+		self.maxProfilesPerCell = maxProfilesPerCell
 
 		self.dimSpan = math.ceil(numCells**(1.0/float(4))) #floor of root 4
 		self.numCells = self.dimSpan**4
 		
 		self.initialCells = cells
 		if(self.initialCells == None):
-			self.cells = [[]*self.maxAmountOfStoredProfilesPerCell]*self.numCells
+			self.cells = [[] for i in range(self.numCells)]
 			self.serializedCells = []
 		else:
 			self.cells = cells
@@ -56,7 +55,7 @@ class PlayerStateGrid(object):
 
 	def reset(self):
 		if(self.initialCells == None):
-			self.cells = [[]*self.maxAmountOfStoredProfilesPerCell]*self.numCells
+			self.cells = [[] for i in range(self.numCells)]
 			self.serializedCells = []
 		else:
 			self.cells = cells
@@ -66,24 +65,27 @@ class PlayerStateGrid(object):
 					self.serializedCells.append(state) 
 
 	def pushToGrid(self, playerState):
-
-
 		cpPadding = math.ceil(playerState.profile.K_cp * self.dimSpan) - 1
 		iPadding = math.ceil(playerState.profile.K_i * self.dimSpan) - 1
 		mhPadding = math.ceil(playerState.profile.K_mh * self.dimSpan) - 1
 		paPadding = math.ceil(playerState.profile.K_pa * self.dimSpan) - 1
 
 		currCellInd = (self.dimSpan**3)*cpPadding + (self.dimSpan**2)*iPadding + self.dimSpan*mhPadding + paPadding
+
+		print(currCellInd)
+		print(json.dumps(playerState, default=lambda o: o.__dict__, sort_keys=True))
+
 		currCell = self.cells[currCellInd]
 		
 		currCell.append(playerState)
 		self.serializedCells.append(playerState)
 		
 		cellsSize = len(self.cells[currCellInd])
-		if (cellsSize > self.maxAmountOfStoredProfilesPerCell):
+
+		if (cellsSize > self.maxProfilesPerCell):
 			stateToDelete = currCell[0]
 			self.serializedCells.remove(stateToDelete)
-			currCell = currCell[-(self.maxAmountOfStoredProfilesPerCell):]
+			currCell = currCell[-self.maxProfilesPerCell:]
 
 		self.cells[currCellInd] = currCell
 

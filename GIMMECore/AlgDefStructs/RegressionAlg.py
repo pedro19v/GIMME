@@ -24,7 +24,7 @@ class KNNRegression(RegressionAlg):
 
 	def predict(self, playerModelBridge, profile, playerId):
 
-		pastModelIncs = playerModelBridge.getPlayerPastModelIncreases(playerId).getAllStates()
+		pastModelIncs = playerModelBridge.getPlayerStateGrid(playerId).getAllStates()
 		pastModelIncsSize = len(pastModelIncs)
 
 		predictedState = PlayerState(profile = profile, characteristics = PlayerCharacteristics())
