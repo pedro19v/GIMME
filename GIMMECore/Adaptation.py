@@ -67,7 +67,7 @@ class Adaptation(object):
 			currTaskId = possibleTaskIds[i]
 
 			cost = abs(bestConfigProfile.sqrDistanceBetween(self.taskModelBridge.getTaskInteractionsProfile(currTaskId)) * self.taskModelBridge.getTaskDifficultyWeight(currTaskId))
-			cost += abs(avgState.characteristics.ability - self.taskModelBridge.getTaskMinRequiredAbility(currTaskId) * self.taskModelBridge.getTaskProfileWeight(currTaskId))
+			cost += abs(avgState.characteristics.ability - self.taskModelBridge.getMinTaskRequiredAbility(currTaskId) * self.taskModelBridge.getTaskProfileWeight(currTaskId))
 
 			if cost < lowestCost:
 				lowestCost = cost

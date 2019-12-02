@@ -12,26 +12,29 @@ class PlayerModelMock(object):
 		self.baseLearningRate = None
 
 class TaskModelMock(object):
-	def __init__(self, id, description, minRequiredAbility, profile, difficultyWeight, profileWeight):
+	def __init__(self, id, description, minRequiredAbility, profile, minDuration, difficultyWeight, profileWeight):
 		self.id = id
 		self.description = description
 		self.minRequiredAbility = minRequiredAbility
 		self.profile = profile
 		self.difficultyWeight = difficultyWeight
 		self.profileWeight = profileWeight
+		self.minDuration = minDuration
 
 class CustomTaskModelBridge(TaskModelBridge):
 	def __init__(self, tasks):
 		self.tasks = tasks
 
-	def registerNewTask(self, taskId, description, minRequiredAbility, profile, difficultyWeight, profileWeight):
-		self.tasks[taskId] = TaskModelMock(taskId, description, minRequiredAbility, profile, difficultyWeight, profileWeight)
+	def registerNewTask(self, taskId, description, minRequiredAbility, profile, minDuration, difficultyWeight, profileWeight):
+		self.tasks[taskId] = TaskModelMock(taskId, description, minRequiredAbility, profile, minDuration, difficultyWeight, profileWeight)
 	def getAllTaskIds(self):
 		return [int(i) for i in range(20)]
 	def getTaskInteractionsProfile(self, taskId):
 		return self.tasks[taskId].profile
-	def getTaskMinRequiredAbility(self, taskId):
+	def getMinTaskRequiredAbility(self, taskId):
 		return self.tasks[taskId].minRequiredAbility
+	def getMinTaskDuration(self, taskId):
+		return self.tasks[taskId].minDuration
 	def getTaskDifficultyWeight(self, taskId):
 		return self.tasks[taskId].difficultyWeight
 	def getTaskProfileWeight(self, taskId):

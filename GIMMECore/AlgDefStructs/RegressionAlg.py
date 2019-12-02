@@ -5,15 +5,19 @@ import json
 
 class RegressionAlg(ABC):
 
+	def __init__(self, playerModelBridge):
+		self.playerModelBridge = playerModelBridge
+
 	@abstractmethod
-	def predict(self, playerModelBridge, profile, playerId):
+	def predict(self, profile, playerId):
 		pass
 
 
 # ---------------------- KNNRegression stuff ---------------------------
 class KNNRegression(RegressionAlg):
 
-	def __init__(self, numberOfNNs):
+	def __init__(self, playerModelBridge, numberOfNNs):
+		super().__init__(playerModelBridge)
 		self.numberOfNNs = numberOfNNs
 
 	def distSort(self, elem):
@@ -22,9 +26,9 @@ class KNNRegression(RegressionAlg):
 	def creationTimeSort(self, elem):
 		return elem.creationTime
 
-	def predict(self, playerModelBridge, profile, playerId):
+	def predict(self, profile, playerId):
 
-		pastModelIncs = playerModelBridge.getPlayerStateGrid(playerId).getAllStates()
+		pastModelIncs = self.playerModelBridge.getPlayerStateGrid(playerId).getAllStates()
 		pastModelIncsSize = len(pastModelIncs)
 
 		predictedState = PlayerState(profile = profile, characteristics = PlayerCharacteristics())
@@ -54,13 +58,23 @@ class KNNRegression(RegressionAlg):
 # ---------------------- NeuralNetworkRegression stuff ---------------------------
 class NeuralNetworkRegression(RegressionAlg):
 
-	def predict(self, playerModelBridge, profile, playerId):
+	# possible TODO
+
+	def __init__(self, playerModelBridge):
+		super().__init__(playerModelBridge)
+
+	def predict(self, profile, playerId):
 		pass
 
 
 # ---------------------- ReinforcementLearningRegression stuff ---------------------------
 class ReinforcementLearningRegression(RegressionAlg):
 
-	def predict(self, playerModelBridge, profile, playerId):
+	# possible TODO
+
+	def __init__(self, playerModelBridge):
+		super().__init__(playerModelBridge)
+
+	def predict(self, profile, playerId):
 		pass
 

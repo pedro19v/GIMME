@@ -12,11 +12,11 @@ class TaskModelBridge(ABC):
 		pass
 
 	@abstractmethod
-	def getTaskMinRequiredAbility(self, taskId):
+	def getMinTaskRequiredAbility(self, taskId):
 		pass
 
 	@abstractmethod
-	def getTaskMinDuration(self, taskId):
+	def getMinTaskDuration(self, taskId):
 		pass
 
 	@abstractmethod
