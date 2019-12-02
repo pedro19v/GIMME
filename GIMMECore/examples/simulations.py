@@ -152,7 +152,7 @@ evConfigsAlgGrid = EvolutionaryConfigsGen(playerBridge, regAlg = KNNRegression(p
 adaptationGIMMEEv.init(playerBridge, taskBridge, configsGenAlg = evConfigsAlgGrid, name="")
 
 
-randomConfigsAlg = RandomConfigsGen(playerBridge, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, fitnessWeights = PlayerCharacteristics(ability=1.0, engagement=0.0))
+randomConfigsAlg = RandomConfigsGen(playerBridge, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup)
 adaptationRandom.init(playerBridge, taskBridge, configsGenAlg = randomConfigsAlg, name="")
 
 accurateConfigsAlg = AccurateConfigsGen(playerBridge, calcReaction, numberOfConfigChoices=100, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, fitnessWeights = PlayerCharacteristics(ability=1.0, engagement=0.0)) #needed for currIteration updates
