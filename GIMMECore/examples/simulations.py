@@ -8,15 +8,14 @@ import os
 import sys
 import datetime
 sys.path.append(os.path.join(sys.path[0],'..'))
-
 from ModelMocks import *
 
 plt.style.use('tableau-colorblind10')
 random.seed(time.perf_counter())
 
 numRuns = 1
-maxNumTrainingIterations = 2
-numRealIterations = 2
+maxNumTrainingIterations = 40
+numRealIterations = 15
 
 playerWindow = 30
 
@@ -92,14 +91,14 @@ def executeSimulations(playerBridge, taskBridge, adaptation, abilityArray, engag
 		for x in range(numPlayers):
 			adaptation.configsGenAlg.reset()
 			playerBridge.resetPlayer(x)
-			playerBridge.setPlayerPersonality(x, InteractionsProfile(K_i=random.uniform(0.0, 1.0), K_cp=random.uniform(0.0, 1.0), K_mh=random.uniform(0.0, 1.0), K_pa=random.uniform(0.0, 1.0)))
+			playerBridge.setPlayerPersonality(x, InteractionsProfile(K_i=random.uniform(0.0, 1.0), K_cp=random.uniform(0.0, 1.0), K_mh=random.uniform(0.0, 1.0), K_ea=random.uniform(0.0, 1.0)))
 			playerBridge.setBaseLearningRate(x, random.gauss(0.5, 0.16))
 
 		executionPhase(playerBridge, maxNumTrainingIterations, 0, r, adaptation, abilityArray, engagementArray, profDiffArray, groupSizeFreqsArray, configSizeFreqsArray, avgItExecTime, algType, algorithmFilename, canExport, algorithmNum, numAlgorithms)
 		
 		# players change preferences
 		for x in range(numPlayers):
-			playerBridge.setPlayerPersonality(x, InteractionsProfile(K_i=random.uniform(0.0, 1.0), K_cp=random.uniform(0.0, 1.0), K_mh=random.uniform(0.0, 1.0), K_pa=random.uniform(0.0, 1.0)))
+			playerBridge.setPlayerPersonality(x, InteractionsProfile(K_i=random.uniform(0.0, 1.0), K_cp=random.uniform(0.0, 1.0), K_mh=random.uniform(0.0, 1.0), K_ea=random.uniform(0.0, 1.0)))
 
 		executionPhase(playerBridge, numRealIterations, maxNumTrainingIterations, r, adaptation, abilityArray, engagementArray, profDiffArray, groupSizeFreqsArray, configSizeFreqsArray, avgItExecTime, algType, algorithmFilename, canExport, algorithmNum, numAlgorithms)
 
@@ -195,7 +194,7 @@ optimalExecTime = 0.0
 # ----------------------- [Execute Algorithms] ----------------------------
 executeSimulations(playerBridge, taskBridge, adaptationRandom, randomAbilities, randomEngagements, randomPrefProfDiff, [], [], randomExecTime, "random", "Random", True,  1, 4)
 executeSimulations(playerBridge, taskBridge, adaptationGIMME, GIMMEAbilities, GIMMEEngagements, GIMMEPrefProfDiff, GIMMEGroupSizeFreqs, GIMMEConfigsSizeFreqs, GIMMEExecTime, "GIMME", "GIMME", True,  2, 4)
-executeSimulations(playerBridge, taskBridge, adaptationGIMMEEv, GIMMEEvAbilities, GIMMEEvEngagements, GIMMEEvPrefProfDiff, GIMMEEvGroupSizeFreqs, GIMMEEvConfigsSizeFreqs, GIMMEExecTime, "GIMME", "adaptationGIMME", True,  3, 4)
+# executeSimulations(playerBridge, taskBridge, adaptationGIMMEEv, GIMMEEvAbilities, GIMMEEvEngagements, GIMMEEvPrefProfDiff, GIMMEEvGroupSizeFreqs, GIMMEEvConfigsSizeFreqs, GIMMEExecTime, "GIMME", "adaptationGIMME", True,  3, 4)
 executeSimulations(playerBridge, taskBridge, adaptationOptimal, optimalAbilities, optimalEngagements, optimalPrefProfDiff, [], [], optimalExecTime, "optimal", "adaptationOptimal", True, 9, 9)
 executeSimulations(playerBridgeGrid, taskBridge, adaptationGIMMEGrid, GIMMEGridAbilities, GIMMEGridEngagements, GIMMEGridPrefProfDiff, GIMMEGridGroupSizeFreqs, GIMMEGridConfigsSizeFreqs, GIMMEGridExecTime, "GIMMEGrid", "GIMMEGrid", True,  4, 4)
 
@@ -205,12 +204,12 @@ timesteps=[i for i in range(maxNumTrainingIterations + numRealIterations)]
 convValue=[1.0 for i in range(maxNumTrainingIterations + numRealIterations)]
 empConvValue=[optimalAbilities[-1] for i in range(maxNumTrainingIterations + numRealIterations)]
 
-plt.plot(timesteps, GIMMEAbilities, label=r'$GIMME\ strategy$')
-plt.plot(timesteps, GIMMEGridAbilities, label=r'$GIMME\ Grid\ strategy$')
-# plt.plot(timesteps, GIMMEEvAbilities, label=r'$GIMME\ Ev\ strategy$')
-plt.plot(timesteps, randomAbilities, label=r'$Random\ strategy$')
+plt.plot(timesteps, GIMMEAbilities, label="GIMME strategy")
+plt.plot(timesteps, GIMMEGridAbilities, label="GIMME Grid strategy")
+# plt.plot(timesteps, GIMMEEvAbilities, label="GIMME Ev strategy")
+plt.plot(timesteps, randomAbilities, label="Random strategy")
 # plt.plot(timesteps, convValue, linestyle= "--", label=r'$Expected convergence value$')
-plt.plot(timesteps, empConvValue, linestyle= "--", label=r'$Empirical convergence value$')
+plt.plot(timesteps, empConvValue, linestyle= "--", label="\"Perfect Information\" convergence value")
 plt.xlabel("Iteration")
 plt.ylabel("avg Ability Increase")
 plt.legend(loc='best')
@@ -219,15 +218,13 @@ plt.savefig(newpath+'/charts/simulationsResultsAbility.png')
 plt.show()
 
 
-
-convValue=[0.0 for i in range(maxNumTrainingIterations + numRealIterations)]
-
-plt.plot(timesteps, GIMMEPrefProfDiff, label=r'$GIMME\ strategy$')
-plt.plot(timesteps, GIMMEGridPrefProfDiff, label=r'$GIMME\ Grid\ strategy$')
-plt.plot(timesteps, GIMMEEvPrefProfDiff, label=r'$GIMME\ Ev\ strategy$')
-plt.plot(timesteps, randomPrefProfDiff, label=r'$Random\ strategy$')
+empConvValue=[optimalPrefProfDiff[-1] for i in range(maxNumTrainingIterations + numRealIterations)]
+plt.plot(timesteps, GIMMEPrefProfDiff, label="GIMME strategy")
+plt.plot(timesteps, GIMMEGridPrefProfDiff, label="GIMME Grid strategy")
+# plt.plot(timesteps, GIMMEEvPrefProfDiff, label="GIMME Ev strategy")
+plt.plot(timesteps, randomPrefProfDiff, label="Random strategy")
 plt.plot(timesteps, optimalPrefProfDiff, label=r'$Optimal\ strategy$')
-plt.plot(timesteps, convValue, linestyle= "--", label=r'$Expected convergence value$')
+plt.plot(timesteps, empConvValue, linestyle= "--", label="\"Perfect Information\" convergence value")
 
 plt.xlabel("Iteration")
 plt.ylabel("avg Preference Differences")

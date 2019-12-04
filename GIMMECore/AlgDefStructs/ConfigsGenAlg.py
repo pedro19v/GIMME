@@ -35,7 +35,7 @@ class ConfigsGenAlg(ABC):
 		profile.K_cp = random.uniform(0.0, 1.0)
 		profile.K_i = random.uniform(0.0, 1.0)
 		profile.K_mh = random.uniform(0.0, 1.0)
-		profile.K_pa = random.uniform(0.0, 1.0)
+		profile.K_ea = random.uniform(0.0, 1.0)
 		return profile
 
 	@abstractmethod
@@ -373,7 +373,7 @@ class AccurateConfigsGen(ConfigsGenAlg):
 					profile.K_cp += personality.K_cp/newConfigSize
 					profile.K_i += personality.K_i/newConfigSize
 					profile.K_mh += personality.K_mh/newConfigSize
-					profile.K_pa += personality.K_pa/newConfigSize
+					profile.K_ea += personality.K_ea/newConfigSize
 				newConfigProfiles.append(profile)
 
 				# calculate fitness and average state

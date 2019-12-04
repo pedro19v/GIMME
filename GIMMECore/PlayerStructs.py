@@ -64,9 +64,9 @@ class PlayerStateGrid(object):
 		cpPadding = math.ceil(playerState.profile.K_cp * self.dimSpan) - 1
 		iPadding = math.ceil(playerState.profile.K_i * self.dimSpan) - 1
 		mhPadding = math.ceil(playerState.profile.K_mh * self.dimSpan) - 1
-		paPadding = math.ceil(playerState.profile.K_pa * self.dimSpan) - 1
+		eaPadding = math.ceil(playerState.profile.K_ea * self.dimSpan) - 1
 
-		currCellInd = (self.dimSpan**3)*cpPadding + (self.dimSpan**2)*iPadding + self.dimSpan*mhPadding + paPadding
+		currCellInd = (self.dimSpan**3)*cpPadding + (self.dimSpan**2)*iPadding + self.dimSpan*mhPadding + eaPadding
 		currCell = self.cells[currCellInd]
 		
 		currCell.append(playerState)
