@@ -1,6 +1,7 @@
 # Welcome to the GIMME project repository
 
-![logo](ReadmeImages/logo.png)
+<img src="ReadmeImages/logo.png" width="300">
+
 
 GIMME (Group Interactions Management for Multiplayer sErious games) is a research tool which focuses on the management of 
 interactions in groups so that the collective ability improves. 
