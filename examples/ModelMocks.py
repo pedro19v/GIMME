@@ -1,6 +1,5 @@
-from GIMMECore import *
-from PlayerStructs import *
-
+from GIMMECore import TaskModelBridge
+from GIMMECore import PlayerModelBridge
 
 class PlayerModelMock(object):
 	def __init__(self, id, name, currState, pastModelIncreasesGrid, currModelIncreases, personality):

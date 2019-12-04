@@ -1,9 +1,9 @@
 import math
-from AlgDefStructs.RegressionAlg import *
-from AlgDefStructs.ConfigsGenAlg import *
+from .AlgDefStructs.RegressionAlg import *
+from .AlgDefStructs.ConfigsGenAlg import *
 
-from ModelBridge.PlayerModelBridge import PlayerModelBridge 
-from ModelBridge.TaskModelBridge import TaskModelBridge 
+from .ModelBridge.PlayerModelBridge import PlayerModelBridge 
+from .ModelBridge.TaskModelBridge import TaskModelBridge 
 
 class Adaptation(object):
 

@@ -2,9 +2,9 @@ import random
 import math
 import copy
 from abc import ABC, abstractmethod
-from InteractionsProfile import InteractionsProfile 
-from PlayerStructs import *
-from AlgDefStructs.RegressionAlg import *
+from ..InteractionsProfile import InteractionsProfile 
+from ..PlayerStructs import *
+from ..AlgDefStructs.RegressionAlg import *
 import matplotlib.pyplot as plt
 
 

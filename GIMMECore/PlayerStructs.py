@@ -1,8 +1,7 @@
-import numpy
 import math
 import time
 from collections import namedtuple
-from InteractionsProfile import InteractionsProfile
+from .InteractionsProfile import InteractionsProfile
 
 import json
 

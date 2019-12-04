@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 import copy
-from PlayerStructs import *
+from ..PlayerStructs import *
 import json
 
 class RegressionAlg(ABC):

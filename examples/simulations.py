@@ -7,18 +7,18 @@ import math
 import os
 import sys
 import datetime
-sys.path.append(os.path.join(sys.path[0],'..'))
+
+from GIMMECore import *
 from ModelMocks import *
 
 plt.style.use('tableau-colorblind10')
 random.seed(time.perf_counter())
 
-numRuns = 1
+numRuns = 30
 maxNumTrainingIterations = 40
 numRealIterations = 15
 
 playerWindow = 30
-
 numPlayers = 23
 
 startTime = str(datetime.datetime.now())

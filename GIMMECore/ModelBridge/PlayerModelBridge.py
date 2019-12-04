@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from PlayerStructs import *
+from ..PlayerStructs import *
 
 class PlayerModelBridge(ABC):
 

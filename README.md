@@ -20,13 +20,26 @@ Tested on Windows and Linux. May also work in MacOS.
 
 GIMME setup is straightforward. You just got to install the python package:
 
-python setup.py install
+```python 
+python3 setup.py install
+```
 
-And then execute your program. For example, to execute the provided simulations, you just have to enter the folder and call python:
+Then you can start to write programs with our library.
+When importing the package, it is recommended to use the following command:
 
+```python 
+from GIMMECore import *
+```
+This will automatically import all of the associated GIMME classes.
+
+
+## Run an example
+
+Some simulations are provided as example use cases of our system. To execute the provided simulations, you just have to enter the folder examples and call python as usual:
+
+```python 
 cd examples
 python simulations.py
-
-
+```
 
  <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />
