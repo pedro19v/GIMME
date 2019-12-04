@@ -18,18 +18,18 @@ Randomengagements = [0.579464928919271, 0.6118556663224993, 0.6112369966989636, 
 RandomprofDiffArray = [0.7800738338541666, 0.7728791160493987, 0.777591129720335, 0.771922172748005, 0.7711729499531251, 0.7739448375513728, 0.7765329956485857, 0.7780708947677317, 0.7797971407124556, 0.7741438623600235, 0.7811292773403955, 0.7771391992632533, 0.7824005598550016, 0.782880582896174, 0.7717410696053882, 0.7780613379747884, 0.77445191622109, 0.7723035193283447, 0.7782722342867321, 0.7770378426186648, 0.7733318660155051, 0.7786600311947341, 0.7706161130515629, 0.7798281366581193, 0.7743715110324475, 0.7743065136457492, 0.7771437301276161, 0.771416819216074, 0.779416570678309, 0.7710797053196224, 0.7785737709096145, 0.7782972900314534, 0.7790708527047027, 0.7759362695091823, 0.7765104228217768, 0.7760763526120741, 0.7800788786743311, 0.7746344885788768, 0.7771217479357204, 0.7695386434230823, 0.783683568624122, 0.7798340646884881, 0.7765773955961357, 0.7706670936879707, 0.7793939920972467, 0.7784517422223542, 0.7752843326464425, 0.7784615226948277, 0.7851131420679084, 0.7820802363249886, 0.7789425825580254, 0.7776766854307473, 0.776770206317592, 0.7748747214462883, 0.7813143004971939]
 
 
-
 timesteps=[i for i in range(maxNumTrainingIterations + numRealIterations)]
 empConvValue=[0.8518004375307543 for i in range(maxNumTrainingIterations + numRealIterations)]
+
+plt.rcParams.update({'font.size': 22})
 
 plt.plot(timesteps, GIMMEGridabilities, label=r"GIMME Grid strategy")
 plt.plot(timesteps, GIMMEabilities, label="GIMME strategy")
 plt.plot(timesteps, Randomabilities, label="Random strategy")
 plt.plot(timesteps, empConvValue, linestyle= "--", label="\"Perfect Information\" convergence value")
-plt.xlabel("Iteration")
-plt.ylabel("avg Ability Increase")
-plt.legend(loc='best')
-
+plt.xlabel("Iteration", fontsize=30)
+plt.ylabel("avg. Ability Increase", fontsize=30)
+plt.legend(loc='best', fontsize=20)
 plt.show()
 
 
@@ -39,9 +39,7 @@ plt.plot(timesteps, GIMMEGridprofDiffArray, label="GIMME Grid strategy")
 plt.plot(timesteps, GIMMEprofDiffArray, label="GIMME strategy")
 plt.plot(timesteps, RandomprofDiffArray, label="Random strategy")
 plt.plot(timesteps, empConvValue, linestyle= "--", label="\"Perfect Information\" convergence value")
-
-plt.xlabel("Iteration")
-plt.ylabel("avg Preference Differences")
-plt.legend(loc='best')
-
+plt.xlabel("Iteration", fontsize=30)
+plt.ylabel("avg. Preference Differences", fontsize=30)
+plt.legend(loc='best', fontsize=20)
 plt.show()

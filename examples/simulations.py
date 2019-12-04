@@ -14,7 +14,7 @@ from ModelMocks import *
 plt.style.use('tableau-colorblind10')
 random.seed(time.perf_counter())
 
-numRuns = 30
+numRuns = 1
 maxNumTrainingIterations = 40
 numRealIterations = 15
 
@@ -204,15 +204,17 @@ timesteps=[i for i in range(maxNumTrainingIterations + numRealIterations)]
 convValue=[1.0 for i in range(maxNumTrainingIterations + numRealIterations)]
 empConvValue=[optimalAbilities[-1] for i in range(maxNumTrainingIterations + numRealIterations)]
 
+plt.rcParams.update({'font.size': 22})
+
 plt.plot(timesteps, GIMMEAbilities, label="GIMME strategy")
 plt.plot(timesteps, GIMMEGridAbilities, label="GIMME Grid strategy")
 # plt.plot(timesteps, GIMMEEvAbilities, label="GIMME Ev strategy")
 plt.plot(timesteps, randomAbilities, label="Random strategy")
 # plt.plot(timesteps, convValue, linestyle= "--", label=r'$Expected convergence value$')
 plt.plot(timesteps, empConvValue, linestyle= "--", label="\"Perfect Information\" convergence value")
-plt.xlabel("Iteration")
-plt.ylabel("avg Ability Increase")
-plt.legend(loc='best')
+plt.xlabel("Iteration", fontsize=30)
+plt.ylabel("avg. Ability Increase", fontsize=30)
+plt.legend(loc='best', fontsize=20)
 
 plt.savefig(newpath+'/charts/simulationsResultsAbility.png')
 plt.show()
@@ -226,9 +228,9 @@ plt.plot(timesteps, randomPrefProfDiff, label="Random strategy")
 plt.plot(timesteps, optimalPrefProfDiff, label=r'$Optimal\ strategy$')
 plt.plot(timesteps, empConvValue, linestyle= "--", label="\"Perfect Information\" convergence value")
 
-plt.xlabel("Iteration")
-plt.ylabel("avg Preference Differences")
-plt.legend(loc='best')
+plt.xlabel("Iteration", fontsize=30)
+plt.ylabel("avg. Preference Differences", fontsize=30)
+plt.legend(loc='best', fontsize=20)
 
 plt.savefig(newpath+'/charts/simulationsResultsProfileDist.png')
 plt.show()
