@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 from numpy import array
+import matplotlib.collections as collections
 
 maxNumTrainingIterations = 40
 numRealIterations = 15
@@ -23,6 +24,13 @@ empConvValue=[0.8518004375307543 for i in range(maxNumTrainingIterations + numRe
 
 plt.rcParams.update({'font.size': 22})
 
+fig = plt.figure()
+ax = fig.add_subplot(111)
+c1 = collections.BrokenBarHCollection([(0,40)], (0.74,0.12), facecolor='#f7e4d4', alpha=0.5)
+c2 = collections.BrokenBarHCollection([(40,15)], (0.74,0.12), facecolor='#bdedcf', alpha=0.5)
+ax.add_collection(c1)
+ax.add_collection(c2)
+
 plt.plot(timesteps, GIMMEGridabilities, label=r"GIMME Grid strategy")
 plt.plot(timesteps, GIMMEabilities, label="GIMME strategy")
 plt.plot(timesteps, Randomabilities, label="Random strategy")
@@ -30,6 +38,7 @@ plt.plot(timesteps, empConvValue, linestyle= "--", label="\"Perfect Information\
 plt.xlabel("Iteration", fontsize=30)
 plt.ylabel("avg. Ability Increase", fontsize=30)
 plt.legend(loc='best', fontsize=20)
+
 plt.show()
 
 
@@ -42,4 +51,5 @@ plt.plot(timesteps, empConvValue, linestyle= "--", label="\"Perfect Information\
 plt.xlabel("Iteration", fontsize=30)
 plt.ylabel("avg. Preference Differences", fontsize=30)
 plt.legend(loc='best', fontsize=20)
+
 plt.show()

@@ -42,8 +42,6 @@ class KNNRegression(RegressionAlg):
 		pastModelIncs = pastModelIncs[:numberOfIterations]
 		pastModelIncs = sorted(pastModelIncs, key=self.creationTimeSort)
 		
-		# print(json.dumps(pastModelIncsCopy, default=lambda o: o.__dict__["dist"], sort_keys=True))
-
 		for i in range(numberOfIterations):
 			currState = pastModelIncs[i]
 			pastCharacteristics = currState.characteristics
@@ -51,7 +49,6 @@ class KNNRegression(RegressionAlg):
 			predictedState.characteristics.ability += pastCharacteristics.ability / numberOfIterations * ((numberOfIterations - i)/numberOfIterations)
 			predictedState.characteristics.engagement += pastCharacteristics.engagement/ numberOfIterations * ((numberOfIterations - i)/numberOfIterations)
 		
-		# print(json.dumps(predictedState, default=lambda o: o.__dict__, sort_keys=True))
 		return predictedState
 
 

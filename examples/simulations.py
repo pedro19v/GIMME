@@ -204,7 +204,15 @@ timesteps=[i for i in range(maxNumTrainingIterations + numRealIterations)]
 convValue=[1.0 for i in range(maxNumTrainingIterations + numRealIterations)]
 empConvValue=[optimalAbilities[-1] for i in range(maxNumTrainingIterations + numRealIterations)]
 
+
 plt.rcParams.update({'font.size': 22})
+
+fig = plt.figure()
+ax = fig.add_subplot(111)
+c1 = collections.BrokenBarHCollection([(0,40)], (0.74,0.12), facecolor='#f7e4d4', alpha=0.5)
+c2 = collections.BrokenBarHCollection([(40,15)], (0.74,0.12), facecolor='#bdedcf', alpha=0.5)
+ax.add_collection(c1)
+ax.add_collection(c2)
 
 plt.plot(timesteps, GIMMEAbilities, label="GIMME strategy")
 plt.plot(timesteps, GIMMEGridAbilities, label="GIMME Grid strategy")
