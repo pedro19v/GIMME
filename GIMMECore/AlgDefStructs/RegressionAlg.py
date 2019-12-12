@@ -52,6 +52,7 @@ class KNNRegression(RegressionAlg):
 		return predictedState
 
 
+
 # ---------------------- NeuralNetworkRegression stuff ---------------------------
 class NeuralNetworkRegression(RegressionAlg):
 
