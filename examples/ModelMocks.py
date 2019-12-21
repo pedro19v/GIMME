@@ -45,11 +45,12 @@ class CustomPlayerModelBridge(PlayerModelBridge):
 		self.players = players
 		self.numPlayers = len(players)
 
+
 	def registerNewPlayer(self, playerId, name, currState, pastModelIncreasesGrid, currModelIncreases, personality):
 		self.players[int(playerId)] = PlayerModelMock(playerId, name, currState, pastModelIncreasesGrid, currModelIncreases, personality)	
 	def resetPlayer(self, playerId):
 		self.players[int(playerId)].currState.reset()
-		self.players[int(playerId)].pastModelIncreasesGrid.reset()
+		# self.players[int(playerId)].pastModelIncreasesGrid.reset()
 	def updatePlayerState(self, playerId, newState):
 		self.players[int(playerId)].currState = newState
 	def savePlayerState(self, playerId, increases, newState):

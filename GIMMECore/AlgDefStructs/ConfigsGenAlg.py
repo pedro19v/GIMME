@@ -36,6 +36,7 @@ class ConfigsGenAlg(ABC):
 		profile.K_i = random.uniform(0.0, 1.0)
 		profile.K_mh = random.uniform(0.0, 1.0)
 		profile.K_ea = random.uniform(0.0, 1.0)
+		profile.normalize()
 		return profile
 
 	@abstractmethod
@@ -156,7 +157,7 @@ class RandomConfigsGen(ConfigsGenAlg):
 
 class SimpleConfigsGen(ConfigsGenAlg):
 
-	def __init__(self, playerModelBridge, regAlg = None, numberOfConfigChoices = 100, preferredNumberOfPlayersPerGroup = None, minNumberOfPlayersPerGroup = 2, maxNumberOfPlayersPerGroup = 5, qualityWeights = PlayerCharacteristics(ability = 0.5, engagement = 0.5)):
+	def __init__(self, playerModelBridge, regAlg = None, numberOfConfigChoices = 100, preferredNumberOfPlayersPerGroup = None, minNumberOfPlayersPerGroup = 2, maxNumberOfPlayersPerGroup = 5, qualityWeights = PlayerCharacteristics(ability = 0.5, engagement = 0.5), allPlayersInited = True):
 		super().__init__(playerModelBridge, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, minNumberOfPlayersPerGroup = minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup = maxNumberOfPlayersPerGroup)
 		self.regAlg = regAlg
 		self.numberOfConfigChoices = numberOfConfigChoices
@@ -164,11 +165,21 @@ class SimpleConfigsGen(ConfigsGenAlg):
 		
 		self.qualityWeights = qualityWeights
 
+		self.allPlayersInited = allPlayersInited
+		self.configsGenAlgIniter = RandomConfigsGen(playerModelBridge, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, minNumberOfPlayersPerGroup = minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup = maxNumberOfPlayersPerGroup)
+
 		if(regAlg==None):
 			regAlg = KNNRegression(playerModelBridge, 5)
 
+	def areAllPlayersInited(self, allPlayersInited):
+		self.allPlayersInited = allPlayersInited
+
 	def organize(self):
 		playerIds = self.playerModelBridge.getAllPlayerIds() 
+
+		if(not self.allPlayersInited):
+			return self.configsGenAlgIniter.organize()
+
 		currMaxFitness = -float("inf")
 
 		bestGroups = []

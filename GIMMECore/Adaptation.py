@@ -23,6 +23,9 @@ class Adaptation(object):
 		self.playerModelBridge = playerModelBridge
 		self.taskModelBridge = taskModelBridge
 
+	def setName(self, name):
+		self.name=name
+
 	def getName(self):
 		return self.name;
 
