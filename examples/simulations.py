@@ -49,8 +49,7 @@ def simulateReaction(playerBridge, currIteration, playerId):
 def calcReaction(playerBridge, state, playerId, interactionsProfile, currIteration):
 	personality = playerBridge.getPlayerPersonality(playerId)
 	newState = PlayerState(characteristics = PlayerCharacteristics(ability=state.characteristics.ability, engagement=state.characteristics.engagement), profile=state.profile)
-	newState.characteristics.engagement = 0.05* (newState.characteristics.engagement) + 0.95* (math.sqrt(2.0) - personality.distanceBetween(interactionsProfile)) / math.sqrt(2.0)  #between 0 and 1
-	# newState.characteristics.engagement = 0.05* (newState.characteristics.engagement) + 0.95* (2.0 - personality.distanceBetween(interactionsProfile))/2.0  #between 0 and 1
+	newState.characteristics.engagement = 0.20* (newState.characteristics.engagement) + 0.80* (math.sqrt(2.0) - personality.distanceBetween(interactionsProfile)) / math.sqrt(2.0)  #between 0 and 1
 	abilityIncreaseSim = (newState.characteristics.engagement*playerBridge.getBaseLearningRate(playerId))
 	newState.characteristics.ability = newState.characteristics.ability + abilityIncreaseSim
 	
@@ -77,9 +76,6 @@ def executionPhase(playerBridge, maxNumIterations, startingI, currRun, adaptatio
 		t1 = time.perf_counter() - t0
 		avgItExecTime += (t1 - t0)/(numRuns) # CPU seconds elapsed (floating point)
 
-		currAbility = 0
-		currEngagement = 0
-
 		for x in range(numPlayers):
 			increases = simulateReaction(playerBridge, i, x)
 			abilityMatrix[i][currRun] += increases.characteristics.ability / numPlayers
@@ -96,8 +92,6 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 	playerBridge, taskBridge, adaptation, \
 	abilityMean, abilitySTDev, engagementMean, engagementSTDev, profDiffMean, profDiffSTDev, avgItExecTime,\
 	canExport, algorithmNum, numAlgorithms):
-
-
 
 
 	totalNumIterations = len(abilityMean) #assumption that the total number of iterations is given by the size of the ability results array...

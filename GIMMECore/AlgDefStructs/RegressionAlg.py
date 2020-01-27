@@ -40,14 +40,15 @@ class KNNRegression(RegressionAlg):
 
 		numberOfIterations = min(self.numberOfNNs, len(pastModelIncs))
 		pastModelIncs = pastModelIncs[:numberOfIterations]
-		# pastModelIncs = sorted(pastModelIncs, key=self.creationTimeSort)
 
+		triangularNumberOfIt = sum(range(numberOfIterations + 1))
 		for i in range(numberOfIterations):
 			currState = pastModelIncs[i]
 			pastCharacteristics = currState.characteristics
+			ratio = (numberOfIterations - i)/triangularNumberOfIt
 
-			predictedState.characteristics.ability += pastCharacteristics.ability / numberOfIterations * ((numberOfIterations - i)/numberOfIterations)
-			predictedState.characteristics.engagement += pastCharacteristics.engagement/ numberOfIterations * ((numberOfIterations - i)/numberOfIterations)
+			predictedState.characteristics.ability += pastCharacteristics.ability * ratio
+			predictedState.characteristics.engagement += pastCharacteristics.engagement * ratio
 
 		return predictedState
 
