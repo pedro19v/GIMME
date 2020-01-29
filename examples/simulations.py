@@ -19,7 +19,7 @@ from ModelMocks import *
 plt.style.use('tableau-colorblind10')
 random.seed(time.perf_counter())
 
-numRuns = 300
+numRuns = 1000
 maxNumTrainingIterations = 20
 numRealIterations = 20
 
