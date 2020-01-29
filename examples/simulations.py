@@ -283,73 +283,15 @@ optimalExecTime = 0.0
 
 
 # ----------------------- [Execute Algorithms] ----------------------------
-executeSimulations(maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, playerBridge, taskBridge, adaptationGIMME, GIMMEAbilityMeans, GIMMEAbilitySTDev, GIMMEEngagementMeans, GIMMEEngagementSTDev, GIMMEProfDiffMeans, GIMMEProfDiffSTDev, GIMMEExecTime, True,  2, 4)
+executeSimulations(maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, playerBridge, taskBridge, adaptationGIMME, GIMMEAbilityMeans, GIMMEAbilitySTDev, GIMMEEngagementMeans, GIMMEEngagementSTDev, GIMMEProfDiffMeans, GIMMEProfDiffSTDev, GIMMEExecTime, True,  1, 4)
 adaptationGIMME.setName("GIMMEOld")
 executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, taskBridge, adaptationGIMME, GIMMEOldAbilityMeans, GIMMEOldAbilitySTDev, GIMMEOldEngagementMeans, GIMMEOldEngagementSTDev, GIMMEOldProfDiffMeans, GIMMEOldProfDiffSTDev, GIMMEOldExecTime, True,  2, 4)
 executeSimulations(maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, playerBridge, taskBridge, adaptationOptimal, optimalAbilityMeans, optimalAbilitySTDev, optimalEngagementMeans, optimalEngagementSTDev, optimalProfDiffMeans, optimalProfDiffSTDev, optimalExecTime, True, 3, 4)
-executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, taskBridge, adaptationRandom, randomAbilityMeans, randomAbilitySTDev, randomEngagementMeans, randomEngagementSTDev, randomProfDiffMeans, randomProfDiffSTDev, randomExecTime, True,  1, 4)
+executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, taskBridge, adaptationRandom, randomAbilityMeans, randomAbilitySTDev, randomEngagementMeans, randomEngagementSTDev, randomProfDiffMeans, randomProfDiffSTDev, randomExecTime, True,  4, 4)
 # executeSimulations(maxNumTrainingIterations,numRealIterations, playerBridge, taskBridge, adaptationGIMMEEv, GIMMEEvAbilities, GIMMEEvEngagements, GIMMEEvPrefProfDiff, GIMMEEvGroupSizeFreqs, GIMMEEvConfigsSizeFreqs, GIMMEExecTime, "GIMME", "adaptationGIMME", True,  3, 4)
 # executeSimulations(maxNumTrainingIterations,numRealIterations, playerBridgeGrid, taskBridge, adaptationGIMMEGrid, GIMMEGridAbilityMean, GIMMEGridAbilitySTDev, GIMMEGridEngagementMean, GIMMEGridEngagementSTDev, GIMMEGridProfDiffMean, GIMMEGridProfDiffSTDev, GIMMEGridExecTime, True,  4, 4)
 
 
 
-# ----------------------- [Generate Plots] --------------------------------
-timesteps=[i for i in range(maxNumTrainingIterations + numRealIterations)]
-timestepsReal=[i+maxNumTrainingIterations for i in range(numRealIterations)]
-convValue=[1.0 for i in range(maxNumTrainingIterations + numRealIterations)]
-empConvValue=[optimalAbilityMeans[-1] for i in range(maxNumTrainingIterations + numRealIterations)]
-totalMin = min(min(randomAbilityMeans[maxNumTrainingIterations:]),min(GIMMEAbilityMeans),min(GIMMEOldAbilityMeans[maxNumTrainingIterations:]),min(optimalAbilityMeans[maxNumTrainingIterations:]))
-totalMax = max(max(randomAbilityMeans[maxNumTrainingIterations:]),max(GIMMEAbilityMeans),max(GIMMEOldAbilityMeans[maxNumTrainingIterations:]),max(optimalAbilityMeans[maxNumTrainingIterations:]))
-
-plt.rcParams.update({'font.size': 22})
-
-fig = plt.figure(num=None, figsize=(18, 8), dpi=100, facecolor='w', edgecolor='k')
-ax = fig.add_subplot(111)
-c1 = collections.BrokenBarHCollection([(0,maxNumTrainingIterations)], (totalMin-0.05,(totalMax-totalMin)+0.1), facecolor='#f7e4d4', alpha=0.5)
-c2 = collections.BrokenBarHCollection([(maxNumTrainingIterations,numRealIterations)], (totalMin-0.05,(totalMax-totalMin)+0.1), facecolor='#bdedcf', alpha=0.5)
-ax.add_collection(c1)
-ax.add_collection(c2)
-
-
-plt.errorbar(timesteps, GIMMEAbilityMeans, GIMMEAbilitySTDev, marker='s', capsize=2.0, alpha=0.5, label="GIMME strategy")
-plt.errorbar(timestepsReal, GIMMEOldAbilityMeans[maxNumTrainingIterations:], GIMMEOldAbilitySTDev[maxNumTrainingIterations:], marker='s', capsize=2.0, alpha=0.5, label="GIMME Old strategy")
-# plt.errorbar(timesteps, GIMMEGridAbilityMean, GIMMEGridAbilitySTDev, marker='s', capsize=2.0, alpha=0.5, label="GIMME Grid strategy")
-# plt.plot(timesteps, GIMMEEvAbilities, label="GIMME Ev strategy")
-plt.errorbar(timestepsReal, randomAbilityMeans[maxNumTrainingIterations:], randomAbilitySTDev[maxNumTrainingIterations:], marker='s', capsize=2.0, alpha=0.5, label="Random strategy")
-# plt.errorbar(timesteps, optimalAbilityMeans, optimalAbilitySTDev, marker='s', capsize=2.0, alpha=0.5, label="\"Perfect Information\" strategy")
-plt.plot(timestepsReal, empConvValue[maxNumTrainingIterations:], linestyle= "--", label="\"Perfect Information\" convergence value")
-plt.xlabel("Iteration", fontsize=30)
-plt.ylabel("avg. Ability Increase", fontsize=30)
-plt.legend(loc='best', fontsize=20)
-
-plt.savefig(newpath+'/charts/simulationsResultsAbility.png', dpi=300, figsize=(6,20))
-# plt.show()
-
-
-
-empConvValue=[optimalProfDiffMeans[-1] for i in range(maxNumTrainingIterations + numRealIterations)]
-
-fig = plt.figure(num=None, figsize=(18, 8), dpi=100, facecolor='w', edgecolor='k')
-ax = fig.add_subplot(111)
-totalMin = min(min(randomProfDiffMeans[maxNumTrainingIterations:]),min(GIMMEProfDiffMeans),min(GIMMEOldProfDiffMeans[maxNumTrainingIterations:]),min(optimalProfDiffMeans[maxNumTrainingIterations:]))
-totalMax = max(max(randomProfDiffMeans[maxNumTrainingIterations:]),max(GIMMEProfDiffMeans),max(GIMMEOldProfDiffMeans[maxNumTrainingIterations:]),max(optimalProfDiffMeans[maxNumTrainingIterations:]))
-c1 = collections.BrokenBarHCollection([(0,maxNumTrainingIterations)], (totalMin-0.05,(totalMax-totalMin)+0.1), facecolor='#f7e4d4', alpha=0.5)
-c2 = collections.BrokenBarHCollection([(maxNumTrainingIterations,numRealIterations)], (totalMin-0.05,(totalMax-totalMin)+0.1), facecolor='#bdedcf', alpha=0.5)
-ax.add_collection(c1)
-ax.add_collection(c2)
-
-
-plt.errorbar(timesteps, GIMMEProfDiffMeans, GIMMEProfDiffSTDev, marker='s', capsize=2.0, alpha=0.5, label="GIMME strategy")
-plt.errorbar(timestepsReal, GIMMEOldProfDiffMeans[maxNumTrainingIterations:], GIMMEOldProfDiffSTDev[maxNumTrainingIterations:], marker='s', capsize=2.0, alpha=0.5, label="GIMME Old strategy")
-# plt.errorbar(timesteps, GIMMEGridProfDiffMean, GIMMEGridProfDiffSTDev, marker='s', capsize=2.0, alpha=0.5, label="GIMME Grid strategy")
-plt.errorbar(timestepsReal, randomProfDiffMeans[maxNumTrainingIterations:], randomProfDiffSTDev[maxNumTrainingIterations:], marker='s', capsize=2.0, alpha=0.5, label="Random strategy")
-plt.plot(timestepsReal, empConvValue[maxNumTrainingIterations:], linestyle= "--", label="\"Perfect Information\" convergence value")
-plt.xlabel("Iteration", fontsize=30)
-plt.ylabel("avg. Profile to Pref. dist", fontsize=30)
-plt.legend(loc='best', fontsize=20)
-
-plt.savefig(newpath+'/charts/simulationsResultsProfileDist.png', dpi=300, figsize=(6,20))
-# plt.show()
-
-
-
+print("Done!                        ", end="\r")
+		
