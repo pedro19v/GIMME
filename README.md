@@ -5,15 +5,15 @@
 
 GIMME (Group Interactions Management for Multiplayer sErious games) is a research tool which focuses on the management of 
 interactions in groups so that the collective ability improves. 
-More specifically, what sets the method appart is that the interactions between players are explicity considered when forming group configurations (also called coalition structures in some problems).
+More specifically, what sets the method appart is that the interactions between players are explicity considered when forming group configurations (also commonly named coalition structures).
 This repository contains the core of the application (written in Python), as well as some examples. 
 Over time, we aim to improve the core functionalities as well as provide more examples for GIMME.
 
 
 ## Requirements
 
-GIMME only requires Python 3 in order to be executed (Tested in Python 3.7.4). No additional tools are required.
-Tested on Windows and Linux. May also work in MacOS.
+GIMME requires Python 3 in order to be executed (Tested in Python 3.7.4). No additional tools are required.
+Tested on Windows and Linux. May also work in MacOS, but remins still untested in this platform.
 
 
 ## Setup
@@ -31,7 +31,7 @@ When importing the package, it is recommended to use the following command:
 from GIMMECore import *
 ```
 This will automatically import all of the associated GIMME classes.
-
+Besides the core, the user has to also implement the functionalities to store data used by the algorithm. This is done by extending two abstract data bridges: the [PlayerModelBridge](https://github.com/SamGomes/GIMME/wiki/PlayerModelBridge) and [TaskModelBridge](https://github.com/SamGomes/GIMME/wiki/TaskModelBridge). 
 
 ## Run an example
 
