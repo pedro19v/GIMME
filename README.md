@@ -13,7 +13,7 @@ Over time, we aim to improve the core functionalities as well as provide more ex
 ## Requirements
 
 GIMME requires Python 3 in order to be executed (Tested in Python 3.7.4). No additional tools are required.
-Tested on Windows and Linux. May also work in MacOS, but remins still untested in this platform.
+Tested on Windows and Linux. May also work in MacOS, but remains untested in this platform.
 
 
 ## Setup
