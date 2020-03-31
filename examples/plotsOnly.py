@@ -63,7 +63,7 @@ plt.errorbar(timestepsReal, GIMMEOldAbilityMeans[maxNumTrainingIterations:], GIM
 # plt.plot(timesteps, GIMMEEvAbilities, label="GIMME Ev strategy")
 plt.errorbar(timestepsReal, randomAbilityMeans[maxNumTrainingIterations:], randomAbilitySTDev[maxNumTrainingIterations:], marker='s', capsize=5.0, alpha=0.5, linewidth=3, elinewidth=2, label="Random strategy")
 # plt.errorbar(timesteps, optimalAbilityMeans, optimalAbilitySTDev, marker='s', capsize=2.0, alpha=0.5, label="\"Perfect Information\" strategy")
-plt.plot(timestepsReal, empHighestValue[maxNumTrainingIterations:], linestyle= "--", linewidth=3, label="Highest avg. \"Perfect Information\" increase")
+plt.plot(timestepsReal, empHighestValue[maxNumTrainingIterations:], linestyle= "--", linewidth=3, label="\"Perfect Information\" upper bound")
 plt.xlabel("Iteration", fontsize=40)
 plt.ylabel("avg. Ability Increase", fontsize=40)
 plt.legend(loc='best', fontsize=29)

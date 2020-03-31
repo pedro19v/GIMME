@@ -2,19 +2,9 @@ from abc import ABC, abstractmethod
 from ..PlayerStructs import *
 
 class PlayerModelBridge(ABC):
-
-	@abstractmethod
-	def savePlayerState(self, playerId, newState):
-		pass
-
-	@abstractmethod
-	def setPlayerCharacteristics(self, playerId, characteristics):
-		pass
-
 	@abstractmethod
 	def resetPlayer(self, playerId):
 		pass
-
 
 	@abstractmethod
 	def getAllPlayerIds(self):
@@ -41,4 +31,15 @@ class PlayerModelBridge(ABC):
 	@abstractmethod
 	def getPlayerPersonality(self, playerId):
 		pass
-		
+
+	@abstractmethod
+	def setPlayerPersonality(self, playerId, personality):
+		pass
+
+	@abstractmethod
+	def savePlayerState(self, playerId, increases, newState):
+		pass
+
+	@abstractmethod
+	def setPlayerCharacteristics(self, playerId, characteristics):
+		pass
