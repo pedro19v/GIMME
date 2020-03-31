@@ -54,7 +54,8 @@ class Adaptation(object):
 				currState = self.playerModelBridge.getPlayerCurrState(playerId)
 				currState.profile = groupProfile	
 				currState.tailoredTaskId = tailoredTaskId	
-				self.playerModelBridge.updatePlayerState(playerId, currState)
+				self.playerModelBridge.setPlayerCharacteristics(playerId, currState.characteristics)
+				self.playerModelBridge.setPlayerProfile(playerId, currState.profile)
 
 		return adaptedConfig
 

@@ -37,9 +37,14 @@ class PlayerModelBridge(ABC):
 		pass
 
 	@abstractmethod
-	def savePlayerState(self, playerId, increases, newState):
+	def setAndSavePlayerStateToGrid(self, playerId, increases, newState):
 		pass
 
+	
 	@abstractmethod
 	def setPlayerCharacteristics(self, playerId, characteristics):
+		pass
+
+	@abstractmethod		
+	def setPlayerProfile(self, playerId, profile):
 		pass

@@ -19,7 +19,7 @@ from ModelMocks import *
 plt.style.use('tableau-colorblind10')
 random.seed(time.perf_counter())
 
-numRuns = 1000
+numRuns = 2
 maxNumTrainingIterations = 20
 numRealIterations = 20
 
@@ -43,7 +43,7 @@ def simulateReaction(playerBridge, currIteration, playerId):
 	increases = PlayerState()
 	increases.profile = currState.profile
 	increases.characteristics = PlayerCharacteristics(ability=(newState.characteristics.ability - currState.characteristics.ability), engagement=newState.characteristics.engagement)
-	playerBridge.savePlayerState(playerId, increases, newState)	
+	playerBridge.setAndSavePlayerStateToGrid(playerId, increases, newState)	
 	return increases
 
 def calcReaction(playerBridge, state, playerId, interactionsProfile, currIteration):

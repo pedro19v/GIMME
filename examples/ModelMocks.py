@@ -50,9 +50,7 @@ class CustomPlayerModelBridge(PlayerModelBridge):
 		self.players[int(playerId)] = PlayerModelMock(playerId, name, currState, pastModelIncreasesGrid, currModelIncreases, personality)	
 	def resetPlayer(self, playerId):
 		self.players[int(playerId)].currState.reset()
-	def updatePlayerState(self, playerId, newState):
-		self.players[int(playerId)].currState = newState
-	def savePlayerState(self, playerId, increases, newState):
+	def setAndSavePlayerStateToGrid(self, playerId, increases, newState):
 		self.players[int(playerId)].currState = newState
 		self.players[int(playerId)].pastModelIncreasesGrid.pushToGrid(increases)
 
@@ -79,5 +77,8 @@ class CustomPlayerModelBridge(PlayerModelBridge):
 
 	def setPlayerPersonality(self, playerId, personality):
 		self.players[int(playerId)].personality = personality
+
 	def setPlayerCharacteristics(self, playerId, characteristics):
 		self.players[int(playerId)].currState.characteristics = characteristics
+	def setPlayerProfile(self, playerId, profile):
+		self.players[int(playerId)].currState.profile = profile
