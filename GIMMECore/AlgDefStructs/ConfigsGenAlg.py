@@ -16,6 +16,7 @@ class ConfigsGenAlg(ABC):
 		
 		if(minNumberOfPlayersPerGroup > maxNumberOfPlayersPerGroup):
 			raise ValueError('The min number of players per group cannot be higher than the max!') 
+		
 		if preferredNumberOfPlayersPerGroup == None:
 			self.maxNumberOfPlayersPerGroup = maxNumberOfPlayersPerGroup
 			self.minNumberOfPlayersPerGroup = minNumberOfPlayersPerGroup
@@ -186,10 +187,9 @@ class SimpleConfigsGen(ConfigsGenAlg):
 		bestConfigProfiles = []
 		bestAvgStates = []
 
-		if(len(playerIds) < self.minNumberOfPlayersPerGroup):
-			print("number of players is lower than the minimum number of players per group!")
-			input()
-			return bestGroups
+		# if(len(playerIds) < self.minNumberOfPlayersPerGroup):
+		# 	print("number of players is lower than the minimum number of players per group!")
+		# 	return bestGroups
 		minNumGroups = math.ceil(len(playerIds) / self.maxNumberOfPlayersPerGroup)
 		maxNumGroups = math.floor(len(playerIds) / self.minNumberOfPlayersPerGroup)
 		

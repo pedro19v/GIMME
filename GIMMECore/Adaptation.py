@@ -31,11 +31,15 @@ class Adaptation(object):
 
 	def iterate(self):
 		if not self.initialized:
-			raise ValueError('Adaptation not Initialized! Core not executed.') 
+			raise AssertionError('Adaptation not Initialized! Core not executed.') 
 			return
-
+		
 		self.playerIds = self.playerModelBridge.getAllPlayerIds()
 		self.taskIds = self.taskModelBridge.getAllTaskIds()
+
+		if len(self.playerIds) < self.configsGenAlg.minNumberOfPlayersPerGroup:
+			raise ValueError('Not enough players to form a group.') 
+			return
 
 		adaptedConfig = self.configsGenAlg.organize()
 

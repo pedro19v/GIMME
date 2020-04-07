@@ -58,8 +58,8 @@ plt.xticks(np.arange(1, numRealIterations+1, step=1.0), fontsize=30)
 plt.yticks(fontsize=30)
 
 
-plt.errorbar(timestepsReal, GIMMEAbilityMeans[maxNumTrainingIterations:], GIMMEAbilitySTDev[maxNumTrainingIterations:], marker='s', capsize=5.0, alpha=0.5, linewidth=3, elinewidth=2, label="GIMME strategy (with training)")
-plt.errorbar(timestepsReal, GIMMEOldAbilityMeans[maxNumTrainingIterations:], GIMMEOldAbilitySTDev[maxNumTrainingIterations:], marker='s', capsize=5.0, alpha=0.5, linewidth=3, elinewidth=2, label="GIMME strategy (no training)")
+plt.errorbar(timestepsReal, GIMMEAbilityMeans[maxNumTrainingIterations:], GIMMEAbilitySTDev[maxNumTrainingIterations:], marker='s', capsize=5.0, alpha=0.5, linewidth=3, elinewidth=2, label="GIMME strategy (informed)")
+plt.errorbar(timestepsReal, GIMMEOldAbilityMeans[maxNumTrainingIterations:], GIMMEOldAbilitySTDev[maxNumTrainingIterations:], marker='s', capsize=5.0, alpha=0.5, linewidth=3, elinewidth=2, label="GIMME strategy (uninformed)")
 # plt.errorbar(timesteps, GIMMEGridAbilityMean, GIMMEGridAbilitySTDev, marker='s', capsize=2.0, alpha=0.5, label="GIMME Grid strategy")
 # plt.plot(timesteps, GIMMEEvAbilities, label="GIMME Ev strategy")
 plt.errorbar(timestepsReal, randomAbilityMeans[maxNumTrainingIterations:], randomAbilitySTDev[maxNumTrainingIterations:], marker='s', capsize=5.0, alpha=0.5, linewidth=3, elinewidth=2, label="Random strategy")
