@@ -45,21 +45,21 @@ class Adaptation(object):
 
 		adaptedGroups = adaptedConfig["groups"]
 		adaptedProfiles = adaptedConfig["profiles"]
-		adaptedAvgStates = adaptedConfig["avgStates"]
+		adaptedAvgCharacteristics = adaptedConfig["avgCharacteristics"]
 
 		for groupIndex in range(len(adaptedGroups)):
 			currGroup = adaptedGroups[groupIndex]
 			groupProfile = adaptedProfiles[groupIndex]
-			avgState = adaptedAvgStates[groupIndex]
+			avgState = adaptedAvgCharacteristics[groupIndex]
 			
-			tailoredTaskId = self.selectTask(self.taskIds, groupProfile, avgState)
-
+			adaptedTaskId = self.selectTask(self.taskIds, groupProfile, avgState)
 			for playerId in currGroup:
 				currState = self.playerModelBridge.getPlayerCurrState(playerId)
 				currState.profile = groupProfile	
-				currState.tailoredTaskId = tailoredTaskId	
+				currState.adaptedTaskId = adaptedTaskId	
 				self.playerModelBridge.setPlayerCharacteristics(playerId, currState.characteristics)
 				self.playerModelBridge.setPlayerProfile(playerId, currState.profile)
+			adaptedConfig["adaptedTaskId"] = adaptedTaskId
 
 		return adaptedConfig
 
@@ -74,7 +74,7 @@ class Adaptation(object):
 			currTaskId = possibleTaskIds[i]
 
 			cost = abs(bestConfigProfile.sqrDistanceBetween(self.taskModelBridge.getTaskInteractionsProfile(currTaskId)) * self.taskModelBridge.getTaskDifficultyWeight(currTaskId))
-			cost += abs(avgState.characteristics.ability - self.taskModelBridge.getMinTaskRequiredAbility(currTaskId) * self.taskModelBridge.getTaskProfileWeight(currTaskId))
+			cost += abs(avgState.ability - self.taskModelBridge.getMinTaskRequiredAbility(currTaskId) * self.taskModelBridge.getTaskProfileWeight(currTaskId))
 
 			if cost < lowestCost:
 				lowestCost = cost

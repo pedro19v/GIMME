@@ -21,7 +21,7 @@ class PlayerState(object):
 		self.profile = profile
 		self.dist = dist
 		self.groupId = -1
-		self.tailoredTaskId = -1
+		self.adaptedTaskId = -1
 
 	def reset(self):
 		self.characteristics.reset()

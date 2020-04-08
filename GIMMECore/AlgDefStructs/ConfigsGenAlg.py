@@ -69,7 +69,7 @@ class RandomConfigsGen(ConfigsGenAlg):
 
 		bestGroups = []
 		bestConfigProfiles = []
-		bestAvgStates = []
+		bestAvgCharacteristics = []
 
 		if(len(playerIds) < self.minNumberOfPlayersPerGroup):
 			print("number of players is lower than the minimum number of players per group!")
@@ -82,7 +82,7 @@ class RandomConfigsGen(ConfigsGenAlg):
 		playersWithoutGroup = playerIds.copy()
 		newGroups = []
 		newConfigProfiles = []
-		newAvgStates = []
+		newAvgCharacteristics = []
 
 		if(minNumGroups < maxNumGroups):
 			numGroups = numpy.random.randint(minNumGroups, maxNumGroups)
@@ -139,21 +139,21 @@ class RandomConfigsGen(ConfigsGenAlg):
 			profile = self.profileGenerator()
 			newConfigProfiles.append(profile)
 
+			currAvgCharacteristics = PlayerCharacteristics()
+			currAvgCharacteristics.reset()
 			for currPlayer in group:
 				currState = self.playerModelBridge.getPlayerCurrState(currPlayer)
-
-				newAvgState = PlayerState()
-				newAvgState.characteristics.ability += currState.characteristics.ability / groupSize
-				newAvgState.characteristics.engagement += currState.characteristics.engagement / groupSize
-				newAvgState.profile = profile
-				newAvgStates.append(newAvgState)
+				currAvgCharacteristics.ability += currState.characteristics.ability / groupSize
+				currAvgCharacteristics.engagement += currState.characteristics.engagement / groupSize
+			currAvgCharacteristics.profile = profile
+			newAvgCharacteristics.append(currAvgCharacteristics)
 
 		bestGroups = newGroups
 		bestConfigProfiles = newConfigProfiles
-		bestAvgStates = newAvgStates
+		bestAvgCharacteristics = newAvgCharacteristics
 		
 		self.updateMetrics(bestGroups)
-		return {"groups": bestGroups, "profiles": bestConfigProfiles, "avgStates": bestAvgStates}
+		return {"groups": bestGroups, "profiles": bestConfigProfiles, "avgCharacteristics": bestAvgCharacteristics}
 
 
 class SimpleConfigsGen(ConfigsGenAlg):
@@ -185,11 +185,8 @@ class SimpleConfigsGen(ConfigsGenAlg):
 
 		bestGroups = []
 		bestConfigProfiles = []
-		bestAvgStates = []
+		bestAvgCharacteristics = []
 
-		# if(len(playerIds) < self.minNumberOfPlayersPerGroup):
-		# 	print("number of players is lower than the minimum number of players per group!")
-		# 	return bestGroups
 		minNumGroups = math.ceil(len(playerIds) / self.maxNumberOfPlayersPerGroup)
 		maxNumGroups = math.floor(len(playerIds) / self.minNumberOfPlayersPerGroup)
 		
@@ -198,8 +195,6 @@ class SimpleConfigsGen(ConfigsGenAlg):
 			
 			playersWithoutGroup = playerIds.copy()
 			newGroups = []
-			newConfigProfiles = []
-			newAvgStates = []
 
 			if(minNumGroups < maxNumGroups):
 				numGroups = numpy.random.randint(minNumGroups, maxNumGroups)
@@ -248,7 +243,7 @@ class SimpleConfigsGen(ConfigsGenAlg):
 			newConfigSize = len(newGroups)
 			currFitness = 0.0
 			newConfigProfiles = []
-			newAvgState = []
+			newAvgCharacteristics = []
 
 			# generate profiles
 			for groupI in range(newConfigSize):
@@ -259,29 +254,28 @@ class SimpleConfigsGen(ConfigsGenAlg):
 				profile = self.profileGenerator()
 				newConfigProfiles.append(profile)
 
+				currAvgCharacteristics = PlayerCharacteristics()
+				currAvgCharacteristics.reset()
 				# calculate fitness and average state
 				for currPlayer in group:
 
 					currState = self.playerModelBridge.getPlayerCurrState(currPlayer)
 					currState.profile = profile
 
-					newAvgState = PlayerState()
-					newAvgState.characteristics.ability += currState.characteristics.ability / groupSize
-					newAvgState.characteristics.engagement += currState.characteristics.engagement / groupSize
-					newAvgState.profile = profile
-					newAvgStates.append(newAvgState)
-
+					currAvgCharacteristics.ability += currState.characteristics.ability / groupSize
+					currAvgCharacteristics.engagement += currState.characteristics.engagement / groupSize
+				
 					predictedIncreases = self.regAlg.predict(profile, currPlayer)
 					currFitness += self.qualityWeights.ability*predictedIncreases.characteristics.ability + self.qualityWeights.engagement*predictedIncreases.characteristics.engagement
-
+			
+				newAvgCharacteristics.append(currAvgCharacteristics)
 			if (currFitness > currMaxFitness):
 				bestGroups = newGroups
 				bestConfigProfiles = newConfigProfiles
-				bestAvgStates = newAvgStates
+				bestAvgCharacteristics = newAvgCharacteristics
 				currMaxFitness = currFitness
-		
 		self.updateMetrics(bestGroups)
-		return {"groups": bestGroups, "profiles": bestConfigProfiles, "avgStates": bestAvgStates}
+		return {"groups": bestGroups, "profiles": bestConfigProfiles, "avgCharacteristics": bestAvgCharacteristics}
 
 
 
@@ -307,7 +301,7 @@ class AccurateConfigsGen(ConfigsGenAlg):
 
 		bestGroups = []
 		bestConfigProfiles = []
-		bestAvgStates = []
+		bestAvgCharacteristics = []
 
 		if(len(playerIds) < self.minNumberOfPlayersPerGroup):
 			print("number of players is lower than the minimum number of players per group!")
@@ -321,8 +315,6 @@ class AccurateConfigsGen(ConfigsGenAlg):
 			
 			playersWithoutGroup = playerIds.copy()
 			newGroups = []
-			newConfigProfiles = []
-			newAvgStates = []
 
 			if(minNumGroups < maxNumGroups):
 				numGroups = numpy.random.randint(minNumGroups, maxNumGroups)
@@ -370,7 +362,7 @@ class AccurateConfigsGen(ConfigsGenAlg):
 			newConfigSize = len(newGroups)
 			currFitness = 0.0
 			newConfigProfiles = []
-			newAvgState = []
+			newAvgCharacteristics = []
 
 			# generate profiles
 			for groupI in range(newConfigSize):
@@ -387,16 +379,16 @@ class AccurateConfigsGen(ConfigsGenAlg):
 					profile.K_ea += personality.K_ea/newConfigSize
 				newConfigProfiles.append(profile)
 
+
 				# calculate fitness and average state
+				currAvgCharacteristics = PlayerCharacteristics()
+				currAvgCharacteristics.reset()
 				for currPlayer in group:
 					currState = self.playerModelBridge.getPlayerCurrState(currPlayer)
 					currState.profile = profile
 
-					newAvgState = PlayerState()
-					newAvgState.characteristics.ability += currState.characteristics.ability / groupSize
-					newAvgState.characteristics.engagement += currState.characteristics.engagement / groupSize
-					newAvgState.profile = profile
-					newAvgStates.append(newAvgState)
+					currAvgCharacteristics.ability += currState.characteristics.ability / groupSize
+					currAvgCharacteristics.engagement += currState.characteristics.engagement / groupSize
 
 					newState = self.simulationFunc(self.playerModelBridge, currState, currPlayer, profile, self.currIteration)
 		
@@ -405,16 +397,16 @@ class AccurateConfigsGen(ConfigsGenAlg):
 					increases.characteristics = PlayerCharacteristics(ability=(newState.characteristics.ability - currState.characteristics.ability), engagement=newState.characteristics.engagement)
 				
 					currFitness += self.qualityWeights.ability*increases.characteristics.ability + self.qualityWeights.engagement*increases.characteristics.engagement
-
+				currAvgCharacteristics.profile = profile
+				newAvgCharacteristics.append(currAvgCharacteristics)
 			if (currFitness > currMaxFitness):
 				bestGroups = newGroups
 				bestConfigProfiles = newConfigProfiles
-				bestAvgStates = newAvgStates
+				bestAvgCharacteristics = newAvgCharacteristics
 				currMaxFitness = currFitness
 
 		self.updateMetrics(bestGroups)
-		return {"groups": bestGroups, "profiles": bestConfigProfiles, "avgStates": bestAvgStates}
-
+		return {"groups": bestGroups, "profiles": bestConfigProfiles, "avgCharacteristics": bestAvgCharacteristics}
 
 
 
@@ -562,4 +554,4 @@ class EvolutionaryConfigsGen(ConfigsGenAlg):
 			elif 0 in bestConfigProfiles: bestConfigProfiles.remove(0)
 			else: break
 
-		return {"groups": bestGroups, "profiles": bestConfigProfiles, "avgStates": [PlayerState() for i in range(maxNumGroups)]}
+		return {"groups": bestGroups, "profiles": bestConfigProfiles, "avgCharacteristics": [PlayerCharacteristics() for i in range(maxNumGroups)]}
