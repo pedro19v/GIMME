@@ -1,68 +1,68 @@
 import math
+import copy
 
 class InteractionsProfile(object):
 
-	def __init__(self, K_cp=0, K_i=0, K_mh=0, K_ea=0):
-		self.K_cp = K_cp
-		self.K_i = K_i
-		self.K_mh = K_mh
-		self.K_ea = K_ea
+	def __init__(self, dimensions = {}):
+		self.dimensions = dimensions
 
 	def reset(self):
-		self.K_cp = 0
-		self.K_i = 0
-		self.K_mh = 0
-		self.K_ea = 0
+		for key in self.dimensions:
+			self.dimensions[key] = 0
+
+	def generateCopy(self):
+		keys = list(self.dimensions.keys())
+		newVar = type(self)(copy.copy(self.dimensions))
+		for key in keys:
+			newVar.dimensions[key] = self.dimensions[key]
+		return newVar
 
 	def normalize(self):
-		total = self.K_cp + self.K_i + self.K_mh + self.K_ea
+		total = 0
+		for key in self.dimensions:
+			total += self.dimensions[key]
 		if(total==0):
-			self.K_cp = 0.25
-			self.K_i = 0.25
-			self.K_mh = 0.25
-			self.K_ea = 0.25
+			for key in self.dimensions:
+				self.dimensions[key] = 0.25
 		else:
-			self.K_cp = self.K_cp / total
-			self.K_i = self.K_i / total
-			self.K_mh = self.K_mh / total
-			self.K_ea = self.K_ea / total
+			for key in self.dimensions:
+				self.dimensions[key] = self.dimensions[key]/total
 
 	def normalizedDistanceBetween(self, profileToTest):
-		thisProfile = self
-		cost = InteractionsProfile()
+		cost = self.generateCopy()
+		cost.reset()
+
+		if(len(cost.dimensions) != len(profileToTest.dimensions)):
+			print("[ERROR] Could not compute distance between profiles in different spaces. Execution aborted.")
+			quit()
 
 		# normalizar cada uma das dims X/X+Y+Z; Y/X+Y+Z, Z/X+Y+Z
-		cost.K_cp = abs(thisProfile.K_cp - profileToTest.K_cp)
-		cost.K_i = abs(thisProfile.K_i - profileToTest.K_i)
-		cost.K_mh = abs(thisProfile.K_mh - profileToTest.K_mh)
-		cost.K_ea = abs(thisProfile.K_pa - profileToTest.K_pa)
+		for key in cost.dimensions:
+			cost.dimensions[key] = abs(self.dimensions[key] - profileToTest.dimensions[key])
 
 		cost.normalize()
 
-		cost.K_cp = pow(cost.K_cp, 2)
-		cost.K_i = pow(cost.K_i, 2)
-		cost.K_mh = pow(cost.K_mh, 2)
-		cost.K_ea = pow(cost.K_pa, 2)
+		total = 0
+		for key in cost.dimensions:
+			cost.dimensions[key] = pow(cost.dimensions[key], 2)
+			total += cost.dimensions[key]
 
-		return math.sqrt(cost.K_cp + cost.K_i + cost.K_mh + cost.K_pa)
+		return math.sqrt(total)
 	
 
 	def sqrDistanceBetween(self, profileToTest):
-		thisProfile = self
-		cost = InteractionsProfile()
+		cost = self.generateCopy()
+		cost.reset()
 
-		# normalizar cada uma das dims X/X+Y+Z; Y/X+Y+Z, Z/X+Y+Z
-		cost.K_cp = thisProfile.K_cp - profileToTest.K_cp
-		cost.K_i = thisProfile.K_i - profileToTest.K_i
-		cost.K_mh = thisProfile.K_mh - profileToTest.K_mh
-		cost.K_ea = thisProfile.K_ea - profileToTest.K_ea
+		for key in cost.dimensions:
+			cost.dimensions[key] = abs(self.dimensions[key] - profileToTest.dimensions[key])
 
-		cost.K_cp = pow(cost.K_cp, 2)
-		cost.K_i = pow(cost.K_i, 2)
-		cost.K_mh = pow(cost.K_mh, 2)
-		cost.K_ea = pow(cost.K_ea, 2)
+		total = 0
+		for key in cost.dimensions:
+			cost.dimensions[key] = pow(cost.dimensions[key], 2)
+			total += cost.dimensions[key]
 
-		return cost.K_cp + cost.K_i + cost.K_mh + cost.K_ea
+		return total
 
 
 	def distanceBetween(self, profileToTest):

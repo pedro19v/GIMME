@@ -23,12 +23,6 @@ class Adaptation(object):
 		self.playerModelBridge = playerModelBridge
 		self.taskModelBridge = taskModelBridge
 
-	def setName(self, name):
-		self.name=name
-
-	def getName(self):
-		return self.name;
-
 	def iterate(self):
 		if not self.initialized:
 			raise AssertionError('Adaptation not Initialized! Core not executed.') 
@@ -46,12 +40,16 @@ class Adaptation(object):
 		adaptedGroups = adaptedConfig["groups"]
 		adaptedProfiles = adaptedConfig["profiles"]
 		adaptedAvgCharacteristics = adaptedConfig["avgCharacteristics"]
+		adaptedConfig["adaptedTaskId"] = -1
+
+		
+
 
 		for groupIndex in range(len(adaptedGroups)):
 			currGroup = adaptedGroups[groupIndex]
 			groupProfile = adaptedProfiles[groupIndex]
 			avgState = adaptedAvgCharacteristics[groupIndex]
-			
+		
 			adaptedTaskId = self.selectTask(self.taskIds, groupProfile, avgState)
 			for playerId in currGroup:
 				currState = self.playerModelBridge.getPlayerCurrState(playerId)
@@ -60,7 +58,6 @@ class Adaptation(object):
 				self.playerModelBridge.setPlayerCharacteristics(playerId, currState.characteristics)
 				self.playerModelBridge.setPlayerProfile(playerId, currState.profile)
 			adaptedConfig["adaptedTaskId"] = adaptedTaskId
-
 		return adaptedConfig
 
 	def selectTask(self,

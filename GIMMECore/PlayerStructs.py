@@ -1,9 +1,9 @@
 import math
 import time
-from collections import namedtuple
+import copy
+import json
 from .InteractionsProfile import InteractionsProfile
 
-import json
 
 
 class PlayerCharacteristics(object):
@@ -31,8 +31,9 @@ class PlayerState(object):
 
 
 class PlayerStateGrid(object):
-	def __init__(self, numCells=1, maxProfilesPerCell=30,  cells=None):
+	def __init__(self, interactionsProfileTemplate, numCells=1, maxProfilesPerCell=30,  cells=None):
 		self.maxProfilesPerCell = maxProfilesPerCell
+		self.interactionsProfileTemplate = interactionsProfileTemplate
 
 		self.dimSpan = math.ceil(numCells**(1.0/float(4))) #floor of root 4
 		self.numCells = self.dimSpan**4
@@ -60,21 +61,21 @@ class PlayerStateGrid(object):
 					self.serializedCells.append(state) 
 
 	def pushToGrid(self, playerState):
-		cpPadding = math.ceil(playerState.profile.K_cp * self.dimSpan) - 1
-		iPadding = math.ceil(playerState.profile.K_i * self.dimSpan) - 1
-		mhPadding = math.ceil(playerState.profile.K_mh * self.dimSpan) - 1
-		eaPadding = math.ceil(playerState.profile.K_ea * self.dimSpan) - 1
+		padding = self.interactionsProfileTemplate.generateCopy()
+		padding.reset()
+		currCellInd = 0
+		paddingKeys = list(padding.dimensions.keys())
+		for key in padding.dimensions:
+			currDim = padding.dimensions[key]
+			currDim = math.ceil(playerState.profile.dimensions[key] * self.dimSpan) - 1
+			if(currDim < 0):
+				currDim=0
+			currCellInd += (self.dimSpan**paddingKeys.index(key))*currDim
+			padding.dimensions[key] = currDim
 
-		if(cpPadding < 0):
-			cpPadding=0
-		if(iPadding < 0):
-			iPadding=0
-		if(mhPadding < 0):
-			mhPadding=0
-		if(eaPadding< 0):
-			eaPadding=0
 
-		currCellInd = (self.dimSpan**3)*cpPadding + (self.dimSpan**2)*iPadding + self.dimSpan*mhPadding + eaPadding
+		# print(json.dumps(len(self.cells[0]), default=lambda o: o.__dict__, sort_keys=True))
+		# currCellInd = (self.dimSpan**3)*cpPadding + (self.dimSpan**2)*iPadding + self.dimSpan*mhPadding + eaPadding
 		currCell = self.cells[currCellInd]
 		
 		currCell.append(playerState)

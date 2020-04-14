@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 class ConfigsGenAlg(ABC):
 
-	def __init__(self, playerModelBridge, preferredNumberOfPlayersPerGroup = None, minNumberOfPlayersPerGroup = 2, maxNumberOfPlayersPerGroup = 5):
+	def __init__(self, playerModelBridge, interactionsProfileTemplate, preferredNumberOfPlayersPerGroup = None, minNumberOfPlayersPerGroup = 2, maxNumberOfPlayersPerGroup = 5):
 		self.groupSizeFreqs = {}
 		self.configSizeFreqs = {}
 		
@@ -25,6 +25,7 @@ class ConfigsGenAlg(ABC):
 			self.minNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup
 
 		self.playerModelBridge = playerModelBridge
+		self.interactionsProfileTemplate = interactionsProfileTemplate
 
 	def reset(self):
 		self.groupSizeFreqs = {}
@@ -32,12 +33,20 @@ class ConfigsGenAlg(ABC):
 
 	def randomProfileGenerator(self):
 		# generate learning profile
-		profile = InteractionsProfile()
-		profile.K_cp = random.uniform(0.0, 1.0)
-		profile.K_i = random.uniform(0.0, 1.0)
-		profile.K_mh = random.uniform(0.0, 1.0)
-		profile.K_ea = random.uniform(0.0, 1.0)
+		
+		# profile = copy.deepcopy(self.interactionsProfileTemplate)
+
+		# for key in profile.dimensions:
+		# 	profile.dimensions[key] = random.uniform(0.0, 1.0)
+		# profile.normalize()
+
+		profile = self.interactionsProfileTemplate.generateCopy()
+		profile.reset()
+
+		for key in profile.dimensions:
+			profile.dimensions[key] = random.uniform(0.0, 1.0)
 		profile.normalize()
+
 		return profile
 
 	@abstractmethod
@@ -60,8 +69,8 @@ class ConfigsGenAlg(ABC):
 
 class RandomConfigsGen(ConfigsGenAlg):
 
-	def __init__(self, playerModelBridge, preferredNumberOfPlayersPerGroup = None, minNumberOfPlayersPerGroup = 2, maxNumberOfPlayersPerGroup = 5):
-		super().__init__(playerModelBridge, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, minNumberOfPlayersPerGroup = minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup = maxNumberOfPlayersPerGroup)
+	def __init__(self, playerModelBridge, interactionsProfileTemplate, preferredNumberOfPlayersPerGroup = None, minNumberOfPlayersPerGroup = 2, maxNumberOfPlayersPerGroup = 5):
+		super().__init__(playerModelBridge, interactionsProfileTemplate, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, minNumberOfPlayersPerGroup = minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup = maxNumberOfPlayersPerGroup)
 		self.profileGenerator = self.randomProfileGenerator
 
 	def organize(self):
@@ -151,15 +160,15 @@ class RandomConfigsGen(ConfigsGenAlg):
 		bestGroups = newGroups
 		bestConfigProfiles = newConfigProfiles
 		bestAvgCharacteristics = newAvgCharacteristics
-		
+
 		self.updateMetrics(bestGroups)
 		return {"groups": bestGroups, "profiles": bestConfigProfiles, "avgCharacteristics": bestAvgCharacteristics}
 
 
 class SimpleConfigsGen(ConfigsGenAlg):
 
-	def __init__(self, playerModelBridge, regAlg = None, numberOfConfigChoices = 100, preferredNumberOfPlayersPerGroup = None, minNumberOfPlayersPerGroup = 2, maxNumberOfPlayersPerGroup = 5, qualityWeights = PlayerCharacteristics(ability = 0.5, engagement = 0.5), allPlayersInited = True):
-		super().__init__(playerModelBridge, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, minNumberOfPlayersPerGroup = minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup = maxNumberOfPlayersPerGroup)
+	def __init__(self, playerModelBridge, interactionsProfileTemplate, regAlg = None, numberOfConfigChoices = 100, preferredNumberOfPlayersPerGroup = None, minNumberOfPlayersPerGroup = 2, maxNumberOfPlayersPerGroup = 5, qualityWeights = PlayerCharacteristics(ability = 0.5, engagement = 0.5), allPlayersInited = True):
+		super().__init__(playerModelBridge, interactionsProfileTemplate, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, minNumberOfPlayersPerGroup = minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup = maxNumberOfPlayersPerGroup)
 		self.regAlg = regAlg
 		self.numberOfConfigChoices = numberOfConfigChoices
 		self.profileGenerator = self.randomProfileGenerator
@@ -167,7 +176,7 @@ class SimpleConfigsGen(ConfigsGenAlg):
 		self.qualityWeights = qualityWeights
 
 		self.allPlayersInited = allPlayersInited
-		self.configsGenAlgIniter = RandomConfigsGen(playerModelBridge, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, minNumberOfPlayersPerGroup = minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup = maxNumberOfPlayersPerGroup)
+		self.configsGenAlgIniter = RandomConfigsGen(playerModelBridge, interactionsProfileTemplate, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, minNumberOfPlayersPerGroup = minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup = maxNumberOfPlayersPerGroup)
 
 		if(regAlg==None):
 			regAlg = KNNRegression(playerModelBridge, 5)
@@ -176,6 +185,7 @@ class SimpleConfigsGen(ConfigsGenAlg):
 		self.allPlayersInited = allPlayersInited
 
 	def organize(self):
+
 		playerIds = self.playerModelBridge.getAllPlayerIds() 
 
 		if(not self.allPlayersInited):
@@ -274,6 +284,7 @@ class SimpleConfigsGen(ConfigsGenAlg):
 				bestConfigProfiles = newConfigProfiles
 				bestAvgCharacteristics = newAvgCharacteristics
 				currMaxFitness = currFitness
+
 		self.updateMetrics(bestGroups)
 		return {"groups": bestGroups, "profiles": bestConfigProfiles, "avgCharacteristics": bestAvgCharacteristics}
 
@@ -281,8 +292,8 @@ class SimpleConfigsGen(ConfigsGenAlg):
 
 class AccurateConfigsGen(ConfigsGenAlg):
 
-	def __init__(self, playerModelBridge, simulationFunc, numberOfConfigChoices = 100, preferredNumberOfPlayersPerGroup = None, minNumberOfPlayersPerGroup = 2, maxNumberOfPlayersPerGroup = 5, qualityWeights = PlayerCharacteristics(ability = 0.5, engagement = 0.5)):
-		super().__init__(playerModelBridge, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, minNumberOfPlayersPerGroup = minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup = maxNumberOfPlayersPerGroup)
+	def __init__(self, playerModelBridge, interactionsProfileTemplate, simulationFunc, numberOfConfigChoices = 100, preferredNumberOfPlayersPerGroup = None, minNumberOfPlayersPerGroup = 2, maxNumberOfPlayersPerGroup = 5, qualityWeights = PlayerCharacteristics(ability = 0.5, engagement = 0.5)):
+		super().__init__(playerModelBridge, interactionsProfileTemplate, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, minNumberOfPlayersPerGroup = minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup = maxNumberOfPlayersPerGroup)
 		self.profileGenerator = self.randomProfileGenerator
 		self.numberOfConfigChoices = numberOfConfigChoices
 		self.simulationFunc = simulationFunc
@@ -373,10 +384,8 @@ class AccurateConfigsGen(ConfigsGenAlg):
 				profile = InteractionsProfile()
 				for currPlayer in group:
 					personality = self.playerModelBridge.getPlayerPersonality(currPlayer)
-					profile.K_cp += personality.K_cp/newConfigSize
-					profile.K_i += personality.K_i/newConfigSize
-					profile.K_mh += personality.K_mh/newConfigSize
-					profile.K_ea += personality.K_ea/newConfigSize
+					for dim in profile.dimensions:
+						profile.dimensions[dim] += personality.dimensions[dim]/newConfigSize
 				newConfigProfiles.append(profile)
 
 
@@ -411,8 +420,8 @@ class AccurateConfigsGen(ConfigsGenAlg):
 
 
 class EvolutionaryConfigsGen(ConfigsGenAlg):
-	def __init__(self, playerModelBridge, regAlg = None, numberOfConfigChoices = 100, preferredNumberOfPlayersPerGroup = None, minNumberOfPlayersPerGroup = 2, maxNumberOfPlayersPerGroup = 5, fitnessWeights = PlayerCharacteristics(ability = 0.5, engagement = 0.5), numMutations=4, probOfMutation=0.1, numFitSurvivors=None):
-		super().__init__(playerModelBridge, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, minNumberOfPlayersPerGroup = minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup = maxNumberOfPlayersPerGroup)
+	def __init__(self, playerModelBridge, interactionsProfileTemplate, regAlg = None, numberOfConfigChoices = 100, preferredNumberOfPlayersPerGroup = None, minNumberOfPlayersPerGroup = 2, maxNumberOfPlayersPerGroup = 5, fitnessWeights = PlayerCharacteristics(ability = 0.5, engagement = 0.5), numMutations=4, probOfMutation=0.1, numFitSurvivors=None):
+		super().__init__(playerModelBridge, interactionsProfileTemplate, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, minNumberOfPlayersPerGroup = minNumberOfPlayersPerGroup, maxNumberOfPlayersPerGroup = maxNumberOfPlayersPerGroup)
 		self.regAlg = regAlg
 		self.numberOfConfigChoices = numberOfConfigChoices
 
