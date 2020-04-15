@@ -33,7 +33,7 @@ class InteractionsProfile(object):
 		cost.reset()
 
 		if(len(cost.dimensions) != len(profileToTest.dimensions)):
-			print("[ERROR] Could not compute distance between profiles in different spaces. Execution aborted.")
+			print("[ERROR] Could not compute distance between profiles in different sized spaces. Execution aborted.")
 			quit()
 
 		# normalizar cada uma das dims X/X+Y+Z; Y/X+Y+Z, Z/X+Y+Z
@@ -53,6 +53,15 @@ class InteractionsProfile(object):
 	def sqrDistanceBetween(self, profileToTest):
 		cost = self.generateCopy()
 		cost.reset()
+
+		# print("dims:--------------")
+		# print(profileToTest.dimensions)
+		# print(cost.dimensions)
+		# print("--------------")
+
+		if(len(cost.dimensions) != len(profileToTest.dimensions)):
+			print("[ERROR] Could not compute distance between profiles in different sized spaces. Execution aborted.")
+			quit()
 
 		for key in cost.dimensions:
 			cost.dimensions[key] = abs(self.dimensions[key] - profileToTest.dimensions[key])

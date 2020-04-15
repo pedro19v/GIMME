@@ -19,7 +19,7 @@ from ModelMocks import *
 plt.style.use('tableau-colorblind10')
 random.seed(time.perf_counter())
 
-numRuns = 1
+numRuns = 1000
 maxNumTrainingIterations = 20
 numRealIterations = 20
 
@@ -63,10 +63,10 @@ def executionPhase(playerBridge, maxNumIterations, startingI, currRun, adaptatio
 		adaptation.configsGenAlg.areAllPlayersInited(False)
 	
 	while(i < maxNumIterations + startingI):
-
 		if adaptation.name == "accurate":
 			adaptation.configsGenAlg.updateCurrIteration(i)
 		
+
 		t0 = time.perf_counter()
 
 		print("step (" +str(i - startingI)+ " of "+str(maxNumIterations)+") of run ("+str(currRun)+" of "+str(numRuns)+") of algorithm \""+str(adaptation.name)+"\"						", end="\r")
@@ -102,24 +102,25 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 	adaptationName = adaptation.name
 
 
-	profileTemplate = InteractionsProfile()
+	profileTemplate = InteractionsProfile({})
 	for d in range(numInteractionDimensions):
-		profileTemplate.dimensions["dim_"+str(d)] = 0
+		profileTemplate.dimensions["dim_"+str(d)] = 0.0
+
 
 	# create players and tasks
 	for x in range(numPlayers):
 		if adaptationName == "GIMMEGrid":
-			playerBridge.registerNewPlayer(int(x), "name", PlayerState(time.time()), PlayerStateGrid(profileTemplate,numCells = 16, maxProfilesPerCell = 2), PlayerCharacteristics(), InteractionsProfile())
+			playerBridge.registerNewPlayer(int(x), "name", PlayerState(creationTime = time.time(), profile = profileTemplate.generateCopy()), PlayerStateGrid(profileTemplate.generateCopy(), numCells = 5, maxProfilesPerCell = 2), PlayerCharacteristics(), profileTemplate.generateCopy())
 		else:
-			playerBridge.registerNewPlayer(int(x), "name", PlayerState(time.time()), PlayerStateGrid(profileTemplate,numCells = 1, maxProfilesPerCell = playerWindow), PlayerCharacteristics(), InteractionsProfile())
+			playerBridge.registerNewPlayer(int(x), "name", PlayerState(creationTime = time.time(), profile = profileTemplate.generateCopy()), PlayerStateGrid(profileTemplate.generateCopy(), numCells = 1, maxProfilesPerCell = playerWindow), PlayerCharacteristics(), profileTemplate.generateCopy())
 	for x in range(20):
-		taskBridge.registerNewTask(int(x), "description", random.uniform(0, 1), InteractionsProfile(), datetime.timedelta(minutes=1), 0.5, 0.5)
+		taskBridge.registerNewTask(int(x), "description", random.uniform(0, 1), profileTemplate.generateCopy(), datetime.timedelta(minutes=1), 0.5, 0.5)
 
 
 	for r in range(numRuns):
 		realPersonalities = []
 		for x in range(numPlayers):
-			profile = InteractionsProfile()
+			profile = profileTemplate.generateCopy()
 			for d in range(numInteractionDimensions):
 				profile.dimensions["dim_"+str(d)] = random.uniform(0, 1)
 			realPersonalities.append(profile)
@@ -127,7 +128,7 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 
 		questionnairePersonalities = []
 		for x in range(numPlayers):
-			profile = InteractionsProfile()
+			profile = profileTemplate.generateCopy()
 			currRealPersonality = realPersonalities[x]
 			for d in range(numInteractionDimensions):
 				profile.dimensions["dim_"+str(d)] = numpy.clip(random.gauss(currRealPersonality.dimensions["dim_"+str(d)], 0.2),0,1)
@@ -229,19 +230,20 @@ preferredNumberOfPlayersPerGroup = 4
 
 # - - - - - 
 intProfTemplate = InteractionsProfile({"dim_0": 0, "dim_1": 0, "dim_2": 0})
-simpleConfigsAlg = SimpleConfigsGen(playerBridge, intProfTemplate, regAlg = KNNRegression(playerBridge, 5), numberOfConfigChoices=100, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5))
+
+simpleConfigsAlg = SimpleConfigsGen(playerBridge, intProfTemplate.generateCopy(), regAlg = KNNRegression(playerBridge, 5), numberOfConfigChoices=100, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5))
 adaptationGIMMEOld.init(playerBridge, taskBridge, configsGenAlg = simpleConfigsAlg, name="GIMMEOld")
 
 # - - - - - 
 intProfTemplate = InteractionsProfile({"dim_0": 0, "dim_1": 0, "dim_2": 0, "dim_3": 0})
 
-simpleConfigsAlg = SimpleConfigsGen(playerBridge, intProfTemplate, regAlg = KNNRegression(playerBridge, 5), numberOfConfigChoices=100, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5))
+simpleConfigsAlg = SimpleConfigsGen(playerBridge, intProfTemplate.generateCopy(), regAlg = KNNRegression(playerBridge, 5), numberOfConfigChoices=100, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5))
 adaptationGIMME.init(playerBridge, taskBridge, configsGenAlg = simpleConfigsAlg, name="GIMME")
 
-randomConfigsAlg = RandomConfigsGen(playerBridge, intProfTemplate, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup)
+randomConfigsAlg = RandomConfigsGen(playerBridge, intProfTemplate.generateCopy(), preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup)
 adaptationRandom.init(playerBridge, taskBridge, configsGenAlg = randomConfigsAlg, name="random")
 
-accurateConfigsAlg = AccurateConfigsGen(playerBridge, intProfTemplate, calcReaction, numberOfConfigChoices=100, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, qualityWeights = PlayerCharacteristics(ability=1.0, engagement=0.0)) #needed for currIteration updates
+accurateConfigsAlg = AccurateConfigsGen(playerBridge, intProfTemplate.generateCopy(), calcReaction, numberOfConfigChoices=100, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, qualityWeights = PlayerCharacteristics(ability=1.0, engagement=0.0)) #needed for currIteration updates
 adaptationOptimal.init(playerBridge, taskBridge, configsGenAlg = accurateConfigsAlg, name="accurate")
 
 
@@ -308,16 +310,19 @@ optimalExecTime = 0.0
 
 
 # ----------------------- [Execute Algorithms] ----------------------------
-executeSimulations(maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, playerBridge, taskBridge, adaptationGIMME, GIMMEAbilityMeans, GIMMEAbilitySTDev, GIMMEEngagementMeans, GIMMEEngagementSTDev, GIMMEProfDiffMeans, GIMMEProfDiffSTDev, GIMMEExecTime, True, 4)
-
-executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, taskBridge, adaptationGIMME, GIMMEOldAbilityMeans, GIMMEOldAbilitySTDev, GIMMEOldEngagementMeans, GIMMEOldEngagementSTDev, GIMMEOldProfDiffMeans, GIMMEOldProfDiffSTDev, GIMMEOldExecTime, True, 3)
-
-adaptationGIMME.name = "GIMMENoBoot"
-executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, taskBridge, adaptationGIMME, GIMMENoBootAbilityMeans, GIMMENoBootAbilitySTDev, GIMMENoBootEngagementMeans, GIMMENoBootEngagementSTDev, GIMMENoBootProfDiffMeans, GIMMENoBootProfDiffSTDev, GIMMENoBootExecTime, True, 4)
 
 
 executeSimulations(maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, playerBridge, taskBridge, adaptationOptimal, optimalAbilityMeans, optimalAbilitySTDev, optimalEngagementMeans, optimalEngagementSTDev, optimalProfDiffMeans, optimalProfDiffSTDev, optimalExecTime, True, 4)
 executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, taskBridge, adaptationRandom, randomAbilityMeans, randomAbilitySTDev, randomEngagementMeans, randomEngagementSTDev, randomProfDiffMeans, randomProfDiffSTDev, randomExecTime, True, 4)
+
+
+executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, taskBridge, adaptationGIMMEOld, GIMMEOldAbilityMeans, GIMMEOldAbilitySTDev, GIMMEOldEngagementMeans, GIMMEOldEngagementSTDev, GIMMEOldProfDiffMeans, GIMMEOldProfDiffSTDev, GIMMEOldExecTime, True, 3)
+executeSimulations(maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, playerBridge, taskBridge, adaptationGIMME, GIMMEAbilityMeans, GIMMEAbilitySTDev, GIMMEEngagementMeans, GIMMEEngagementSTDev, GIMMEProfDiffMeans, GIMMEProfDiffSTDev, GIMMEExecTime, True, 4)
+
+
+adaptationGIMME.name = "GIMMENoBoot"
+executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, taskBridge, adaptationGIMME, GIMMENoBootAbilityMeans, GIMMENoBootAbilitySTDev, GIMMENoBootEngagementMeans, GIMMENoBootEngagementSTDev, GIMMENoBootProfDiffMeans, GIMMENoBootProfDiffSTDev, GIMMENoBootExecTime, True, 4)
+
 
 
 print("Done!                        ", end="\r")

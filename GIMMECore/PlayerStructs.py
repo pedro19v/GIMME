@@ -73,9 +73,6 @@ class PlayerStateGrid(object):
 			currCellInd += (self.dimSpan**paddingKeys.index(key))*currDim
 			padding.dimensions[key] = currDim
 
-
-		# print(json.dumps(len(self.cells[0]), default=lambda o: o.__dict__, sort_keys=True))
-		# currCellInd = (self.dimSpan**3)*cpPadding + (self.dimSpan**2)*iPadding + self.dimSpan*mhPadding + eaPadding
 		currCell = self.cells[currCellInd]
 		
 		currCell.append(playerState)

@@ -34,15 +34,13 @@ class Adaptation(object):
 		if len(self.playerIds) < self.configsGenAlg.minNumberOfPlayersPerGroup:
 			raise ValueError('Not enough players to form a group.') 
 			return
-
+			
 		adaptedConfig = self.configsGenAlg.organize()
 
 		adaptedGroups = adaptedConfig["groups"]
 		adaptedProfiles = adaptedConfig["profiles"]
 		adaptedAvgCharacteristics = adaptedConfig["avgCharacteristics"]
 		adaptedConfig["adaptedTaskId"] = -1
-
-		
 
 
 		for groupIndex in range(len(adaptedGroups)):

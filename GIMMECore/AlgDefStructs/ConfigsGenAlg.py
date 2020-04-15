@@ -185,7 +185,6 @@ class SimpleConfigsGen(ConfigsGenAlg):
 		self.allPlayersInited = allPlayersInited
 
 	def organize(self):
-
 		playerIds = self.playerModelBridge.getAllPlayerIds() 
 
 		if(not self.allPlayersInited):
@@ -381,11 +380,14 @@ class AccurateConfigsGen(ConfigsGenAlg):
 				groupSize = len(group)
 
 				# generate profile as average of the personalities
-				profile = InteractionsProfile()
+				profile = self.interactionsProfileTemplate.generateCopy()
+				profile.reset()
+				
 				for currPlayer in group:
 					personality = self.playerModelBridge.getPlayerPersonality(currPlayer)
 					for dim in profile.dimensions:
 						profile.dimensions[dim] += personality.dimensions[dim]/newConfigSize
+					profile.normalize()
 				newConfigProfiles.append(profile)
 
 
