@@ -21,7 +21,7 @@ Tested on Windows and Linux. May also work in MacOS, but remains untested in thi
 GIMME setup is straightforward. You just got to install the python package:
 
 ```python 
-python3 setup.py install
+sudo python3 setup.py install
 ```
 
 Then you can start to write programs with our library.
