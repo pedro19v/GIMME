@@ -84,6 +84,7 @@ class RandomConfigsGen(ConfigsGenAlg):
 			print("number of players is lower than the minimum number of players per group!")
 			input()
 			return bestGroups
+			
 		minNumGroups = math.ceil(len(playerIds) / self.maxNumberOfPlayersPerGroup)
 		maxNumGroups = math.floor(len(playerIds) / self.minNumberOfPlayersPerGroup)
 

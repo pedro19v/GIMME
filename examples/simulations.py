@@ -19,7 +19,7 @@ from ModelMocks import *
 plt.style.use('tableau-colorblind10')
 random.seed(time.perf_counter())
 
-numRuns = 1000
+numRuns = 30
 maxNumTrainingIterations = 20
 numRealIterations = 20
 
@@ -49,7 +49,7 @@ def simulateReaction(playerBridge, currIteration, playerId):
 def calcReaction(playerBridge, state, playerId, interactionsProfile, currIteration):
 	personality = playerBridge.getPlayerPersonality(playerId)
 	newState = PlayerState(characteristics = PlayerCharacteristics(ability=state.characteristics.ability, engagement=state.characteristics.engagement), profile=state.profile)
-	newState.characteristics.engagement = 0.20* (newState.characteristics.engagement) + 0.80* (math.sqrt(2.0) - personality.distanceBetween(interactionsProfile)) / math.sqrt(2.0)  #between 0 and 1
+	newState.characteristics.engagement = (math.sqrt(2.0) - personality.distanceBetween(interactionsProfile)) / math.sqrt(2.0)  #between 0 and 1
 	abilityIncreaseSim = (newState.characteristics.engagement*playerBridge.getBaseLearningRate(playerId))
 	newState.characteristics.ability = newState.characteristics.ability + abilityIncreaseSim
 	return newState
@@ -59,14 +59,13 @@ def executionPhase(playerBridge, maxNumIterations, startingI, currRun, adaptatio
 	canExport):
 	i = startingI
 	
-	if i==0 and (adaptation.name == "GIMME" or adaptation.name == "GIMMEOld"):
+	if i==0 and (adaptation.name == "GIMME" or adaptation.name == "GIMMENoBoot" or adaptation.name == "GIMMEOld"):
 		adaptation.configsGenAlg.areAllPlayersInited(False)
 	
 	while(i < maxNumIterations + startingI):
 		if adaptation.name == "accurate":
 			adaptation.configsGenAlg.updateCurrIteration(i)
 		
-
 		t0 = time.perf_counter()
 
 		print("step (" +str(i - startingI)+ " of "+str(maxNumIterations)+") of run ("+str(currRun)+" of "+str(numRuns)+") of algorithm \""+str(adaptation.name)+"\"						", end="\r")
@@ -218,6 +217,7 @@ adaptationGIMMEOld = Adaptation()
 
 
 adaptationRandom = Adaptation()
+adaptationRandomOld = Adaptation()
 adaptationOptimal = Adaptation()
 
 
@@ -231,8 +231,11 @@ preferredNumberOfPlayersPerGroup = 4
 # - - - - - 
 intProfTemplate = InteractionsProfile({"dim_0": 0, "dim_1": 0, "dim_2": 0})
 
-simpleConfigsAlg = SimpleConfigsGen(playerBridge, intProfTemplate.generateCopy(), regAlg = KNNRegression(playerBridge, 5), numberOfConfigChoices=100, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5))
-adaptationGIMMEOld.init(playerBridge, taskBridge, configsGenAlg = simpleConfigsAlg, name="GIMMEOld")
+simpleConfigsAlgOld = SimpleConfigsGen(playerBridge, intProfTemplate.generateCopy(), regAlg = KNNRegression(playerBridge, 5), numberOfConfigChoices=100, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5))
+adaptationGIMMEOld.init(playerBridge, taskBridge, configsGenAlg = simpleConfigsAlgOld, name="GIMMEOld")
+
+randomOldConfigsAlg = RandomConfigsGen(playerBridge, intProfTemplate.generateCopy(), preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup)
+adaptationRandomOld.init(playerBridge, taskBridge, configsGenAlg = randomOldConfigsAlg, name="randomOld")
 
 # - - - - - 
 intProfTemplate = InteractionsProfile({"dim_0": 0, "dim_1": 0, "dim_2": 0, "dim_3": 0})
@@ -300,6 +303,15 @@ randomEngagementSTDev = [0  for y in range(maxNumTrainingIterations + numRealIte
 randomProfDiffSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
 randomExecTime = 0.0
 
+randomOldAbilityMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+randomOldEngagementMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+randomOldProfDiffMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+randomOldAbilitySTDev = [0 for y in range(maxNumTrainingIterations + numRealIterations)]
+randomOldEngagementSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+randomOldProfDiffSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+randomOldExecTime = 0.0
+
+
 optimalAbilityMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
 optimalEngagementMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
 optimalProfDiffMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
@@ -312,16 +324,31 @@ optimalExecTime = 0.0
 # ----------------------- [Execute Algorithms] ----------------------------
 
 
-executeSimulations(maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, playerBridge, taskBridge, adaptationOptimal, optimalAbilityMeans, optimalAbilitySTDev, optimalEngagementMeans, optimalEngagementSTDev, optimalProfDiffMeans, optimalProfDiffSTDev, optimalExecTime, True, 4)
-executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, taskBridge, adaptationRandom, randomAbilityMeans, randomAbilitySTDev, randomEngagementMeans, randomEngagementSTDev, randomProfDiffMeans, randomProfDiffSTDev, randomExecTime, True, 4)
+executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
+	taskBridge, adaptationOptimal, optimalAbilityMeans, optimalAbilitySTDev, optimalEngagementMeans, optimalEngagementSTDev, 
+	optimalProfDiffMeans, optimalProfDiffSTDev, optimalExecTime, True, 4)
+
+executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
+	taskBridge, adaptationRandom, randomAbilityMeans, randomAbilitySTDev, randomEngagementMeans, randomEngagementSTDev, 
+	randomProfDiffMeans, randomProfDiffSTDev, randomExecTime, True, 4)
+executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
+	taskBridge, adaptationRandomOld, randomOldAbilityMeans, randomOldAbilitySTDev, randomOldEngagementMeans, randomOldEngagementSTDev, 
+	randomOldProfDiffMeans, randomOldProfDiffSTDev, randomOldExecTime, True, 3)
 
 
-executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, taskBridge, adaptationGIMMEOld, GIMMEOldAbilityMeans, GIMMEOldAbilitySTDev, GIMMEOldEngagementMeans, GIMMEOldEngagementSTDev, GIMMEOldProfDiffMeans, GIMMEOldProfDiffSTDev, GIMMEOldExecTime, True, 3)
-executeSimulations(maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, playerBridge, taskBridge, adaptationGIMME, GIMMEAbilityMeans, GIMMEAbilitySTDev, GIMMEEngagementMeans, GIMMEEngagementSTDev, GIMMEProfDiffMeans, GIMMEProfDiffSTDev, GIMMEExecTime, True, 4)
+executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
+	taskBridge, adaptationGIMMEOld, GIMMEOldAbilityMeans, GIMMEOldAbilitySTDev, 
+	GIMMEOldEngagementMeans, GIMMEOldEngagementSTDev, 
+	GIMMEOldProfDiffMeans, GIMMEOldProfDiffSTDev, GIMMEOldExecTime, True, 3)
+executeSimulations(maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
+	taskBridge, adaptationGIMME, GIMMEAbilityMeans, GIMMEAbilitySTDev, GIMMEEngagementMeans, GIMMEEngagementSTDev, 
+	GIMMEProfDiffMeans, GIMMEProfDiffSTDev, GIMMEExecTime, True, 4)
 
 
 adaptationGIMME.name = "GIMMENoBoot"
-executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, taskBridge, adaptationGIMME, GIMMENoBootAbilityMeans, GIMMENoBootAbilitySTDev, GIMMENoBootEngagementMeans, GIMMENoBootEngagementSTDev, GIMMENoBootProfDiffMeans, GIMMENoBootProfDiffSTDev, GIMMENoBootExecTime, True, 4)
+executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
+	taskBridge, adaptationGIMME, GIMMENoBootAbilityMeans, GIMMENoBootAbilitySTDev, 
+	GIMMENoBootEngagementMeans, GIMMENoBootEngagementSTDev, GIMMENoBootProfDiffMeans, GIMMENoBootProfDiffSTDev, GIMMENoBootExecTime, True, 4)
 
 
 
@@ -347,10 +374,11 @@ plt.xticks(np.arange(1, numRealIterations+1, step=1.0), fontsize=30)
 plt.yticks(fontsize=30)
 
 
-plt.errorbar(timestepsReal, GIMMEAbilityMeans[maxNumTrainingIterations:], GIMMEAbilitySTDev[maxNumTrainingIterations:], marker='s', capsize=5.0, alpha=0.5, linewidth=3, elinewidth=2, label="Bootstrapped GIMME strategy")
-plt.errorbar(timestepsReal, GIMMENoBootAbilityMeans[maxNumTrainingIterations:], GIMMENoBootAbilitySTDev[maxNumTrainingIterations:], marker='s', capsize=5.0, alpha=0.5, linewidth=3, elinewidth=2, label="GIMME strategy")
-plt.errorbar(timestepsReal, randomAbilityMeans[maxNumTrainingIterations:], randomAbilitySTDev[maxNumTrainingIterations:], marker='s', capsize=5.0, alpha=0.5, linewidth=3, elinewidth=2, label="Random strategy")
-plt.errorbar(timestepsReal, GIMMEOldAbilityMeans[maxNumTrainingIterations:], GIMMEOldAbilitySTDev[maxNumTrainingIterations:], marker='s', capsize=5.0, alpha=0.5, linewidth=3, elinewidth=2, label="GIMME strategy (old GIPs)")
+plt.errorbar(timestepsReal, GIMMEAbilityMeans[maxNumTrainingIterations:], GIMMEAbilitySTDev[maxNumTrainingIterations:], marker='s', capsize=5.0, alpha=0.5, linewidth=3, elinewidth=2, label="Bootstrapped GIMME")
+plt.errorbar(timestepsReal, GIMMENoBootAbilityMeans[maxNumTrainingIterations:], GIMMENoBootAbilitySTDev[maxNumTrainingIterations:], marker='s', capsize=5.0, alpha=0.5, linewidth=3, elinewidth=2, label="GIMME")
+plt.errorbar(timestepsReal, randomAbilityMeans[maxNumTrainingIterations:], randomAbilitySTDev[maxNumTrainingIterations:], marker='s', capsize=5.0, alpha=0.5, linewidth=3, elinewidth=2, label="Random")
+plt.errorbar(timestepsReal, GIMMEOldAbilityMeans[maxNumTrainingIterations:], GIMMEOldAbilitySTDev[maxNumTrainingIterations:], marker='s', capsize=5.0, alpha=0.5, linewidth=3, elinewidth=2, label="GIMME (old GIPs)")
+plt.errorbar(timestepsReal, randomOldAbilityMeans[maxNumTrainingIterations:], randomOldAbilitySTDev[maxNumTrainingIterations:], marker='s', capsize=5.0, alpha=0.5, linewidth=3, elinewidth=2, label="Random (old GIPs)")
 plt.plot(timestepsReal, empHighestValue[maxNumTrainingIterations:], linestyle= "--", linewidth=3, label="\"Perfect Information\" upper bound")
 plt.xlabel("Iteration", fontsize=40)
 plt.ylabel("avg. Ability Increase", fontsize=40)

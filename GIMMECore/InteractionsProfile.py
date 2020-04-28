@@ -54,11 +54,6 @@ class InteractionsProfile(object):
 		cost = self.generateCopy()
 		cost.reset()
 
-		# print("dims:--------------")
-		# print(profileToTest.dimensions)
-		# print(cost.dimensions)
-		# print("--------------")
-
 		if(len(cost.dimensions) != len(profileToTest.dimensions)):
 			print("[ERROR] Could not compute distance between profiles in different sized spaces. Execution aborted.")
 			quit()
