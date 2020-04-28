@@ -16,10 +16,13 @@ sys.path.insert(1,'/home/samgomes/Documents/doutoramento/reps/GIMME/GIMME')
 from GIMMECore import *
 from ModelMocks import *
 
+import plotBuilder
+
+
 plt.style.use('tableau-colorblind10')
 random.seed(time.perf_counter())
 
-numRuns = 30
+numRuns = 2
 maxNumTrainingIterations = 20
 numRealIterations = 20
 
@@ -31,7 +34,6 @@ newpath = "./simulationResults/" + startTime +" numRuns:" + str(numRuns) + ",max
 if not os.path.exists(newpath):
     os.makedirs(newpath)
     os.makedirs(newpath+"/charts/")
-
 
 
 # ----------------------- [Auxiliary Methods] --------------------------------
@@ -186,7 +188,7 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 	configSizeFreqs = adaptation.configsGenAlg.configSizeFreqs
 
 	if canExport == True:
-		f = open(newpath+"/"+adaptationName+".txt", "w")
+		f = open(newpath+"/results.txt", "w+")
 		f.write(adaptationName+"AbilityMeans = "+json.dumps(abilityMean)+"\n")
 		f.write(adaptationName+"AbilitySTDev = "+json.dumps(abilitySTDev)+"\n")
 		f.write(adaptationName+"EngagementMeans = "+json.dumps(engagementMean)+"\n")
@@ -194,6 +196,15 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 		f.write(adaptationName+"ProfDiffMeans = "+json.dumps(profDiffMean)+"\n")
 		f.write(adaptationName+"ProfDiffSTDev = "+json.dumps(profDiffSTDev)+"\n")
 		f.close()
+
+		f2 = open("./latestResults.txt", "w+")
+		f2.write(adaptationName+"AbilityMeans = "+json.dumps(abilityMean)+"\n")
+		f2.write(adaptationName+"AbilitySTDev = "+json.dumps(abilitySTDev)+"\n")
+		f2.write(adaptationName+"EngagementMeans = "+json.dumps(engagementMean)+"\n")
+		f2.write(adaptationName+"EngagementSTDev = "+json.dumps(engagementSTDev)+"\n")
+		f2.write(adaptationName+"ProfDiffMeans = "+json.dumps(profDiffMean)+"\n")
+		f2.write(adaptationName+"ProfDiffSTDev = "+json.dumps(profDiffSTDev)+"\n")
+		f2.close()
 
 
 
@@ -218,7 +229,7 @@ adaptationGIMMEOld = Adaptation()
 
 adaptationRandom = Adaptation()
 adaptationRandomOld = Adaptation()
-adaptationOptimal = Adaptation()
+adaptationAccurate = Adaptation()
 
 
 realPersonalities = []
@@ -247,7 +258,7 @@ randomConfigsAlg = RandomConfigsGen(playerBridge, intProfTemplate.generateCopy()
 adaptationRandom.init(playerBridge, taskBridge, configsGenAlg = randomConfigsAlg, name="random")
 
 accurateConfigsAlg = AccurateConfigsGen(playerBridge, intProfTemplate.generateCopy(), calcReaction, numberOfConfigChoices=100, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, qualityWeights = PlayerCharacteristics(ability=1.0, engagement=0.0)) #needed for currIteration updates
-adaptationOptimal.init(playerBridge, taskBridge, configsGenAlg = accurateConfigsAlg, name="accurate")
+adaptationAccurate.init(playerBridge, taskBridge, configsGenAlg = accurateConfigsAlg, name="accurate")
 
 
 
@@ -312,21 +323,21 @@ randomOldProfDiffSTDev = [0  for y in range(maxNumTrainingIterations + numRealIt
 randomOldExecTime = 0.0
 
 
-optimalAbilityMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
-optimalEngagementMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
-optimalProfDiffMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
-optimalAbilitySTDev = [0 for y in range(maxNumTrainingIterations + numRealIterations)]
-optimalEngagementSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
-optimalProfDiffSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
-optimalExecTime = 0.0
+accurateAbilityMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+accurateEngagementMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+accurateProfDiffMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+accurateAbilitySTDev = [0 for y in range(maxNumTrainingIterations + numRealIterations)]
+accurateEngagementSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+accurateProfDiffSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+accurateExecTime = 0.0
 
 
 # ----------------------- [Execute Algorithms] ----------------------------
 
 
 executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-	taskBridge, adaptationOptimal, optimalAbilityMeans, optimalAbilitySTDev, optimalEngagementMeans, optimalEngagementSTDev, 
-	optimalProfDiffMeans, optimalProfDiffSTDev, optimalExecTime, True, 4)
+	taskBridge, adaptationAccurate, accurateAbilityMeans, accurateAbilitySTDev, accurateEngagementMeans, accurateEngagementSTDev, 
+	accurateProfDiffMeans, accurateProfDiffSTDev, accurateExecTime, True, 4)
 
 executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
 	taskBridge, adaptationRandom, randomAbilityMeans, randomAbilitySTDev, randomEngagementMeans, randomEngagementSTDev, 
@@ -355,34 +366,17 @@ executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBrid
 print("Done!                        ", end="\r")
 
 
-print("Generating results...                        ", end="\r")
-import numpy as np 
-import seaborn as sns
-# ----------------------- [Generate Plots] --------------------------------
-sns.set_palette(sns.color_palette("colorblind"))
+print("Generating plot...                        ", end="\r")
 
-timesteps=[i+1 for i in range(maxNumTrainingIterations + numRealIterations)]
-timestepsReal=[i+1 for i in range(numRealIterations)]
-convValue=[1.0 for i in range(maxNumTrainingIterations + numRealIterations)]
-empHighestValue=[max(optimalAbilityMeans) for i in range(maxNumTrainingIterations + numRealIterations)]
-totalMin = min(min(randomAbilityMeans[maxNumTrainingIterations:]),min(GIMMEAbilityMeans),min(GIMMEOldAbilityMeans[maxNumTrainingIterations:]),min(optimalAbilityMeans[maxNumTrainingIterations:]))
-totalMax = max(max(randomAbilityMeans[maxNumTrainingIterations:]),max(GIMMEAbilityMeans),max(GIMMEOldAbilityMeans[maxNumTrainingIterations:]),max(optimalAbilityMeans[maxNumTrainingIterations:]))
+plt = plotBuilder.buildPlot(maxNumTrainingIterations,numRealIterations,
+	accurateAbilityMeans, randomAbilityMeans, randomOldAbilityMeans,
+	GIMMEAbilityMeans, GIMMEOldAbilityMeans, 
+	GIMMENoBootAbilityMeans,
 
-plt.rcParams.update({'font.size': 22})
-
-plt.xticks(np.arange(1, numRealIterations+1, step=1.0), fontsize=30)
-plt.yticks(fontsize=30)
-
-
-plt.errorbar(timestepsReal, GIMMEAbilityMeans[maxNumTrainingIterations:], GIMMEAbilitySTDev[maxNumTrainingIterations:], marker='s', capsize=5.0, alpha=0.5, linewidth=3, elinewidth=2, label="Bootstrapped GIMME")
-plt.errorbar(timestepsReal, GIMMENoBootAbilityMeans[maxNumTrainingIterations:], GIMMENoBootAbilitySTDev[maxNumTrainingIterations:], marker='s', capsize=5.0, alpha=0.5, linewidth=3, elinewidth=2, label="GIMME")
-plt.errorbar(timestepsReal, randomAbilityMeans[maxNumTrainingIterations:], randomAbilitySTDev[maxNumTrainingIterations:], marker='s', capsize=5.0, alpha=0.5, linewidth=3, elinewidth=2, label="Random")
-plt.errorbar(timestepsReal, GIMMEOldAbilityMeans[maxNumTrainingIterations:], GIMMEOldAbilitySTDev[maxNumTrainingIterations:], marker='s', capsize=5.0, alpha=0.5, linewidth=3, elinewidth=2, label="GIMME (old GIPs)")
-plt.errorbar(timestepsReal, randomOldAbilityMeans[maxNumTrainingIterations:], randomOldAbilitySTDev[maxNumTrainingIterations:], marker='s', capsize=5.0, alpha=0.5, linewidth=3, elinewidth=2, label="Random (old GIPs)")
-plt.plot(timestepsReal, empHighestValue[maxNumTrainingIterations:], linestyle= "--", linewidth=3, label="\"Perfect Information\" upper bound")
-plt.xlabel("Iteration", fontsize=40)
-plt.ylabel("avg. Ability Increase", fontsize=40)
-plt.legend(loc='best', fontsize=29)
+	accurateAbilitySTDev, randomAbilitySTDev, randomOldAbilitySTDev,
+	GIMMEAbilitySTDev, GIMMEOldAbilitySTDev, 
+	GIMMENoBootAbilitySTDev,
+	)
 
 plt.savefig(newpath+"/charts/chart.png")
 plt.show()
