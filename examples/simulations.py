@@ -36,6 +36,16 @@ if not os.path.exists(newpath):
     os.makedirs(newpath+"/charts/")
 
 
+f = open(newpath+"/results.py", "a")
+f.write("maxNumTrainingIterations = "+ str(maxNumTrainingIterations)+"\n");
+f.write("numRealIterations = "+ str(numRealIterations)+"\n");
+f.close()
+
+f2 = open("./latestResults.py", "w")
+f2.write("maxNumTrainingIterations = "+ str(maxNumTrainingIterations)+"\n");
+f2.write("numRealIterations = "+ str(numRealIterations)+"\n");
+f2.close()
+
 # ----------------------- [Auxiliary Methods] --------------------------------
 
 def simulateReaction(playerBridge, currIteration, playerId):
@@ -188,22 +198,24 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 	configSizeFreqs = adaptation.configsGenAlg.configSizeFreqs
 
 	if canExport == True:
-		f = open(newpath+"/results.txt", "w+")
+		f = open(newpath+"/results.py", "a")
 		f.write(adaptationName+"AbilityMeans = "+json.dumps(abilityMean)+"\n")
 		f.write(adaptationName+"AbilitySTDev = "+json.dumps(abilitySTDev)+"\n")
 		f.write(adaptationName+"EngagementMeans = "+json.dumps(engagementMean)+"\n")
 		f.write(adaptationName+"EngagementSTDev = "+json.dumps(engagementSTDev)+"\n")
 		f.write(adaptationName+"ProfDiffMeans = "+json.dumps(profDiffMean)+"\n")
 		f.write(adaptationName+"ProfDiffSTDev = "+json.dumps(profDiffSTDev)+"\n")
+		f.write("\n")
 		f.close()
 
-		f2 = open("./latestResults.txt", "w+")
+		f2 = open("./latestResults.py", "a")
 		f2.write(adaptationName+"AbilityMeans = "+json.dumps(abilityMean)+"\n")
 		f2.write(adaptationName+"AbilitySTDev = "+json.dumps(abilitySTDev)+"\n")
 		f2.write(adaptationName+"EngagementMeans = "+json.dumps(engagementMean)+"\n")
 		f2.write(adaptationName+"EngagementSTDev = "+json.dumps(engagementSTDev)+"\n")
 		f2.write(adaptationName+"ProfDiffMeans = "+json.dumps(profDiffMean)+"\n")
 		f2.write(adaptationName+"ProfDiffSTDev = "+json.dumps(profDiffSTDev)+"\n")
+		f2.write("\n")
 		f2.close()
 
 
