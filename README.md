@@ -37,7 +37,7 @@ from GIMMECore import *
 This will automatically import all of the associated GIMME classes.
 Besides importing the core, the user has to also implement the functionalities to store data used by the algorithm. This is done by extending two abstract data bridges: the [PlayerModelBridge](https://github.com/SamGomes/GIMME/wiki/PlayerModelBridge) and [TaskModelBridge](https://github.com/SamGomes/GIMME/wiki/TaskModelBridge). 
 
-## Run an example
+## Execute an example
 
 Some simulations are provided as example use cases of our system. To execute the provided simulations, you just have to enter the folder examples and call python as usual:
 
@@ -61,7 +61,7 @@ As of the current version, there are still some unexplored open pathways. They i
 - The integration of the tool in a multiplayer serious game (example/ use case);
 - The integration of automatic task selection (not covered by simulations).
 
-Any help to improve this idea is welcome.
+*Any help to improve this idea is welcome.*
 
 
 ## License
