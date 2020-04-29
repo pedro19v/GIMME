@@ -22,7 +22,7 @@ import plotBuilder
 plt.style.use('tableau-colorblind10')
 random.seed(time.perf_counter())
 
-numRuns = 2
+numRuns = 1000
 maxNumTrainingIterations = 20
 numRealIterations = 20
 
@@ -78,19 +78,19 @@ def executionPhase(playerBridge, maxNumIterations, startingI, currRun, adaptatio
 		if adaptation.name == "accurate":
 			adaptation.configsGenAlg.updateCurrIteration(i)
 		
-		t0 = time.perf_counter()
+		# t0 = time.perf_counter()
 
 		print("step (" +str(i - startingI)+ " of "+str(maxNumIterations)+") of run ("+str(currRun)+" of "+str(numRuns)+") of algorithm \""+str(adaptation.name)+"\"						", end="\r")
 		adaptation.iterate()
 
-		t1 = time.perf_counter() - t0
-		avgItExecTime += (t1 - t0)/(numRuns) # CPU seconds elapsed (floating point)
+		# t1 = time.perf_counter() - t0
+		# avgItExecTime += (t1 - t0)/(numRuns) # CPU seconds elapsed (floating point)
 
 		for x in range(numPlayers):
 			increases = simulateReaction(playerBridge, i, x)
 			abilityMatrix[i][currRun] += increases.characteristics.ability / numPlayers
-			engagementMatrix[i][currRun] += increases.characteristics.engagement / numPlayers
-			profDiffMatrix[i][currRun] += playerBridge.getPlayerPersonality(x).distanceBetween(playerBridge.getPlayerCurrProfile(x)) / numPlayers
+			# engagementMatrix[i][currRun] += increases.characteristics.engagement / numPlayers
+			# profDiffMatrix[i][currRun] += playerBridge.getPlayerPersonality(x).distanceBetween(playerBridge.getPlayerCurrProfile(x)) / numPlayers
 		i+=1
 
 		if adaptation.name == "GIMME" or adaptation.name == "GIMMENoBoot" or adaptation.name == "GIMMEOld":
@@ -101,7 +101,7 @@ def executionPhase(playerBridge, maxNumIterations, startingI, currRun, adaptatio
 def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations,firstRealI,\
 	playerBridge, taskBridge, adaptation, \
 	abilityMean, abilitySTDev, engagementMean, engagementSTDev, profDiffMean, profDiffSTDev, avgItExecTime,\
-	canExport, numInteractionDimensions):
+	numInteractionDimensions, canExport = True, considerExtremePersonalityValues = False):
 
 
 	totalNumIterations = len(abilityMean) #assumption that the total number of iterations is given by the size of the ability results array...
@@ -133,7 +133,10 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 		for x in range(numPlayers):
 			profile = profileTemplate.generateCopy()
 			for d in range(numInteractionDimensions):
-				profile.dimensions["dim_"+str(d)] = random.uniform(0, 1)
+				if(considerExtremePersonalityValues):
+					profile.dimensions = random.choice([{"dim_0":1,"dim_1":0,"dim_2":0,"dim_3":0},{"dim_0":0,"dim_1":1,"dim_2":0,"dim_3":0},{"dim_0":0,"dim_1":0,"dim_2":1,"dim_3":0},{"dim_0":0,"dim_1":0,"dim_2":0,"dim_3":1}])
+				else:
+					profile.dimensions["dim_"+str(d)] = random.uniform(0, 1)
 			realPersonalities.append(profile)
 			realPersonalities[x].normalize()
 
@@ -277,6 +280,15 @@ adaptationAccurate.init(playerBridge, taskBridge, configsGenAlg = accurateConfig
 
 # ----------------------- [Create Arrays] --------------------------------
 
+GIMMEEPAbilityMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMEEPEngagementMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMEEPProfDiffMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMEEPAbilitySTDev = [0 for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMEEPEngagementSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMEEPProfDiffSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMEEPExecTime = 0.0
+
+
 GIMMEOldAbilityMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
 GIMMEOldEngagementMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
 GIMMEOldProfDiffMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
@@ -347,31 +359,39 @@ accurateExecTime = 0.0
 # ----------------------- [Execute Algorithms] ----------------------------
 
 
-executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-	taskBridge, adaptationAccurate, accurateAbilityMeans, accurateAbilitySTDev, accurateEngagementMeans, accurateEngagementSTDev, 
-	accurateProfDiffMeans, accurateProfDiffSTDev, accurateExecTime, True, 4)
+# executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
+# 	taskBridge, adaptationAccurate, accurateAbilityMeans, accurateAbilitySTDev, accurateEngagementMeans, accurateEngagementSTDev, 
+# 	accurateProfDiffMeans, accurateProfDiffSTDev, accurateExecTime, 4)
 
-executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-	taskBridge, adaptationRandom, randomAbilityMeans, randomAbilitySTDev, randomEngagementMeans, randomEngagementSTDev, 
-	randomProfDiffMeans, randomProfDiffSTDev, randomExecTime, True, 4)
-executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-	taskBridge, adaptationRandomOld, randomOldAbilityMeans, randomOldAbilitySTDev, randomOldEngagementMeans, randomOldEngagementSTDev, 
-	randomOldProfDiffMeans, randomOldProfDiffSTDev, randomOldExecTime, True, 3)
+# executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
+# 	taskBridge, adaptationRandom, randomAbilityMeans, randomAbilitySTDev, randomEngagementMeans, randomEngagementSTDev, 
+# 	randomProfDiffMeans, randomProfDiffSTDev, randomExecTime, 4)
+# executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
+# 	taskBridge, adaptationRandomOld, randomOldAbilityMeans, randomOldAbilitySTDev, randomOldEngagementMeans, randomOldEngagementSTDev, 
+# 	randomOldProfDiffMeans, randomOldProfDiffSTDev, randomOldExecTime, 3)
 
 
-executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-	taskBridge, adaptationGIMMEOld, GIMMEOldAbilityMeans, GIMMEOldAbilitySTDev, 
-	GIMMEOldEngagementMeans, GIMMEOldEngagementSTDev, 
-	GIMMEOldProfDiffMeans, GIMMEOldProfDiffSTDev, GIMMEOldExecTime, True, 3)
-executeSimulations(maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-	taskBridge, adaptationGIMME, GIMMEAbilityMeans, GIMMEAbilitySTDev, GIMMEEngagementMeans, GIMMEEngagementSTDev, 
-	GIMMEProfDiffMeans, GIMMEProfDiffSTDev, GIMMEExecTime, True, 4)
+# executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
+# 	taskBridge, adaptationGIMMEOld, GIMMEOldAbilityMeans, GIMMEOldAbilitySTDev, 
+# 	GIMMEOldEngagementMeans, GIMMEOldEngagementSTDev, 
+# 	GIMMEOldProfDiffMeans, GIMMEOldProfDiffSTDev, GIMMEOldExecTime, 3)
+# executeSimulations(maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
+# 	taskBridge, adaptationGIMME, GIMMEAbilityMeans, GIMMEAbilitySTDev, GIMMEEngagementMeans, GIMMEEngagementSTDev, 
+# 	GIMMEProfDiffMeans, GIMMEProfDiffSTDev, GIMMEExecTime, 4)
 
 
 adaptationGIMME.name = "GIMMENoBoot"
 executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
 	taskBridge, adaptationGIMME, GIMMENoBootAbilityMeans, GIMMENoBootAbilitySTDev, 
-	GIMMENoBootEngagementMeans, GIMMENoBootEngagementSTDev, GIMMENoBootProfDiffMeans, GIMMENoBootProfDiffSTDev, GIMMENoBootExecTime, True, 4)
+	GIMMENoBootEngagementMeans, GIMMENoBootEngagementSTDev, GIMMENoBootProfDiffMeans, GIMMENoBootProfDiffSTDev,
+	GIMMENoBootExecTime, 4)
+
+# Extreme personalities
+adaptationGIMME.name = "GIMMEEP"
+executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
+	taskBridge, adaptationGIMME, GIMMEEPAbilityMeans, GIMMEEPAbilitySTDev, 
+	GIMMEEPEngagementMeans, GIMMEEPEngagementSTDev, GIMMEEPProfDiffMeans, GIMMEEPProfDiffSTDev, GIMMEEPExecTime,
+	4, considerExtremePersonalityValues = True)
 
 
 
@@ -383,11 +403,11 @@ print("Generating plot...                        ", end="\r")
 plt = plotBuilder.buildPlot(maxNumTrainingIterations,numRealIterations,
 	accurateAbilityMeans, randomAbilityMeans, randomOldAbilityMeans,
 	GIMMEAbilityMeans, GIMMEOldAbilityMeans, 
-	GIMMENoBootAbilityMeans,
+	GIMMENoBootAbilityMeans, GIMMEEPAbilityMeans,
 
 	accurateAbilitySTDev, randomAbilitySTDev, randomOldAbilitySTDev,
 	GIMMEAbilitySTDev, GIMMEOldAbilitySTDev, 
-	GIMMENoBootAbilitySTDev,
+	GIMMENoBootAbilitySTDev, GIMMEEPAbilitySTDev
 	)
 
 plt.savefig(newpath+"/charts/chart.png")

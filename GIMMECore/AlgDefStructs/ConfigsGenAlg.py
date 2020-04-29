@@ -277,7 +277,7 @@ class SimpleConfigsGen(ConfigsGenAlg):
 				
 					predictedIncreases = self.regAlg.predict(profile, currPlayer)
 					currFitness += self.qualityWeights.ability*predictedIncreases.characteristics.ability + self.qualityWeights.engagement*predictedIncreases.characteristics.engagement
-			
+
 				newAvgCharacteristics.append(currAvgCharacteristics)
 			if (currFitness > currMaxFitness):
 				bestGroups = newGroups

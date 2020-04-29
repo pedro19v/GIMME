@@ -6,11 +6,11 @@ import latestResults as results
 plt = plotBuilder.buildPlot(results.maxNumTrainingIterations,results.numRealIterations,
 	results.accurateAbilityMeans, results.randomAbilityMeans, results.randomOldAbilityMeans,
 	results.GIMMEAbilityMeans, results.GIMMEOldAbilityMeans, 
-	results.GIMMENoBootAbilityMeans,
+	results.GIMMENoBootAbilityMeans, results.GIMMEEPAbilityMeans,
 
 	results.accurateAbilitySTDev, results.randomAbilitySTDev, results.randomOldAbilitySTDev,
 	results.GIMMEAbilitySTDev, results.GIMMEOldAbilitySTDev, 
-	results.GIMMENoBootAbilitySTDev,
+	results.GIMMENoBootAbilitySTDev, results.GIMMEEPAbilitySTDev
 	)
 
 plt.show()
