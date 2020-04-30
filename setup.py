@@ -15,6 +15,18 @@ setup(
     'Programming Language :: Python :: 3.6',
     'Programming Language :: Python :: 3.7',
     'Topic :: Scientific/Engineering :: Adaptation'
+    ],
+    install_requires=[
+      'os',
+      'sys',
+      'random',
+      'time',
+      'math',
+      'json',
+      'datetime',
+      'seaborn',
+      'matplotlib',
+      'numpy'
     ]
 
 )
