@@ -22,7 +22,6 @@ def buildPlot(maxNumTrainingIterations,numRealIterations,
 	empHighestValue=[max(accurateAbilityMeans) for i in range(maxNumTrainingIterations + numRealIterations)]
 
 
-	
 	plt.rcParams.update({'font.size': 22})
 
 	plt.xticks(np.arange(1, numRealIterations+1, step=1.0), fontsize=30)

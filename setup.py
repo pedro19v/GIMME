@@ -22,7 +22,6 @@ setup(
       'random',
       'time',
       'math',
-      'json',
       'datetime',
       'seaborn',
       'matplotlib',

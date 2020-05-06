@@ -120,10 +120,7 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 
 	# create players and tasks
 	for x in range(numPlayers):
-		if adaptationName == "GIMMEGrid":
-			playerBridge.registerNewPlayer(int(x), "name", PlayerState(creationTime = time.time(), profile = profileTemplate.generateCopy()), PlayerStateGrid(profileTemplate.generateCopy(), numCells = 5, maxProfilesPerCell = 2), PlayerCharacteristics(), profileTemplate.generateCopy())
-		else:
-			playerBridge.registerNewPlayer(int(x), "name", PlayerState(creationTime = time.time(), profile = profileTemplate.generateCopy()), PlayerStateGrid(profileTemplate.generateCopy(), numCells = 1, maxProfilesPerCell = playerWindow), PlayerCharacteristics(), profileTemplate.generateCopy())
+		playerBridge.registerNewPlayer(int(x), "name", PlayerState(creationTime = time.time(), profile = profileTemplate.generateCopy()), PlayerStateGrid(profileTemplate.generateCopy(), numCells = 1, maxProfilesPerCell = playerWindow), PlayerCharacteristics(), profileTemplate.generateCopy())
 	for x in range(20):
 		taskBridge.registerNewTask(int(x), "description", random.uniform(0, 1), profileTemplate.generateCopy(), datetime.timedelta(minutes=1), 0.5, 0.5)
 
@@ -154,20 +151,16 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 			adaptation.configsGenAlg.reset()
 			playerBridge.resetPlayer(x)
 			personality = questionnairePersonalities[x]
-			# personality.normalize()
 			playerBridge.setPlayerPersonality(x, personality)
 			playerBridge.setBaseLearningRate(x, random.gauss(0.5, 0.16))
 
 		executionPhase(playerBridge, maxNumTrainingIterations, firstTrainingI, r, adaptation, abilityMatrix, engagementMatrix, profDiffMatrix, avgItExecTime, canExport)
-		
+	
 		# change for "real" personality from which the predictions supposidely are based on...
 		for x in range(numPlayers):
-			playerBridge.resetPlayer(x)
+			playerBridge.resetState(x)
 			predictedPersonality = playerBridge.getPlayerPersonality(x)
 			realPersonality = realPersonalities[x]
-			# realPersonality.normalize()
-			# print(json.dumps(realPersonality, default= lambda o: o.__dict__, sort_keys=True))
-			# print("---")
 			playerBridge.setPlayerPersonality(x, realPersonality)
 
 		executionPhase(playerBridge, numRealIterations, firstRealI, r, adaptation, abilityMatrix, engagementMatrix, profDiffMatrix, avgItExecTime, canExport)
@@ -358,26 +351,10 @@ accurateExecTime = 0.0
 
 # ----------------------- [Execute Algorithms] ----------------------------
 
-
-# executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-# 	taskBridge, adaptationAccurate, accurateAbilityMeans, accurateAbilitySTDev, accurateEngagementMeans, accurateEngagementSTDev, 
-# 	accurateProfDiffMeans, accurateProfDiffSTDev, accurateExecTime, 4)
-
-# executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-# 	taskBridge, adaptationRandom, randomAbilityMeans, randomAbilitySTDev, randomEngagementMeans, randomEngagementSTDev, 
-# 	randomProfDiffMeans, randomProfDiffSTDev, randomExecTime, 4)
-# executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-# 	taskBridge, adaptationRandomOld, randomOldAbilityMeans, randomOldAbilitySTDev, randomOldEngagementMeans, randomOldEngagementSTDev, 
-# 	randomOldProfDiffMeans, randomOldProfDiffSTDev, randomOldExecTime, 3)
-
-
-# executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-# 	taskBridge, adaptationGIMMEOld, GIMMEOldAbilityMeans, GIMMEOldAbilitySTDev, 
-# 	GIMMEOldEngagementMeans, GIMMEOldEngagementSTDev, 
-# 	GIMMEOldProfDiffMeans, GIMMEOldProfDiffSTDev, GIMMEOldExecTime, 3)
-# executeSimulations(maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-# 	taskBridge, adaptationGIMME, GIMMEAbilityMeans, GIMMEAbilitySTDev, GIMMEEngagementMeans, GIMMEEngagementSTDev, 
-# 	GIMMEProfDiffMeans, GIMMEProfDiffSTDev, GIMMEExecTime, 4)
+adaptationGIMME.name = "GIMME"
+executeSimulations(maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
+	taskBridge, adaptationGIMME, GIMMEAbilityMeans, GIMMEAbilitySTDev, GIMMEEngagementMeans, GIMMEEngagementSTDev, 
+	GIMMEProfDiffMeans, GIMMEProfDiffSTDev, GIMMEExecTime, 4)
 
 
 adaptationGIMME.name = "GIMMENoBoot"
@@ -392,6 +369,24 @@ executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBrid
 	taskBridge, adaptationGIMME, GIMMEEPAbilityMeans, GIMMEEPAbilitySTDev, 
 	GIMMEEPEngagementMeans, GIMMEEPEngagementSTDev, GIMMEEPProfDiffMeans, GIMMEEPProfDiffSTDev, GIMMEEPExecTime,
 	4, considerExtremePersonalityValues = True)
+
+executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
+	taskBridge, adaptationAccurate, accurateAbilityMeans, accurateAbilitySTDev, accurateEngagementMeans, accurateEngagementSTDev, 
+	accurateProfDiffMeans, accurateProfDiffSTDev, accurateExecTime, 4)
+
+executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
+	taskBridge, adaptationRandom, randomAbilityMeans, randomAbilitySTDev, randomEngagementMeans, randomEngagementSTDev, 
+	randomProfDiffMeans, randomProfDiffSTDev, randomExecTime, 4)
+executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
+	taskBridge, adaptationRandomOld, randomOldAbilityMeans, randomOldAbilitySTDev, randomOldEngagementMeans, randomOldEngagementSTDev, 
+	randomOldProfDiffMeans, randomOldProfDiffSTDev, randomOldExecTime, 3)
+
+
+executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
+	taskBridge, adaptationGIMMEOld, GIMMEOldAbilityMeans, GIMMEOldAbilitySTDev, 
+	GIMMEOldEngagementMeans, GIMMEOldEngagementSTDev, 
+	GIMMEOldProfDiffMeans, GIMMEOldProfDiffSTDev, GIMMEOldExecTime, 3)
+
 
 
 

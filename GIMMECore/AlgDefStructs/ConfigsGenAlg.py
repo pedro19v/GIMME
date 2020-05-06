@@ -33,13 +33,6 @@ class ConfigsGenAlg(ABC):
 
 	def randomProfileGenerator(self):
 		# generate learning profile
-		
-		# profile = copy.deepcopy(self.interactionsProfileTemplate)
-
-		# for key in profile.dimensions:
-		# 	profile.dimensions[key] = random.uniform(0.0, 1.0)
-		# profile.normalize()
-
 		profile = self.interactionsProfileTemplate.generateCopy()
 		profile.reset()
 
@@ -48,6 +41,69 @@ class ConfigsGenAlg(ABC):
 		profile.normalize()
 
 		return profile
+
+
+	def randomConfigGenerator(self, playerIds, minNumGroups, maxNumGroups):
+		
+		returnedConfig = []
+
+		if(len(playerIds) < self.minNumberOfPlayersPerGroup):
+			print("number of players is lower than the minimum number of players per group!")
+			return bestGroups
+			
+		# generate random config
+		playersWithoutGroup = playerIds.copy()
+
+		if(minNumGroups < maxNumGroups):
+			numGroups = numpy.random.randint(minNumGroups, maxNumGroups)
+		else: # players length is 1
+			numGroups = maxNumGroups
+
+		# generate min num players for each group
+		playersWithoutGroupSize = len(playersWithoutGroup)
+		for g in range(numGroups):
+			currGroup = []
+
+			if(playersWithoutGroupSize < 1):
+				break
+
+			# add min number of players to the group
+			for p in range(self.minNumberOfPlayersPerGroup):
+				currPlayerIndex = random.randint(0, len(playersWithoutGroup) - 1)
+				currPlayerID = playersWithoutGroup[currPlayerIndex]
+				currGroup.append(currPlayerID)
+				del playersWithoutGroup[currPlayerIndex]
+			
+			returnedConfig.append(currGroup)
+		
+		# append the rest
+		playersWithoutGroupSize = len(playersWithoutGroup)
+		while playersWithoutGroupSize > 0:
+			currPlayerIndex = 0;
+			if (playersWithoutGroupSize > 1):
+				currPlayerIndex = random.randint(0, playersWithoutGroupSize - 1)
+			else:
+				currPlayerIndex = 0
+			currPlayerID = playersWithoutGroup[currPlayerIndex]
+
+			groupsSize = len(returnedConfig)
+
+			availableGroups = returnedConfig.copy()
+			while (len(currGroup) > (self.maxNumberOfPlayersPerGroup - 1)):
+				if(len(availableGroups) < 1):
+					currGroup = random.choice(returnedConfig)
+					break
+				currGroup = random.choice(availableGroups)
+				availableGroups.remove(currGroup)
+
+			currGroup.append(currPlayerID)
+
+			del playersWithoutGroup[currPlayerIndex]
+			playersWithoutGroupSize = len(playersWithoutGroup)
+
+		return returnedConfig
+
+
 
 	@abstractmethod
 	def organize(self):
@@ -75,71 +131,14 @@ class RandomConfigsGen(ConfigsGenAlg):
 
 	def organize(self):
 		playerIds = self.playerModelBridge.getAllPlayerIds() 
-
-		bestGroups = []
-		bestConfigProfiles = []
-		bestAvgCharacteristics = []
-
-		if(len(playerIds) < self.minNumberOfPlayersPerGroup):
-			print("number of players is lower than the minimum number of players per group!")
-			input()
-			return bestGroups
-			
 		minNumGroups = math.ceil(len(playerIds) / self.maxNumberOfPlayersPerGroup)
 		maxNumGroups = math.floor(len(playerIds) / self.minNumberOfPlayersPerGroup)
-
-		# generate random config
-		playersWithoutGroup = playerIds.copy()
-		newGroups = []
+		
 		newConfigProfiles = []
 		newAvgCharacteristics = []
-
-		if(minNumGroups < maxNumGroups):
-			numGroups = numpy.random.randint(minNumGroups, maxNumGroups)
-		else: # players length is 1
-			numGroups = maxNumGroups + 1
-
-		# generate min groups
-		playersWithoutGroupSize = len(playersWithoutGroup)
-		for g in range(numGroups):
-			currGroup = []
-			# add min number of players to the group
-			for p in range(min(len(playersWithoutGroup), self.minNumberOfPlayersPerGroup)):
-				currPlayerIndex = random.randint(0, len(playersWithoutGroup) - 1)
-				currPlayerID = playersWithoutGroup[currPlayerIndex]
-				currGroup.append(currPlayerID)
-				del playersWithoutGroup[currPlayerIndex]
-			
-			# to not add empty groups
-			if(len(currGroup)>0):
-				newGroups.append(currGroup)
-
-		# append the rest
-		playersWithoutGroupSize = len(playersWithoutGroup)
-		while playersWithoutGroupSize > 0:
-			randomGroupIndex = random.randint(0, len(newGroups) - 1)
-			currPlayerIndex = 0;
-			if (playersWithoutGroupSize > 1):
-				currPlayerIndex = random.randint(0, playersWithoutGroupSize - 1)
-			else:
-				currPlayerIndex = 0
-
-			currGroup = newGroups[randomGroupIndex]
-			groupsSize = len(newGroups)
-
-			while (len(currGroup) > (maxNumberOfPlayersPerGroup - 1)):
-				randomGroupIndex += 1
-				currGroup = newGroups[randomGroupIndex%groupsSize]
-
-			currPlayerID = playersWithoutGroup[currPlayerIndex]
-			currGroup.append(currPlayerID)
-
-			del playersWithoutGroup[currPlayerIndex]
-			playersWithoutGroupSize = len(playersWithoutGroup)
-
-
-		newConfigSize = len(newGroups)
 		
+		newGroups = self.randomConfigGenerator(playerIds, minNumGroups, maxNumGroups)
+		newConfigSize = len(newGroups)		
 		# generate profiles
 		for groupI in range(newConfigSize):
 			group = newGroups[groupI]
@@ -158,12 +157,8 @@ class RandomConfigsGen(ConfigsGenAlg):
 			currAvgCharacteristics.profile = profile
 			newAvgCharacteristics.append(currAvgCharacteristics)
 
-		bestGroups = newGroups
-		bestConfigProfiles = newConfigProfiles
-		bestAvgCharacteristics = newAvgCharacteristics
-
-		self.updateMetrics(bestGroups)
-		return {"groups": bestGroups, "profiles": bestConfigProfiles, "avgCharacteristics": bestAvgCharacteristics}
+		self.updateMetrics(newGroups)
+		return {"groups": newGroups, "profiles": newConfigProfiles, "avgCharacteristics": newAvgCharacteristics}
 
 
 class SimpleConfigsGen(ConfigsGenAlg):
@@ -187,9 +182,8 @@ class SimpleConfigsGen(ConfigsGenAlg):
 
 	def organize(self):
 		playerIds = self.playerModelBridge.getAllPlayerIds() 
-
-		if(not self.allPlayersInited):
-			return self.configsGenAlgIniter.organize()
+		minNumGroups = math.ceil(len(playerIds) / self.maxNumberOfPlayersPerGroup)
+		maxNumGroups = math.floor(len(playerIds) / self.minNumberOfPlayersPerGroup)
 
 		currMaxFitness = -float("inf")
 
@@ -197,59 +191,11 @@ class SimpleConfigsGen(ConfigsGenAlg):
 		bestConfigProfiles = []
 		bestAvgCharacteristics = []
 
-		minNumGroups = math.ceil(len(playerIds) / self.maxNumberOfPlayersPerGroup)
-		maxNumGroups = math.floor(len(playerIds) / self.minNumberOfPlayersPerGroup)
 		
 		# generate several random groups, calculate their fitness and select the best one
 		for i in range(self.numberOfConfigChoices):
 			
-			playersWithoutGroup = playerIds.copy()
-			newGroups = []
-
-			if(minNumGroups < maxNumGroups):
-				numGroups = numpy.random.randint(minNumGroups, maxNumGroups)
-			else: # players length is 1
-				numGroups = maxNumGroups + 1
-
-			# generate min groups
-			playersWithoutGroupSize = len(playersWithoutGroup)
-			for g in range(numGroups):
-				currGroup = []
-				# add min number of players to the group
-				for p in range(min(len(playersWithoutGroup), self.minNumberOfPlayersPerGroup)):
-					currPlayerIndex = random.randint(0, len(playersWithoutGroup) - 1)
-					currPlayerID = playersWithoutGroup[currPlayerIndex]
-					currGroup.append(currPlayerID)
-					del playersWithoutGroup[currPlayerIndex]
-				
-				# to not add empty groups
-				if(len(currGroup)>0):
-					newGroups.append(currGroup)
-
-			# append the rest
-			playersWithoutGroupSize = len(playersWithoutGroup)
-			while playersWithoutGroupSize > 0:
-				randomGroupIndex = random.randint(0, len(newGroups) - 1)
-				currPlayerIndex = 0;
-				if (playersWithoutGroupSize > 1):
-					currPlayerIndex = random.randint(0, playersWithoutGroupSize - 1)
-				else:
-					currPlayerIndex = 0
-
-				currGroup = newGroups[randomGroupIndex]
-				groupsSize = len(newGroups)
-
-				while (len(currGroup) > (maxNumberOfPlayersPerGroup - 1)):
-					randomGroupIndex += 1
-					currGroup = newGroups[randomGroupIndex%groupsSize]
-
-				currPlayerID = playersWithoutGroup[currPlayerIndex]
-				currGroup.append(currPlayerID)
-
-				del playersWithoutGroup[currPlayerIndex]
-				playersWithoutGroupSize = len(playersWithoutGroup)
-
-
+			newGroups = self.randomConfigGenerator(playerIds, minNumGroups, maxNumGroups)
 			newConfigSize = len(newGroups)
 			currFitness = 0.0
 			newConfigProfiles = []
@@ -307,6 +253,8 @@ class AccurateConfigsGen(ConfigsGenAlg):
 
 	def organize(self):
 		playerIds = self.playerModelBridge.getAllPlayerIds() 
+		minNumGroups = math.ceil(len(playerIds) / self.maxNumberOfPlayersPerGroup)
+		maxNumGroups = math.floor(len(playerIds) / self.minNumberOfPlayersPerGroup)
 
 		currMaxFitness = -float("inf")
 
@@ -314,62 +262,10 @@ class AccurateConfigsGen(ConfigsGenAlg):
 		bestConfigProfiles = []
 		bestAvgCharacteristics = []
 
-		if(len(playerIds) < self.minNumberOfPlayersPerGroup):
-			print("number of players is lower than the minimum number of players per group!")
-			input()
-			return bestGroups
-		minNumGroups = math.ceil(len(playerIds) / self.maxNumberOfPlayersPerGroup)
-		maxNumGroups = math.floor(len(playerIds) / self.minNumberOfPlayersPerGroup)
-		
 		# generate several random groups, calculate their fitness and select the best one
 		for i in range(self.numberOfConfigChoices):
 			
-			playersWithoutGroup = playerIds.copy()
-			newGroups = []
-
-			if(minNumGroups < maxNumGroups):
-				numGroups = numpy.random.randint(minNumGroups, maxNumGroups)
-			else: # players length is 1
-				numGroups = maxNumGroups + 1
-
-			# generate min groups
-			playersWithoutGroupSize = len(playersWithoutGroup)
-			for g in range(numGroups):
-				currGroup = []
-				# add min number of players to the group
-				for p in range(min(len(playersWithoutGroup), self.minNumberOfPlayersPerGroup)):
-					currPlayerIndex = random.randint(0, len(playersWithoutGroup) - 1)
-					currPlayerID = playersWithoutGroup[currPlayerIndex]
-					currGroup.append(currPlayerID)
-					del playersWithoutGroup[currPlayerIndex]
-				
-				# to not add empty groups
-				if(len(currGroup)>0):
-					newGroups.append(currGroup)
-
-			# append the rest
-			playersWithoutGroupSize = len(playersWithoutGroup)
-			while playersWithoutGroupSize > 0:
-				randomGroupIndex = random.randint(0, len(newGroups) - 1)
-				currPlayerIndex = 0;
-				if (playersWithoutGroupSize > 1):
-					currPlayerIndex = random.randint(0, playersWithoutGroupSize - 1)
-				else:
-					currPlayerIndex = 0
-
-				currGroup = newGroups[randomGroupIndex]
-				groupsSize = len(newGroups)
-
-				while (len(currGroup) > (maxNumberOfPlayersPerGroup - 1)):
-					randomGroupIndex += 1
-					currGroup = newGroups[randomGroupIndex%groupsSize]
-
-				currPlayerID = playersWithoutGroup[currPlayerIndex]
-				currGroup.append(currPlayerID)
-
-				del playersWithoutGroup[currPlayerIndex]
-				playersWithoutGroupSize = len(playersWithoutGroup)
-
+			newGroups = self.randomConfigGenerator(playerIds, minNumGroups, maxNumGroups)
 			newConfigSize = len(newGroups)
 			currFitness = 0.0
 			newConfigProfiles = []
@@ -405,12 +301,11 @@ class AccurateConfigsGen(ConfigsGenAlg):
 					newState = self.simulationFunc(self.playerModelBridge, currState, currPlayer, profile, self.currIteration)
 		
 					increases = PlayerState()
-					increases.profile = currState.profile
 					increases.characteristics = PlayerCharacteristics(ability=(newState.characteristics.ability - currState.characteristics.ability), engagement=newState.characteristics.engagement)
 				
 					currFitness += self.qualityWeights.ability*increases.characteristics.ability + self.qualityWeights.engagement*increases.characteristics.engagement
-				currAvgCharacteristics.profile = profile
 				newAvgCharacteristics.append(currAvgCharacteristics)
+			
 			if (currFitness > currMaxFitness):
 				bestGroups = newGroups
 				bestConfigProfiles = newConfigProfiles
