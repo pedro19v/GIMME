@@ -18,36 +18,17 @@ class InteractionsProfile(object):
 		return newVar
 
 	def normalize(self):
-		total = 0
-		for key in self.dimensions:
-			total += self.dimensions[key]
-		if(total==0):
+		if(len(self.dimensions)>2):
+			total = 0
 			for key in self.dimensions:
-				self.dimensions[key] = 0.25
-		else:
-			for key in self.dimensions:
-				self.dimensions[key] = self.dimensions[key]/total
+				total += self.dimensions[key]
+			if(total==0):
+				for key in self.dimensions:
+					self.dimensions[key] = 0.25
+			else:
+				for key in self.dimensions:
+					self.dimensions[key] = self.dimensions[key]/total
 
-	def normalizedDistanceBetween(self, profileToTest):
-		cost = self.generateCopy()
-		cost.reset()
-
-		if(len(cost.dimensions) != len(profileToTest.dimensions)):
-			print("[ERROR] Could not compute distance between profiles in different sized spaces. Execution aborted.")
-			quit()
-
-		# normalizar cada uma das dims X/X+Y+Z; Y/X+Y+Z, Z/X+Y+Z
-		for key in cost.dimensions:
-			cost.dimensions[key] = abs(self.dimensions[key] - profileToTest.dimensions[key])
-
-		cost.normalize()
-
-		total = 0
-		for key in cost.dimensions:
-			cost.dimensions[key] = pow(cost.dimensions[key], 2)
-			total += cost.dimensions[key]
-
-		return math.sqrt(total)
 	
 
 	def sqrDistanceBetween(self, profileToTest):
@@ -70,4 +51,5 @@ class InteractionsProfile(object):
 
 
 	def distanceBetween(self, profileToTest):
-		return math.sqrt(self.sqrDistanceBetween(profileToTest))
+		numDims = len(profileToTest.dimensions)
+		return self.sqrDistanceBetween(profileToTest)**(1/float(numDims)) 

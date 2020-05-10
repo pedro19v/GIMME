@@ -27,7 +27,6 @@ class KNNRegression(RegressionAlg):
 		return elem.creationTime
 
 	def predict(self, profile, playerId):
-
 		pastModelIncs = self.playerModelBridge.getPlayerStateGrid(playerId).getAllStates()
 		pastModelIncsSize = len(pastModelIncs)
 

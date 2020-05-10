@@ -60,8 +60,11 @@ def simulateReaction(playerBridge, currIteration, playerId):
 
 def calcReaction(playerBridge, state, playerId, interactionsProfile, currIteration):
 	personality = playerBridge.getPlayerPersonality(playerId)
+	numDims = len(personality.dimensions)
 	newState = PlayerState(characteristics = PlayerCharacteristics(ability=state.characteristics.ability, engagement=state.characteristics.engagement), profile=state.profile)
-	newState.characteristics.engagement = (math.sqrt(2.0) - personality.distanceBetween(interactionsProfile)) / math.sqrt(2.0)  #between 0 and 1
+	newState.characteristics.engagement = 1 - (personality.distanceBetween(interactionsProfile) / numDims**(1/float(numDims)))  #between 0 and 1
+	if newState.characteristics.engagement>1:
+		breakpoint()
 	abilityIncreaseSim = (newState.characteristics.engagement*playerBridge.getBaseLearningRate(playerId))
 	newState.characteristics.ability = newState.characteristics.ability + abilityIncreaseSim
 	return newState
@@ -75,6 +78,7 @@ def executionPhase(playerBridge, maxNumIterations, startingI, currRun, adaptatio
 		adaptation.configsGenAlg.areAllPlayersInited(False)
 	
 	while(i < maxNumIterations + startingI):
+
 		if adaptation.name == "accurate":
 			adaptation.configsGenAlg.updateCurrIteration(i)
 		
@@ -165,6 +169,7 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 
 		executionPhase(playerBridge, numRealIterations, firstRealI, r, adaptation, abilityMatrix, engagementMatrix, profDiffMatrix, avgItExecTime, canExport)
 
+
 	# finish to calculate means and std devs for charts
 	avgItExecTime /= totalNumIterations
 	for i in range(totalNumIterations):
@@ -234,6 +239,11 @@ taskBridge = CustomTaskModelBridge(tasks)
 adaptationGIMME = Adaptation()
 adaptationGIMMEOld = Adaptation()
 
+adaptationGIMME1D = Adaptation()
+adaptationGIMME2D = Adaptation()
+adaptationGIMME5D = Adaptation()
+adaptationGIMME6D = Adaptation()
+
 
 adaptationRandom = Adaptation()
 adaptationRandomOld = Adaptation()
@@ -269,7 +279,33 @@ accurateConfigsAlg = AccurateConfigsGen(playerBridge, intProfTemplate.generateCo
 adaptationAccurate.init(playerBridge, taskBridge, configsGenAlg = accurateConfigsAlg, name="accurate")
 
 
+# - - - - -
 
+intProfTemplate = InteractionsProfile({"dim_0": 0})
+
+simpleConfigsAlg1D = SimpleConfigsGen(playerBridge, intProfTemplate.generateCopy(), regAlg = KNNRegression(playerBridge, 5), numberOfConfigChoices=100, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5))
+adaptationGIMME1D.init(playerBridge, taskBridge, configsGenAlg = simpleConfigsAlg1D, name="GIMME1D")
+
+
+
+intProfTemplate = InteractionsProfile({"dim_0": 0, "dim_1": 0})
+
+simpleConfigsAlg2D = SimpleConfigsGen(playerBridge, intProfTemplate.generateCopy(), regAlg = KNNRegression(playerBridge, 5), numberOfConfigChoices=100, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5))
+adaptationGIMME2D.init(playerBridge, taskBridge, configsGenAlg = simpleConfigsAlg2D, name="GIMME2D")
+
+
+
+intProfTemplate = InteractionsProfile({"dim_0": 0, "dim_1": 0, "dim_2": 0, "dim_3": 0, "dim_4": 0})
+
+simpleConfigsAlg5D = SimpleConfigsGen(playerBridge, intProfTemplate.generateCopy(), regAlg = KNNRegression(playerBridge, 5), numberOfConfigChoices=100, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5))
+adaptationGIMME5D.init(playerBridge, taskBridge, configsGenAlg = simpleConfigsAlg5D, name="GIMME5D")
+
+
+
+intProfTemplate = InteractionsProfile({"dim_0": 0, "dim_1": 0, "dim_2": 0, "dim_3": 0, "dim_4": 0, "dim_5": 0})
+
+simpleConfigsAlg6D = SimpleConfigsGen(playerBridge, intProfTemplate.generateCopy(), regAlg = KNNRegression(playerBridge, 5), numberOfConfigChoices=100, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5))
+adaptationGIMME6D.init(playerBridge, taskBridge, configsGenAlg = simpleConfigsAlg6D, name="GIMME6D")
 
 # ----------------------- [Create Arrays] --------------------------------
 
@@ -349,6 +385,41 @@ accurateProfDiffSTDev = [0  for y in range(maxNumTrainingIterations + numRealIte
 accurateExecTime = 0.0
 
 
+GIMME2DAbilityMeans = [0 for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME2DEngagementMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME2DProfDiffMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME2DAbilitySTDev = [0 for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME2DEngagementSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME2DProfDiffSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME2DExecTime = 0.0
+
+
+GIMME1DAbilityMeans = [0 for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME1DEngagementMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME1DProfDiffMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME1DAbilitySTDev = [0 for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME1DEngagementSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME1DProfDiffSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME1DExecTime = 0.0
+
+
+GIMME5DAbilityMeans = [0 for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME5DEngagementMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME5DProfDiffMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME5DAbilitySTDev = [0 for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME5DEngagementSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME5DProfDiffSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME5DExecTime = 0.0
+
+
+GIMME6DAbilityMeans = [0 for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME6DEngagementMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME6DProfDiffMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME6DAbilitySTDev = [0 for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME6DEngagementSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME6DProfDiffSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME6DExecTime = 0.0
+
 # ----------------------- [Execute Algorithms] ----------------------------
 
 adaptationGIMME.name = "GIMME"
@@ -388,11 +459,23 @@ executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBrid
 	GIMMEOldProfDiffMeans, GIMMEOldProfDiffSTDev, GIMMEOldExecTime, 3)
 
 
+executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
+	taskBridge, adaptationGIMME1D, GIMME1DAbilityMeans, GIMME1DAbilitySTDev, GIMME1DEngagementMeans, GIMME1DEngagementSTDev, 
+	GIMME1DProfDiffMeans, GIMME1DProfDiffSTDev, GIMME1DExecTime, 1)
 
+executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
+	taskBridge, adaptationGIMME2D, GIMME2DAbilityMeans, GIMME2DAbilitySTDev, GIMME2DEngagementMeans, GIMME2DEngagementSTDev, 
+	GIMME2DProfDiffMeans, GIMME2DProfDiffSTDev, GIMME2DExecTime, 2)
+
+executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
+	taskBridge, adaptationGIMME5D, GIMME5DAbilityMeans, GIMME5DAbilitySTDev, GIMME5DEngagementMeans, GIMME5DEngagementSTDev, 
+	GIMME5DProfDiffMeans, GIMME5DProfDiffSTDev, GIMME5DExecTime, 5)
+
+executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
+	taskBridge, adaptationGIMME6D, GIMME6DAbilityMeans, GIMME6DAbilitySTDev, GIMME6DEngagementMeans, GIMME6DEngagementSTDev, 
+	GIMME6DProfDiffMeans, GIMME6DProfDiffSTDev, GIMME6DExecTime, 6)
 
 print("Done!                        ", end="\r")
-
-
 print("Generating plot...                        ", end="\r")
 
 plt = plotBuilder.buildPlot(maxNumTrainingIterations,numRealIterations,
@@ -402,7 +485,10 @@ plt = plotBuilder.buildPlot(maxNumTrainingIterations,numRealIterations,
 
 	accurateAbilitySTDev, randomAbilitySTDev, randomOldAbilitySTDev,
 	GIMMEAbilitySTDev, GIMMEOldAbilitySTDev, 
-	GIMMENoBootAbilitySTDev, GIMMEEPAbilitySTDev
+	GIMMENoBootAbilitySTDev, GIMMEEPAbilitySTDev,
+
+	GIMME1DAbilityMeans, GIMME2DAbilityMeans, GIMME5DAbilityMeans, GIMME6DAbilityMeans,
+	GIMME1DAbilitySTDev, GIMME2DAbilitySTDev, GIMME5DAbilitySTDev, GIMME6DAbilitySTDev
 	)
 
 plt.savefig(newpath+"/charts/chart.png")
