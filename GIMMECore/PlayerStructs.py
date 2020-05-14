@@ -60,6 +60,7 @@ class PlayerStateGrid(object):
 				for state in cell:
 					self.serializedCells.append(state) 
 
+
 	def pushToGrid(self, playerState):
 		padding = self.interactionsProfileTemplate.generateCopy()
 		padding.reset()

@@ -1,9 +1,11 @@
 import math
 from .AlgDefStructs.RegressionAlg import *
 from .AlgDefStructs.ConfigsGenAlg import *
+from .AlgDefStructs.PersonalityEstAlg import *
 
 from .ModelBridge.PlayerModelBridge import PlayerModelBridge 
 from .ModelBridge.TaskModelBridge import TaskModelBridge 
+
 
 class Adaptation(object):
 
@@ -34,7 +36,8 @@ class Adaptation(object):
 		if len(self.playerIds) < self.configsGenAlg.minNumberOfPlayersPerGroup:
 			raise ValueError('Not enough players to form a group.') 
 			return
-			
+		
+
 		adaptedConfig = self.configsGenAlg.organize()
 
 		adaptedGroups = adaptedConfig["groups"]
@@ -42,20 +45,34 @@ class Adaptation(object):
 		adaptedAvgCharacteristics = adaptedConfig["avgCharacteristics"]
 		adaptedConfig["adaptedTaskId"] = -1
 
+		groupStr = "["
 
 		for groupIndex in range(len(adaptedGroups)):
 			currGroup = adaptedGroups[groupIndex]
 			groupProfile = adaptedProfiles[groupIndex]
 			avgState = adaptedAvgCharacteristics[groupIndex]
 		
+			groupStr += "["
+
 			adaptedTaskId = self.selectTask(self.taskIds, groupProfile, avgState)
 			for playerId in currGroup:
+
 				currState = self.playerModelBridge.getPlayerCurrState(playerId)
 				currState.profile = groupProfile	
 				currState.adaptedTaskId = adaptedTaskId	
 				self.playerModelBridge.setPlayerCharacteristics(playerId, currState.characteristics)
 				self.playerModelBridge.setPlayerProfile(playerId, currState.profile)
+
+				groupStr += str(self.playerModelBridge.getPlayerPersonality(playerId).dimensions.values())+",\n"
+
 			adaptedConfig["adaptedTaskId"] = adaptedTaskId
+
+
+			groupStr += ",groupPrf: "+ str(groupProfile.dimensions.values()) +" ],\n\n"
+
+		groupStr += "]"
+		print(groupStr)
+
 		return adaptedConfig
 
 	def selectTask(self,

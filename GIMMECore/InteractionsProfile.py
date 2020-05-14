@@ -18,17 +18,21 @@ class InteractionsProfile(object):
 		return newVar
 
 	def normalize(self):
-		if(len(self.dimensions)>2):
+		self = self.normalized()
+		
+	def normalized(self):
+		clone = self.generateCopy() 
+		if(len(clone.dimensions)>2):
 			total = 0
-			for key in self.dimensions:
-				total += self.dimensions[key]
+			for key in clone.dimensions:
+				total += clone.dimensions[key]
 			if(total==0):
-				for key in self.dimensions:
-					self.dimensions[key] = 0.25
+				for key in clone.dimensions:
+					clone.dimensions[key] = 1/len(clone.dimensions)
 			else:
-				for key in self.dimensions:
-					self.dimensions[key] = self.dimensions[key]/total
-
+				for key in clone.dimensions:
+					clone.dimensions[key] = clone.dimensions[key]/total
+		return clone
 	
 
 	def sqrDistanceBetween(self, profileToTest):
