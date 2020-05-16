@@ -1,14 +1,17 @@
 import math
 import copy
+import random
 
 class InteractionsProfile(object):
 
 	def __init__(self, dimensions = {}):
 		self.dimensions = dimensions
+		self.normalize()
 
 	def reset(self):
 		for key in self.dimensions:
 			self.dimensions[key] = 0
+		return self.normalize()
 
 	def generateCopy(self):
 		keys = list(self.dimensions.keys())
@@ -18,22 +21,41 @@ class InteractionsProfile(object):
 		return newVar
 
 	def normalize(self):
-		self = self.normalized()
-		
+		self.normalization(self)
+
 	def normalized(self):
 		clone = self.generateCopy() 
-		if(len(clone.dimensions)>2):
-			total = 0
-			for key in clone.dimensions:
-				total += clone.dimensions[key]
-			if(total==0):
-				for key in clone.dimensions:
-					clone.dimensions[key] = 1/len(clone.dimensions)
-			else:
-				for key in clone.dimensions:
-					clone.dimensions[key] = clone.dimensions[key]/total
-		return clone
+		return self.normalization(clone)
 	
+	def normalization(self, profile):
+		if(len(profile.dimensions)>2):
+			total = 0
+			for key in profile.dimensions:
+				total += profile.dimensions[key]
+			if(total==0):
+				for key in profile.dimensions:
+					profile.dimensions[key] = 1/len(profile.dimensions)
+			else:
+				for key in profile.dimensions:
+					profile.dimensions[key] = profile.dimensions[key]/total
+		return profile
+
+
+
+	def randomize(self):
+		self.randomization(self)
+
+	def randomized(self):
+		clone = self.generateCopy() 
+		return self.randomization(clone)
+
+	def randomization(self, profile):
+		profile.reset()
+		for key in profile.dimensions:
+			profile.dimensions[key] = random.uniform(0.0, 1.0)
+		profile.normalize()
+		return profile
+
 
 	def sqrDistanceBetween(self, profileToTest):
 		cost = self.generateCopy()

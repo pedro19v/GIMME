@@ -13,20 +13,33 @@ class PersonalityEstAlg(ABC):
 
 
 class SimplePersonalityEstAlg(PersonalityEstAlg):
-	def __init__(self, playerModelBridge, qualityFunc):
+	def __init__(self, playerModelBridge, interactionsProfileTemplate, regAlg, numTestedPlayerProfiles = 100, qualityWeights = PlayerCharacteristics(ability = 0.5, engagement = 0.5)):
 		super().__init__(playerModelBridge)
 		self.playerModelBridge = playerModelBridge
-		self.qualityFunc = qualityFunc
+		self.qualityWeights = qualityWeights
 
-		self.bestQualities = {}
+		self.numTestedPlayerProfiles = numTestedPlayerProfiles
+		self.interactionsProfileTemplate = interactionsProfileTemplate
 
+		self.regAlg = regAlg
+
+	def calcQuality(self, state):
+		return self.qualityWeights.ability*state.characteristics.ability + self.qualityWeights.engagement*state.characteristics.engagement
+	
 	def updateEstimates(self):
 		playerIds = self.playerModelBridge.getAllPlayerIds()
-		for player in playerIds:
-			currPersonalityEst = self.playerModelBridge.getPlayerPersonalityEst(player)
-			currPersonalityQuality = self.bestQualities[playerId]
-			lastDataPoint = self.playerModelBridge.getPlayerCurrState(player)
-			quality = self.qualityFunc(lastDataPoint)
-			if quality > currPersonalityQuality:
-				self.bestQualities[playerId] = currPersonalityQuality
-				self.playerModelBridge.setPersonalityEst(player, lastDataPoint.profile)
+		for playerId in playerIds:
+			currPersonalityEst = self.playerModelBridge.getPlayerPersonalityEst(playerId)
+			newPersonalityEst = currPersonalityEst
+			if(currPersonalityEst != None):
+				bestQuality = self.calcQuality(self.regAlg.predict(currPersonalityEst, playerId))
+			else:
+				bestQuality = -1
+			for i in range(self.numTestedPlayerProfiles):
+				profile = self.interactionsProfileTemplate.generateCopy().randomized()
+				currQuality = self.calcQuality(self.regAlg.predict(profile, playerId))
+				if currQuality >= bestQuality:
+					bestQuality = currQuality
+					newPersonalityEst = profile
+
+			self.playerModelBridge.setPlayerPersonalityEst(playerId, newPersonalityEst)

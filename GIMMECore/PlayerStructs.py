@@ -13,6 +13,7 @@ class PlayerCharacteristics(object):
 	def reset(self):
 		self.ability = 0
 		self.engagement = 0
+		return self
 
 class PlayerState(object):
 	def __init__(self, creationTime = time.time(), profile = InteractionsProfile(), characteristics = PlayerCharacteristics(), dist = -1):
@@ -28,6 +29,7 @@ class PlayerState(object):
 		self.profile.reset()
 		self.dist = -1
 		self.groupId = -1
+		return self
 
 
 class PlayerStateGrid(object):
@@ -59,7 +61,7 @@ class PlayerStateGrid(object):
 			for cell in self.cells:
 				for state in cell:
 					self.serializedCells.append(state) 
-
+		return self
 
 	def pushToGrid(self, playerState):
 		padding = self.interactionsProfileTemplate.generateCopy()

@@ -7,6 +7,7 @@ class PlayerModelMock(object):
 		self.id = id
 		self.name = name
 		self.pastModelIncreasesGrid = pastModelIncreasesGrid
+
 		self.personalityEst = personalityEst.normalized()
 		self.realPersonality = realPersonality.normalized()
 		self.baseLearningRate = None

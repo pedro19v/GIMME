@@ -28,6 +28,8 @@ numRealIterations = 20
 preferredNumberOfPlayersPerGroup = 3
 numberOfConfigChoices = 100
 
+numTestedPlayerProfilesInEst = 100
+
 playerWindow = 10
 numPlayers = 9
 
@@ -123,18 +125,21 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 	for d in range(numInteractionDimensions):
 		profileTemplate.dimensions["dim_"+str(d)] = 0.0
 
+	
+
 
 	# create players and tasks
 	for x in range(numPlayers):
-		playerBridge.registerNewPlayer(int(x), "name", PlayerState(creationTime = time.time(), profile = profileTemplate.generateCopy()), PlayerStateGrid(profileTemplate.generateCopy(), numCells = 1, maxProfilesPerCell = playerWindow), PlayerCharacteristics(), profileTemplate.generateCopy(), profileTemplate.generateCopy())
+		playerBridge.registerNewPlayer(int(x), "name", PlayerState(profile = profileTemplate.generateCopy()), 
+			PlayerStateGrid(profileTemplate.generateCopy(), numCells = 1, maxProfilesPerCell = playerWindow), 
+			PlayerCharacteristics(), profileTemplate.generateCopy(), profileTemplate.generateCopy())
 	for x in range(20):
-		taskBridge.registerNewTask(int(x), "description", random.uniform(0, 1), profileTemplate.generateCopy(), datetime.timedelta(minutes=1), 0.5, 0.5)
+		taskBridge.registerNewTask(int(x), "description", random.uniform(0, 1), profileTemplate.generateCopy(), 
+			datetime.timedelta(minutes=1), 0.5, 0.5)
 
 
 
 	for r in range(numRuns):
-		breakpoint()
-
 		realPersonalities = []
 		EPdimensions = [{"dim_0":1,"dim_1":0,"dim_2":0},{"dim_0":0,"dim_1":1,"dim_2":0},{"dim_0":0,"dim_1":0,"dim_2":1}]		
 		# EPdimensions = [{"dim_0":1,"dim_1":0,"dim_2":0,"dim_3":0},{"dim_0":0,"dim_1":1,"dim_2":0,"dim_3":0},{"dim_0":0,"dim_1":0,"dim_2":1,"dim_3":0},{"dim_0":0,"dim_1":0,"dim_2":0,"dim_3":1}]		
@@ -277,9 +282,32 @@ questionnairePersonalities = []
 
 # ----------------------- [Init Algorithms] --------------------------------
 # - - - - - 
+
+regAlg = KNNRegression(playerBridge, 5)
+
 intProfTemplate = InteractionsProfile({"dim_0": 0, "dim_1": 0, "dim_2": 0})
 
-simpleConfigsAlgOld = SimpleConfigsGen(playerBridge, intProfTemplate.generateCopy(), regAlg = KNNRegression(playerBridge, 5), persEstAlg = SimplePersonalityEstAlg(playerBridge, SimpleConfigsGen.calcQuality), numberOfConfigChoices=numberOfConfigChoices, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5))
+# simpleConfigsAlgOld = SimpleConfigsGenVer1(
+# 	playerBridge, 
+# 	intProfTemplate.generateCopy(), 
+# 	regAlg, 
+# 	persEstAlg = SimplePersonalityEstAlg(
+# 		playerBridge, 
+# 		intProfTemplate.generateCopy(), 
+# 		regAlg,
+# 		numTestedPlayerProfiles = numTestedPlayerProfilesInEst, 
+# 		qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)), 
+# 	numberOfConfigChoices = numberOfConfigChoices, 
+# 	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
+# 	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5))
+simpleConfigsAlgOld = SimpleConfigsGenVer2(
+	playerBridge, 
+	intProfTemplate.generateCopy(), 
+	regAlg, 
+	numTestedGroupProfiles = numTestedPlayerProfilesInEst,
+	numberOfConfigChoices = numberOfConfigChoices, 
+	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
+	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5))
 adaptationGIMMEOld.init(playerBridge, taskBridge, configsGenAlg = simpleConfigsAlgOld, name="GIMMEOld")
 
 randomOldConfigsAlg = RandomConfigsGen(playerBridge, intProfTemplate.generateCopy(), preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup)
@@ -288,7 +316,19 @@ adaptationRandomOld.init(playerBridge, taskBridge, configsGenAlg = randomOldConf
 # - - - - - 
 intProfTemplate = InteractionsProfile({"dim_0": 0, "dim_1": 0, "dim_2": 0, "dim_3": 0})
 
-simpleConfigsAlg = SimpleConfigsGen(playerBridge, intProfTemplate.generateCopy(), regAlg = KNNRegression(playerBridge, 5), persEstAlg = SimplePersonalityEstAlg(playerBridge, SimpleConfigsGen.calcQuality), numberOfConfigChoices=numberOfConfigChoices, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5))
+simpleConfigsAlg = SimpleConfigsGenVer1(
+	playerBridge, 
+	intProfTemplate.generateCopy(), 
+	regAlg, 
+	persEstAlg = SimplePersonalityEstAlg(
+		playerBridge, 
+		intProfTemplate.generateCopy(), 
+		regAlg,
+		numTestedPlayerProfiles = numTestedPlayerProfilesInEst, 
+		qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)), 
+	numberOfConfigChoices = numberOfConfigChoices, 
+	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
+	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5))
 adaptationGIMME.init(playerBridge, taskBridge, configsGenAlg = simpleConfigsAlg, name="GIMME")
 
 randomConfigsAlg = RandomConfigsGen(playerBridge, intProfTemplate.generateCopy(), preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup)
@@ -302,28 +342,76 @@ adaptationAccurate.init(playerBridge, taskBridge, configsGenAlg = accurateConfig
 
 intProfTemplate = InteractionsProfile({"dim_0": 0})
 
-simpleConfigsAlg1D = SimpleConfigsGen(playerBridge, intProfTemplate.generateCopy(), regAlg = KNNRegression(playerBridge, 5), persEstAlg = SimplePersonalityEstAlg(playerBridge, SimpleConfigsGen.calcQuality), numberOfConfigChoices=numberOfConfigChoices, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5))
+simpleConfigsAlg1D = SimpleConfigsGenVer1(
+	playerBridge, 
+	intProfTemplate.generateCopy(), 
+	regAlg, 
+	persEstAlg = SimplePersonalityEstAlg(
+		playerBridge, 
+		intProfTemplate.generateCopy(), 
+		regAlg,
+		numTestedPlayerProfiles = numTestedPlayerProfilesInEst, 
+		qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)), 
+	numberOfConfigChoices = numberOfConfigChoices, 
+	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
+	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5))
 adaptationGIMME1D.init(playerBridge, taskBridge, configsGenAlg = simpleConfigsAlg1D, name="GIMME1D")
 
 
 
 intProfTemplate = InteractionsProfile({"dim_0": 0, "dim_1": 0})
 
-simpleConfigsAlg2D = SimpleConfigsGen(playerBridge, intProfTemplate.generateCopy(), regAlg = KNNRegression(playerBridge, 5), persEstAlg = SimplePersonalityEstAlg(playerBridge, SimpleConfigsGen.calcQuality), numberOfConfigChoices=numberOfConfigChoices, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5))
+simpleConfigsAlg2D = SimpleConfigsGenVer1(
+	playerBridge, 
+	intProfTemplate.generateCopy(), 
+	regAlg, 
+	persEstAlg = SimplePersonalityEstAlg(
+		playerBridge, 
+		intProfTemplate.generateCopy(), 
+		regAlg,
+		numTestedPlayerProfiles = numTestedPlayerProfilesInEst, 
+		qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)), 
+	numberOfConfigChoices = numberOfConfigChoices, 
+	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
+	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5))
 adaptationGIMME2D.init(playerBridge, taskBridge, configsGenAlg = simpleConfigsAlg2D, name="GIMME2D")
 
 
 
 intProfTemplate = InteractionsProfile({"dim_0": 0, "dim_1": 0, "dim_2": 0, "dim_3": 0, "dim_4": 0})
 
-simpleConfigsAlg5D = SimpleConfigsGen(playerBridge, intProfTemplate.generateCopy(), regAlg = KNNRegression(playerBridge, 5), persEstAlg = SimplePersonalityEstAlg(playerBridge, SimpleConfigsGen.calcQuality), numberOfConfigChoices=numberOfConfigChoices, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5))
+simpleConfigsAlg5D = SimpleConfigsGenVer1(
+	playerBridge, 
+	intProfTemplate.generateCopy(), 
+	regAlg, 
+	persEstAlg = SimplePersonalityEstAlg(
+		playerBridge, 
+		intProfTemplate.generateCopy(), 
+		regAlg,
+		numTestedPlayerProfiles = numTestedPlayerProfilesInEst, 
+		qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)), 
+	numberOfConfigChoices = numberOfConfigChoices, 
+	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
+	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5))
 adaptationGIMME5D.init(playerBridge, taskBridge, configsGenAlg = simpleConfigsAlg5D, name="GIMME5D")
 
 
 
 intProfTemplate = InteractionsProfile({"dim_0": 0, "dim_1": 0, "dim_2": 0, "dim_3": 0, "dim_4": 0, "dim_5": 0})
 
-simpleConfigsAlg6D = SimpleConfigsGen(playerBridge, intProfTemplate.generateCopy(), regAlg = KNNRegression(playerBridge, 5), persEstAlg = SimplePersonalityEstAlg(playerBridge, SimpleConfigsGen.calcQuality), numberOfConfigChoices=numberOfConfigChoices, preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5))
+simpleConfigsAlg6D = SimpleConfigsGenVer1(
+	playerBridge, 
+	intProfTemplate.generateCopy(), 
+	regAlg, 
+	persEstAlg = SimplePersonalityEstAlg(
+		playerBridge, 
+		intProfTemplate.generateCopy(), 
+		regAlg,
+		numTestedPlayerProfiles = numTestedPlayerProfilesInEst, 
+		qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)), 
+	numberOfConfigChoices = numberOfConfigChoices, 
+	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
+	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5))
 adaptationGIMME6D.init(playerBridge, taskBridge, configsGenAlg = simpleConfigsAlg6D, name="GIMME6D")
 
 # ----------------------- [Create Arrays] --------------------------------

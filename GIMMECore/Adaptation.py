@@ -63,7 +63,7 @@ class Adaptation(object):
 				self.playerModelBridge.setPlayerCharacteristics(playerId, currState.characteristics)
 				self.playerModelBridge.setPlayerProfile(playerId, currState.profile)
 
-				groupStr += str(self.playerModelBridge.getPlayerPersonality(playerId).dimensions.values())+",\n"
+				groupStr += str(self.playerModelBridge.getPlayerRealPersonality(playerId).dimensions.values())+",\n"
 
 			adaptedConfig["adaptedTaskId"] = adaptedTaskId
 
