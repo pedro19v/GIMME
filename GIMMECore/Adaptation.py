@@ -71,7 +71,7 @@ class Adaptation(object):
 			groupStr += ",groupPrf: "+ str(groupProfile.dimensions.values()) +" ],\n\n"
 
 		groupStr += "]"
-		print(groupStr)
+		# print(groupStr)
 
 		return adaptedConfig
 

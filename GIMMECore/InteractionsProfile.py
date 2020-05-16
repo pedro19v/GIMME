@@ -21,7 +21,7 @@ class InteractionsProfile(object):
 		return newVar
 
 	def normalize(self):
-		self.normalization(self)
+		return self.normalization(self)
 
 	def normalized(self):
 		clone = self.generateCopy() 
@@ -43,7 +43,7 @@ class InteractionsProfile(object):
 
 
 	def randomize(self):
-		self.randomization(self)
+		return self.randomization(self)
 
 	def randomized(self):
 		clone = self.generateCopy() 

@@ -1,2 +1,2 @@
 maxNumTrainingIterations = 20
-numRealIterations = 20
+numRealIterations = 8

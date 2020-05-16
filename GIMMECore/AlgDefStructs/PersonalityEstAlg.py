@@ -36,7 +36,7 @@ class SimplePersonalityEstAlg(PersonalityEstAlg):
 			else:
 				bestQuality = -1
 			for i in range(self.numTestedPlayerProfiles):
-				profile = self.interactionsProfileTemplate.generateCopy().randomized()
+				profile = self.interactionsProfileTemplate.generateCopy().randomize()
 				currQuality = self.calcQuality(self.regAlg.predict(profile, playerId))
 				if currQuality >= bestQuality:
 					bestQuality = currQuality
