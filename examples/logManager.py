@@ -1,3 +1,5 @@
+from abc import ABC, abstractmethod
+
 
 class LogManager(ABC):
 
@@ -5,7 +7,7 @@ class LogManager(ABC):
 		pass
 
 	@abstractmethod
-    def writeToLog(database, table, argsNValues):
+	def writeToLog(self, database, table, argsNValues):
 		pass
 
 
@@ -17,8 +19,7 @@ class SilentLogManager(LogManager):
 	def __init__(self):
 		pass
 
-	@abstractmethod
-    def writeToLog(database, table, argsNValues):
+	def writeToLog(self, database, table, argsNValues):
 		pass
 
 class DebugLogManager(LogManager):
@@ -26,8 +27,7 @@ class DebugLogManager(LogManager):
 	def __init__(self):
 		pass
 
-	@abstractmethod
-    def writeToLog(database, table, argsNValues):
+	def writeToLog(self, database, table, argsNValues):
 		pass
 
 
@@ -42,8 +42,7 @@ class MongoDBLogManager(LogManager):
 	def __init__(self):
 		pass
 
-	@abstractmethod
-    def writeToLog(database, table, argsNValues):
+	def writeToLog(self, database, table, argsNValues):
 		pass
 
 
@@ -51,20 +50,27 @@ class MongoDBLogManager(LogManager):
 # ----------------------------------------------------------
 
 import csv
+import os
 
 class CSVLogManager(LogManager):
 
-	def __init__(self):
-		self.wroteHeader = False;
+	def __init__(self, filePath):
+		self.filePath = filePath
+		self.wroteHeader = False
 
-	@abstractmethod
-    def writeToLog(database, table, argsNValues):
-    	with open(table+".csv", "wb") as csvfile:
-		    fieldnames = argsNValues.keys
-		    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+	def writeToLog(self, database, table, argsNValues):
+		newFilePath = self.filePath + database +"/"
+		if not os.path.exists(newFilePath):
+			self.wroteHeader = False;
+			os.makedirs(newFilePath)
+		newFilePath = newFilePath + table + ".csv"
 
-		    if(!self.wroteHeader):
-		    	writer.writeheader()
-		    	self.wroteHeader = True
-		    	
-		    writer.writerow(argsNValues)
+		with open(newFilePath, "a", newline='') as csvfile:
+			fieldnames = list(argsNValues.keys())
+			writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+			if not self.wroteHeader:
+				writer.writeheader()
+				self.wroteHeader = True
+
+			writer.writerow(argsNValues)
