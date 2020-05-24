@@ -40,27 +40,35 @@ class PlayerStateGrid(object):
 		self.dimSpan = math.ceil(numCells**(1.0/float(4))) #floor of root 4
 		self.numCells = self.dimSpan**4
 		
+		self.numCellStates = 0
+
 		self.initialCells = cells
 		if(self.initialCells == None):
 			self.cells = [[] for i in range(self.numCells)]
 			self.serializedCells = []
+			self.numCellStates = 0
 		else:
 			self.cells = cells
 			self.serializedCells = []
+			self.numCellStates = 0
 			for cell in self.cells:
 				for state in cell:
 					self.serializedCells.append(state) 
+					self.numCellStates = self.numCellStates + 1
 
 	def reset(self):
 		if(self.initialCells == None):
 			self.cells = [[] for i in range(self.numCells)]
 			self.serializedCells = []
+			self.numCellStates = 0
 		else:
 			self.cells = cells
 			self.serializedCells = []
+			self.numCellStates = 0
 			for cell in self.cells:
 				for state in cell:
 					self.serializedCells.append(state) 
+					self.numCellStates = self.numCellStates + 1
 		return self
 
 	def pushToGrid(self, playerState):
@@ -80,11 +88,13 @@ class PlayerStateGrid(object):
 		
 		currCell.append(playerState)
 		self.serializedCells.append(playerState)
+		self.numCellStates = self.numCellStates + 1
 		
 		cellsSize = len(self.cells[currCellInd])
 		if (cellsSize > self.maxProfilesPerCell):
 			stateToDelete = currCell[0]
 			self.serializedCells.remove(stateToDelete)
+			self.numCellStates = self.numCellStates - 1
 			currCell = currCell[-self.maxProfilesPerCell:]
 
 		self.cells[currCellInd] = currCell
@@ -92,3 +102,6 @@ class PlayerStateGrid(object):
 	def getAllStates(self):
 		# serialize multi into single dimensional array
 		return self.serializedCells
+
+	def getNumStates(self):
+		return self.numCellStates

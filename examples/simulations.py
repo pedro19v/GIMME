@@ -21,9 +21,9 @@ import plotBuilder
 
 random.seed(time.perf_counter())
 
-numRuns = 100
+numRuns = 300
 maxNumTrainingIterations = 20
-numRealIterations = 8
+numRealIterations = 20
 
 preferredNumberOfPlayersPerGroup = 3
 numberOfConfigChoices = 500
@@ -120,9 +120,9 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 
 	# create players and tasks
 	for x in range(numPlayers):
-		playerBridge.registerNewPlayer(int(x), "name", PlayerState(profile = profileTemplate.generateCopy()), 
+		playerBridge.registerNewPlayer(int(x), "name", PlayerState(profile = profileTemplate.generateCopy().reset()), 
 			PlayerStateGrid(profileTemplate.generateCopy(), numCells = 1, maxProfilesPerCell = playerWindow), 
-			PlayerCharacteristics(), profileTemplate.generateCopy(), profileTemplate.generateCopy())
+			PlayerCharacteristics(), profileTemplate.generateCopy().reset(), profileTemplate.generateCopy().reset())
 	for x in range(20):
 		taskBridge.registerNewTask(int(x), "description", random.uniform(0, 1), profileTemplate.generateCopy(), 
 			datetime.timedelta(minutes=1), 0.5, 0.5)
@@ -158,7 +158,7 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 			profile = profileTemplate.generateCopy()
 			currRealPersonality = realPersonalities[x]
 			for d in range(numInteractionDimensions):
-				profile.dimensions["dim_"+str(d)] = numpy.clip(random.gauss(currRealPersonality.dimensions["dim_"+str(d)], 0.2),0,1)
+				profile.dimensions["dim_"+str(d)] = numpy.clip(random.gauss(currRealPersonality.dimensions["dim_"+str(d)], 0.1),0,1)
 			questionnairePersonalities.append(profile)
 			questionnairePersonalities[x].normalize()
 
@@ -167,26 +167,33 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 			adaptation.configsGenAlg.reset()
 			playerBridge.resetPlayer(x)
 
-			playerBridge.setPlayerPersonalityEst(x, profileTemplate.generateCopy().reset())
-			playerBridge.setPlayerRealPersonality(x, profileTemplate.generateCopy().reset())
-			
+			playerBridge.setPlayerPersonalityEst(x, intProfTemplate.generateCopy().reset())
+			# realPersonality = realPersonalities[x]
+			# playerBridge.setPlayerRealPersonality(x, realPersonality)
+
+			questionnairePersonality = questionnairePersonalities[x]
+			playerBridge.setPlayerRealPersonality(x, questionnairePersonality)
+
 
 			# has bootstrap
-			if(maxNumTrainingIterations > 0):
-				personality = questionnairePersonalities[x]
-				playerBridge.setPlayerPersonalityEst(x, personality)
-			realPersonality = realPersonalities[x]
-			playerBridge.setPlayerRealPersonality(x, realPersonality)
+			# if(maxNumTrainingIterations > 0):
+			# 	personality = questionnairePersonalities[x]
+			# 	playerBridge.setPlayerPersonalityEst(x, personality)
+
 
 			playerBridge.setBaseLearningRate(x, random.gauss(0.5, 0.16))
 
-		breakpoint()
 
-		# executionPhase(playerBridge, maxNumTrainingIterations, firstTrainingI, r, adaptation, abilityMatrix, engagementMatrix, profDiffMatrix, avgItExecTime, canExport)
+		# breakpoint()
+
+		executionPhase(playerBridge, maxNumTrainingIterations, firstTrainingI, r, adaptation, abilityMatrix, engagementMatrix, profDiffMatrix, avgItExecTime, canExport)
 	
-		# # change for "real" personality from which the predictions supposidely are based on...
-		# for x in range(numPlayers):
-		# 	playerBridge.resetState(x)
+		# change for "real" personality from which the predictions supposidely are based on...
+		for x in range(numPlayers):
+			playerBridge.resetState(x)
+
+			realPersonality = realPersonalities[x]
+			playerBridge.setPlayerRealPersonality(x, realPersonality)
 
 		executionPhase(playerBridge, numRealIterations, firstRealI, r, adaptation, abilityMatrix, engagementMatrix, profDiffMatrix, avgItExecTime, canExport)
 
@@ -522,7 +529,144 @@ GIMME6DEngagementSTDev = [0  for y in range(maxNumTrainingIterations + numRealIt
 GIMME6DProfDiffSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
 GIMME6DExecTime = 0.0
 
+
+
+adaptationInitStr = """
+GIMMEEPAbilityMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMEEPEngagementMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMEEPProfDiffMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMEEPAbilitySTDev = [0 for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMEEPEngagementSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMEEPProfDiffSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMEEPExecTime = 0.0
+
+
+GIMMEOldAbilityMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMEOldEngagementMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMEOldProfDiffMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMEOldAbilitySTDev = [0 for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMEOldEngagementSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMEOldProfDiffSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMEOldExecTime = 0.0
+
+
+GIMMENoBootAbilityMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMENoBootEngagementMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMENoBootProfDiffMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMENoBootAbilitySTDev = [0 for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMENoBootEngagementSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMENoBootProfDiffSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMENoBootExecTime = 0.0
+
+GIMMEAbilityMeans = [0 for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMEEngagementMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMEProfDiffMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMEAbilitySTDev = [0 for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMEEngagementSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMEProfDiffSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMEExecTime = 0.0
+
+GIMMEGridAbilityMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMEGridEngagementMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMEGridProfDiffMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMEGridAbilitySTDev = [0 for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMEGridEngagementSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMEGridProfDiffSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMEGridExecTime = 0.0
+
+GIMMEEvAbilityMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMEEvEngagements = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMEEvPrefProfDiff = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMEEvAbilitySTDev = [0 for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMEEvEngagementSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMEEvProfDiffSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMMEEvExecTime = 0.0
+
+randomAbilityMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+randomEngagementMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+randomProfDiffMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+randomAbilitySTDev = [0 for y in range(maxNumTrainingIterations + numRealIterations)]
+randomEngagementSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+randomProfDiffSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+randomExecTime = 0.0
+
+randomOldAbilityMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+randomOldEngagementMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+randomOldProfDiffMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+randomOldAbilitySTDev = [0 for y in range(maxNumTrainingIterations + numRealIterations)]
+randomOldEngagementSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+randomOldProfDiffSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+randomOldExecTime = 0.0
+
+
+accurateAbilityMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+accurateEngagementMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+accurateProfDiffMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+accurateAbilitySTDev = [0 for y in range(maxNumTrainingIterations + numRealIterations)]
+accurateEngagementSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+accurateProfDiffSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+accurateExecTime = 0.0
+
+
+GIMME2DAbilityMeans = [0 for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME2DEngagementMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME2DProfDiffMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME2DAbilitySTDev = [0 for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME2DEngagementSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME2DProfDiffSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME2DExecTime = 0.0
+
+
+GIMME1DAbilityMeans = [0 for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME1DEngagementMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME1DProfDiffMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME1DAbilitySTDev = [0 for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME1DEngagementSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME1DProfDiffSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME1DExecTime = 0.0
+
+
+GIMME5DAbilityMeans = [0 for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME5DEngagementMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME5DProfDiffMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME5DAbilitySTDev = [0 for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME5DEngagementSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME5DProfDiffSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME5DExecTime = 0.0
+
+
+GIMME6DAbilityMeans = [0 for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME6DEngagementMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME6DProfDiffMeans = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME6DAbilitySTDev = [0 for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME6DEngagementSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME6DProfDiffSTDev = [0  for y in range(maxNumTrainingIterations + numRealIterations)]
+GIMME6DExecTime = 0.0
+	"""
+
+
+
+f = open(newpath+"/results.py", "a")
+f.write(adaptationInitStr)
+f.write("\n")
+f.close()
+
+f2 = open("./latestResults.py", "a")
+f2.write(adaptationInitStr)
+f2.write("\n")
+f2.close()
+
+
 # ----------------------- [Execute Algorithms] ----------------------------
+
+
+
+adaptationGIMME.name = "GIMME"
+executeSimulations(maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
+	taskBridge, adaptationGIMME, GIMMEAbilityMeans, GIMMEAbilitySTDev, GIMMEEngagementMeans, GIMMEEngagementSTDev, 
+	GIMMEProfDiffMeans, GIMMEProfDiffSTDev, GIMMEExecTime, 4)
+
+
 
 
 adaptationGIMME.name = "GIMMENoBoot"
@@ -539,13 +683,6 @@ executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBrid
 # 	4, considerExtremePersonalityValues = True)
 
 
-adaptationGIMME.name = "GIMME"
-executeSimulations(maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-	taskBridge, adaptationGIMME, GIMMEAbilityMeans, GIMMEAbilitySTDev, GIMMEEngagementMeans, GIMMEEngagementSTDev, 
-	GIMMEProfDiffMeans, GIMMEProfDiffSTDev, GIMMEExecTime, 4)
-
-
-
 
 
 # adaptationGIMME.name = "GIMMEEP"
@@ -557,11 +694,10 @@ executeSimulations(maxNumTrainingIterations, 0, numRealIterations, maxNumTrainin
 
 
 
-
-
 executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
 	taskBridge, adaptationAccurate, accurateAbilityMeans, accurateAbilitySTDev, accurateEngagementMeans, accurateEngagementSTDev, 
 	accurateProfDiffMeans, accurateProfDiffSTDev, accurateExecTime, 4)
+
 
 executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
 	taskBridge, adaptationRandom, randomAbilityMeans, randomAbilitySTDev, randomEngagementMeans, randomEngagementSTDev, 

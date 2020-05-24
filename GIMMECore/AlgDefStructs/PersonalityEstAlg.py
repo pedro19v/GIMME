@@ -29,6 +29,7 @@ class SimplePersonalityEstAlg(PersonalityEstAlg):
 	def updateEstimates(self):
 		playerIds = self.playerModelBridge.getAllPlayerIds()
 		for playerId in playerIds:
+			
 			currPersonalityEst = self.playerModelBridge.getPlayerPersonalityEst(playerId)
 			newPersonalityEst = currPersonalityEst
 			if(currPersonalityEst != None):
@@ -43,3 +44,4 @@ class SimplePersonalityEstAlg(PersonalityEstAlg):
 					newPersonalityEst = profile
 
 			self.playerModelBridge.setPlayerPersonalityEst(playerId, newPersonalityEst)
+		# breakpoint()

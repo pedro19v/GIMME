@@ -131,10 +131,17 @@ class RandomConfigsGen(ConfigsGenAlg):
 		for groupI in range(newConfigSize):
 			group = newGroups[groupI]
 			groupSize = len(group)
-			
+
+
+			profile = self.interactionsProfileTemplate.generateCopy()			
 			# generate random profile
-			profile = self.interactionsProfileTemplate.generateCopy().randomize()
+			for currPlayer in group:
+				random = self.interactionsProfileTemplate.generateCopy().randomize()
+				for dim in profile.dimensions:
+					profile.dimensions[dim] += random.dimensions[dim] / newConfigSize
+			profile.normalize()
 			newConfigProfiles.append(profile)
+
 
 			currAvgCharacteristics = PlayerCharacteristics().reset()
 			for currPlayer in group:
@@ -159,14 +166,50 @@ class SimpleConfigsGenVer1(ConfigsGenAlg):
 
 	def calcQuality(self, state):
 		return self.qualityWeights.ability*state.characteristics.ability + self.qualityWeights.engagement*state.characteristics.engagement
-			
+	
+	# def organize(self):
+	# 	playerIds = self.playerModelBridge.getAllPlayerIds() 
+	# 	minNumGroups = math.ceil(len(playerIds) / self.maxNumberOfPlayersPerGroup)
+	# 	maxNumGroups = math.floor(len(playerIds) / self.minNumberOfPlayersPerGroup)
+		
+	# 	newConfigProfiles = []
+	# 	newAvgCharacteristics = []
+		
+	# 	newGroups = self.randomConfigGenerator(playerIds, minNumGroups, maxNumGroups)
+	# 	newConfigSize = len(newGroups)		
+	# 	# generate profiles
+	# 	for groupI in range(newConfigSize):
+	# 		group = newGroups[groupI]
+	# 		groupSize = len(group)
+
+
+	# 		profile = self.interactionsProfileTemplate.generateCopy()			
+	# 		# generate random profile
+	# 		for currPlayer in group:
+	# 			# personality = self.playerModelBridge.getPlayerPersonalityEst(currPlayer)
+	# 			random = self.interactionsProfileTemplate.generateCopy().randomize()
+	# 			for dim in profile.dimensions:
+	# 				profile.dimensions[dim] += random.dimensions[dim] / newConfigSize
+	# 		profile.normalize()
+	# 		newConfigProfiles.append(profile)
+
+	# 		currAvgCharacteristics = PlayerCharacteristics().reset()
+	# 		for currPlayer in group:
+	# 			currState = self.playerModelBridge.getPlayerCurrState(currPlayer)
+	# 			currAvgCharacteristics.ability += currState.characteristics.ability / groupSize
+	# 			currAvgCharacteristics.engagement += currState.characteristics.engagement / groupSize
+	# 		currAvgCharacteristics.profile = profile
+	# 		newAvgCharacteristics.append(currAvgCharacteristics)
+
+	# 	self.updateMetrics(newGroups)
+	# 	return {"groups": newGroups, "profiles": newConfigProfiles, "avgCharacteristics": newAvgCharacteristics}
+	
 	def organize(self):
 		playerIds = self.playerModelBridge.getAllPlayerIds() 
 		minNumGroups = math.ceil(len(playerIds) / self.maxNumberOfPlayersPerGroup)
 		maxNumGroups = math.floor(len(playerIds) / self.minNumberOfPlayersPerGroup)
 
 		currMaxQuality = -float("inf")
-
 		bestGroups = []
 		bestConfigProfiles = []
 		bestAvgCharacteristics = []
@@ -178,6 +221,7 @@ class SimpleConfigsGenVer1(ConfigsGenAlg):
 		# generate several random groups, calculate their fitness and select the best one
 		for i in range(self.numberOfConfigChoices):
 			
+			# generate several random groups
 			newGroups = self.randomConfigGenerator(playerIds, minNumGroups, maxNumGroups)
 			newConfigSize = len(newGroups)
 			currQuality = 0.0
@@ -195,8 +239,8 @@ class SimpleConfigsGenVer1(ConfigsGenAlg):
 				for currPlayer in group:
 					personality = self.playerModelBridge.getPlayerPersonalityEst(currPlayer)
 					for dim in profile.dimensions:
-						profile.dimensions[dim] += personality.dimensions[dim]/newConfigSize
-					profile.normalize()
+						profile.dimensions[dim] += personality.dimensions[dim] / newConfigSize
+				profile.normalize()
 				newConfigProfiles.append(profile)
 
 
@@ -322,6 +366,9 @@ class AccurateConfigsGen(ConfigsGenAlg):
 	def updateCurrIteration(self, newCurrIteration):
 		self.currIteration = newCurrIteration
 
+	def calcQuality(self, state):
+		return self.qualityWeights.ability*state.characteristics.ability + self.qualityWeights.engagement*state.characteristics.engagement
+	
 	def organize(self):
 		playerIds = self.playerModelBridge.getAllPlayerIds() 
 		minNumGroups = math.ceil(len(playerIds) / self.maxNumberOfPlayersPerGroup)
@@ -336,6 +383,7 @@ class AccurateConfigsGen(ConfigsGenAlg):
 		# generate several random groups, calculate their fitness and select the best one
 		for i in range(self.numberOfConfigChoices):
 			
+			# generate several random groups
 			newGroups = self.randomConfigGenerator(playerIds, minNumGroups, maxNumGroups)
 			newConfigSize = len(newGroups)
 			currQuality = 0.0
@@ -347,32 +395,32 @@ class AccurateConfigsGen(ConfigsGenAlg):
 				group = newGroups[groupI]
 				groupSize = len(group)
 
-				# generate profile as average of the personalities
+				# generate profile as average of the personalities estimates
 				profile = self.interactionsProfileTemplate.generateCopy().reset()
-				
 				for currPlayer in group:
 					personality = self.playerModelBridge.getPlayerRealPersonality(currPlayer)
 					for dim in profile.dimensions:
-						profile.dimensions[dim] += personality.dimensions[dim]/newConfigSize
-					profile.normalize()
+						profile.dimensions[dim] += personality.dimensions[dim] / newConfigSize
+				profile.normalize()
 				newConfigProfiles.append(profile)
 
 
 				# calculate fitness and average state
-				currAvgCharacteristics = PlayerCharacteristics().reset()
+				currAvgCharacteristics = PlayerCharacteristics()
+				currAvgCharacteristics.reset()
 				for currPlayer in group:
+
 					currState = self.playerModelBridge.getPlayerCurrState(currPlayer)
 					currState.profile = profile
 
 					currAvgCharacteristics.ability += currState.characteristics.ability / groupSize
 					currAvgCharacteristics.engagement += currState.characteristics.engagement / groupSize
-
+				
 					newState = self.simulationFunc(self.playerModelBridge, currState, currPlayer, profile, self.currIteration)
-		
 					increases = PlayerState()
 					increases.characteristics = PlayerCharacteristics(ability=(newState.characteristics.ability - currState.characteristics.ability), engagement=newState.characteristics.engagement)
-				
-					currQuality += self.qualityWeights.ability*increases.characteristics.ability + self.qualityWeights.engagement*increases.characteristics.engagement
+					currQuality += self.calcQuality(increases)
+
 				newAvgCharacteristics.append(currAvgCharacteristics)
 			
 			if (currQuality > currMaxQuality):
