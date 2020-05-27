@@ -26,21 +26,24 @@ suppressMessages(library(stringr))
 options(warn=-1)
 
 
+print("GeneratingPlots...")
+
 cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 
 resultsLog <- read.csv(file="GIMMESims/results.csv", header=TRUE, sep=",")
-
 resultsLog <- resultsLog[resultsLog$iteration > 19,]
 
 
 # plot strategies
 avg <- aggregate(abilityInc ~ iteration*algorithm , resultsLog , mean)
-sdev <- aggregate(abilityInc ~ iteration*algorithm , resultsLog , sd)
+avgPerRun <- aggregate(abilityInc ~ iteration*algorithm*run , resultsLog , mean)
+sdev <- aggregate(abilityInc ~ iteration*algorithm , avgPerRun , sd)
 
 
 upBound <- max(avg$abilityInc[avg$algorithm == "accurate"])
 avg$abilityInc[avg$algorithm == "accurate"] <- upBound
 
+print(sdev)
 avg$linetype <- ""
 
 avg$linetype[avg$algorithm != "accurate"] <- "solid"

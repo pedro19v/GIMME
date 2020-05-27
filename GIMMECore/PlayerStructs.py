@@ -57,6 +57,7 @@ class PlayerStateGrid(object):
 					self.numCellStates = self.numCellStates + 1
 
 	def reset(self):
+		self.numCellStates = 0
 		if(self.initialCells == None):
 			self.cells = [[] for i in range(self.numCells)]
 			self.serializedCells = []

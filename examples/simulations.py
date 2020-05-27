@@ -23,11 +23,11 @@ import plotBuilder
 random.seed(time.perf_counter())
 simsID = seed = random.randrange(sys.maxsize)
 
-numRuns = 10
+numRuns = 100
 maxNumTrainingIterations = 20
 numRealIterations = 20
 
-preferredNumberOfPlayersPerGroup = 3
+preferredNumberOfPlayersPerGroup = 4
 numberOfConfigChoices = 500
 
 numTestedPlayerProfilesInEst = 100
@@ -43,6 +43,7 @@ if not os.path.exists(newpath):
 
 # ----------------------- [Log Manager Setup] --------------------------------
 
+# logManager = MongoDBLogManager("mongodb+srv://studyAC1:studyAC1@cluster0-nfksn.mongodb.net/test?retryWrites=true&w=majority")
 logManager = CSVLogManager(newpath)
 
 # ----------------------- [Auxiliary Methods] --------------------------------
@@ -69,19 +70,17 @@ def calcReaction(playerBridge, state, playerId, interactionsProfile, currIterati
 	return newState
 
 def executionPhase(playerBridge, maxNumIterations, startingI, currRun, adaptation):
+	if(maxNumIterations <= 0):
+		return
+
 	i = startingI
 	while(i < maxNumIterations + startingI):
 
 		if adaptation.name == "accurate":
 			adaptation.configsGenAlg.updateCurrIteration(i)
 		
-		# t0 = time.perf_counter()
-
 		print("step (" +str(i - startingI)+ " of "+str(maxNumIterations)+") of run ("+str(currRun)+" of "+str(numRuns)+") of algorithm \""+str(adaptation.name)+"\"						", end="\r")
 		adaptation.iterate()
-
-		# t1 = time.perf_counter() - t0
-		# avgItExecTime += (t1 - t0)/(numRuns) # CPU seconds elapsed (floating point)
 
 		for x in range(numPlayers):
 			increases = simulateReaction(playerBridge, i, x)
@@ -95,11 +94,7 @@ def executionPhase(playerBridge, maxNumIterations, startingI, currRun, adaptatio
 					"abilityInc": str(increases.characteristics.ability),
 					"engagementInc": str(increases.characteristics.engagement),
 					# "profDiff": str(playerBridge.getPlayerPersonality(x).distanceBetween(playerBridge.getPlayerCurrProfile(x)))
-				})
-			# abilityMatrix[i][currRun] += increases.characteristics.ability / numPlayers
-			# engagementMatrix[i][currRun] += increases.characteristics.engagement / numPlayers
-			# profDiffMatrix[i][currRun] += playerBridge.getPlayerPersonality(x).distanceBetween(playerBridge.getPlayerCurrProfile(x)) / numPlayers
-		
+				})		
 		i+=1
 
 
@@ -110,7 +105,7 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 	adaptationName = adaptation.name
 
 
-	profileTemplate = InteractionsProfile({})
+	profileTemplate = InteractionsProfile()
 	for d in range(numInteractionDimensions):
 		profileTemplate.dimensions["dim_"+str(d)] = 0.0
 
@@ -128,14 +123,20 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 
 	for r in range(numRuns):
 		realPersonalities = []
+		questionnairePersonalities = []
+
 		# EPdimensions = [{"dim_0":1,"dim_1":0,"dim_2":0},{"dim_0":0,"dim_1":1,"dim_2":0},{"dim_0":0,"dim_1":0,"dim_2":1}]		
 		EPdimensions = [{"dim_0":1,"dim_1":0,"dim_2":0,"dim_3":0},{"dim_0":0,"dim_1":1,"dim_2":0,"dim_3":0},{"dim_0":0,"dim_1":0,"dim_2":1,"dim_3":0},{"dim_0":0,"dim_1":0,"dim_2":0,"dim_3":1}]		
 		EPdimensionsAux = EPdimensions.copy()	
 		
 		playersDimsStr = "players: [\n"	
 		
+
+		adaptation.configsGenAlg.reset()
+
+
 		for x in range(numPlayers):
-			profile = profileTemplate.generateCopy()
+			profile = profileTemplate.generateCopy().reset()
 			if(considerExtremePersonalityValues):
 				if(len(EPdimensionsAux) == 0):
 					EPdimensionsAux = EPdimensions.copy()
@@ -147,42 +148,35 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 			realPersonalities.append(profile)
 			realPersonalities[x].normalize()
 
-		playersDimsStr += "],\n"
-		# print(playersDimsStr)
 
-		questionnairePersonalities = []
-		for x in range(numPlayers):
-			profile = profileTemplate.generateCopy()
+			profile = profileTemplate.generateCopy().reset()
 			currRealPersonality = realPersonalities[x]
 			for d in range(numInteractionDimensions):
 				profile.dimensions["dim_"+str(d)] = numpy.clip(random.gauss(currRealPersonality.dimensions["dim_"+str(d)], 0.1),0,1)
 			questionnairePersonalities.append(profile)
 			questionnairePersonalities[x].normalize()
+		
 
-		# init players including predicted personality
-		for x in range(numPlayers):
-			adaptation.configsGenAlg.reset()
+			# init players including predicted personality
 			playerBridge.resetPlayer(x)
 
-			playerBridge.setPlayerPersonalityEst(x, intProfTemplate.generateCopy().reset())
+			playerBridge.setPlayerPersonalityEst(x, profileTemplate.generateCopy().reset())
 			# realPersonality = realPersonalities[x]
 			# playerBridge.setPlayerRealPersonality(x, realPersonality)
 
 			questionnairePersonality = questionnairePersonalities[x]
 			playerBridge.setPlayerRealPersonality(x, questionnairePersonality)
 
-
-			# has bootstrap
-			# if(maxNumTrainingIterations > 0):
-			# 	personality = questionnairePersonalities[x]
-			# 	playerBridge.setPlayerPersonalityEst(x, personality)
+			playerBridge.setBaseLearningRate(x, 0.5)
 
 
-			playerBridge.setBaseLearningRate(x, random.gauss(0.5, 0.16))
+
+		playersDimsStr += "],\n"
+		# print(playersDimsStr)
+
 
 
 		# breakpoint()
-
 		executionPhase(playerBridge, maxNumTrainingIterations, firstTrainingI, r, adaptation)
 	
 		# change for "real" personality from which the predictions supposidely are based on...
@@ -191,7 +185,9 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 
 			realPersonality = realPersonalities[x]
 			playerBridge.setPlayerRealPersonality(x, realPersonality)
+			playerBridge.setBaseLearningRate(x, random.gauss(0.5, 0.16))
 
+		# breakpoint()
 		executionPhase(playerBridge, numRealIterations, firstRealI, r, adaptation)
 
 
@@ -399,6 +395,8 @@ executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBrid
 
 executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
 	taskBridge, adaptationRandom, 4)
+
+
 
 # executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
 	# taskBridge, adaptationRandomOld, 3)

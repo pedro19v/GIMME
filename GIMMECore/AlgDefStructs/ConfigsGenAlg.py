@@ -166,43 +166,7 @@ class SimpleConfigsGenVer1(ConfigsGenAlg):
 
 	def calcQuality(self, state):
 		return self.qualityWeights.ability*state.characteristics.ability + self.qualityWeights.engagement*state.characteristics.engagement
-	
-	# def organize(self):
-	# 	playerIds = self.playerModelBridge.getAllPlayerIds() 
-	# 	minNumGroups = math.ceil(len(playerIds) / self.maxNumberOfPlayersPerGroup)
-	# 	maxNumGroups = math.floor(len(playerIds) / self.minNumberOfPlayersPerGroup)
-		
-	# 	newConfigProfiles = []
-	# 	newAvgCharacteristics = []
-		
-	# 	newGroups = self.randomConfigGenerator(playerIds, minNumGroups, maxNumGroups)
-	# 	newConfigSize = len(newGroups)		
-	# 	# generate profiles
-	# 	for groupI in range(newConfigSize):
-	# 		group = newGroups[groupI]
-	# 		groupSize = len(group)
 
-
-	# 		profile = self.interactionsProfileTemplate.generateCopy()			
-	# 		# generate random profile
-	# 		for currPlayer in group:
-	# 			# personality = self.playerModelBridge.getPlayerPersonalityEst(currPlayer)
-	# 			random = self.interactionsProfileTemplate.generateCopy().randomize()
-	# 			for dim in profile.dimensions:
-	# 				profile.dimensions[dim] += random.dimensions[dim] / newConfigSize
-	# 		profile.normalize()
-	# 		newConfigProfiles.append(profile)
-
-	# 		currAvgCharacteristics = PlayerCharacteristics().reset()
-	# 		for currPlayer in group:
-	# 			currState = self.playerModelBridge.getPlayerCurrState(currPlayer)
-	# 			currAvgCharacteristics.ability += currState.characteristics.ability / groupSize
-	# 			currAvgCharacteristics.engagement += currState.characteristics.engagement / groupSize
-	# 		currAvgCharacteristics.profile = profile
-	# 		newAvgCharacteristics.append(currAvgCharacteristics)
-
-	# 	self.updateMetrics(newGroups)
-	# 	return {"groups": newGroups, "profiles": newConfigProfiles, "avgCharacteristics": newAvgCharacteristics}
 	
 	def organize(self):
 		playerIds = self.playerModelBridge.getAllPlayerIds() 

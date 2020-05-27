@@ -35,15 +35,17 @@ class DebugLogManager(LogManager):
 
 # ----------------------------------------------------------
 
-
+import pymongo
 
 class MongoDBLogManager(LogManager):
 
-	def __init__(self):
-		pass
+	def __init__(self, connector):
+		self.client = pymongo.MongoClient(connector)
 
 	def writeToLog(self, database, table, argsNValues):
-		pass
+		mydb = self.client[database]
+		mycol = mydb[table]
+		mycol.insert_one(argsNValues)
 
 
 
@@ -56,7 +58,7 @@ class CSVLogManager(LogManager):
 
 	def __init__(self, filePath):
 		self.filePath = filePath
-		self.wroteHeader = False
+		self.wroteHeader = True
 
 	def writeToLog(self, database, table, argsNValues):
 		newFilePath = self.filePath + database +"/"
