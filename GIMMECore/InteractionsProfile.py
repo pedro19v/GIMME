@@ -11,7 +11,10 @@ class InteractionsProfile(object):
 	def reset(self):
 		for key in self.dimensions:
 			self.dimensions[key] = 0
-		return self.normalize()
+		return self
+
+	def init(self):
+		return self.reset().normalize()
 
 	def generateCopy(self):
 		keys = list(self.dimensions.keys())

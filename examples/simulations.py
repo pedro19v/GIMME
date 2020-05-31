@@ -23,7 +23,7 @@ import plotBuilder
 random.seed(time.perf_counter())
 simsID = seed = random.randrange(sys.maxsize)
 
-numRuns = 100
+numRuns = 200
 maxNumTrainingIterations = 20
 numRealIterations = 20
 
@@ -93,7 +93,7 @@ def executionPhase(playerBridge, maxNumIterations, startingI, currRun, adaptatio
 					"playerID": str(x),
 					"abilityInc": str(increases.characteristics.ability),
 					"engagementInc": str(increases.characteristics.engagement),
-					# "profDiff": str(playerBridge.getPlayerPersonality(x).distanceBetween(playerBridge.getPlayerCurrProfile(x)))
+					"profDiff": str(playerBridge.getPlayerRealPersonality(x).distanceBetween(playerBridge.getPlayerCurrProfile(x)))
 				})		
 		i+=1
 
@@ -160,7 +160,7 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 			# init players including predicted personality
 			playerBridge.resetPlayer(x)
 
-			playerBridge.setPlayerPersonalityEst(x, profileTemplate.generateCopy().reset())
+			playerBridge.setPlayerPersonalityEst(x, profileTemplate.generateCopy().init())
 			# realPersonality = realPersonalities[x]
 			# playerBridge.setPlayerRealPersonality(x, realPersonality)
 
@@ -229,20 +229,21 @@ regAlg = KNNRegression(playerBridge, 5)
 
 intProfTemplate = InteractionsProfile({"dim_0": 0, "dim_1": 0, "dim_2": 0})
 
-simpleConfigsAlgOld = SimpleConfigsGenVer1(
+simpleConfigsAlgOld = SimulatedAnnealingConfigsGen(
 	playerBridge, 
 	intProfTemplate.generateCopy(), 
 	regAlg, 
-	persEstAlg = SimplePersonalityEstAlg(
+	SimplePersonalityEstAlgVer2(
 		playerBridge, 
 		intProfTemplate.generateCopy(), 
 		regAlg,
-		numTestedPlayerProfiles = numTestedPlayerProfilesInEst, 
+		# numTestedPlayerProfiles = numTestedPlayerProfilesInEst, 
 		qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)), 
+	1.0 / float(numRealIterations), 
 	numberOfConfigChoices = numberOfConfigChoices, 
 	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
 	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5))
-# simpleConfigsAlgOld = SimpleConfigsGenVer2(
+# simpleConfigsAlgOld = SimulatedAnnealingConfigsGen(
 # 	playerBridge, 
 # 	intProfTemplate.generateCopy(), 
 # 	regAlg, 
@@ -258,16 +259,17 @@ adaptationRandomOld.init(playerBridge, taskBridge, configsGenAlg = randomOldConf
 # - - - - - 
 intProfTemplate = InteractionsProfile({"dim_0": 0, "dim_1": 0, "dim_2": 0, "dim_3": 0})
 
-simpleConfigsAlg = SimpleConfigsGenVer1(
+simpleConfigsAlg = SimulatedAnnealingConfigsGen(
 	playerBridge, 
 	intProfTemplate.generateCopy(), 
 	regAlg, 
-	persEstAlg = SimplePersonalityEstAlg(
+	SimplePersonalityEstAlgVer2(
 		playerBridge, 
 		intProfTemplate.generateCopy(), 
 		regAlg,
-		numTestedPlayerProfiles = numTestedPlayerProfilesInEst, 
+		# numTestedPlayerProfiles = numTestedPlayerProfilesInEst, 
 		qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)), 
+	1.0 / float(numRealIterations), 
 	numberOfConfigChoices = numberOfConfigChoices, 
 	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
 	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5))
@@ -284,16 +286,17 @@ adaptationAccurate.init(playerBridge, taskBridge, configsGenAlg = accurateConfig
 
 intProfTemplate = InteractionsProfile({"dim_0": 0})
 
-simpleConfigsAlg1D = SimpleConfigsGenVer1(
+simpleConfigsAlg1D = SimulatedAnnealingConfigsGen(
 	playerBridge, 
 	intProfTemplate.generateCopy(), 
 	regAlg, 
-	persEstAlg = SimplePersonalityEstAlg(
+	SimplePersonalityEstAlgVer2(
 		playerBridge, 
 		intProfTemplate.generateCopy(), 
 		regAlg,
-		numTestedPlayerProfiles = numTestedPlayerProfilesInEst, 
+		# numTestedPlayerProfiles = numTestedPlayerProfilesInEst, 
 		qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)), 
+	1.0 / float(numRealIterations), 
 	numberOfConfigChoices = numberOfConfigChoices, 
 	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
 	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5))
@@ -303,16 +306,17 @@ adaptationGIMME1D.init(playerBridge, taskBridge, configsGenAlg = simpleConfigsAl
 
 intProfTemplate = InteractionsProfile({"dim_0": 0, "dim_1": 0})
 
-simpleConfigsAlg2D = SimpleConfigsGenVer1(
+simpleConfigsAlg2D = SimulatedAnnealingConfigsGen(
 	playerBridge, 
 	intProfTemplate.generateCopy(), 
 	regAlg, 
-	persEstAlg = SimplePersonalityEstAlg(
+	SimplePersonalityEstAlgVer2(
 		playerBridge, 
 		intProfTemplate.generateCopy(), 
 		regAlg,
-		numTestedPlayerProfiles = numTestedPlayerProfilesInEst, 
+		# numTestedPlayerProfiles = numTestedPlayerProfilesInEst, 
 		qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)), 
+	1.0 / float(numRealIterations), 
 	numberOfConfigChoices = numberOfConfigChoices, 
 	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
 	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5))
@@ -322,16 +326,17 @@ adaptationGIMME2D.init(playerBridge, taskBridge, configsGenAlg = simpleConfigsAl
 
 intProfTemplate = InteractionsProfile({"dim_0": 0, "dim_1": 0, "dim_2": 0, "dim_3": 0, "dim_4": 0})
 
-simpleConfigsAlg5D = SimpleConfigsGenVer1(
+simpleConfigsAlg5D = SimulatedAnnealingConfigsGen(
 	playerBridge, 
 	intProfTemplate.generateCopy(), 
-	regAlg, 
-	persEstAlg = SimplePersonalityEstAlg(
+	regAlg,
+	SimplePersonalityEstAlgVer2(
 		playerBridge, 
 		intProfTemplate.generateCopy(), 
 		regAlg,
-		numTestedPlayerProfiles = numTestedPlayerProfilesInEst, 
+		# numTestedPlayerProfiles = numTestedPlayerProfilesInEst, 
 		qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)), 
+	1.0 / float(numRealIterations), 
 	numberOfConfigChoices = numberOfConfigChoices, 
 	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
 	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5))
@@ -341,16 +346,17 @@ adaptationGIMME5D.init(playerBridge, taskBridge, configsGenAlg = simpleConfigsAl
 
 intProfTemplate = InteractionsProfile({"dim_0": 0, "dim_1": 0, "dim_2": 0, "dim_3": 0, "dim_4": 0, "dim_5": 0})
 
-simpleConfigsAlg6D = SimpleConfigsGenVer1(
+simpleConfigsAlg6D = SimulatedAnnealingConfigsGen(
 	playerBridge, 
 	intProfTemplate.generateCopy(), 
 	regAlg, 
-	persEstAlg = SimplePersonalityEstAlg(
+	SimplePersonalityEstAlgVer2(
 		playerBridge, 
 		intProfTemplate.generateCopy(), 
 		regAlg,
-		numTestedPlayerProfiles = numTestedPlayerProfilesInEst, 
+		# numTestedPlayerProfiles = numTestedPlayerProfilesInEst, 
 		qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)), 
+	1.0 / float(numRealIterations), 
 	numberOfConfigChoices = numberOfConfigChoices, 
 	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
 	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5))

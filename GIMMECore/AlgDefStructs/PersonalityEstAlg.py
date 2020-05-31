@@ -12,7 +12,38 @@ class PersonalityEstAlg(ABC):
 		pass
 
 
-class SimplePersonalityEstAlg(PersonalityEstAlg):
+
+class SimplePersonalityEstAlgVer2(PersonalityEstAlg):
+	def __init__(self, playerModelBridge, interactionsProfileTemplate, regAlg, qualityWeights = PlayerCharacteristics(ability = 0.5, engagement = 0.5)):
+		super().__init__(playerModelBridge)
+		self.playerModelBridge = playerModelBridge
+		self.qualityWeights = qualityWeights
+
+		self.interactionsProfileTemplate = interactionsProfileTemplate
+
+		self.regAlg = regAlg
+
+		self.bestQualities = {}
+
+	def calcQuality(self, state):
+		return self.qualityWeights.ability*state.characteristics.ability + self.qualityWeights.engagement*state.characteristics.engagement
+	
+	
+	def updateEstimates(self):
+		playerIds = self.playerModelBridge.getAllPlayerIds()
+		for playerId in playerIds:
+			currPersonalityEst = self.playerModelBridge.getPlayerPersonalityEst(playerId)
+			currPersonalityQuality = self.bestQualities.get(playerId, 0.0)
+			lastDataPoint = self.playerModelBridge.getPlayerCurrState(playerId)
+			quality = self.calcQuality(lastDataPoint)
+			if quality > currPersonalityQuality:
+				self.bestQualities[playerId] = currPersonalityQuality
+				self.playerModelBridge.setPlayerPersonalityEst(playerId, lastDataPoint.profile)
+
+
+
+
+class SimplePersonalityEstAlgVer1(PersonalityEstAlg):
 	def __init__(self, playerModelBridge, interactionsProfileTemplate, regAlg, numTestedPlayerProfiles = 100, qualityWeights = PlayerCharacteristics(ability = 0.5, engagement = 0.5)):
 		super().__init__(playerModelBridge)
 		self.playerModelBridge = playerModelBridge
@@ -36,6 +67,7 @@ class SimplePersonalityEstAlg(PersonalityEstAlg):
 				bestQuality = self.calcQuality(self.regAlg.predict(currPersonalityEst, playerId))
 			else:
 				bestQuality = -1
+			
 			for i in range(self.numTestedPlayerProfiles):
 				profile = self.interactionsProfileTemplate.generateCopy().randomize()
 				currQuality = self.calcQuality(self.regAlg.predict(profile, playerId))
