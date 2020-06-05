@@ -4,8 +4,8 @@ import random
 
 class InteractionsProfile(object):
 
-	def __init__(self, dimensions = {}):
-		self.dimensions = dimensions
+	def __init__(self, dimensions = None):
+		self.dimensions = {} if dimensions == None else dimensions
 		self.normalize()
 
 	def reset(self):
@@ -31,7 +31,7 @@ class InteractionsProfile(object):
 		return self.normalization(clone)
 	
 	def normalization(self, profile):
-		if(len(profile.dimensions)>2):
+		if(len(profile.dimensions)>1):
 			total = 0
 			for key in profile.dimensions:
 				total += profile.dimensions[key]

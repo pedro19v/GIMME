@@ -13,16 +13,20 @@ class PersonalityEstAlg(ABC):
 
 
 
-class SimplePersonalityEstAlgVer2(PersonalityEstAlg):
-	def __init__(self, playerModelBridge, interactionsProfileTemplate, regAlg, qualityWeights = PlayerCharacteristics(ability = 0.5, engagement = 0.5)):
+class ExploitationPersonalityEstAlg(PersonalityEstAlg):
+	def __init__(self, 
+		playerModelBridge, 
+		interactionsProfileTemplate, 
+		regAlg, 
+		qualityWeights = None):
+
 		super().__init__(playerModelBridge)
+		
 		self.playerModelBridge = playerModelBridge
-		self.qualityWeights = qualityWeights
+		self.qualityWeights = PlayerCharacteristics(ability = 0.5, engagement = 0.5) if qualityWeights == None else qualityWeights 
 
 		self.interactionsProfileTemplate = interactionsProfileTemplate
-
 		self.regAlg = regAlg
-
 		self.bestQualities = {}
 
 	def calcQuality(self, state):
@@ -43,13 +47,20 @@ class SimplePersonalityEstAlgVer2(PersonalityEstAlg):
 
 
 
-class SimplePersonalityEstAlgVer1(PersonalityEstAlg):
-	def __init__(self, playerModelBridge, interactionsProfileTemplate, regAlg, numTestedPlayerProfiles = 100, qualityWeights = PlayerCharacteristics(ability = 0.5, engagement = 0.5)):
+class ExplorationPersonalityEstAlg(PersonalityEstAlg):
+	def __init__(self, 
+		playerModelBridge, 
+		interactionsProfileTemplate, 
+		regAlg, 
+		numTestedPlayerProfiles = None, 
+		qualityWeights = None):
+		
 		super().__init__(playerModelBridge)
+		
 		self.playerModelBridge = playerModelBridge
-		self.qualityWeights = qualityWeights
+		self.qualityWeights = PlayerCharacteristics(ability = 0.5, engagement = 0.5) if qualityWeights == None else qualityWeights 
 
-		self.numTestedPlayerProfiles = numTestedPlayerProfiles
+		self.numTestedPlayerProfiles = 100 if numTestedPlayerProfiles == None else numTestedPlayerProfiles
 		self.interactionsProfileTemplate = interactionsProfileTemplate
 
 		self.regAlg = regAlg
@@ -76,4 +87,3 @@ class SimplePersonalityEstAlgVer1(PersonalityEstAlg):
 					newPersonalityEst = profile
 
 			self.playerModelBridge.setPlayerPersonalityEst(playerId, newPersonalityEst)
-		# breakpoint()

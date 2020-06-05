@@ -7,39 +7,48 @@ from .InteractionsProfile import InteractionsProfile
 
 
 class PlayerCharacteristics(object):
-	def __init__(self, ability=0, engagement=0):
-		self.ability = ability
-		self.engagement = engagement
+	def __init__(self, ability = None, engagement = None):
+		self.ability = 0 if ability==None else ability
+		self.engagement = 0 if engagement==None else engagement
 	def reset(self):
 		self.ability = 0
 		self.engagement = 0
 		return self
 
 class PlayerState(object):
-	def __init__(self, creationTime = time.time(), profile = InteractionsProfile(), characteristics = PlayerCharacteristics(), dist = -1):
-		self.characteristics = characteristics
-		self.creationTime = creationTime
-		self.profile = profile
-		self.dist = dist
+	def __init__(self, stateType = None, profile = None, characteristics = None, dist = None, quality = None):
+		self.creationTime = time.time()
+		
+		self.stateType = 1 if stateType == None else stateType
+		self.profile = InteractionsProfile() if profile == None else profile
+		self.characteristics = PlayerCharacteristics() if characteristics == None else characteristics
+		self.dist = -1 if dist == None else dist
+		self.quality = -1 if quality == None else quality
+
 		self.groupId = -1
 		self.adaptedTaskId = -1
 
 	def reset(self):
 		self.characteristics.reset()
 		self.profile.reset()
+		self.creationTime = time.time()
+		self.stateType = 1
+		self.quality = -1
 		self.dist = -1
 		self.groupId = -1
+		self.adaptedTaskId = -1
 		return self
 
 
 class PlayerStateGrid(object):
-	def __init__(self, interactionsProfileTemplate, numCells=1, maxProfilesPerCell=30,  cells=None):
-		self.maxProfilesPerCell = maxProfilesPerCell
+	def __init__(self, interactionsProfileTemplate, gridTrimAlg, numCells = None, cells = None):
 		self.interactionsProfileTemplate = interactionsProfileTemplate
+		self.gridTrimAlg = gridTrimAlg
 
+		numCells = 1 if numCells == None else numCells
 		self.dimSpan = math.ceil(numCells**(1.0/float(4))) #floor of root 4
 		self.numCells = self.dimSpan**4
-		
+
 		self.numCellStates = 0
 
 		self.initialCells = cells
@@ -85,20 +94,40 @@ class PlayerStateGrid(object):
 			currCellInd += (self.dimSpan**paddingKeys.index(key))*currDim
 			padding.dimensions[key] = currDim
 
+		if(currCellInd==1):
+			breakpoint()
+		# print(playerState.profile.dimensions)
+
 		currCell = self.cells[currCellInd]
 		
 		currCell.append(playerState)
 		self.serializedCells.append(playerState)
 		self.numCellStates = self.numCellStates + 1
 		
-		cellsSize = len(self.cells[currCellInd])
-		if (cellsSize > self.maxProfilesPerCell):
-			stateToDelete = currCell[0]
-			self.serializedCells.remove(stateToDelete)
-			self.numCellStates = self.numCellStates - 1
-			currCell = currCell[-self.maxProfilesPerCell:]
+
+
+		# actionTime = len(currCell)> 10
+		# if(actionTime):
+		# 	print("serialezCells: "+json.dumps(self.serializedCells, default=lambda o: o.__dict__, sort_keys=True))
+
+		statesToDelete = self.gridTrimAlg.toRemoveList(self.cells[currCellInd])
+		
+		# if(actionTime):
+		# 	print("statesToDelete: "+json.dumps(statesToDelete, default=lambda o: o.__dict__, sort_keys=True))
+		
+		self.serializedCells = list(set(self.serializedCells) - set(statesToDelete))
+		self.numCellStates = self.numCellStates - len(statesToDelete)
+		currCell = list(set(currCell) - set(statesToDelete))
+
+		# if(actionTime):
+		# 	print("serializedCells2: "+json.dumps(self.serializedCells, default=lambda o: o.__dict__, sort_keys=True))
+		
+		# if(actionTime):
+		# 	breakpoint()
+
 
 		self.cells[currCellInd] = currCell
+
 
 	def getAllStates(self):
 		# serialize multi into single dimensional array

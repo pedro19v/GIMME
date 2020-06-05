@@ -12,8 +12,8 @@ class Adaptation(object):
 	def init(self, \
 		playerModelBridge, \
 		taskModelBridge, \
-		configsGenAlg = None, \
-		name=""):
+		name, \
+		configsGenAlg = None):
 
 		self.initialized = True
 		self.playerIds = []
@@ -63,7 +63,7 @@ class Adaptation(object):
 				self.playerModelBridge.setPlayerCharacteristics(playerId, currState.characteristics)
 				self.playerModelBridge.setPlayerProfile(playerId, currState.profile)
 
-				groupStr += str(self.playerModelBridge.getPlayerRealPersonality(playerId).dimensions.values())+",\n"
+				groupStr += str(self.playerModelBridge.getPlayerPersonalityEst(playerId).dimensions.values())+",\n"
 
 			adaptedConfig["adaptedTaskId"] = adaptedTaskId
 
@@ -72,6 +72,7 @@ class Adaptation(object):
 
 		groupStr += "]"
 		# print(groupStr)
+		# breakpoint()
 
 		return adaptedConfig
 

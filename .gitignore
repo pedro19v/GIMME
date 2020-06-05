@@ -3,7 +3,8 @@ _pycache__/
 *$py.class
 
 # **/simulationResults/*
-
+*.csv
+/examples/simulationResults/latestResults/plots/*
 /build/*
 /dist/*
 /GIMMECore.egg-info/*
