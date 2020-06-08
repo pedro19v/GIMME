@@ -291,7 +291,7 @@ class SimulatedAnnealingConfigsGen(ConfigsGenAlg):
 		if(self.temperature > 0.0):
 			self.temperature -= self.temperatureDecay
 		else:
-			self.temperature = 0.5
+			self.temperature = 1.0
 
 		self.updateMetrics(bestGroups)
 		return {"groups": bestGroups, "profiles": bestConfigProfiles, "avgCharacteristics": bestAvgCharacteristics}

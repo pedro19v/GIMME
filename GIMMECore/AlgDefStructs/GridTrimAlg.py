@@ -9,7 +9,7 @@ class GridTrimAlg(ABC):
 		pass
 
 	@abstractmethod
-	def toRemoveList(self, pastModelIncs):
+	def trimmedList(self, pastModelIncs):
 		pass
 
 
@@ -23,10 +23,13 @@ class AgeSortGridTrimAlg(GridTrimAlg):
 	def creationTimeSort(self, elem):
 		return elem.creationTime
 
-	def toRemoveList(self, pastModelIncs):
-		pastModelIncsCopy = pastModelIncs.copy()
-		pastModelIncsCopy = sorted(pastModelIncsCopy, key=self.creationTimeSort)
-		return pastModelIncsCopy[:-self.maxNumModelElements]
+	def trimmedList(self, pastModelIncs):
+
+		if(len(pastModelIncs)< self.maxNumModelElements):
+			return pastModelIncs
+
+		pastModelIncs = sorted(pastModelIncs, key=self.creationTimeSort)
+		return pastModelIncs[-(self.maxNumModelElements - 1):]
 
 
 class QualitySortGridTrimAlg(GridTrimAlg):
@@ -47,35 +50,32 @@ class QualitySortGridTrimAlg(GridTrimAlg):
 
 	def qSort(self, elem):
 		return elem.quality
+
 	def calcQuality(self, state):
-		return self.qualityWeights.ability*state.characteristics.ability + self.qualityWeights.engagement*state.characteristics.engagement
-	
-	def toRemoveList(self, pastModelIncs):
-		pastModelIncsCopy = pastModelIncs.copy()
-
-		bootstrapResidue = []
-		toRemoveList = []
-
+		total = self.qualityWeights.ability*state.characteristics.ability + self.qualityWeights.engagement*state.characteristics.engagement
 		if(self.accStateResidue):
-			bootstrapResidue = list(filter(self.stateTypeFilter, pastModelIncsCopy))
-			# check for bootstrap residue and trim on age
-			toRemoveList.extend(self.ageTrimmer.toRemoveList(bootstrapResidue))
-			# the rest is trimmed on quality
-			pastModelIncsCopy = list(set(pastModelIncsCopy) - set(bootstrapResidue))
+			total += state.stateType
+		return total
 
-		for modelInc in pastModelIncsCopy:
+	def trimmedList(self, pastModelIncs):
+
+		for modelInc in pastModelIncs:
 			if(modelInc.quality == -1):
 				modelInc.quality = self.calcQuality(modelInc)
-		pastModelIncsCopy = sorted(pastModelIncsCopy, key=self.qSort)
-		toRemoveList.extend(pastModelIncsCopy[:-self.maxNumModelElements])
-		
-		return toRemoveList
+
+		# print([elem.quality for elem in pastModelIncs])	
+
+		if(len(pastModelIncs)< self.maxNumModelElements):
+			return pastModelIncs
+
+		pastModelIncs = sorted(pastModelIncs, key=self.qSort)
+		return pastModelIncs[-(self.maxNumModelElements - 1):]
 
 class QualitySoftMaxGridTrimAlg(GridTrimAlg):
 
 	def __init__(self, qualityWeights = None):
 		super().__init__()
 
-	def toRemoveList(self, pastModelIncs):
+	def trimmedList(self, pastModelIncs):
 		pass
 		

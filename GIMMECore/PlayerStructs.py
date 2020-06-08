@@ -100,34 +100,18 @@ class PlayerStateGrid(object):
 
 		currCell = self.cells[currCellInd]
 		
+		self.serializedCells = list(set(self.serializedCells) - set(currCell))
+		self.numCellStates = self.numCellStates - len(currCell)
+		
+
 		currCell.append(playerState)
-		self.serializedCells.append(playerState)
-		self.numCellStates = self.numCellStates + 1
+		currCell = self.gridTrimAlg.trimmedList(currCell)
+
+		self.serializedCells.extend(currCell)
+		self.numCellStates = self.numCellStates + len(currCell)
 		
 
-
-		# actionTime = len(currCell)> 10
-		# if(actionTime):
-		# 	print("serialezCells: "+json.dumps(self.serializedCells, default=lambda o: o.__dict__, sort_keys=True))
-
-		statesToDelete = self.gridTrimAlg.toRemoveList(self.cells[currCellInd])
-		
-		# if(actionTime):
-		# 	print("statesToDelete: "+json.dumps(statesToDelete, default=lambda o: o.__dict__, sort_keys=True))
-		
-		self.serializedCells = list(set(self.serializedCells) - set(statesToDelete))
-		self.numCellStates = self.numCellStates - len(statesToDelete)
-		currCell = list(set(currCell) - set(statesToDelete))
-
-		# if(actionTime):
-		# 	print("serializedCells2: "+json.dumps(self.serializedCells, default=lambda o: o.__dict__, sort_keys=True))
-		
-		# if(actionTime):
-		# 	breakpoint()
-
-
-		self.cells[currCellInd] = currCell
-
+		# print(len(currCell))
 
 	def getAllStates(self):
 		# serialize multi into single dimensional array

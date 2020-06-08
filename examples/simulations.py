@@ -22,7 +22,7 @@ from LogManager import *
 random.seed(time.perf_counter())
 simsID = seed = random.randrange(sys.maxsize)
 
-numRuns = 10
+numRuns = 20
 maxNumTrainingIterations = 20
 numRealIterations = 20
 
@@ -76,9 +76,6 @@ questionnairePersonalities = []
 # logManager = MongoDBLogManager("mongodb+srv://studyAC1:studyAC1@cluster0-\
 # nfksn.mongodb.net/test?retryWrites=true&w=majority")
 logManager = CSVLogManager(newpath)
-
-
-
 
 
 
@@ -165,6 +162,7 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 			pastModelIncreasesGrid = PlayerStateGrid(
 				interactionsProfileTemplate = profileTemplate.generateCopy().reset(), 
 				gridTrimAlg = QualitySortGridTrimAlg(
+				# gridTrimAlg = AgeSortGridTrimAlg(
 					maxNumModelElements = playerWindow, 
 					qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)
 					), 
@@ -211,7 +209,7 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 			profile = profileTemplate.generateCopy().reset()
 			currRealPersonality = realPersonalities[x]
 			for d in range(numInteractionDimensions):
-				profile.dimensions["dim_"+str(d)] = numpy.clip(random.gauss(currRealPersonality.dimensions["dim_"+str(d)], 0.1),0,1)
+				profile.dimensions["dim_"+str(d)] = numpy.clip(random.gauss(currRealPersonality.dimensions["dim_"+str(d)], 0.1), 0, 1)
 			questionnairePersonalities.append(profile)
 			questionnairePersonalities[x].normalize()
 		
@@ -229,7 +227,6 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 
 			playerBridge.getPlayerStateGrid(x).gridTrimAlg.considerStateResidue(False)
 
-
 		playersDimsStr += "],\n"
 		# print(playersDimsStr)
 
@@ -244,7 +241,7 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 
 			realPersonality = realPersonalities[x]
 			playerBridge.setPlayerRealPersonality(x, realPersonality)
-			playerBridge.setBaseLearningRate(x, random.gauss(0.5, 0.16))
+			playerBridge.setBaseLearningRate(x, random.gauss(0.5, 0.05))
 
 			playerBridge.getPlayerStateGrid(x).gridTrimAlg.considerStateResidue(True)
 
@@ -336,7 +333,7 @@ simpleConfigsAlgSA = SimulatedAnnealingConfigsGen(
 		regAlg = regAlg,
 		numTestedPlayerProfiles = numTestedPlayerProfilesInEst, 
 		qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)), 
-	temperatureDecay = 1.0 / float(playerWindow), 
+	temperatureDecay = 2.0 / float(playerWindow), 
 	numberOfConfigChoices = numberOfConfigChoices, 
 	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
 	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)
@@ -486,20 +483,20 @@ adaptationGIMME6D.init(
 # 	taskBridge, adaptationGIMME, 4)
 
 
-# adaptationGIMMESA.name = "GIMME_SA"
-# executeSimulations(maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-# 	taskBridge, adaptationGIMMESA, 4)
+# # adaptationGIMMESA.name = "GIMME_SA"
+# # executeSimulations(maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
+# # 	taskBridge, adaptationGIMMESA, 4)
 
-# adaptationGIMMESA.name = "GIMMENoBoot_SA"
+# # adaptationGIMMESA.name = "GIMMENoBoot_SA"
+# # executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
+# # 	taskBridge, adaptationGIMMESA, 4)
+
+
 # executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-# 	taskBridge, adaptationGIMMESA, 4)
+# 	taskBridge, adaptationAccurate, 4)
 
-
-executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-	taskBridge, adaptationAccurate, 4)
-
-executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-	taskBridge, adaptationRandom, 4)
+# executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
+# 	taskBridge, adaptationRandom, 4)
 
 
 
@@ -508,12 +505,6 @@ executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBrid
 adaptationGIMME.name = "GIMMEEP"
 executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
 	taskBridge, adaptationGIMME, 4, considerExtremePersonalityValues = True)
-
-
-# # adaptationGIMME.name = "GIMMEEP"
-# # executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-# # 	taskBridge, adaptationGIMMEOld,
-# # 	3, considerExtremePersonalityValues = True)
 
 
 
