@@ -22,7 +22,7 @@ from LogManager import *
 random.seed(time.perf_counter())
 simsID = seed = random.randrange(sys.maxsize)
 
-numRuns = 20
+numRuns = 2
 maxNumTrainingIterations = 20
 numRealIterations = 20
 
@@ -474,13 +474,13 @@ adaptationGIMME6D.init(
 
 # ----------------------- [Execute Algorithms] ----------------------------
 
-# adaptationGIMME.name = "GIMME"
-# executeSimulations(maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-# 	taskBridge, adaptationGIMME, 4)
+adaptationGIMME.name = "GIMME"
+executeSimulations(maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
+	taskBridge, adaptationGIMME, 4)
 
-# adaptationGIMME.name = "GIMMENoBoot"
-# executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-# 	taskBridge, adaptationGIMME, 4)
+adaptationGIMME.name = "GIMMENoBoot"
+executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
+	taskBridge, adaptationGIMME, 4)
 
 
 # # adaptationGIMMESA.name = "GIMME_SA"
@@ -492,11 +492,11 @@ adaptationGIMME6D.init(
 # # 	taskBridge, adaptationGIMMESA, 4)
 
 
-# executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-# 	taskBridge, adaptationAccurate, 4)
+executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
+	taskBridge, adaptationAccurate, 4)
 
-# executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-# 	taskBridge, adaptationRandom, 4)
+executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
+	taskBridge, adaptationRandom, 4)
 
 
 

@@ -96,22 +96,20 @@ class PlayerStateGrid(object):
 
 		if(currCellInd==1):
 			breakpoint()
-		# print(playerState.profile.dimensions)
 
 		currCell = self.cells[currCellInd]
 		
 		self.serializedCells = list(set(self.serializedCells) - set(currCell))
 		self.numCellStates = self.numCellStates - len(currCell)
 		
-
 		currCell.append(playerState)
 		currCell = self.gridTrimAlg.trimmedList(currCell)
 
 		self.serializedCells.extend(currCell)
 		self.numCellStates = self.numCellStates + len(currCell)
 		
-
-		# print(len(currCell))
+		self.cells[currCellInd] = currCell
+		# print([elem.quality for elem in currCell])
 
 	def getAllStates(self):
 		# serialize multi into single dimensional array

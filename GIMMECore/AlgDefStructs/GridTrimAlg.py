@@ -40,8 +40,6 @@ class QualitySortGridTrimAlg(GridTrimAlg):
 		self.qualityWeights = PlayerCharacteristics(ability = 0.5, engagement = 0.5) if qualityWeights==None else qualityWeights
 		self.accStateResidue = False if accStateResidue == None else accStateResidue
 
-		self.ageTrimmer = AgeSortGridTrimAlg(maxNumModelElements)
-
 	def considerStateResidue(self, accStateResidue):
 		self.accStateResidue = accStateResidue
 
@@ -63,13 +61,16 @@ class QualitySortGridTrimAlg(GridTrimAlg):
 			if(modelInc.quality == -1):
 				modelInc.quality = self.calcQuality(modelInc)
 
-		# print([elem.quality for elem in pastModelIncs])	
+		# if(self.accStateResidue):
+		# 	self.accStateResidue = False
+		# 	return pastModelIncs[-3:]
 
-		if(len(pastModelIncs)< self.maxNumModelElements):
+
+		if(len(pastModelIncs) < self.maxNumModelElements):
 			return pastModelIncs
 
 		pastModelIncs = sorted(pastModelIncs, key=self.qSort)
-		return pastModelIncs[-(self.maxNumModelElements - 1):]
+		return pastModelIncs[-self.maxNumModelElements:]
 
 class QualitySoftMaxGridTrimAlg(GridTrimAlg):
 

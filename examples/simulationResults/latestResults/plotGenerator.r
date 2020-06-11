@@ -2,6 +2,7 @@
 # install.packages("ggplot2", dep=TRUE, repos = "http://cran.us.r-project.org")
 suppressMessages(library(ggplot2))
 suppressMessages(library(stringr))
+suppressMessages(library(dplyr))
 
 options(warn=-1)
 
@@ -22,6 +23,10 @@ sdev <- aggregate(abilityInc ~ iteration*algorithm , avgPerRun , sd)
 
 print(sprintf("nRuns: %d", nrow(unique(resultsLog[c("simsID","run")]))))
 
+un <- unique(resultsLog[c("simsID","run","algorithm")])
+print(un %>% count(simsID,algorithm), n=Inf)
+
+
 upBound <- max(avg$abilityInc[avg$algorithm == "accurate"])
 avg$abilityInc[avg$algorithm == "accurate"] <- upBound
 sdev$abilityInc[sdev$algorithm == "accurate"] <- 0
@@ -40,11 +45,11 @@ buildAbIncPlots <- function(logAvg, logSDev, plotName){
 		ymax=logAvg$abilityInc+logSDev$abilityInc))
 	plot <- plot + geom_line(stat="identity",linetype = logAvg$linetype, size=0.8)
 	plot <- plot + labs(x = "Iteration", y = "avg. Ability Increase", color="Algorithm") + 
-					theme(axis.text = element_text(size = 15), 
-					axis.title = element_text(size = 15, face = "bold"))
+					theme(axis.text = element_text(size = 20), 
+					axis.title = element_text(size = 30, face = "bold"), legend.title=element_text(size=20), legend.text=element_text(size=20))
 	# plot <- plot + ylim(0.335, 0.41) 
 	plot <- plot + scale_x_continuous(labels = 1:20, breaks = 20:39)
-	suppressMessages(ggsave(sprintf("plots/%s.png", plotName), height=6, width=10, units="in", dpi=500))
+	suppressMessages(ggsave(sprintf("plots/%s.png", plotName), height=6, width=15, units="in", dpi=500))
 }
 
 
