@@ -22,7 +22,7 @@ from LogManager import *
 random.seed(time.perf_counter())
 simsID = seed = random.randrange(sys.maxsize)
 
-numRuns = 2
+numRuns = 25
 maxNumTrainingIterations = 20
 numRealIterations = 20
 
@@ -144,7 +144,10 @@ def executionPhase(isBootstrap, playerBridge, maxNumIterations, startingI, currR
 
 
 def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations,firstRealI,\
-	playerBridge, taskBridge, adaptation, numInteractionDimensions, considerExtremePersonalityValues = False):
+	playerBridge, taskBridge, adaptation, numInteractionDimensions, estimatorsAccuracy = None, considerExtremePersonalityValues = None):
+
+	estimatorsAccuracy = 0.1 if estimatorsAccuracy == None else estimatorsAccuracy
+	considerExtremePersonalityValues = False if considerExtremePersonalityValues == None else considerExtremePersonalityValues
 
 	adaptationName = adaptation.name
 
@@ -209,7 +212,7 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 			profile = profileTemplate.generateCopy().reset()
 			currRealPersonality = realPersonalities[x]
 			for d in range(numInteractionDimensions):
-				profile.dimensions["dim_"+str(d)] = numpy.clip(random.gauss(currRealPersonality.dimensions["dim_"+str(d)], 0.1), 0, 1)
+				profile.dimensions["dim_"+str(d)] = numpy.clip(random.gauss(currRealPersonality.dimensions["dim_"+str(d)], estimatorsAccuracy), 0, 1)
 			questionnairePersonalities.append(profile)
 			questionnairePersonalities[x].normalize()
 		
@@ -528,6 +531,16 @@ executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBrid
 
 executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
 	taskBridge, adaptationGIMME6D, 6)
+
+
+adaptationGIMME.name = "GIMME_LowAccuracyEst"
+executeSimulations(maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
+	taskBridge, adaptationGIMME, 4, estimatorsAccuracy = 0.2)
+
+
+adaptationGIMME.name = "GIMME_HighAccuracyEst"
+executeSimulations(maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
+	taskBridge, adaptationGIMME, 4, estimatorsAccuracy = 0.05)
 
 print("Done!                        ", end="\r")
 
