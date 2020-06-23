@@ -2,7 +2,7 @@
 
 <img src="ReadmeImages/logo.png" width="300">
 
-![version](https://img.shields.io/badge/version-1.1.0-blue)
+![version](https://img.shields.io/badge/version-1.1.5-blue)
 
 GIMME (Group Interactions Management for Multiplayer sErious games) is a research tool which focuses on the management of 
 interactions in groups so that the collective ability improves. 
@@ -47,7 +47,7 @@ cd examples
 python simulations.py
 ```
 
-*Note: For just testing the code, it is advised to change the numRuns variable to a low value, higher than 1, such as 10. numRuns is 1000, because 1000 runs are needed for tendencies to be clearly observed when executing them...*
+*Note: For just testing the code, it is advised to change the numRuns variable to a low value, higher than 1, such as 10. For tendencies to be clearly observed when executing them, it is adviseable to set numRuns to 200.*
 
 This will prompt a plot, summing the results of applying our simulations. Several plots are being built, as we implement new simulation features.
 
