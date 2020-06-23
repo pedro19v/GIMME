@@ -1,6 +1,7 @@
 import random
 import math
 import copy
+import numpy
 from abc import ABC, abstractmethod
 from ..InteractionsProfile import InteractionsProfile 
 from ..PlayerStructs import *
@@ -213,9 +214,9 @@ class SimulatedAnnealingConfigsGen(ConfigsGenAlg):
 		super().init()
 		self.temperature = 1.0
 
-	def reset(self):
+	def reset(self, temperature):
 		super().reset()
-		self.temperature = 0.5
+		self.temperature = numpy.clip(temperature, 0, 1)
 
 
 	def calcQuality(self, state):

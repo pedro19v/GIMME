@@ -13,7 +13,7 @@ class Adaptation(object):
 		playerModelBridge, \
 		taskModelBridge, \
 		name, \
-		configsGenAlg = None):
+		configsGenAlg):
 
 		self.initialized = True
 		self.playerIds = []

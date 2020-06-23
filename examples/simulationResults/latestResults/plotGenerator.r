@@ -23,8 +23,8 @@ sdev <- aggregate(abilityInc ~ iteration*algorithm , avgPerRun , sd)
 
 print(sprintf("nRuns: %d", nrow(unique(resultsLog[c("simsID","run")]))))
 
-un <- unique(resultsLog[c("simsID","run","algorithm")])
-print(un %>% count(simsID,algorithm), n=Inf)
+# un <- unique(resultsLog[c("simsID","run","algorithm")])
+# print(un %>% count(simsID,algorithm), n=Inf)
 
 
 # upBound <- max(avgPerRun$abilityInc[avgPerRun$algorithm == "accurate"]) #for maximum of all runs
@@ -164,8 +164,9 @@ currSdev = sdev[
 			  sdev$algorithm=="GIMME_HighAccuracyEst"
 			  ,]
 
-levels(currAvg$algorithm)[levels(currAvg$algorithm) == "GIMME_LowAccuracyEst"] <- "Low acc. GIMME-Bootstrap" 
-levels(currAvg$algorithm)[levels(currAvg$algorithm) == "GIMME_HighAccuracyEst"] <- "High acc. GIMME-Bootstrap"  
+levels(currAvg$algorithm)[levels(currAvg$algorithm) == "GIMME"] <- "GIMME-Bootstrap" 
+levels(currAvg$algorithm)[levels(currAvg$algorithm) == "GIMME_LowAccuracyEst"] <- "Lower acc. Bootstrap" 
+levels(currAvg$algorithm)[levels(currAvg$algorithm) == "GIMME_HighAccuracyEst"] <- "Higher acc. Bootstrap"  
 buildAbIncPlots(currAvg, currSdev, "simulationsResultsAccuracyComp")
 
 

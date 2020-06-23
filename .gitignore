@@ -8,3 +8,6 @@ _pycache__/
 /build/*
 /dist/*
 /GIMMECore.egg-info/*
+*.csv
+
+examples/simulationResults/latestResults/currResults.zip
