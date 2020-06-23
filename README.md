@@ -3,6 +3,7 @@
 <img src="ReadmeImages/logo.png" width="300">
 
 ![version](https://img.shields.io/badge/version-1.1.5-blue)
+![version](https://img.shields.io/badge/python-v3.7-blue)
 
 GIMME (Group Interactions Management for Multiplayer sErious games) is a research tool which focuses on the management of 
 interactions in groups so that the collective ability improves. 
@@ -15,7 +16,7 @@ Information about the API internals and examples can be observed in our [wiki](h
 
 ## Requirements
 
-GIMME requires Python 3 in order to be executed (Tested in Python 3.7.4). No additional tools are required.
+GIMME requires Python 3 in order to be executed (Tested in Python 3.7.0). No additional tools are required.
 GIMME was tested on Windows and Linux. May also work in MacOS, but remains untested in this platform.
 
 
