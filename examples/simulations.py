@@ -12,8 +12,6 @@ import matplotlib.pyplot as plt
 from numpy import array
 import matplotlib.collections as collections
 
-sys.path.insert(1,'/home/samgomes/Documents/doutoramento/reps/GIMME/GIMME')
-sys.path.insert(1,'/GIMME')
 from GIMMECore import *
 from ModelMocks import *
 
