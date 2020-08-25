@@ -50,7 +50,7 @@ python simulations.py
 
 *Note: For just testing the code, it is advised to change the numRuns variable to a low value, higher than 1, such as 10. For tendencies to be clearly observed when executing them, it is adviseable to set numRuns to 200.*
 
-This will output the data to a csv file ```examples/simulationResults/latestResults/GIMMESims/results.csv)```, summing the results of applying our simulations. Several plots summarizing the results can be built using the r code provided in ```examples/simulationResults/latestResults/plotGenerator.r```.
+This will output the data to a csv file ```examples/simulationResults/latestResults/GIMMESims/results.csv```, summing the results of applying our simulations. Several plots summarizing the results can be built using the r code provided in ```examples/simulationResults/latestResults/plotGenerator.r```.
 
 ## Unit Tests
 As of now, no unit tests are provided, due to development constraints. We believe unit tests will be provided in near updates, as they are needed to ensure consistency in future releases.
