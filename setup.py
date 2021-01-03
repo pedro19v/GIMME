@@ -17,12 +17,6 @@ setup(
     'Topic :: Scientific/Engineering :: Adaptation'
     ],
     install_requires=[
-      'os',
-      'sys',
-      'random',
-      'time',
-      'math',
-      'datetime',
       'numpy'
     ]
 

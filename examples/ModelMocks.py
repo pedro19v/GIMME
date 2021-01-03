@@ -40,6 +40,10 @@ class CustomTaskModelBridge(TaskModelBridge):
 		return self.tasks[taskId].difficultyWeight
 	def getTaskProfileWeight(self, taskId):
 		return self.tasks[taskId].profileWeight
+	def getTaskInitDate(self, taskId):
+		return self.tasks[taskId].initDate
+	def getTaskFinalDate(self, taskId):
+		return self.tasks[taskId].finalDate
 
 
 class CustomPlayerModelBridge(PlayerModelBridge):

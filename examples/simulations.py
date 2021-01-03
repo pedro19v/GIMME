@@ -12,7 +12,10 @@ import matplotlib.pyplot as plt
 from numpy import array
 import matplotlib.collections as collections
 
+sys.path.insert(1,'/home/samgomes/Documents/doutoramento/reps/GIMME/GIMME')
+sys.path.insert(1,'/GIMME')
 from GIMMECore import *
+
 from ModelMocks import *
 
 from LogManager import *
@@ -33,7 +36,6 @@ playerWindow = 10
 numPlayers = 23
 
 startTime = str(datetime.datetime.now())
-# newpath = "./simulationResults/" + startTime +" numRuns:" + str(numRuns) + ",maxNumTrainingIterations: " + str(maxNumTrainingIterations) + ", numRealIterations: " + str(numRealIterations)
 newpath = "./simulationResults/latestResults/"
 if not os.path.exists(newpath):
     os.makedirs(newpath)
@@ -232,10 +234,9 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 		# print(playersDimsStr)
 
 
-		adaptation.configsGenAlg.init()		
-		executionPhase(True, playerBridge, maxNumTrainingIterations, firstTrainingI, r, adaptation)
-	
-		adaptation.configsGenAlg.reset()
+		# executionPhase(True, playerBridge, maxNumTrainingIterations, firstTrainingI, r, adaptation)
+		adaptation.bootstrap(maxNumTrainingIterations)
+
 		# change for "real" personality from which the predictions supposidely are based on...
 		for x in range(numPlayers):
 			playerBridge.resetState(x)

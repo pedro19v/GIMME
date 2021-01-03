@@ -25,6 +25,9 @@ class Adaptation(object):
 		self.playerModelBridge = playerModelBridge
 		self.taskModelBridge = taskModelBridge
 
+		self.configsGenAlg.init()	
+
+
 	def iterate(self):
 		if not self.initialized:
 			raise AssertionError('Adaptation not Initialized! Core not executed.') 
@@ -43,7 +46,7 @@ class Adaptation(object):
 		adaptedGroups = adaptedConfig["groups"]
 		adaptedProfiles = adaptedConfig["profiles"]
 		adaptedAvgCharacteristics = adaptedConfig["avgCharacteristics"]
-		adaptedConfig["adaptedTaskId"] = -1
+		adaptedConfig["adaptedTaskIds"] = []
 
 		groupStr = "["
 
@@ -65,7 +68,7 @@ class Adaptation(object):
 
 				groupStr += str(self.playerModelBridge.getPlayerPersonalityEst(playerId).dimensions.values())+",\n"
 
-			adaptedConfig["adaptedTaskId"] = adaptedTaskId
+			adaptedConfig["adaptedTaskIds"].append(adaptedTaskId)
 
 
 			groupStr += ",groupPrf: "+ str(groupProfile.dimensions.values()) +" ],\n\n"
@@ -94,3 +97,52 @@ class Adaptation(object):
 				bestTaskId = currTaskId
 				
 		return bestTaskId
+
+
+
+
+
+	# Bootstrap
+	def simulateReaction(self, playerId):
+		currState = self.playerModelBridge.getPlayerCurrState(playerId)
+		newState = self.calcReaction(state = currState, playerId = playerId)
+
+		increases = PlayerState(stateType = newState.stateType)
+		increases.profile = currState.profile
+		increases.characteristics = PlayerCharacteristics(ability=(newState.characteristics.ability - currState.characteristics.ability), engagement=newState.characteristics.engagement)
+		self.playerModelBridge.setAndSavePlayerStateToGrid(playerId, increases, newState)	
+		return increases
+
+	def calcReaction(self, state, playerId):
+		personality = self.playerModelBridge.getPlayerRealPersonality(playerId)
+		numDims = len(personality.dimensions)
+		newState = PlayerState(
+			stateType = 0, 
+			characteristics = PlayerCharacteristics(
+				ability=state.characteristics.ability, 
+				engagement=state.characteristics.engagement
+				), 
+			profile=state.profile)
+		newState.characteristics.engagement = 1 - (personality.distanceBetween(state.profile) / math.sqrt(numDims))  #between 0 and 1
+		if newState.characteristics.engagement>1:
+			raise ValueError('Something went wrong. Engagement is > 1.') 
+		abilityIncreaseSim = (newState.characteristics.engagement*self.playerModelBridge.getBaseLearningRate(playerId))
+		newState.characteristics.ability = newState.characteristics.ability + abilityIncreaseSim
+		return newState
+
+	def bootstrap(self, numBootstrapIterations):
+		if(numBootstrapIterations <= 0):
+			raise ValueError('Number of bootstrap iterations must be higher than 0 for this method to be called.') 
+			return
+
+		numPlayers = len(self.playerModelBridge.getAllPlayerIds())
+		i = 0
+		while(i < numBootstrapIterations):
+			self.iterate()
+
+			for x in range(numPlayers):
+				increases = self.simulateReaction(playerId=x)	
+			i+=1
+
+
+		adaptation.configsGenAlg.reset()
