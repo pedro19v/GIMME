@@ -57,7 +57,7 @@ As of now, no unit tests are provided, due to development constraints. We believ
 
 
 ## Report on Latest Features
-We have been writing a report about our latest features, currently available [here](https://drive.google.com/file/d/1Qa5Mccx_P4rPGLnM6NnZ9IXBemLdd3Zp/view?usp=sharing) in pre-print format.
+We have been writing a report about our latest features, currently available [here](https://drive.google.com/file/d/10y9SROvK-20zBGLZggtJVasL5Uw27vWd/view) in pre-print format.
 
 ## Future Improvements
 As of the current version, there are still some unexplored open pathways. They include:
