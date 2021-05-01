@@ -139,11 +139,11 @@ class Adaptation(object):
 		numPlayers = len(self.playerModelBridge.getAllPlayerIds())
 		i = 0
 		while(i < numBootstrapIterations):
+			print("Performming step ("+str(i)+" of "+str(numBootstrapIterations)+") of the bootstrap phase of \""+str(self.name)+"\"...                                                             ", end="\r")
 			self.iterate()
-
 			for x in range(numPlayers):
 				increases = self.simulateReaction(playerId=x)	
 			i+=1
 
 
-		adaptation.configsGenAlg.reset()
+		self.configsGenAlg.reset()

@@ -19,6 +19,22 @@ from GIMMECore import *
 from ModelMocks import *
 from LogManager import *
 
+
+
+print("------------------------------------------")
+print("-----                                -----")
+print("-----       GIMME API EXAMPLE        -----")
+print("-----                                -----")
+print("-----      (SIMULATING A CLASS)      -----")
+print("-----                                -----")
+print("------------------------------------------")
+
+
+print("------------------------------------------")
+print("NOTE: This example tests several group organization algorithms types.")
+print("For more details, consult the source code.")
+print("------------------------------------------")
+
 random.seed(time.perf_counter())
 simsID = seed = random.randrange(sys.maxsize)
 
@@ -43,11 +59,15 @@ if not os.path.exists(newpath):
 
 
 # ----------------------- [Init Models] --------------------------------
+print("Initing mocked models...")
+
 players = [0 for x in range(numPlayers)]
 playersGrid = [0 for x in range(numPlayers)]
 tasks = [0 for x in range(numTasks)]
 
 # ----------------------- [Init Model Bridges] --------------------------------
+print("Initing model bridges...")
+
 playerBridgeGrid = CustomPlayerModelBridge(playersGrid)
 playerBridge = CustomPlayerModelBridge(players)
 
@@ -73,7 +93,7 @@ realPersonalities = []
 questionnairePersonalities = []
 
 # ----------------------- [Init Log Manager] --------------------------------
-
+print("Initing .csv log manager...")
 # logManager = MongoDBLogManager("mongodb+srv://studyAC1:studyAC1@cluster0-\
 # nfksn.mongodb.net/test?retryWrites=true&w=majority")
 logManager = CSVLogManager(newpath)
@@ -125,7 +145,7 @@ def executionPhase(isBootstrap, playerBridge, maxNumIterations, startingI, currR
 		if adaptation.name == "accurate":
 			adaptation.configsGenAlg.updateCurrIteration(i)
 		
-		print("step (" +str(i - startingI)+ " of "+str(maxNumIterations)+") of run ("+str(currRun)+" of "+str(numRuns)+") of algorithm \""+str(adaptation.name)+"\"						", end="\r")
+		print("Performing step (" +str(i - startingI)+ " of "+str(maxNumIterations)+") of run ("+str(currRun)+" of "+str(numRuns)+") of algorithm \""+str(adaptation.name)+"\"...                                                             ", end="\r")
 		adaptation.iterate()
 
 		for x in range(numPlayers):
@@ -255,6 +275,8 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 
 
 # ----------------------- [Init Algorithms] --------------------------------
+print("Initing algorithms...")
+
 regAlg = KNNRegression(playerBridge, 5)
 
 intProfTemplate = InteractionsProfile({"dim_0": 0, "dim_1": 0, "dim_2": 0})
@@ -476,6 +498,7 @@ adaptationGIMME6D.init(
 
 
 # ----------------------- [Execute Algorithms] ----------------------------
+input("<<< All ready! Press any key to start. >>>")
 
 adaptationGIMME.name = "GIMME"
 executeSimulations(maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 

@@ -74,7 +74,7 @@ for x in range(numTasks):
 		difficultyWeight = 0.5, 
 		profileWeight = 0.5)
 
-print("Setting up a random group. org. algorithms...")
+print("Setting up a random group. org. algorithm...")
 
 randomConfigsAlg = RandomConfigsGen(
 	playerModelBridge = playerBridge, 
