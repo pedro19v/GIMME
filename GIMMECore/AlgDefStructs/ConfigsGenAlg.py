@@ -112,13 +112,15 @@ class ConfigsGenAlg(ABC):
 	def organize(self):
 		pass
 
-	def updateMetrics(self, generatedConfig):
-		if(self.configSizeFreqs.get(len(generatedConfig))):
-			self.configSizeFreqs[len(generatedConfig)]+=1
-		else:
-			self.configSizeFreqs[len(generatedConfig)]=1
+	def updateMetrics(self, groups):
 
-		for group in generatedConfig:
+		# kind of sub-optimal, but guarantees encapsulation
+		if(self.configSizeFreqs.get(len(groups))):
+			self.configSizeFreqs[len(groups)]+=1
+		else:
+			self.configSizeFreqs[len(groups)]=1
+
+		for group in groups:
 			if(self.configSizeFreqs.get(len(group))):
 				self.configSizeFreqs[len(group)]+=1
 			else:

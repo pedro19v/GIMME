@@ -46,5 +46,13 @@ class PlayerModelBridge(ABC):
 		pass
 
 	@abstractmethod		
+	def setPlayerGroup(self, playerId, group):
+		pass
+
+	@abstractmethod		
+	def setPlayerTasks(self, playerId, tasks):
+		pass
+
+	@abstractmethod		
 	def setPlayerProfile(self, playerId, profile):
 		pass

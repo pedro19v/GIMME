@@ -14,10 +14,9 @@ import matplotlib.collections as collections
 
 sys.path.insert(1,'/home/samgomes/Documents/doutoramento/reps/GIMME/GIMME')
 sys.path.insert(1,'/GIMME')
+sys.path.insert(1,'../')
 from GIMMECore import *
-
 from ModelMocks import *
-
 from LogManager import *
 
 random.seed(time.perf_counter())
@@ -35,6 +34,8 @@ numTestedPlayerProfilesInEst = 500
 playerWindow = 10
 numPlayers = 23
 
+numTasks = 20
+
 startTime = str(datetime.datetime.now())
 newpath = "./simulationResults/latestResults/"
 if not os.path.exists(newpath):
@@ -44,7 +45,7 @@ if not os.path.exists(newpath):
 # ----------------------- [Init Models] --------------------------------
 players = [0 for x in range(numPlayers)]
 playersGrid = [0 for x in range(numPlayers)]
-tasks = [0 for x in range(20)]
+tasks = [0 for x in range(numTasks)]
 
 # ----------------------- [Init Model Bridges] --------------------------------
 playerBridgeGrid = CustomPlayerModelBridge(playersGrid)
@@ -172,7 +173,7 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 				numCells = 1
 				), 
 			currModelIncreases = PlayerCharacteristics(), personalityEst = profileTemplate.generateCopy().reset(), realPersonality = profileTemplate.generateCopy().reset())
-	for x in range(20):
+	for x in range(numTasks):
 		taskBridge.registerNewTask(
 			taskId = int(x), 
 			description = "description", 

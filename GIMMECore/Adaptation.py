@@ -46,7 +46,7 @@ class Adaptation(object):
 		adaptedGroups = adaptedConfig["groups"]
 		adaptedProfiles = adaptedConfig["profiles"]
 		adaptedAvgCharacteristics = adaptedConfig["avgCharacteristics"]
-		adaptedConfig["adaptedTaskIds"] = []
+		adaptedConfig["tasks"] = []
 
 		groupStr = "["
 
@@ -62,13 +62,14 @@ class Adaptation(object):
 
 				currState = self.playerModelBridge.getPlayerCurrState(playerId)
 				currState.profile = groupProfile	
-				currState.adaptedTaskId = adaptedTaskId	
+				self.playerModelBridge.setPlayerTasks(playerId, [adaptedTaskId])
 				self.playerModelBridge.setPlayerCharacteristics(playerId, currState.characteristics)
 				self.playerModelBridge.setPlayerProfile(playerId, currState.profile)
+				self.playerModelBridge.setPlayerGroup(playerId, currGroup)
 
 				groupStr += str(self.playerModelBridge.getPlayerPersonalityEst(playerId).dimensions.values())+",\n"
 
-			adaptedConfig["adaptedTaskIds"].append(adaptedTaskId)
+			adaptedConfig["tasks"].append(adaptedTaskId)
 
 
 			groupStr += ",groupPrf: "+ str(groupProfile.dimensions.values()) +" ],\n\n"

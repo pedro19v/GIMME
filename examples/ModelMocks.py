@@ -25,11 +25,12 @@ class TaskModelMock(object):
 class CustomTaskModelBridge(TaskModelBridge):
 	def __init__(self, tasks):
 		self.tasks = tasks
+		self.numTasks = len(tasks)
 
 	def registerNewTask(self, taskId, description, minRequiredAbility, profile, minDuration, difficultyWeight, profileWeight):
 		self.tasks[taskId] = TaskModelMock(taskId, description, minRequiredAbility, profile, minDuration, difficultyWeight, profileWeight)
 	def getAllTaskIds(self):
-		return [int(i) for i in range(20)]
+		return [int(i) for i in range(self.numTasks)]
 	def getTaskInteractionsProfile(self, taskId):
 		return self.tasks[taskId].profile
 	def getMinTaskRequiredAbility(self, taskId):
@@ -91,6 +92,12 @@ class CustomPlayerModelBridge(PlayerModelBridge):
 		self.players[int(playerId)].currState.characteristics = characteristics
 	def setPlayerProfile(self, playerId, profile):
 		self.players[int(playerId)].currState.profile = profile
+
+	def setPlayerGroup(self, playerId, group):
+		self.players[int(playerId)].currState.group = group
+
+	def setPlayerTasks(self, playerId, tasks):
+		self.players[int(playerId)].currState.tasks = tasks
 
 	def setPlayerRealPersonality(self, playerId, realPersonality):
 		self.players[int(playerId)].realPersonality = realPersonality

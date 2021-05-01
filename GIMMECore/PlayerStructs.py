@@ -25,8 +25,8 @@ class PlayerState(object):
 		self.dist = -1 if dist == None else dist
 		self.quality = -1 if quality == None else quality
 
-		self.groupId = -1
-		self.adaptedTaskId = -1
+		self.group = []
+		self.tasks = []
 
 	def reset(self):
 		self.characteristics.reset()
@@ -35,8 +35,9 @@ class PlayerState(object):
 		self.stateType = 1
 		self.quality = -1
 		self.dist = -1
-		self.groupId = -1
-		self.adaptedTaskId = -1
+		
+		self.group = []
+		self.tasks = []
 		return self
 
 

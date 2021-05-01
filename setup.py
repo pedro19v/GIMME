@@ -17,7 +17,8 @@ setup(
     'Topic :: Scientific/Engineering :: Adaptation'
     ],
     install_requires=[
-      'numpy'
+      'numpy',
+      'matplotlib'
     ]
 
 )
