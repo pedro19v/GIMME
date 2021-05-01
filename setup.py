@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="GIMMECore",
-    version="1.2.0",
+    version="1.3.0",
     license = "CC BY 4.0",
     author="Samuel Gomes",
     author_email = "samuel.gomes@tecnico.ulisboa.pt",
