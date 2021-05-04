@@ -16,7 +16,7 @@ class PlayerCharacteristics(object):
 		return self
 
 class PlayerState(object):
-	def __init__(self, stateType = None, profile = None, characteristics = None, dist = None, quality = None):
+	def __init__(self, stateType = None, profile = None, characteristics = None, dist = None, quality = None, group = None, tasks = None):
 		self.creationTime = time.time()
 		
 		self.stateType = 1 if stateType == None else stateType
@@ -25,8 +25,8 @@ class PlayerState(object):
 		self.dist = -1 if dist == None else dist
 		self.quality = -1 if quality == None else quality
 
-		self.group = []
-		self.tasks = []
+		self.group = [] if group == None else group
+		self.tasks = [] if tasks == None else tasks
 
 	def reset(self):
 		self.characteristics.reset()
