@@ -1,16 +1,10 @@
 import random
 import json
-import time
-import matplotlib.pyplot as plt
-import math
 import os
 import sys
-import datetime
-import numpy
+import textwrap
 
-import matplotlib.pyplot as plt
-from numpy import array
-import matplotlib.collections as collections
+from datetime import datetime, timedelta
 
 sys.path.insert(1,'/home/samgomes/Documents/doutoramento/reps/GIMME/GIMME')
 sys.path.insert(1,'/GIMME')
@@ -62,19 +56,26 @@ for x in range(numPlayers):
 	playerBridge.resetState(x)
 	playerBridge.getPlayerStateGrid(x).gridTrimAlg.considerStateResidue(True)
 
-print("Setting up the players...")
+print("Players created.")
+
+print("\nSetting up the tasks...")
 
 for x in range(numTasks):
+	diffW = random.uniform(0, 1)
+	profW = 1 - diffW
 	taskBridge.registerNewTask(
 		taskId = int(x), 
 		description = "description", 
 		minRequiredAbility = random.uniform(0, 1), 
-		profile = profileTemplate.generateCopy(), 
-		minDuration = datetime.timedelta(minutes=1), 
-		difficultyWeight = 0.5, 
-		profileWeight = 0.5)
+		profile = profileTemplate.randomized(), 
+		minDuration = str(timedelta(minutes=1)), 
+		difficultyWeight = diffW, 
+		profileWeight = profW)
 
-print("Setting up a random group. org. algorithm...")
+print("Tasks created:")
+print(json.dumps(taskBridge.tasks, default=lambda o: o.__dict__, sort_keys=True, indent=2))
+
+print("\nSetting up a random group. org. algorithm...")
 
 randomConfigsAlg = RandomConfigsGen(
 	playerModelBridge = playerBridge, 
@@ -97,12 +98,13 @@ while(True):
 		readyText = str(input("Please answer y/n: "))
 	ready = (readyText=="y")
 	if(not ready):
+		print("~~~~~~(The End)~~~~~~")
 		break
 
 
 	print("----------------------")
 	print("Iteration Summary:\n\n\n")
-	print(adaptationGIMME.iterate())
+	print(json.dumps(adaptationGIMME.iterate(), default=lambda o: o.__dict__, sort_keys=True))
 
 	print("----------------------\n\n\n")
 	print("Player States:\n\n\n")

@@ -71,12 +71,9 @@ class Adaptation(object):
 
 			adaptedConfig["tasks"].append(adaptedTaskId)
 
-
 			groupStr += ",groupPrf: "+ str(groupProfile.dimensions.values()) +" ],\n\n"
-
+			
 		groupStr += "]"
-		# print(groupStr)
-		# breakpoint()
 
 		return adaptedConfig
 
@@ -90,8 +87,8 @@ class Adaptation(object):
 		for i in range(len(possibleTaskIds)):
 			currTaskId = possibleTaskIds[i]
 
-			cost = abs(bestConfigProfile.sqrDistanceBetween(self.taskModelBridge.getTaskInteractionsProfile(currTaskId)) * self.taskModelBridge.getTaskDifficultyWeight(currTaskId))
-			cost += abs(avgState.ability - self.taskModelBridge.getMinTaskRequiredAbility(currTaskId) * self.taskModelBridge.getTaskProfileWeight(currTaskId))
+			cost = abs(bestConfigProfile.sqrDistanceBetween(self.taskModelBridge.getTaskInteractionsProfile(currTaskId)) * self.taskModelBridge.getTaskProfileWeight(currTaskId))
+			cost += abs(avgState.ability - self.taskModelBridge.getMinTaskRequiredAbility(currTaskId) * self.taskModelBridge.getTaskDifficultyWeight(currTaskId))
 
 			if cost < lowestCost:
 				lowestCost = cost
