@@ -174,7 +174,7 @@ class RandomConfigsGen(ConfigsGenAlg):
 				currState = self.playerModelBridge.getPlayerCurrState(currPlayer)
 				currAvgCharacteristics.ability += currState.characteristics.ability / groupSize
 				currAvgCharacteristics.engagement += currState.characteristics.engagement / groupSize
-			currAvgCharacteristics.profile = profile
+			# currAvgCharacteristics.profile = profile
 			newAvgCharacteristics.append(currAvgCharacteristics)
 
 		self.updateMetrics(newGroups)

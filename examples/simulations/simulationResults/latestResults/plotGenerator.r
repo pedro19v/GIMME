@@ -11,24 +11,29 @@ print("GeneratingPlots...")
 
 # do.call(file.remove, list(list.files("./plots/", full.names = TRUE)))
 
-# resultsLog <- read.csv(file="GIMMESims/results.csv", header=TRUE, sep=",")
-# resultsLog <- resultsLog[resultsLog$iteration > 19,]
-# resultsLog <- resultsLog[complete.cases(resultsLog),]
+resultsLog <- read.csv(file="GIMMESims/results.csv", header=TRUE, sep=",")
+resultsLog <- resultsLog[resultsLog$iteration > 19,]
+resultsLog <- resultsLog[complete.cases(resultsLog),]
 
-# print(sprintf("nRuns: %d", nrow(unique(resultsLog[c("simsID","run")]))))
+print(sprintf("nRuns: %d", nrow(unique(resultsLog[c("simsID","run")]))))
 
-# # plot strategies
-# avg <- aggregate(abilityInc ~ iteration*algorithm , resultsLog, mean)
-# avgPerRun <- aggregate(abilityInc ~ iteration*algorithm*run*simsID , resultsLog , mean)
-# sdev <- aggregate(abilityInc ~ iteration*algorithm , avgPerRun , sd)
+# plot strategies
+avg <- aggregate(abilityInc ~ iteration*algorithm , resultsLog, mean)
+avgPerRun <- aggregate(abilityInc ~ iteration*algorithm*run*simsID , resultsLog , mean)
+sdev <- aggregate(abilityInc ~ iteration*algorithm , avgPerRun , sd)
+
+# sdev <- aggregate(abilityInc ~ iteration*algorithm , resultsLog , sd) 
+# does not make sense, because it would be influenced by the learning rate of the students. 
+# Instead the standard deviation should be of the average of the class, per run.
 
 
-# # un <- unique(resultsLog[c("simsID","run","algorithm")])
-# # print(un %>% count(simsID,algorithm), n=Inf)
+
+# un <- unique(resultsLog[c("simsID","run","algorithm")])
+# print(un %>% count(simsID,algorithm), n=Inf)
 
 
-# # upBound <- max(avgPerRun$abilityInc[avgPerRun$algorithm == "accurate"]) #for maximum of all runs
-# upBound <- max(avg$abilityInc[avg$algorithm == "accurate"]) #for the maximum average value of all runs (more fair)
+# upBound <- max(avgPerRun$abilityInc[avgPerRun$algorithm == "accurate"]) #for maximum of all runs
+# # upBound <- max(avg$abilityInc[avg$algorithm == "accurate"]) #for the maximum average value of all runs (more fair)
 # avg$abilityInc[avg$algorithm == "accurate"] <- upBound
 # sdev$abilityInc[sdev$algorithm == "accurate"] <- 0
 
@@ -36,24 +41,32 @@ print("GeneratingPlots...")
 # save(avg, file = "avg.Rdata")
 # save(sdev, file = "sdev.Rdata")
 
-load(file = "avg.Rdata")
-load(file = "sdev.Rdata")
+# load(file = "avg.Rdata")
+# load(file = "sdev.Rdata")
+
+
 
 buildAbIncPlots <- function(logAvg, logSDev, plotName, colors = NULL){
 
 	plot <- ggplot(logAvg, aes(x = iteration, y=abilityInc, group=algorithm, color=algorithm, alpha = 0.8))
+
 	plot <- plot + geom_errorbar(width=.1, aes(ymin=logAvg$abilityInc-logSDev$abilityInc, 
 		ymax=logAvg$abilityInc+logSDev$abilityInc), size = 0.8)
 
 	plot <- plot + geom_line(aes(linetype=factor(logAvg$linetype)), size = 1.5)
 	plot <- plot + scale_linetype_manual(values=c("solid" = 1, "dashed" = 2), name = "linetype") + guides(linetype = FALSE)
 	
-	plot <- plot + labs(x = "Iteration", y = "avg. Ability Increase", color="Algorithm") + 
-					theme(axis.text = element_text(size = 30), 
-					axis.title = element_text(size = 35, face = "bold"), 
+	plot <- plot + labs(x = "Iteration", y = "Avg. Ability Increase", color="Algorithm") + 
+					theme(axis.text = element_text(size = 30, family="Calibri"), 
+					axis.title = element_text(size = 35, face = "bold", family="Calibri"), 
 					legend.title = element_blank(), 
 					legend.text = element_text(size=30), 
-					legend.position = 'bottom')
+					legend.position = 'bottom',
+					legend.key = element_blank(),
+					panel.background = element_blank(),
+					panel.grid.major = element_blank(), 
+					panel.grid.minor = element_blank(),
+					panel.border = element_rect(colour = "black", fill=NA, size=2.0))
 
 	plot <- plot + scale_x_continuous(labels = 1:20, breaks = 20:39) + scale_alpha(guide=FALSE)
 	if(!is.null(colors)){
