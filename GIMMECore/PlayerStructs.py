@@ -42,7 +42,7 @@ class PlayerState(object):
 		return self
 
 
-class PlayerStateDataFrame(object):
+class PlayerStatesDataFrame(object):
 	def __init__(self, interactionsProfileTemplate, gridTrimAlg, states = None):
 		self.interactionsProfileTemplate = interactionsProfileTemplate
 		self.gridTrimAlg = gridTrimAlg
@@ -55,7 +55,7 @@ class PlayerStateDataFrame(object):
 		self.flatEngagements = []
 
 	def reset(self):
-		self.states = [] if states == None else states
+		self.states = []
 		
 		#auxiliary stuff
 		self.flatProfiles = []
@@ -66,17 +66,24 @@ class PlayerStateDataFrame(object):
 
 	def pushToDataFrame(self, playerState):
 		self.states.append(playerState)
-		flatProfiles.append([dim for dim in playerState.profile.dimensions])
-		flatAbilities.append(playerState.profile.characteristics.ability)
-		flatEngagements.append(playerState.profile.characteristics.engagement)
 
-		trimmedList = self.gridTrimAlg.trimmedList(self.states)
+		#update tuple representation		
+		self.flatProfiles.append([dim for dim in playerState.profile.dimensions])
+		self.flatAbilities.append(playerState.characteristics.ability)
+		self.flatEngagements.append(playerState.characteristics.engagement)
 
-		self.state = trimmedList[0] 
-		for state in self.trimmedList[1]:
-			flatProfiles.remove([dim for dim in state.profile.dimensions])
-			flatAbilities.remove(state.profile.characteristics.ability)
-			flatEngagements.remove(state.profile.characteristics.ability)
+		trimmedListAndRemainder = self.gridTrimAlg.trimmedList(self.states)
+		trimmedList = trimmedListAndRemainder[0]
+		remainder = trimmedListAndRemainder[1]
+
+
+		self.states = trimmedList
+
+		#update tuple representation 
+		for state in remainder:
+			self.flatProfiles.remove([dim for dim in state.profile.dimensions])
+			self.flatAbilities.remove(state.characteristics.ability)
+			self.flatEngagements.remove(state.characteristics.engagement)
 
 
 	def getAllStates(self):

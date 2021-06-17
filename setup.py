@@ -18,7 +18,8 @@ setup(
     ],
     install_requires=[
       'numpy',
-      'scikit-learn'
+      'scikit-learn',
+      'pymongo'
     ]
 
 )

@@ -25,7 +25,7 @@ class PlayerModelBridge(ABC):
 		
 
 	@abstractmethod
-	def getPlayerStateGrid(self, playerId):
+	def getPlayerStatesDataFrame(self, playerId):
 		pass
 
 	@abstractmethod

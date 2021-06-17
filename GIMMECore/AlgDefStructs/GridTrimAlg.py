@@ -26,7 +26,7 @@ class AgeSortGridTrimAlg(GridTrimAlg):
 	def trimmedList(self, pastModelIncs):
 
 		if(len(pastModelIncs) < self.maxNumModelElements):
-			return pastModelIncs
+			return [pastModelIncs, []]
 
 		pastModelIncs = sorted(pastModelIncs, key=self.creationTimeSort)
 		return [pastModelIncs[-self.maxNumModelElements:],pastModelIncs[:-self.maxNumModelElements]]
@@ -63,7 +63,7 @@ class QualitySortGridTrimAlg(GridTrimAlg):
 
 
 		if(len(pastModelIncs) < self.maxNumModelElements):
-			return pastModelIncs
+			return [pastModelIncs, []]
 
 		pastModelIncs = sorted(pastModelIncs, key=self.qSort)
 		return [pastModelIncs[-self.maxNumModelElements:],pastModelIncs[:-self.maxNumModelElements]]

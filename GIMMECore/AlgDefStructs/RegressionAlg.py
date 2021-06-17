@@ -29,7 +29,7 @@ class KNNRegressionLegacy(RegressionAlg):
 		return elem.creationTime
 
 	def predict(self, profile, playerId):
-		pastModelIncs = self.playerModelBridge.getPlayerStateGrid(playerId).getAllStates().copy()
+		pastModelIncs = self.playerModelBridge.getPlayerStatesDataFrame(playerId).getAllStates().copy()
 		pastModelIncsSize = len(pastModelIncs)
 
 		predictedState = PlayerState(profile = profile, characteristics = PlayerCharacteristics())
@@ -70,7 +70,7 @@ class SVMRegression(RegressionAlg):
 
 	def predict(self, profile, playerId):
 		
-		pastModelIncs = self.playerModelBridge.getPlayerStateGrid(playerId).getAllStatesFlatten().copy()
+		pastModelIncs = self.playerModelBridge.getPlayerStatesDataFrame(playerId).getAllStatesFlatten().copy()
 
 		regr = svm.SVR()
 		profData = [dim for dim in profile.dimensions]

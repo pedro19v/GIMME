@@ -183,14 +183,13 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 			playerId = int(x), 
 			name = "name", 
 			currState = PlayerState(profile = profileTemplate.generateCopy().reset()), 
-			pastModelIncreasesGrid = PlayerStateGrid(
+			pastModelIncreasesGrid = PlayerStatesDataFrame(
 				interactionsProfileTemplate = profileTemplate.generateCopy().reset(), 
 				gridTrimAlg = QualitySortGridTrimAlg(
 				# gridTrimAlg = AgeSortGridTrimAlg(
 					maxNumModelElements = playerWindow, 
 					qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)
-					), 
-				numCells = 1
+					)
 				), 
 			currModelIncreases = PlayerCharacteristics(), personalityEst = profileTemplate.generateCopy().reset(), realPersonality = profileTemplate.generateCopy().reset())
 	for x in range(numTasks):
@@ -249,7 +248,7 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 			playerBridge.setPlayerRealPersonality(x, questionnairePersonality)
 			playerBridge.setBaseLearningRate(x, 0.5)
 
-			playerBridge.getPlayerStateGrid(x).gridTrimAlg.considerStateResidue(False)
+			playerBridge.getPlayerStatesDataFrame(x).gridTrimAlg.considerStateResidue(False)
 
 		playersDimsStr += "],\n"
 		# print(playersDimsStr)
@@ -266,7 +265,7 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 			playerBridge.setPlayerRealPersonality(x, realPersonality)
 			playerBridge.setBaseLearningRate(x, random.gauss(0.5, 0.05))
 
-			playerBridge.getPlayerStateGrid(x).gridTrimAlg.considerStateResidue(True)
+			playerBridge.getPlayerStatesDataFrame(x).gridTrimAlg.considerStateResidue(True)
 
 		executionPhase(False, playerBridge, numRealIterations, firstRealI, r, adaptation)
 
@@ -277,7 +276,7 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 # ----------------------- [Init Algorithms] --------------------------------
 print("Initing algorithms...")
 
-regAlg = KNNRegression(playerBridge, 5)
+regAlg = KNNRegressionLegacy(playerBridge, 5)
 
 intProfTemplate = InteractionsProfile({"dim_0": 0, "dim_1": 0, "dim_2": 0})
 

@@ -62,7 +62,7 @@ class CustomPlayerModelBridge(PlayerModelBridge):
 		self.players[int(playerId)].currState.reset()
 	def setAndSavePlayerStateToGrid(self, playerId, increases, newState):
 		self.players[int(playerId)].currState = newState
-		self.players[int(playerId)].pastModelIncreasesGrid.pushToGrid(increases)
+		self.players[int(playerId)].pastModelIncreasesGrid.pushToDataFrame(increases)
 
 	def setBaseLearningRate(self, playerId, blr):
 		self.players[int(playerId)].baseLearningRate = blr
@@ -78,7 +78,7 @@ class CustomPlayerModelBridge(PlayerModelBridge):
 		return self.players[int(playerId)].currState
 	def getPlayerCurrProfile(self,  playerId):
 		return self.players[int(playerId)].currState.profile
-	def getPlayerStateGrid(self, playerId):
+	def getPlayerStatesDataFrame(self, playerId):
 		return self.players[int(playerId)].pastModelIncreasesGrid
 	def getPlayerCurrCharacteristics(self, playerId):
 		return self.players[int(playerId)].currState.characteristics
