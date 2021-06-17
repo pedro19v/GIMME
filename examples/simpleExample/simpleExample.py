@@ -19,15 +19,15 @@ print("-----     SIMPLE GIMME API TEST      -----")
 print("-----                                -----")
 print("------------------------------------------")
 
-numPlayers = int(input("How many players would you like? "))
-numTasks = int(input("How many tasks would you like? "))
+numPlayers = 20#int(input("How many players would you like? "))
+numTasks = 5#int(input("How many tasks would you like? "))
 adaptationGIMME = Adaptation() 
 
 players = [0 for x in range(numPlayers)]
 tasks = [0 for x in range(numTasks)]
 
 
-preferredNumberOfPlayersPerGroup = int(input("How many players per group would you prefer? "))
+preferredNumberOfPlayersPerGroup = 4#int(input("How many players per group would you prefer? "))
 
 playerBridge = CustomPlayerModelBridge(players)
 taskBridge = CustomTaskModelBridge(tasks)
@@ -56,6 +56,18 @@ for x in range(numPlayers):
 	playerBridge.resetState(x)
 	playerBridge.getPlayerStateGrid(x).gridTrimAlg.considerStateResidue(True)
 
+	# init players including predicted personality
+	playerBridge.resetPlayer(x)
+
+	playerBridge.setPlayerPersonalityEst(x, profileTemplate.generateCopy().init())
+	# realPersonality = realPersonalities[x]
+	# playerBridge.setPlayerRealPersonality(x, realPersonality)
+
+	playerBridge.setPlayerRealPersonality(x, profileTemplate.randomized())
+	playerBridge.setBaseLearningRate(x, 0.5)
+
+	playerBridge.getPlayerStateGrid(x).gridTrimAlg.considerStateResidue(False)
+
 print("Players created.")
 
 print("\nSetting up the tasks...")
@@ -77,17 +89,84 @@ print(json.dumps(taskBridge.tasks, default=lambda o: o.__dict__, sort_keys=True,
 
 print("\nSetting up a random group. org. algorithm...")
 
-randomConfigsAlg = RandomConfigsGen(
+
+
+
+
+def simulateReaction(isBootstrap, playerBridge, playerId):
+	currState = playerBridge.getPlayerCurrState(playerId)
+	newState = calcReaction(
+		isBootstrap = isBootstrap, 
+		playerBridge = playerBridge, 
+		state = currState, 
+		playerId = playerId)
+
+	increases = PlayerState(stateType = newState.stateType)
+	increases.profile = currState.profile
+	increases.characteristics = PlayerCharacteristics(ability=(newState.characteristics.ability - currState.characteristics.ability), engagement=newState.characteristics.engagement)
+	playerBridge.setAndSavePlayerStateToGrid(playerId, increases, newState)	
+	return increases
+
+def calcReaction(isBootstrap, playerBridge, state, playerId):
+	personality = playerBridge.getPlayerRealPersonality(playerId)
+	numDims = len(personality.dimensions)
+	newStateType = 0 if isBootstrap else 1
+	newState = PlayerState(
+		stateType = newStateType, 
+		characteristics = PlayerCharacteristics(
+			ability=state.characteristics.ability, 
+			engagement=state.characteristics.engagement
+			), 
+		profile=state.profile)
+	newState.characteristics.engagement = 1 - (personality.distanceBetween(state.profile) / math.sqrt(numDims))  #between 0 and 1
+	if newState.characteristics.engagement>1:
+		breakpoint()
+	abilityIncreaseSim = (newState.characteristics.engagement*playerBridge.getBaseLearningRate(playerId))
+	newState.characteristics.ability = newState.characteristics.ability + abilityIncreaseSim
+	return newState
+
+
+
+
+
+
+numberOfConfigChoices = 100
+numTestedPlayerProfilesInEst = 500
+regAlg = KNNRegression(playerBridge, 5)
+simpleConfigsAlg = StochasticHillclimberConfigsGen(
 	playerModelBridge = playerBridge, 
 	interactionsProfileTemplate = profileTemplate.generateCopy(), 
-	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup
+	regAlg = regAlg, 
+	persEstAlg = ExplorationPersonalityEstAlg(
+		playerModelBridge = playerBridge, 
+		interactionsProfileTemplate = profileTemplate.generateCopy(), 
+		regAlg = regAlg,
+		numTestedPlayerProfiles = numTestedPlayerProfilesInEst, 
+		qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)), 
+	numberOfConfigChoices = numberOfConfigChoices, 
+	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
+	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)
 )
 adaptationGIMME.init(
 	playerModelBridge = playerBridge, 
 	taskModelBridge = taskBridge,
-	configsGenAlg = randomConfigsAlg, 
+	configsGenAlg = simpleConfigsAlg, 
 	name="Test Adaptation"
 )
+
+
+
+# randomConfigsAlg = RandomConfigsGen(
+# 	playerModelBridge = playerBridge, 
+# 	interactionsProfileTemplate = profileTemplate.generateCopy(), 
+# 	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup
+# )
+# adaptationGIMME.init(
+# 	playerModelBridge = playerBridge, 
+# 	taskModelBridge = taskBridge,
+# 	configsGenAlg = randomConfigsAlg, 
+# 	name="Test Adaptation"
+# )
 
 
 ready = True
@@ -109,6 +188,7 @@ while(True):
 	print("----------------------\n\n\n")
 	print("Player States:\n\n\n")
 	for x in range(numPlayers):
+		increases = simulateReaction(False, playerBridge, x)
 		print(json.dumps(playerBridge.getPlayerCurrState(x), default=lambda o: o.__dict__, sort_keys=True))
 
 

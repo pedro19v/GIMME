@@ -25,11 +25,11 @@ class AgeSortGridTrimAlg(GridTrimAlg):
 
 	def trimmedList(self, pastModelIncs):
 
-		if(len(pastModelIncs)< self.maxNumModelElements):
+		if(len(pastModelIncs) < self.maxNumModelElements):
 			return pastModelIncs
 
 		pastModelIncs = sorted(pastModelIncs, key=self.creationTimeSort)
-		return pastModelIncs[-(self.maxNumModelElements - 1):]
+		return [pastModelIncs[-self.maxNumModelElements:],pastModelIncs[:-self.maxNumModelElements]]
 
 
 class QualitySortGridTrimAlg(GridTrimAlg):
@@ -61,22 +61,18 @@ class QualitySortGridTrimAlg(GridTrimAlg):
 			if(modelInc.quality == -1):
 				modelInc.quality = self.calcQuality(modelInc)
 
-		# if(self.accStateResidue):
-		# 	self.accStateResidue = False
-		# 	return pastModelIncs[-3:]
-
 
 		if(len(pastModelIncs) < self.maxNumModelElements):
 			return pastModelIncs
 
 		pastModelIncs = sorted(pastModelIncs, key=self.qSort)
-		return pastModelIncs[-self.maxNumModelElements:]
+		return [pastModelIncs[-self.maxNumModelElements:],pastModelIncs[:-self.maxNumModelElements]]
 
-class QualitySoftMaxGridTrimAlg(GridTrimAlg):
+# class QualitySoftMaxGridTrimAlg(GridTrimAlg):
 
-	def __init__(self, qualityWeights = None):
-		super().__init__()
+# 	def __init__(self, qualityWeights = None):
+# 		super().__init__()
 
-	def trimmedList(self, pastModelIncs):
-		pass
+# 	def trimmedList(self, pastModelIncs):
+# 		pass
 		

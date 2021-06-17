@@ -1,7 +1,9 @@
-from abc import ABC, abstractmethod
 import copy
-from ..PlayerStructs import *
 import json
+
+from abc import ABC, abstractmethod
+from ..PlayerStructs import *
+from sklearn import svm
 
 class RegressionAlg(ABC):
 
@@ -13,8 +15,8 @@ class RegressionAlg(ABC):
 		pass
 
 
-# ---------------------- KNNRegression stuff ---------------------------
-class KNNRegression(RegressionAlg):
+# ---------------------- KNNRegressionLegacy ---------------------------
+class KNNRegressionLegacy(RegressionAlg):
 
 	def __init__(self, playerModelBridge, numberOfNNs):
 		super().__init__(playerModelBridge)
@@ -51,12 +53,40 @@ class KNNRegression(RegressionAlg):
 
 		return predictedState
 
+# ---------------------- KNNRegression ---------------------------
+class KNNRegression(RegressionAlg):
 
+	def __init__(self, playerModelBridge):
+		super().__init__(playerModelBridge)
 
-# ---------------------- NeuralNetworkRegression stuff ---------------------------
-class NeuralNetworkRegression(RegressionAlg):
+	def predict(self, profile, playerId):
+		pass
 
-	# possible TODO
+# ---------------------- SVMRegression ---------------------------
+class SVMRegression(RegressionAlg):
+
+	def __init__(self, playerModelBridge):
+		super().__init__(playerModelBridge)
+
+	def predict(self, profile, playerId):
+		
+		pastModelIncs = self.playerModelBridge.getPlayerStateGrid(playerId).getAllStatesFlatten().copy()
+
+		regr = svm.SVR()
+		profData = [dim for dim in profile.dimensions]
+
+		prevProfs = pastModelIncs['profiles']
+		regr.fit(prevProfs, pastModelIncs['ability'])
+		print(regr.predict([profData]))
+
+		regr.fit(prevProfs, pastModelIncs['engagement'])
+		print(regr.predict([[profData]]))
+
+		predState = PlayerState(profile = predProfile, characteristics = PlayerCharacteristics(ability = predAbility, engagement = predEngagement))
+		return predState
+
+# ---------------------- DecisionTreesRegression ---------------------------
+class DecisionTreesRegression(RegressionAlg):
 
 	def __init__(self, playerModelBridge):
 		super().__init__(playerModelBridge)
@@ -65,10 +95,8 @@ class NeuralNetworkRegression(RegressionAlg):
 		pass
 
 
-# ---------------------- ReinforcementLearningRegression stuff ---------------------------
-class ReinforcementLearningRegression(RegressionAlg):
-
-	# possible TODO
+# ---------------------- NeuralNetworkRegression ---------------------------
+class NeuralNetworkRegression(RegressionAlg):
 
 	def __init__(self, playerModelBridge):
 		super().__init__(playerModelBridge)

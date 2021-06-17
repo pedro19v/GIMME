@@ -28,6 +28,7 @@ class PlayerState(object):
 		self.group = [] if group == None else group
 		self.tasks = [] if tasks == None else tasks
 
+
 	def reset(self):
 		self.characteristics.reset()
 		self.profile.reset()
@@ -41,80 +42,49 @@ class PlayerState(object):
 		return self
 
 
-class PlayerStateGrid(object):
-	def __init__(self, interactionsProfileTemplate, gridTrimAlg, numCells = None, cells = None):
+class PlayerStateDataFrame(object):
+	def __init__(self, interactionsProfileTemplate, gridTrimAlg, states = None):
 		self.interactionsProfileTemplate = interactionsProfileTemplate
 		self.gridTrimAlg = gridTrimAlg
 
-		numCells = 1 if numCells == None else numCells
-		self.dimSpan = math.ceil(numCells**(1.0/float(4))) #floor of root 4
-		self.numCells = self.dimSpan**4
+		self.states = [] if states == None else states
 
-		self.numCellStates = 0
-
-		self.initialCells = cells
-		if(self.initialCells == None):
-			self.cells = [[] for i in range(self.numCells)]
-			self.serializedCells = []
-			self.numCellStates = 0
-		else:
-			self.cells = cells
-			self.serializedCells = []
-			self.numCellStates = 0
-			for cell in self.cells:
-				for state in cell:
-					self.serializedCells.append(state) 
-					self.numCellStates = self.numCellStates + 1
+		#auxiliary stuff
+		self.flatProfiles = []
+		self.flatAbilities = []
+		self.flatEngagements = []
 
 	def reset(self):
-		self.numCellStates = 0
-		if(self.initialCells == None):
-			self.cells = [[] for i in range(self.numCells)]
-			self.serializedCells = []
-			self.numCellStates = 0
-		else:
-			self.cells = cells
-			self.serializedCells = []
-			self.numCellStates = 0
-			for cell in self.cells:
-				for state in cell:
-					self.serializedCells.append(state) 
-					self.numCellStates = self.numCellStates + 1
+		self.states = [] if states == None else states
+		
+		#auxiliary stuff
+		self.flatProfiles = []
+		self.flatAbilities = []
+		self.flatEngagements = []
+
 		return self
 
-	def pushToGrid(self, playerState):
-		padding = self.interactionsProfileTemplate.generateCopy()
-		padding.reset()
-		currCellInd = 0
-		paddingKeys = list(padding.dimensions.keys())
-		for key in padding.dimensions:
-			currDim = padding.dimensions[key]
-			currDim = math.ceil(playerState.profile.dimensions[key] * self.dimSpan) - 1
-			if(currDim < 0):
-				currDim=0
-			currCellInd += (self.dimSpan**paddingKeys.index(key))*currDim
-			padding.dimensions[key] = currDim
+	def pushToDataFrame(self, playerState):
+		self.states.append(playerState)
+		flatProfiles.append([dim for dim in playerState.profile.dimensions])
+		flatAbilities.append(playerState.profile.characteristics.ability)
+		flatEngagements.append(playerState.profile.characteristics.engagement)
 
-		if(currCellInd==1):
-			breakpoint()
+		trimmedList = self.gridTrimAlg.trimmedList(self.states)
 
-		currCell = self.cells[currCellInd]
-		
-		self.serializedCells = list(set(self.serializedCells) - set(currCell))
-		self.numCellStates = self.numCellStates - len(currCell)
-		
-		currCell.append(playerState)
-		currCell = self.gridTrimAlg.trimmedList(currCell)
+		self.state = trimmedList[0] 
+		for state in self.trimmedList[1]:
+			flatProfiles.remove([dim for dim in state.profile.dimensions])
+			flatAbilities.remove(state.profile.characteristics.ability)
+			flatEngagements.remove(state.profile.characteristics.ability)
 
-		self.serializedCells.extend(currCell)
-		self.numCellStates = self.numCellStates + len(currCell)
-		
-		self.cells[currCellInd] = currCell
-		# print([elem.quality for elem in currCell])
 
 	def getAllStates(self):
-		# serialize multi into single dimensional array
-		return self.serializedCells
+		return self.states
+
+
+	def getAllStatesFlatten(self):
+		return {'profiles': self.flatProfiles, 'abilities': self.flatAbilities, 'engagements': self.flatEngagements}
 
 	def getNumStates(self):
-		return self.numCellStates
+		return len(self.states)
