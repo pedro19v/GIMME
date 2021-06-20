@@ -82,3 +82,6 @@ class InteractionsProfile(object):
 	def distanceBetween(self, profileToTest):
 		numDims = len(profileToTest.dimensions)
 		return self.sqrDistanceBetween(profileToTest)**(1/float(numDims)) 
+
+	def flattened(self):
+		return [dim for dim in self.dimensions.values()]

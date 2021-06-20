@@ -44,7 +44,7 @@ for x in range(numPlayers):
 		currState = PlayerState(profile = profileTemplate.generateCopy().reset()), 
 		pastModelIncreasesGrid = PlayerStatesDataFrame(
 			interactionsProfileTemplate = profileTemplate.generateCopy().reset(), 
-			gridTrimAlg = QualitySortGridTrimAlg(
+			gridTrimAlg = QualitySortPlayerDataTrimAlg(
 				maxNumModelElements = 30, 
 				qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)
 				)

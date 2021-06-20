@@ -706,8 +706,119 @@ class AccurateConfigsGen(ConfigsGenAlg):
 
 
 
+from deap import base
+from deap import creator
+from deap import tools
+from collections import *
 
-class EvolutionaryConfigsGen(ConfigsGenAlg):
+class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
+	def __init__(self, 
+		playerModelBridge, 
+		interactionsProfileTemplate, 
+		regAlg = None, 
+		numberOfConfigChoices = None, 
+		preferredNumberOfPlayersPerGroup = None, 
+		minNumberOfPlayersPerGroup = None, 
+		maxNumberOfPlayersPerGroup = None, 
+		fitnessWeights = None, 
+		probOfCross = None, 
+		probOfMutation = None, 
+		numFitSurvivors = None):
+
+		super().__init__(
+			playerModelBridge = playerModelBridge,
+			interactionsProfileTemplate = interactionsProfileTemplate, 
+			preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
+			minNumberOfPlayersPerGroup = minNumberOfPlayersPerGroup, 
+			maxNumberOfPlayersPerGroup = maxNumberOfPlayersPerGroup)
+
+		self.regAlg = regAlg
+		self.numberOfConfigChoices = 100 if numberOfConfigChoices == None else numberOfConfigChoices 
+
+		self.populationInited = False
+		self.numFitSurvivors = 10 if numFitSurvivors == None else numFitSurvivors
+		self.probOfCross = 0.7 if probOfCross == None else probOfCross
+		self.probOfMutation = 0.2 if probOfMutation == None else probOfMutation
+
+		if(regAlg==None):
+			regAlg = KNNRegression(playerModelBridge, 5)
+
+		self.fitnessWeights = PlayerCharacteristics(ability = 0.5, engagement = 0.5) if qualityWeights == None else qualityWeights
+
+		self.initGenAlg()
+
+
+	def reset(self):
+		super().reset()
+		self.currPopulation = []
+		self.currProfiles = []
+		self.populationInited = False
+
+
+	def calcFitness(self, individual):
+		config = individual[0]
+		profiles = individual[1]
+
+		for groupI in range(config):
+			
+			group = config[groupI]
+			profile = profiles[groupI]
+
+			totalFitness = 0
+
+			for playerId in group:
+				predictedIncreases = self.regAlg.predict(profile, playerId)
+				totalFitness += self.fitnessWeights.ability*predictedIncreases.characteristics.ability + self.fitnessWeights.engagement*predictedIncreases.characteristics.engagement
+
+		return totalFitness, #must return a tuple
+
+	def updatePopulation(self, playerIds, numPlayers, maxNumGroups, numberOfConfigChoices):
+		# represented as simple genotypes
+		self.currPopulation = [ {'config': [], 'fitness': 0.0}  for y in range(numberOfConfigChoices)]
+		for individual in self.currPopulation:
+			individual["config"] = [[playerIds[x], random.randint(0, maxNumGroups-1)] for x in range(numPlayers)]
+
+		self.currProfiles = [ {'config': [], 'fitness': 0.0} for y in range(numberOfConfigChoices)]
+		for individual in self.currProfiles:
+			individual["config"] = [InteractionsProfile(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1)) for x in range(maxNumGroups)]
+
+
+	def initGenAlg(self):
+		playerIds = self.playerModelBridge.getAllPlayerIds() 
+		minNumGroups = math.ceil(len(playerIds) / self.maxNumberOfPlayersPerGroup)
+		maxNumGroups = math.floor(len(playerIds) / self.minNumberOfPlayersPerGroup)
+
+		creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
+		creator.create("Individual", list, typecode='i', fitness=creator.FitnessMin)
+
+		toolbox = base.Toolbox()
+
+		toolbox.register("group", randomConfigGenerator, playerIds, minNumGroups, maxNumGroups)
+		toolbox.register("profile", InteractionsProfile().randomize())
+		toolbox.register("individual", tools.initRepeat, creator.Individual, [creator.group, creator.profile])
+		toolbox.register("population", tools.initRepeat, list, toolbox.individual)
+
+		toolbox.register("mate", tools.cxPartialyMatched)
+		toolbox.register("mutate", tools.mutShuffleIndexes, indpb=self.probOfMutation)
+		toolbox.register("select", tools.selTournament, tournsize=self.numFitSurvivors)
+		toolbox.register("evaluate", self.calcFitness)
+
+		random.seed(169)
+
+		self.pop = toolbox.population(n = self.numberOfConfigChoices)
+		self.hof = tools.HallOfFame(1)
+
+	def organize(self):
+		
+		algorithms.eaSimple(self.pop, toolbox, cxpb=self.probOfCross, mutpb=self.probOfMutation, ngen=500, hallOfFame = self.hof)
+		breakpoint()
+
+		return {"groups": bestGroups, "profiles": bestConfigProfiles, "avgCharacteristics": [PlayerCharacteristics() for i in range(maxNumGroups)]}
+
+
+
+
+class EvolutionaryConfigsGenLegacy(ConfigsGenAlg):
 	def __init__(self, 
 		playerModelBridge, 
 		interactionsProfileTemplate, 

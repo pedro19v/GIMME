@@ -3,7 +3,8 @@ import json
 
 from abc import ABC, abstractmethod
 from ..PlayerStructs import *
-from sklearn import svm
+
+from sklearn import linear_model, neighbors
 
 class RegressionAlg(ABC):
 
@@ -15,8 +16,8 @@ class RegressionAlg(ABC):
 		pass
 
 
-# ---------------------- KNNRegressionLegacy ---------------------------
-class KNNRegressionLegacy(RegressionAlg):
+# ---------------------- KNNRegression ---------------------------
+class KNNRegression(RegressionAlg):
 
 	def __init__(self, playerModelBridge, numberOfNNs):
 		super().__init__(playerModelBridge)
@@ -29,6 +30,9 @@ class KNNRegressionLegacy(RegressionAlg):
 		return elem.creationTime
 
 	def predict(self, profile, playerId):
+		# import time
+		# startTime = time.time()
+
 		pastModelIncs = self.playerModelBridge.getPlayerStatesDataFrame(playerId).getAllStates().copy()
 		pastModelIncsSize = len(pastModelIncs)
 
@@ -51,38 +55,105 @@ class KNNRegressionLegacy(RegressionAlg):
 			predictedState.characteristics.ability += pastCharacteristics.ability * ratio
 			predictedState.characteristics.engagement += pastCharacteristics.engagement * ratio
 
+		# executionTime = (time.time() - startTime)
+		# print('Execution time in seconds: ' + str(executionTime))
+		
 		return predictedState
 
-# ---------------------- KNNRegression ---------------------------
-class KNNRegression(RegressionAlg):
+# ---------------------- KNNRegressionSKLearn ---------------------------
+class KNNRegressionSKLearn(RegressionAlg):
 
-	def __init__(self, playerModelBridge):
+	def __init__(self, playerModelBridge, numberOfNNs):
 		super().__init__(playerModelBridge)
+		self.numberOfNNs = numberOfNNs
+
 
 	def predict(self, profile, playerId):
-		pass
+		# import time
+		# startTime = time.time()
 
-# ---------------------- SVMRegression ---------------------------
-class SVMRegression(RegressionAlg):
+		pastModelIncs = self.playerModelBridge.getPlayerStatesDataFrame(playerId).getAllStatesFlatten()
+
+		lenPMI = len(pastModelIncs['profiles'])
+		
+		numberOfNNs = self.numberOfNNs
+		if(lenPMI < self.numberOfNNs):
+			if(lenPMI==0):
+				return PlayerState(profile = profile, characteristics = PlayerCharacteristics(ability = 0.5, engagement = 0.5))
+			numberOfNNs = lenPMI
+
+		profData = profile.flattened()
+		prevProfs = pastModelIncs['profiles']
+		
+
+		self.regrAb = neighbors.KNeighborsRegressor(numberOfNNs, weights="distance")
+		self.regrAb.fit(prevProfs, pastModelIncs['abilities'])
+		predAbilityInc = self.regrAb.predict([profData])[0]
+
+		self.regrEng = neighbors.KNeighborsRegressor(numberOfNNs, weights="distance")
+		self.regrEng.fit(prevProfs, pastModelIncs['engagements'])
+		predEngagement = self.regrEng.predict([profData])[0]
+
+		predState = PlayerState(profile = profile, characteristics = PlayerCharacteristics(ability = predAbilityInc, engagement = predEngagement))
+		
+
+		# executionTime = (time.time() - startTime)
+		# print('Execution time in seconds: ' + str(executionTime))
+
+		return predState
+
+# ---------------------- LinearRegressionSKLearn ---------------------------
+class LinearRegressionSKLearn(RegressionAlg):
 
 	def __init__(self, playerModelBridge):
 		super().__init__(playerModelBridge)
 
 	def predict(self, profile, playerId):
 		
-		pastModelIncs = self.playerModelBridge.getPlayerStatesDataFrame(playerId).getAllStatesFlatten().copy()
+		pastModelIncs = self.playerModelBridge.getPlayerStatesDataFrame(playerId).getAllStatesFlatten()
 
-		regr = svm.SVR()
-		profData = [dim for dim in profile.dimensions]
+		if(len(pastModelIncs['profiles'])==0):
+			return PlayerState(profile = profile, characteristics = PlayerCharacteristics(ability = 0.5, engagement = 0.5))
+
+		profData = profile.flattened()
 
 		prevProfs = pastModelIncs['profiles']
-		regr.fit(prevProfs, pastModelIncs['ability'])
-		print(regr.predict([profData]))
 
-		regr.fit(prevProfs, pastModelIncs['engagement'])
-		print(regr.predict([[profData]]))
+		regr = linear_model.LinearRegression() 
+		regr.fit(prevProfs, pastModelIncs['abilities'])
+		predAbilityInc = regr.predict([profData])[0]
 
-		predState = PlayerState(profile = predProfile, characteristics = PlayerCharacteristics(ability = predAbility, engagement = predEngagement))
+		regr.fit(prevProfs, pastModelIncs['engagements'])
+		predEngagement = regr.predict([profData])[0]
+
+		predState = PlayerState(profile = profile, characteristics = PlayerCharacteristics(ability = predAbilityInc, engagement = predEngagement))
+		return predState
+
+# ---------------------- SVMRegressionSKLearn ---------------------------
+class SVMRegressionSKLearn(RegressionAlg):
+
+	def __init__(self, playerModelBridge):
+		super().__init__(playerModelBridge)
+
+	def predict(self, profile, playerId):
+		
+		pastModelIncs = self.playerModelBridge.getPlayerStatesDataFrame(playerId).getAllStatesFlatten()
+
+		if(len(pastModelIncs['profiles'])==0):
+			return PlayerState(profile = profile, characteristics = PlayerCharacteristics(ability = 0.5, engagement = 0.5))
+
+		profData = profile.flattened()
+
+		prevProfs = pastModelIncs['profiles']
+
+		regr = svm.SVR()
+		regr.fit(prevProfs, pastModelIncs['abilities'])
+		predAbility = regr.predict([profData])[0]
+
+		regr.fit(prevProfs, pastModelIncs['engagements'])
+		predEngagement = regr.predict([profData])[0]
+
+		predState = PlayerState(profile = profile, characteristics = PlayerCharacteristics(ability = predAbility, engagement = predEngagement))
 		return predState
 
 # ---------------------- DecisionTreesRegression ---------------------------

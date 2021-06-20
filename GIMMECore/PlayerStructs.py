@@ -68,22 +68,30 @@ class PlayerStatesDataFrame(object):
 		self.states.append(playerState)
 
 		#update tuple representation		
-		self.flatProfiles.append([dim for dim in playerState.profile.dimensions])
+		self.flatProfiles.append(playerState.profile.flattened())
 		self.flatAbilities.append(playerState.characteristics.ability)
 		self.flatEngagements.append(playerState.characteristics.engagement)
 
+		# print(json.dumps(self.states, default=lambda o: o.__dict__, sort_keys=True, indent=2))
+		# print("---------")
+		# print(self.flatProfiles)
+		# print(self.flatAbilities)
+		# print(self.flatEngagements)
+
 		trimmedListAndRemainder = self.gridTrimAlg.trimmedList(self.states)
 		trimmedList = trimmedListAndRemainder[0]
-		remainder = trimmedListAndRemainder[1]
+		remainderIndexes = trimmedListAndRemainder[1]
 
+		# print(remainderIndexes)
+		
 
 		self.states = trimmedList
 
 		#update tuple representation 
-		for state in remainder:
-			self.flatProfiles.remove([dim for dim in state.profile.dimensions])
-			self.flatAbilities.remove(state.characteristics.ability)
-			self.flatEngagements.remove(state.characteristics.engagement)
+		for i in remainderIndexes:
+			self.flatProfiles.pop(i)
+			self.flatAbilities.pop(i)
+			self.flatEngagements.pop(i)
 
 
 	def getAllStates(self):

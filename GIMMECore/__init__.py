@@ -2,7 +2,7 @@ from .Adaptation import Adaptation
 from .AlgDefStructs.RegressionAlg import *
 from .AlgDefStructs.ConfigsGenAlg import *
 from .AlgDefStructs.PersonalityEstAlg import *
-from .AlgDefStructs.GridTrimAlg import *
+from .AlgDefStructs.PlayerDataTrimAlg import *
 
 from .PlayerStructs import *
 from .InteractionsProfile import InteractionsProfile

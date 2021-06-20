@@ -38,7 +38,7 @@ print("------------------------------------------")
 random.seed(time.perf_counter())
 simsID = seed = random.randrange(sys.maxsize)
 
-numRuns = 25
+numRuns = 10
 maxNumTrainingIterations = 20
 numRealIterations = 20
 
@@ -50,7 +50,7 @@ numTestedPlayerProfilesInEst = 500
 playerWindow = 10
 numPlayers = 23
 
-numTasks = 20
+numTasks = 1
 
 startTime = str(datetime.datetime.now())
 newpath = "./simulationResults/latestResults/"
@@ -185,8 +185,8 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 			currState = PlayerState(profile = profileTemplate.generateCopy().reset()), 
 			pastModelIncreasesGrid = PlayerStatesDataFrame(
 				interactionsProfileTemplate = profileTemplate.generateCopy().reset(), 
-				gridTrimAlg = QualitySortGridTrimAlg(
-				# gridTrimAlg = AgeSortGridTrimAlg(
+				gridTrimAlg = QualitySortPlayerDataTrimAlg(
+				# gridTrimAlg = AgeSortPlayerDataTrimAlg(
 					maxNumModelElements = playerWindow, 
 					qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)
 					)
@@ -276,7 +276,8 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 # ----------------------- [Init Algorithms] --------------------------------
 print("Initing algorithms...")
 
-regAlg = KNNRegressionLegacy(playerBridge, 5)
+regAlg = KNNRegression(playerModelBridge = playerBridge, numberOfNNs = 5)
+# regAlg = KNNRegressionSKLearn(playerModelBridge = playerBridge, numberOfNNs = 5)
 
 intProfTemplate = InteractionsProfile({"dim_0": 0, "dim_1": 0, "dim_2": 0})
 

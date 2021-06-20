@@ -3,7 +3,7 @@ import copy
 from ..PlayerStructs import *
 import json
 
-class GridTrimAlg(ABC):
+class PlayerDataTrimAlg(ABC):
 
 	def __init__(self):
 		pass
@@ -14,7 +14,7 @@ class GridTrimAlg(ABC):
 
 
 # ---------------------- KNNRegression stuff ---------------------------
-class AgeSortGridTrimAlg(GridTrimAlg):
+class AgeSortPlayerDataTrimAlg(PlayerDataTrimAlg):
 
 	def __init__(self, maxNumModelElements):
 		super().__init__()
@@ -28,11 +28,14 @@ class AgeSortGridTrimAlg(GridTrimAlg):
 		if(len(pastModelIncs) < self.maxNumModelElements):
 			return [pastModelIncs, []]
 
-		pastModelIncs = sorted(pastModelIncs, key=self.creationTimeSort)
-		return [pastModelIncs[-self.maxNumModelElements:],pastModelIncs[:-self.maxNumModelElements]]
+		pastModelIncsSorted = sorted(pastModelIncs, key=self.creationTimeSort)
+		removedI = pastModelIncs.index(pastModelIncsSorted[self.maxNumModelElements - 1])
+		pastModelIncs.pop(removedI)
+		# return [pastModelIncs[-self.maxNumModelElements:], pastModelIncs[:-self.maxNumModelElements]]
+		return [pastModelIncs, [removedI]]
 
 
-class QualitySortGridTrimAlg(GridTrimAlg):
+class QualitySortPlayerDataTrimAlg(PlayerDataTrimAlg):
 
 	def __init__(self, maxNumModelElements, qualityWeights = None, accStateResidue = None):
 		super().__init__()
@@ -65,10 +68,14 @@ class QualitySortGridTrimAlg(GridTrimAlg):
 		if(len(pastModelIncs) < self.maxNumModelElements):
 			return [pastModelIncs, []]
 
-		pastModelIncs = sorted(pastModelIncs, key=self.qSort)
-		return [pastModelIncs[-self.maxNumModelElements:],pastModelIncs[:-self.maxNumModelElements]]
+		pastModelIncsSorted = sorted(pastModelIncs, key=self.qSort)
+		removedI = pastModelIncs.index(pastModelIncsSorted[self.maxNumModelElements - 1])
+		pastModelIncs.pop(removedI)
+		# return [pastModelIncs[-self.maxNumModelElements:], pastModelIncs[:-self.maxNumModelElements]]
+		return [pastModelIncs, [removedI]]
 
-# class QualitySoftMaxGridTrimAlg(GridTrimAlg):
+
+# class QualitySoftMaxPlayerDataTrimAlg(PlayerDataTrimAlg):
 
 # 	def __init__(self, qualityWeights = None):
 # 		super().__init__()
