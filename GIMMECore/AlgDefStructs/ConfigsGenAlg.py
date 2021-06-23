@@ -748,7 +748,7 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 	def randomIndividualGenerator(self, playerIds, minNumGroups, maxNumGroups):
 		groups = self.randomConfigGenerator(playerIds, minNumGroups, maxNumGroups)
 		profs = [self.randomProfileGenerator() for i in range(len(groups))]
-		return [groups, [val for sublist in profs for val in sublist]]
+		return [groups, profs]
 
 	def randomProfileGenerator(self):
 		return self.interactionsProfileTemplate.randomized().flattened()
@@ -756,9 +756,13 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 
 
 	def cxGIMME(self, ind1, ind2):
+
 		# configs
 		config1 = ind1[0]
 		config2 = ind2[0]
+
+		newConfig1 = []
+		newConfig2 = []
 
 		l1 = len(config1)
 		l2 = len(config2)
@@ -821,21 +825,20 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 			child2.extend(remainder2[:missingLen2])
 			remainder2 = remainder2[missingLen2:]
 
+			newConfig1.append(child1)
+			newConfig2.append(child2)
 
 
 
+		# profiles are maintained
+		# prof1 = ind1[1]
+		# prof2 = ind2[1]
 
-		# profiles
-		prof1 = ind1[1]
-		prof2 = ind2[1]
+		# newProfiles = tools.cxBlend(prof1, prof2, 0.5)
 
-		newProfiles = tools.cxBlend(prof1, prof2, 0.5)
-
-		#the inds become offsprings
-		ind1[0] = newConfigs[0] 
-		ind1[1] = newProfiles[0]
-		ind2[0] = newConfigs[1] 
-		ind2[1] = newProfiles[1]
+		#the inds become children
+		ind1[0] = newConfig1
+		ind2[0] = newConfig2
 
 		return (ind1, ind2)
 
@@ -843,7 +846,7 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 	def mutGIMME(self, individual, indpb):
 		#only mutate GIPs for now
 		prof = individual[1]
-		individual[1] = tools.mutShuffleIndexes(prof, indpb)
+		individual[1][random.randint(0,len(individual[1])-1)] = self.randomProfileGenerator()
 		return individual,
 
 	def reset(self):
@@ -853,13 +856,12 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 	def calcFitness(self, individual):
 		config = individual[0]
 		profiles = individual[1]
-		profiles = [profiles[x:x+2] for x in range(0, len(profiles), 2)]
 
-		print(profiles)
 		for groupI in range(len(config)):
 			
 			group = config[groupI]
 			flatProfile = profiles[groupI]
+
 
 			#unflatten profile
 			profile = self.interactionsProfileTemplate.unflattened(array = flatProfile)
@@ -900,7 +902,7 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 
 	def organize(self):
 		
-		algorithms.eaSimple(self.pop, self.toolbox, cxpb=self.probOfCross, mutpb=self.probOfMutation, ngen=500, halloffame = self.hof)
+		algorithms.eaSimple(self.pop, self.toolbox, cxpb=self.probOfCross, mutpb=self.probOfMutation, ngen=500, halloffame = self.hof, verbose=True)
 		breakpoint()
 
 		return {"groups": bestGroups, "profiles": bestConfigProfiles, "avgCharacteristics": [PlayerCharacteristics() for i in range(maxNumGroups)]}
