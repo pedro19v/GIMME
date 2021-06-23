@@ -751,7 +751,7 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		return [groups, profs]
 
 	def randomProfileGenerator(self):
-		return self.interactionsProfileTemplate.randomized().flattened()
+		return self.interactionsProfileTemplate.randomized()
 
 
 
@@ -860,11 +860,8 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		for groupI in range(len(config)):
 			
 			group = config[groupI]
-			flatProfile = profiles[groupI]
+			profile = profiles[groupI]
 
-
-			#unflatten profile
-			profile = self.interactionsProfileTemplate.unflattened(array = flatProfile)
 			totalFitness = 0
 
 			for playerId in group:
@@ -895,17 +892,28 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		self.toolbox.register("select", tools.selTournament, tournsize=self.numFitSurvivors)
 		self.toolbox.register("evaluate", self.calcFitness)
 
-		# random.seed(169)
-
 		self.pop = self.toolbox.population(n = self.numberOfConfigChoices)
 		self.hof = tools.HallOfFame(1)
 
 	def organize(self):
-		
-		algorithms.eaSimple(self.pop, self.toolbox, cxpb=self.probOfCross, mutpb=self.probOfMutation, ngen=500, halloffame = self.hof, verbose=True)
-		breakpoint()
+		algorithms.eaSimple(self.pop, self.toolbox, cxpb=self.probOfCross, mutpb=self.probOfMutation, ngen=5, halloffame = self.hof, verbose=True)
 
-		return {"groups": bestGroups, "profiles": bestConfigProfiles, "avgCharacteristics": [PlayerCharacteristics() for i in range(maxNumGroups)]}
+		bestGroups = self.hof[0][0]
+		bestConfigProfiles = self.hof[0][1]
+
+		avgCharacteristicsArray = []
+		for group in bestGroups:
+			groupSize = len(group)
+			avgCharacteristics = PlayerCharacteristics()
+			for currPlayer in group:
+				currState = self.playerModelBridge.getPlayerCurrState(currPlayer)
+				avgCharacteristics.ability += currState.characteristics.ability / groupSize
+				avgCharacteristics.engagement += currState.characteristics.engagement / groupSize
+			avgCharacteristicsArray.append(avgCharacteristics)
+
+
+
+		return {"groups": bestGroups, "profiles": bestConfigProfiles, "avgCharacteristics": avgCharacteristicsArray}
 
 
 
