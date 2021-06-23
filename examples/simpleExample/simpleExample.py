@@ -32,7 +32,7 @@ preferredNumberOfPlayersPerGroup = 4#int(input("How many players per group would
 playerBridge = CustomPlayerModelBridge(players)
 taskBridge = CustomTaskModelBridge(tasks)
 
-profileTemplate = InteractionsProfile({"Valence": 0, "Focus": 0})
+profileTemplate = InteractionsProfile({"Focus": 0, "Challenge": 0})
 
 
 print("Setting up the players...")

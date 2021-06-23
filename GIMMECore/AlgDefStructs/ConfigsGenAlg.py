@@ -742,7 +742,30 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 
 		self.qualityWeights = PlayerCharacteristics(ability = 0.5, engagement = 0.5) if qualityWeights == None else qualityWeights
 
-		self.initGenAlg()
+
+
+		playerIds = self.playerModelBridge.getAllPlayerIds() 
+		minNumGroups = math.ceil(len(playerIds) / self.maxNumberOfPlayersPerGroup)
+		maxNumGroups = math.floor(len(playerIds) / self.minNumberOfPlayersPerGroup)
+
+		creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
+		creator.create("Individual", list, typecode='i', fitness=creator.FitnessMin)
+
+		self.toolbox = base.Toolbox()
+
+		self.toolbox.register("indices", self.randomIndividualGenerator, playerIds, minNumGroups, maxNumGroups)
+		# toolbox.register("indices", [toolbox.group, toolbox.profile])
+
+		self.toolbox.register("individual", tools.initIterate, creator.Individual, self.toolbox.indices)
+		self.toolbox.register("population", tools.initRepeat, list, self.toolbox.individual)
+
+		self.toolbox.register("mate", self.cxGIMME)
+		self.toolbox.register("mutate", self.mutGIMME, indpb=self.probOfMutation)
+		self.toolbox.register("select", tools.selTournament, tournsize=self.numFitSurvivors)
+		self.toolbox.register("evaluate", self.calcFitness)
+
+
+		self.resetGenAlg()
 
 
 	def randomIndividualGenerator(self, playerIds, minNumGroups, maxNumGroups):
@@ -851,7 +874,7 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 
 	def reset(self):
 		super().reset()
-		self.initGenAlg()
+		self.resetGenAlg()
 
 	def calcFitness(self, individual):
 		config = individual[0]
@@ -871,32 +894,14 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		return totalFitness, #must return a tuple
 
 	
-	def initGenAlg(self):
-		playerIds = self.playerModelBridge.getAllPlayerIds() 
-		minNumGroups = math.ceil(len(playerIds) / self.maxNumberOfPlayersPerGroup)
-		maxNumGroups = math.floor(len(playerIds) / self.minNumberOfPlayersPerGroup)
-
-		creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
-		creator.create("Individual", list, typecode='i', fitness=creator.FitnessMin)
-
-		self.toolbox = base.Toolbox()
-
-		self.toolbox.register("indices", self.randomIndividualGenerator, playerIds, minNumGroups, maxNumGroups)
-		# toolbox.register("indices", [toolbox.group, toolbox.profile])
-
-		self.toolbox.register("individual", tools.initIterate, creator.Individual, self.toolbox.indices)
-		self.toolbox.register("population", tools.initRepeat, list, self.toolbox.individual)
-
-		self.toolbox.register("mate", self.cxGIMME)
-		self.toolbox.register("mutate", self.mutGIMME, indpb=self.probOfMutation)
-		self.toolbox.register("select", tools.selTournament, tournsize=self.numFitSurvivors)
-		self.toolbox.register("evaluate", self.calcFitness)
+	def resetGenAlg(self):
+		
 
 		self.pop = self.toolbox.population(n = self.numberOfConfigChoices)
 		self.hof = tools.HallOfFame(1)
 
 	def organize(self):
-		algorithms.eaSimple(self.pop, self.toolbox, cxpb=self.probOfCross, mutpb=self.probOfMutation, ngen=5, halloffame = self.hof, verbose=True)
+		algorithms.eaSimple(self.pop, self.toolbox, cxpb=self.probOfCross, mutpb=self.probOfMutation, ngen=5, halloffame = self.hof, verbose=False)
 
 		bestGroups = self.hof[0][0]
 		bestConfigProfiles = self.hof[0][1]
@@ -910,8 +915,6 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 				avgCharacteristics.ability += currState.characteristics.ability / groupSize
 				avgCharacteristics.engagement += currState.characteristics.engagement / groupSize
 			avgCharacteristicsArray.append(avgCharacteristics)
-
-
 
 		return {"groups": bestGroups, "profiles": bestConfigProfiles, "avgCharacteristics": avgCharacteristicsArray}
 

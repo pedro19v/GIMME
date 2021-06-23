@@ -75,17 +75,10 @@ taskBridge = CustomTaskModelBridge(tasks)
 
 # ----------------------- [Init Adaptations] --------------------------------
 adaptationGIMME = Adaptation()
-adaptationGIMMESA = Adaptation()
-adaptationGIMMEOld = Adaptation()
-
-adaptationGIMME1D = Adaptation()
-adaptationGIMME2D = Adaptation()
-adaptationGIMME5D = Adaptation()
-adaptationGIMME6D = Adaptation()
+adaptationEvl = Adaptation()
 
 
 adaptationRandom = Adaptation()
-adaptationRandomOld = Adaptation()
 adaptationAccurate = Adaptation()
 
 
@@ -277,55 +270,28 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 print("Initing algorithms...")
 
 regAlg = KNNRegression(playerModelBridge = playerBridge, numberOfNNs = 5)
-# regAlg = KNNRegressionSKLearn(playerModelBridge = playerBridge, numberOfNNs = 5)
 
-intProfTemplate = InteractionsProfile({"dim_0": 0, "dim_1": 0, "dim_2": 0})
+# - - - - - 
+intProfTemplate = InteractionsProfile({"dim_0": 0, "dim_1": 0})
 
-simpleConfigsAlgOld = StochasticHillclimberConfigsGen(
+evolutionaryConfigsAlg = EvolutionaryConfigsGenDEAP(
 	playerModelBridge = playerBridge, 
 	interactionsProfileTemplate = intProfTemplate.generateCopy(), 
 	regAlg = regAlg, 
-	persEstAlg = ExplorationPersonalityEstAlg(
-		playerModelBridge = playerBridge, 
-		interactionsProfileTemplate = intProfTemplate.generateCopy(), 
-		regAlg = regAlg,
-		numTestedPlayerProfiles = numTestedPlayerProfilesInEst, 
-		qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)), 
 	numberOfConfigChoices = numberOfConfigChoices, 
 	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
-	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)
+	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5),
+	probOfCross = 0.7, 
+	probOfMutation = 0.2, 
+	numFitSurvivors = 10
 )
-# simpleConfigsAlgOld = SimulatedAnnealingConfigsGen(
-# 	playerBridge, 
-# 	intProfTemplate.generateCopy(), 
-# 	regAlg, 
-# 	numTestedGroupProfiles = numTestedPlayerProfilesInEst,
-# 	numberOfConfigChoices = numberOfConfigChoices, 
-# 	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
-# 	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5))
-adaptationGIMMEOld.init(
-	playerModelBridge = playerBridge, 
-	taskModelBridge = taskBridge, 
-	configsGenAlg = simpleConfigsAlgOld, 
-	name="GIMMEOld"
-)
-
-randomOldConfigsAlg = RandomConfigsGen(
-	playerModelBridge = playerBridge, 
-	interactionsProfileTemplate = intProfTemplate.generateCopy(), 
-	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup
-)
-adaptationRandomOld.init(
+adaptationEvl.init(
 	playerModelBridge = playerBridge, 
 	taskModelBridge = taskBridge,
-	configsGenAlg = randomOldConfigsAlg,
-	name="randomOld"
+	configsGenAlg = evolutionaryConfigsAlg, 
+	name="GIMME"
 )
 
-
-
-# - - - - - 
-intProfTemplate = InteractionsProfile({"dim_0": 0, "dim_1": 0, "dim_2": 0, "dim_3": 0})
 simpleConfigsAlg = StochasticHillclimberConfigsGen(
 	playerModelBridge = playerBridge, 
 	interactionsProfileTemplate = intProfTemplate.generateCopy(), 
@@ -348,29 +314,6 @@ adaptationGIMME.init(
 )
 
 
-simpleConfigsAlgSA = SimulatedAnnealingConfigsGen(
-	playerModelBridge = playerBridge, 
-	interactionsProfileTemplate = intProfTemplate.generateCopy(), 
-	regAlg = regAlg, 
-	persEstAlg = ExplorationPersonalityEstAlg(
-		playerModelBridge = playerBridge, 
-		interactionsProfileTemplate = intProfTemplate.generateCopy(), 
-		regAlg = regAlg,
-		numTestedPlayerProfiles = numTestedPlayerProfilesInEst, 
-		qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)), 
-	temperatureDecay = 2.0 / float(playerWindow), 
-	numberOfConfigChoices = numberOfConfigChoices, 
-	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
-	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)
-)
-adaptationGIMMESA.init(
-	playerModelBridge = playerBridge, 
-	taskModelBridge = taskBridge,
-	configsGenAlg = simpleConfigsAlgSA, 
-	name="GIMME_SA"
-)
-
-
 randomConfigsAlg = RandomConfigsGen(
 	playerModelBridge = playerBridge, 
 	interactionsProfileTemplate = intProfTemplate.generateCopy(), 
@@ -383,187 +326,24 @@ adaptationRandom.init(
 	name="random"
 )
 
-accurateConfigsAlg = AccurateConfigsGen(
-	playerModelBridge = playerBridge, 
-	interactionsProfileTemplate = intProfTemplate.generateCopy(), 
-	simulationFunc = calcReaction, 
-	numberOfConfigChoices = numberOfConfigChoices, 
-	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
-	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)  #needed for currIteration updates
-)
-adaptationAccurate.init(
-	playerModelBridge = playerBridge, 
-	taskModelBridge = taskBridge,
-	configsGenAlg = accurateConfigsAlg,
-	name="accurate"
-)
-
-
-# - - - - -
-intProfTemplate = InteractionsProfile({"dim_0": 0})
-simpleConfigsAlg1D = StochasticHillclimberConfigsGen(
-	playerModelBridge = playerBridge, 
-	interactionsProfileTemplate = intProfTemplate.generateCopy(), 
-	regAlg = regAlg, 
-	persEstAlg = ExplorationPersonalityEstAlg(
-		playerModelBridge = playerBridge, 
-		interactionsProfileTemplate = intProfTemplate.generateCopy(), 
-		regAlg = regAlg,
-		numTestedPlayerProfiles = numTestedPlayerProfilesInEst, 
-		qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)), 
-	numberOfConfigChoices = numberOfConfigChoices, 
-	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
-	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)
-)
-adaptationGIMME1D.init(
-	playerModelBridge = playerBridge, 
-	taskModelBridge = taskBridge, 
-	configsGenAlg = simpleConfigsAlg1D, 
-	name="GIMME1D"
-)
-
-
-
-intProfTemplate = InteractionsProfile({"dim_0": 0, "dim_1": 0})
-simpleConfigsAlg2D = StochasticHillclimberConfigsGen(
-	playerModelBridge = playerBridge, 
-	interactionsProfileTemplate = intProfTemplate.generateCopy(), 
-	regAlg = regAlg, 
-	persEstAlg = ExplorationPersonalityEstAlg(
-		playerModelBridge = playerBridge, 
-		interactionsProfileTemplate = intProfTemplate.generateCopy(), 
-		regAlg = regAlg,
-		numTestedPlayerProfiles = numTestedPlayerProfilesInEst, 
-		qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)), 
-	numberOfConfigChoices = numberOfConfigChoices, 
-	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
-	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)
-)
-adaptationGIMME2D.init(
-	playerModelBridge = playerBridge, 
-	taskModelBridge = taskBridge, 
-	configsGenAlg = simpleConfigsAlg2D, 
-	name="GIMME2D"
-)
-
-
-
-intProfTemplate = InteractionsProfile({"dim_0": 0, "dim_1": 0, "dim_2": 0, "dim_3": 0, "dim_4": 0})
-simpleConfigsAlg5D = StochasticHillclimberConfigsGen(
-	playerModelBridge = playerBridge, 
-	interactionsProfileTemplate = intProfTemplate.generateCopy(), 
-	regAlg = regAlg, 
-	persEstAlg = ExplorationPersonalityEstAlg(
-		playerModelBridge = playerBridge, 
-		interactionsProfileTemplate = intProfTemplate.generateCopy(), 
-		regAlg = regAlg,
-		numTestedPlayerProfiles = numTestedPlayerProfilesInEst, 
-		qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)), 
-	numberOfConfigChoices = numberOfConfigChoices, 
-	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
-	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)
-)
-adaptationGIMME5D.init(
-	playerModelBridge = playerBridge, 
-	taskModelBridge = taskBridge, 
-	configsGenAlg = simpleConfigsAlg5D, 
-	name="GIMME5D"
-)
-
-
-
-intProfTemplate = InteractionsProfile({"dim_0": 0, "dim_1": 0, "dim_2": 0, "dim_3": 0, "dim_4": 0, "dim_5": 0})
-simpleConfigsAlg6D = StochasticHillclimberConfigsGen(
-	playerModelBridge = playerBridge, 
-	interactionsProfileTemplate = intProfTemplate.generateCopy(), 
-	regAlg = regAlg, 
-	persEstAlg = ExplorationPersonalityEstAlg(
-		playerModelBridge = playerBridge, 
-		interactionsProfileTemplate = intProfTemplate.generateCopy(), 
-		regAlg = regAlg,
-		numTestedPlayerProfiles = numTestedPlayerProfilesInEst, 
-		qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)), 
-	numberOfConfigChoices = numberOfConfigChoices, 
-	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
-	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)
-)
-adaptationGIMME6D.init(
-	playerModelBridge = playerBridge, 
-	taskModelBridge = taskBridge, 
-	configsGenAlg = simpleConfigsAlg6D, 
-	name="GIMME6D"
-)
-
-
-
 
 # ----------------------- [Execute Algorithms] ----------------------------
 input("<<< All ready! Press any key to start. >>>")
 
+
+adaptationEvl.name = "GIMME_Evl"
+executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
+	taskBridge, adaptationEvl, 2)
+
 adaptationGIMME.name = "GIMME"
-executeSimulations(maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-	taskBridge, adaptationGIMME, 4)
-
-adaptationGIMME.name = "GIMMENoBoot"
 executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-	taskBridge, adaptationGIMME, 4)
+	taskBridge, adaptationGIMME, 2)
 
-
-# # adaptationGIMMESA.name = "GIMME_SA"
-# # executeSimulations(maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-# # 	taskBridge, adaptationGIMMESA, 4)
-
-# # adaptationGIMMESA.name = "GIMMENoBoot_SA"
-# # executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-# # 	taskBridge, adaptationGIMMESA, 4)
-
-
+adaptationRandom.name = "Random"
 executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-	taskBridge, adaptationAccurate, 4)
-
-executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-	taskBridge, adaptationRandom, 4)
+	taskBridge, adaptationRandom, 2)
 
 
-
-
-# Extreme personalities
-adaptationGIMME.name = "GIMMEEP"
-executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-	taskBridge, adaptationGIMME, 4, considerExtremePersonalityValues = True)
-
-
-
-# Old vs New comparison
-executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-	taskBridge, adaptationRandomOld, 3)
-
-executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-	taskBridge, adaptationGIMMEOld, 3)
-
-
-# GIP size comparisons
-executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-	taskBridge, adaptationGIMME1D, 1)
-
-executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-	taskBridge, adaptationGIMME2D, 2)
-
-executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-	taskBridge, adaptationGIMME5D, 5)
-
-executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-	taskBridge, adaptationGIMME6D, 6)
-
-
-adaptationGIMME.name = "GIMME_LowAccuracyEst"
-executeSimulations(maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-	taskBridge, adaptationGIMME, 4, estimatorsAccuracy = 0.2)
-
-
-adaptationGIMME.name = "GIMME_HighAccuracyEst"
-executeSimulations(maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-	taskBridge, adaptationGIMME, 4, estimatorsAccuracy = 0.05)
 
 print("Done!                        ", end="\r")
 
