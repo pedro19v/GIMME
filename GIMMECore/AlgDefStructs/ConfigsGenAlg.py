@@ -706,9 +706,7 @@ class AccurateConfigsGen(ConfigsGenAlg):
 
 
 
-from deap import base
-from deap import creator
-from deap import tools
+from deap import base, creator, tools, algorithms
 from collections import *
 
 class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
@@ -720,7 +718,7 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		preferredNumberOfPlayersPerGroup = None, 
 		minNumberOfPlayersPerGroup = None, 
 		maxNumberOfPlayersPerGroup = None, 
-		fitnessWeights = None, 
+		qualityWeights = None, 
 		probOfCross = None, 
 		probOfMutation = None, 
 		numFitSurvivors = None):
@@ -735,7 +733,6 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		self.regAlg = regAlg
 		self.numberOfConfigChoices = 100 if numberOfConfigChoices == None else numberOfConfigChoices 
 
-		self.populationInited = False
 		self.numFitSurvivors = 10 if numFitSurvivors == None else numFitSurvivors
 		self.probOfCross = 0.7 if probOfCross == None else probOfCross
 		self.probOfMutation = 0.2 if probOfMutation == None else probOfMutation
@@ -743,46 +740,138 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		if(regAlg==None):
 			regAlg = KNNRegression(playerModelBridge, 5)
 
-		self.fitnessWeights = PlayerCharacteristics(ability = 0.5, engagement = 0.5) if qualityWeights == None else qualityWeights
+		self.qualityWeights = PlayerCharacteristics(ability = 0.5, engagement = 0.5) if qualityWeights == None else qualityWeights
 
 		self.initGenAlg()
 
 
+	def randomIndividualGenerator(self, playerIds, minNumGroups, maxNumGroups):
+		groups = self.randomConfigGenerator(playerIds, minNumGroups, maxNumGroups)
+		profs = [self.randomProfileGenerator() for i in range(len(groups))]
+		return [groups, [val for sublist in profs for val in sublist]]
+
+	def randomProfileGenerator(self):
+		return self.interactionsProfileTemplate.randomized().flattened()
+
+
+
+	def cxGIMME(self, ind1, ind2):
+		# configs
+		config1 = ind1[0]
+		config2 = ind2[0]
+
+		l1 = len(config1)
+		l2 = len(config2)
+
+		if (l1 > l2):
+			maxLenConfig = config1
+			maxLen = l1
+			minLenConfig = config2
+			minLen = l2
+		else:
+			maxLenConfig = config2
+			maxLen = l2
+			minLenConfig = config1
+			minLen = l1
+
+		cxpoints = [] 
+		
+		clist1 = []
+		clist2 = []
+
+		remainder1 = []
+		remainder2 = []
+		for i in range(minLen):
+			parent1 = minLenConfig[i]
+			parent2 = maxLenConfig[i]
+
+			cxpoint = 2 #random.randint(1,minLen - 1)
+			cxpoints.append(cxpoint) 
+
+			clist1.extend(parent1)
+			clist2.extend(parent2)
+
+			remainder1.extend(parent1[cxpoint:])
+			remainder2.extend(parent2[cxpoint:])
+
+
+		d1 = {k:v for v,k in enumerate(clist1)}
+		d2 = {k:v for v,k in enumerate(clist2)}
+
+		remainder1.sort(key=d2.get)
+		remainder2.sort(key=d1.get)
+
+		for i in range(minLen):
+			parent1 = minLenConfig[i]
+			parent2 = maxLenConfig[i]
+
+			cxpoint = cxpoints[i] 
+
+			#C1 Implementation
+			# maintain left part
+			child1, child2 = parent1[:cxpoint], parent2[:cxpoint]
+
+
+			# reorder right part
+			missingLen1 = len(parent1) - len(child1)
+			child1.extend(remainder1[:missingLen1])
+			remainder1 = remainder1[missingLen1:]
+
+			missingLen2 = len(parent2) - len(child2)
+			child2.extend(remainder2[:missingLen2])
+			remainder2 = remainder2[missingLen2:]
+
+
+
+
+
+		# profiles
+		prof1 = ind1[1]
+		prof2 = ind2[1]
+
+		newProfiles = tools.cxBlend(prof1, prof2, 0.5)
+
+		#the inds become offsprings
+		ind1[0] = newConfigs[0] 
+		ind1[1] = newProfiles[0]
+		ind2[0] = newConfigs[1] 
+		ind2[1] = newProfiles[1]
+
+		return (ind1, ind2)
+
+
+	def mutGIMME(self, individual, indpb):
+		#only mutate GIPs for now
+		prof = individual[1]
+		individual[1] = tools.mutShuffleIndexes(prof, indpb)
+		return individual,
+
 	def reset(self):
 		super().reset()
-		self.currPopulation = []
-		self.currProfiles = []
-		self.populationInited = False
-
+		self.initGenAlg()
 
 	def calcFitness(self, individual):
 		config = individual[0]
 		profiles = individual[1]
+		profiles = [profiles[x:x+2] for x in range(0, len(profiles), 2)]
 
-		for groupI in range(config):
+		print(profiles)
+		for groupI in range(len(config)):
 			
 			group = config[groupI]
-			profile = profiles[groupI]
+			flatProfile = profiles[groupI]
 
+			#unflatten profile
+			profile = self.interactionsProfileTemplate.unflattened(array = flatProfile)
 			totalFitness = 0
 
 			for playerId in group:
 				predictedIncreases = self.regAlg.predict(profile, playerId)
-				totalFitness += self.fitnessWeights.ability*predictedIncreases.characteristics.ability + self.fitnessWeights.engagement*predictedIncreases.characteristics.engagement
+				totalFitness += self.qualityWeights.ability*predictedIncreases.characteristics.ability + self.qualityWeights.engagement*predictedIncreases.characteristics.engagement
 
 		return totalFitness, #must return a tuple
 
-	def updatePopulation(self, playerIds, numPlayers, maxNumGroups, numberOfConfigChoices):
-		# represented as simple genotypes
-		self.currPopulation = [ {'config': [], 'fitness': 0.0}  for y in range(numberOfConfigChoices)]
-		for individual in self.currPopulation:
-			individual["config"] = [[playerIds[x], random.randint(0, maxNumGroups-1)] for x in range(numPlayers)]
-
-		self.currProfiles = [ {'config': [], 'fitness': 0.0} for y in range(numberOfConfigChoices)]
-		for individual in self.currProfiles:
-			individual["config"] = [InteractionsProfile(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1)) for x in range(maxNumGroups)]
-
-
+	
 	def initGenAlg(self):
 		playerIds = self.playerModelBridge.getAllPlayerIds() 
 		minNumGroups = math.ceil(len(playerIds) / self.maxNumberOfPlayersPerGroup)
@@ -791,26 +880,27 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
 		creator.create("Individual", list, typecode='i', fitness=creator.FitnessMin)
 
-		toolbox = base.Toolbox()
+		self.toolbox = base.Toolbox()
 
-		toolbox.register("group", randomConfigGenerator, playerIds, minNumGroups, maxNumGroups)
-		toolbox.register("profile", InteractionsProfile().randomize())
-		toolbox.register("individual", tools.initRepeat, creator.Individual, [creator.group, creator.profile])
-		toolbox.register("population", tools.initRepeat, list, toolbox.individual)
+		self.toolbox.register("indices", self.randomIndividualGenerator, playerIds, minNumGroups, maxNumGroups)
+		# toolbox.register("indices", [toolbox.group, toolbox.profile])
 
-		toolbox.register("mate", tools.cxPartialyMatched)
-		toolbox.register("mutate", tools.mutShuffleIndexes, indpb=self.probOfMutation)
-		toolbox.register("select", tools.selTournament, tournsize=self.numFitSurvivors)
-		toolbox.register("evaluate", self.calcFitness)
+		self.toolbox.register("individual", tools.initIterate, creator.Individual, self.toolbox.indices)
+		self.toolbox.register("population", tools.initRepeat, list, self.toolbox.individual)
 
-		random.seed(169)
+		self.toolbox.register("mate", self.cxGIMME)
+		self.toolbox.register("mutate", self.mutGIMME, indpb=self.probOfMutation)
+		self.toolbox.register("select", tools.selTournament, tournsize=self.numFitSurvivors)
+		self.toolbox.register("evaluate", self.calcFitness)
 
-		self.pop = toolbox.population(n = self.numberOfConfigChoices)
+		# random.seed(169)
+
+		self.pop = self.toolbox.population(n = self.numberOfConfigChoices)
 		self.hof = tools.HallOfFame(1)
 
 	def organize(self):
 		
-		algorithms.eaSimple(self.pop, toolbox, cxpb=self.probOfCross, mutpb=self.probOfMutation, ngen=500, hallOfFame = self.hof)
+		algorithms.eaSimple(self.pop, self.toolbox, cxpb=self.probOfCross, mutpb=self.probOfMutation, ngen=500, halloffame = self.hof)
 		breakpoint()
 
 		return {"groups": bestGroups, "profiles": bestConfigProfiles, "avgCharacteristics": [PlayerCharacteristics() for i in range(maxNumGroups)]}

@@ -5,6 +5,14 @@ import random
 class InteractionsProfile(object):
 
 	def __init__(self, dimensions = None):
+		# if(dimensions != None):
+		# 	if(type(dimensions)== dict):
+		# 		self.dimensions = dimensions
+		# 	elif(type(dimensions)== list):
+		# 		self.unflatten(dimensions)
+		# else:
+		# 	self.dimensions = {}
+
 		self.dimensions = {} if dimensions == None else dimensions
 		self.normalize()
 
@@ -83,5 +91,23 @@ class InteractionsProfile(object):
 		numDims = len(profileToTest.dimensions)
 		return self.sqrDistanceBetween(profileToTest)**(1/float(numDims)) 
 
+
 	def flattened(self):
 		return [dim for dim in self.dimensions.values()]
+
+
+
+	def unflattenFunc(self, profile, array):
+		i = 0
+		for key in self.dimensions.keys():
+			self.dimensions[key] = array[i]
+			i += 1
+		return self
+
+
+	def unflatten(self, array):
+		return self.unflattenFunc(self, array)
+
+	def unflattened(self, array):
+		clone = self.generateCopy() 
+		return self.unflattenFunc(clone, array)

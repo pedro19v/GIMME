@@ -32,7 +32,7 @@ preferredNumberOfPlayersPerGroup = 4#int(input("How many players per group would
 playerBridge = CustomPlayerModelBridge(players)
 taskBridge = CustomTaskModelBridge(tasks)
 
-profileTemplate = InteractionsProfile({"dim_0": 0, "dim_1": 0})
+profileTemplate = InteractionsProfile({"Valence": 0, "Focus": 0})
 
 
 print("Setting up the players...")
@@ -131,7 +131,17 @@ def calcReaction(isBootstrap, playerBridge, state, playerId):
 
 numberOfConfigChoices = 100
 numTestedPlayerProfilesInEst = 500
-regAlg = KNNRegressionLegacy(playerBridge, 5)
+regAlg = KNNRegression(playerBridge, 5)
+
+GAConfigsAlg = EvolutionaryConfigsGenDEAP(
+	playerModelBridge = playerBridge, 
+	interactionsProfileTemplate = profileTemplate.generateCopy(), 
+	regAlg = regAlg, 
+	numberOfConfigChoices = numberOfConfigChoices, 
+	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
+	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)
+)
+
 simpleConfigsAlg = StochasticHillclimberConfigsGen(
 	playerModelBridge = playerBridge, 
 	interactionsProfileTemplate = profileTemplate.generateCopy(), 
@@ -149,7 +159,7 @@ simpleConfigsAlg = StochasticHillclimberConfigsGen(
 adaptationGIMME.init(
 	playerModelBridge = playerBridge, 
 	taskModelBridge = taskBridge,
-	configsGenAlg = simpleConfigsAlg, 
+	configsGenAlg = GAConfigsAlg, 
 	name="Test Adaptation"
 )
 
