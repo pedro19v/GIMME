@@ -38,7 +38,7 @@ print("------------------------------------------")
 random.seed(time.perf_counter())
 simsID = seed = random.randrange(sys.maxsize)
 
-numRuns = 10
+numRuns = 20
 maxNumTrainingIterations = 20
 numRealIterations = 20
 

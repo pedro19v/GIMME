@@ -58,7 +58,7 @@ class CSVLogManager(LogManager):
 
 	def __init__(self, filePath):
 		self.filePath = filePath
-		self.wroteHeader = True
+		self.wroteHeader = False
 
 	def writeToLog(self, database, table, argsNValues):
 		newFilePath = self.filePath + database +"/"

@@ -1,5 +1,6 @@
-# install.packages("stringr", dep = TRUE, repos = 'http://cran.rstudio.com/')
+# install.packages("stringi", dep = TRUE, repos = 'http://cran.rstudio.com/')
 # install.packages("ggplot2", dep=TRUE, repos = "http://cran.us.r-project.org")
+# install.packages("dplyr", dep=TRUE, repos = "http://cran.us.r-project.org")
 suppressMessages(library(ggplot2))
 suppressMessages(library(stringr))
 suppressMessages(library(dplyr))

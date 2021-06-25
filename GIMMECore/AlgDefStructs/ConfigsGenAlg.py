@@ -714,11 +714,13 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		playerModelBridge, 
 		interactionsProfileTemplate, 
 		regAlg = None, 
-		numberOfConfigChoices = None, 
 		preferredNumberOfPlayersPerGroup = None, 
 		minNumberOfPlayersPerGroup = None, 
 		maxNumberOfPlayersPerGroup = None, 
-		qualityWeights = None, 
+		qualityWeights = None,
+
+		initialPopulationSize = None, 
+		numberOfEvolutionsPerIteration = None,  
 		probOfCross = None, 
 		probOfMutation = None, 
 		numFitSurvivors = None):
@@ -731,11 +733,13 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 			maxNumberOfPlayersPerGroup = maxNumberOfPlayersPerGroup)
 
 		self.regAlg = regAlg
-		self.numberOfConfigChoices = 100 if numberOfConfigChoices == None else numberOfConfigChoices 
+		self.initialPopulationSize = 100 if initialPopulationSize == None else initialPopulationSize 
 
-		self.numFitSurvivors = 10 if numFitSurvivors == None else numFitSurvivors
+
+		self.numberOfEvolutionsPerIteration = 500 if numberOfEvolutionsPerIteration == None else numberOfEvolutionsPerIteration
 		self.probOfCross = 0.7 if probOfCross == None else probOfCross
 		self.probOfMutation = 0.2 if probOfMutation == None else probOfMutation
+		self.numFitSurvivors = 10 if numFitSurvivors == None else numFitSurvivors
 
 		if(regAlg==None):
 			regAlg = KNNRegression(playerModelBridge, 5)
@@ -744,16 +748,16 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 
 
 
-		playerIds = self.playerModelBridge.getAllPlayerIds() 
-		minNumGroups = math.ceil(len(playerIds) / self.maxNumberOfPlayersPerGroup)
-		maxNumGroups = math.floor(len(playerIds) / self.minNumberOfPlayersPerGroup)
+		self.playerIds = self.playerModelBridge.getAllPlayerIds() 
+		self.minNumGroups = math.ceil(len(self.playerIds) / self.maxNumberOfPlayersPerGroup)
+		self.maxNumGroups = math.floor(len(self.playerIds) / self.minNumberOfPlayersPerGroup)
 
 		creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
 		creator.create("Individual", list, typecode='i', fitness=creator.FitnessMin)
 
 		self.toolbox = base.Toolbox()
 
-		self.toolbox.register("indices", self.randomIndividualGenerator, playerIds, minNumGroups, maxNumGroups)
+		self.toolbox.register("indices", self.randomIndividualGenerator, self.playerIds, self.minNumGroups, self.maxNumGroups)
 		# toolbox.register("indices", [toolbox.group, toolbox.profile])
 
 		self.toolbox.register("individual", tools.initIterate, creator.Individual, self.toolbox.indices)
@@ -863,13 +867,28 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		ind1[0] = newConfig1
 		ind2[0] = newConfig2
 
+		del ind1.fitness.values
+		del ind2.fitness.values
+
 		return (ind1, ind2)
 
 
 	def mutGIMME(self, individual, indpb):
-		#only mutate GIPs for now
-		prof = individual[1]
-		individual[1][random.randint(0,len(individual[1])-1)] = self.randomProfileGenerator()
+		
+		# mutation prob
+		# if random.randrange(1) < indpb:
+			#mutate config
+			# individual[0] = self.randomConfigGenerator(self.playerIds, self.minNumGroups, self.maxNumGroups)
+
+		#mutate GIPs
+		profs = individual[1]
+		for i in range(len(profs)):
+			if random.randrange(1) < indpb:
+		 		profs[i] = self.randomProfileGenerator()
+		individual[1] = profs
+	
+		del individual.fitness.values
+
 		return individual,
 
 	def reset(self):
@@ -880,31 +899,40 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		config = individual[0]
 		profiles = individual[1]
 
+		totalFitness = 0.0
+		# breakpoint()
 		for groupI in range(len(config)):
 			
 			group = config[groupI]
 			profile = profiles[groupI]
 
-			totalFitness = 0
-
 			for playerId in group:
 				predictedIncreases = self.regAlg.predict(profile, playerId)
-				totalFitness += self.qualityWeights.ability*predictedIncreases.characteristics.ability + self.qualityWeights.engagement*predictedIncreases.characteristics.engagement
+				totalFitness += self.qualityWeights.ability* predictedIncreases.characteristics.ability + \
+								self.qualityWeights.engagement* predictedIncreases.characteristics.engagement
 
+		totalFitness = -totalFitness
+		individual.fitness.values = totalFitness,
+		# print(totalFitness)
 		return totalFitness, #must return a tuple
 
 	
 	def resetGenAlg(self):
-		
-
-		self.pop = self.toolbox.population(n = self.numberOfConfigChoices)
+		self.pop = self.toolbox.population(n = self.initialPopulationSize)
 		self.hof = tools.HallOfFame(1)
 
 	def organize(self):
-		algorithms.eaSimple(self.pop, self.toolbox, cxpb=self.probOfCross, mutpb=self.probOfMutation, ngen=5, halloffame = self.hof, verbose=False)
+
+		# stats = tools.Statistics(lambda ind: ind.fitness.values)
+		# stats.register("avg", numpy.mean)
+		# stats.register("min", numpy.min)
+		# stats.register("max", numpy.max)
+		algorithms.eaSimple(self.pop, self.toolbox, cxpb=self.probOfCross, mutpb=self.probOfMutation, 
+							ngen=self.numberOfEvolutionsPerIteration, halloffame = self.hof, verbose=False)
 
 		bestGroups = self.hof[0][0]
 		bestConfigProfiles = self.hof[0][1]
+
 
 		avgCharacteristicsArray = []
 		for group in bestGroups:

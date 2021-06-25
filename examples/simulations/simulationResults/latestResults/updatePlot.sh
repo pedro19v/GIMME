@@ -1,2 +1,2 @@
  
-watch -n 10 Rscript plotGenerator.r
+watch -n 5 Rscript plotGeneratorEvl.r
