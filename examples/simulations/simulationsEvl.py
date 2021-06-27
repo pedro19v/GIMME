@@ -38,7 +38,7 @@ print("------------------------------------------")
 random.seed(time.perf_counter())
 simsID = seed = random.randrange(sys.maxsize)
 
-numRuns = 100
+numRuns = 5
 maxNumTrainingIterations = 20
 numRealIterations = 20
 
@@ -138,7 +138,7 @@ def executionPhase(isBootstrap, playerBridge, maxNumIterations, startingI, currR
 		if adaptation.name == "accurate":
 			adaptation.configsGenAlg.updateCurrIteration(i)
 		
-		print("Performing step (" +str(i - startingI)+ " of "+str(maxNumIterations)+") of run ("+str(currRun)+" of "+str(numRuns)+") of algorithm \""+str(adaptation.name)+"\"...                                                             ", end="\r")
+		print("Performing step (" +str(i - startingI)+ " of "+str(maxNumIterations)+") of run ("+str(currRun+1)+" of "+str(numRuns)+") of algorithm \""+str(adaptation.name)+"\"...                                                             ", end="\r")
 		adaptation.iterate()
 
 		for x in range(numPlayers):
@@ -261,7 +261,7 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 		
 		if r > 0:
 			adaptation.configsGenAlg.reset()
-		
+
 		executionPhase(False, playerBridge, numRealIterations, firstRealI, r, adaptation)
 
 
@@ -283,8 +283,8 @@ evolutionaryConfigsAlg = EvolutionaryConfigsGenDEAP(
 	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
 	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5),
 	initialPopulationSize = 1000, 
-	numberOfEvolutionsPerIteration = 1, 
-	probOfCross = 0.7, 
+	numberOfEvolutionsPerIteration = 5, 
+	probOfCross = 0.5, 
 	probOfMutation = 0.8, 
 	numFitSurvivors = 100
 )
@@ -338,13 +338,13 @@ adaptationEvl.name = "GIMME_Evl"
 executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, 
 	playerBridge, taskBridge, adaptationEvl, 2)
 
-# adaptationGIMME.name = "GIMME"
-# executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, 
-# 	playerBridge, taskBridge, adaptationGIMME, 2)
+adaptationGIMME.name = "GIMME"
+executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, 
+	playerBridge, taskBridge, adaptationGIMME, 2)
 
-# adaptationRandom.name = "Random"
-# executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations,
-# 	playerBridge, taskBridge, adaptationRandom, 2)
+adaptationRandom.name = "Random"
+executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations,
+	playerBridge, taskBridge, adaptationRandom, 2)
 
 
 

@@ -59,12 +59,11 @@ class CSVLogManager(LogManager):
 	def __init__(self, filePath):
 		self.filePath = filePath
 		self.wroteHeader = False
-		os.remove("/home/samgomes/Documents/doutoramento/reps/GIMME/GIMME/examples/simulations/simulationResults/latestResults/GIMMESims/resultsEvl.csv") 
+		# os.remove("/home/samgomes/Documents/doutoramento/reps/GIMME/GIMME/examples/simulations/simulationResults/latestResults/GIMMESims/resultsEvl.csv") 
 
 	def writeToLog(self, database, table, argsNValues):
 		newFilePath = self.filePath + database +"/"
 		if not os.path.exists(newFilePath):
-			self.wroteHeader = False;
 			os.makedirs(newFilePath)
 		newFilePath = newFilePath + table + ".csv"
 
@@ -73,7 +72,8 @@ class CSVLogManager(LogManager):
 			writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
 			if not self.wroteHeader:
-				writer.writeheader()
+				if os.stat(newFilePath).st_size == 0:
+					writer.writeheader()
 				self.wroteHeader = True
 
 			writer.writerow(argsNValues)
