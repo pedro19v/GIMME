@@ -42,12 +42,12 @@ sdev <- aggregate(abilityInc ~ iteration*algorithm , avgPerRun , sd)
 
 buildAbIncPlots <- function(logAvg, logSDev, plotName, colors = NULL){
 
-	plot <- ggplot(logAvg, aes(x = iteration, y=abilityInc, group=algorithm, color=algorithm, alpha = 0.8))
+	plot <- ggplot(logAvg, aes(x = iteration, y=abilityInc, group=algorithm, color=algorithm, alpha = 0.8)) + geom_point()
 
-	plot <- plot + geom_errorbar(width=.1, aes(ymin=logAvg$abilityInc-logSDev$abilityInc, 
-		ymax=logAvg$abilityInc+logSDev$abilityInc), size = 0.8)
+	# plot <- plot + geom_errorbar(width=.1, aes(ymin=logAvg$abilityInc-logSDev$abilityInc, 
+	# 	ymax=logAvg$abilityInc+logSDev$abilityInc), size = 0.8)
 
-	plot <- plot + geom_line(aes(linetype=factor(logAvg$linetype)), size = 1.5)
+	# plot <- plot + geom_line(aes(linetype=factor(logAvg$linetype)), size = 1.5)
 	plot <- plot + scale_linetype_manual(values=c("solid" = 1, "dashed" = 2), name = "linetype") + guides(linetype = FALSE)
 	
 	plot <- plot + labs(x = "Iteration", y = "Avg. Ability Increase", color="Algorithm") + 
@@ -73,9 +73,9 @@ buildAbIncPlots <- function(logAvg, logSDev, plotName, colors = NULL){
 
 
 # cmp average ability increase of sim anneal, hillclimb, pure random and accurate
-currAvg = 	avg[
+currAvg = 	avgPerRun[
 				# avg$algorithm=="GIMME" | 
-				avg$algorithm=="GIMME_Evl" #|
+				avgPerRun$algorithm=="GIMME_Evl" #|
 				# avg$algorithm=="Random"
 				,]
 

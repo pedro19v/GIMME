@@ -746,8 +746,6 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 
 		self.qualityWeights = PlayerCharacteristics(ability = 0.5, engagement = 0.5) if qualityWeights == None else qualityWeights
 
-
-
 		self.playerIds = self.playerModelBridge.getAllPlayerIds() 
 		self.minNumGroups = math.ceil(len(self.playerIds) / self.maxNumberOfPlayersPerGroup)
 		self.maxNumGroups = math.floor(len(self.playerIds) / self.minNumberOfPlayersPerGroup)
@@ -768,8 +766,20 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		self.toolbox.register("select", tools.selTournament, tournsize=self.numFitSurvivors)
 		self.toolbox.register("evaluate", self.calcFitness)
 
-
 		self.resetGenAlg()
+
+	
+	def resetGenAlg(self):
+
+		if hasattr(self, "pop"):
+			del self.pop
+		if hasattr(self, "hof"):
+			del self.hof
+
+		self.pop = self.toolbox.population(n = self.initialPopulationSize)
+		self.hof = tools.HallOfFame(1)
+		# breakpoint()
+
 
 
 	def randomIndividualGenerator(self, playerIds, minNumGroups, maxNumGroups):
@@ -779,7 +789,6 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 
 	def randomProfileGenerator(self):
 		return self.interactionsProfileTemplate.randomized()
-
 
 
 	def cxGIMME(self, ind1, ind2):
@@ -872,22 +881,27 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 
 		return (ind1, ind2)
 
-
 	def mutGIMME(self, individual, indpb):
 		
 		# mutation prob
-		# if random.randrange(1) < indpb:
-			#mutate config
-			# individual[0] = self.randomConfigGenerator(self.playerIds, self.minNumGroups, self.maxNumGroups)
+		if random.randrange(1) < indpb:
+			
+			# mutate config
+			indCpy = copy.copy(individual)
+			indCpy[0] = self.randomConfigGenerator(self.playerIds, self.minNumGroups, self.maxNumGroups)
+			# indCpy[1] = [self.randomProfileGenerator() for i in range(len(indCpy[0]))]
+			del indCpy.fitness.values
 
-		#mutate GIPs
-		profs = individual[1]
-		for i in range(len(profs)):
-			if random.randrange(1) < indpb:
-		 		profs[i] = self.randomProfileGenerator()
-		individual[1] = profs
-	
-		del individual.fitness.values
+			individual = self.cxGIMME(individual, indCpy)[0]
+
+			#mutate GIPs
+			profs = individual[1]
+			for i in range(len(profs)):
+				# if random.randrange(1) < indpb:
+			 	profs[i] = self.randomProfileGenerator()
+			individual[1] = profs
+		
+			del individual.fitness.values
 
 		return individual,
 
@@ -908,18 +922,15 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 
 			for playerId in group:
 				predictedIncreases = self.regAlg.predict(profile, playerId)
-				totalFitness += self.qualityWeights.ability* predictedIncreases.characteristics.ability + \
-								self.qualityWeights.engagement* predictedIncreases.characteristics.engagement
+				totalFitness += (self.qualityWeights.ability* predictedIncreases.characteristics.ability + \
+								self.qualityWeights.engagement* predictedIncreases.characteristics.engagement)
 
 		totalFitness = -totalFitness
-		individual.fitness.values = totalFitness,
+		# individual.fitness.values = totalFitness,
 		# print(totalFitness)
 		return totalFitness, #must return a tuple
 
-	
-	def resetGenAlg(self):
-		self.pop = self.toolbox.population(n = self.initialPopulationSize)
-		self.hof = tools.HallOfFame(1)
+
 
 	def organize(self):
 

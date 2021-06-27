@@ -38,7 +38,7 @@ print("------------------------------------------")
 random.seed(time.perf_counter())
 simsID = seed = random.randrange(sys.maxsize)
 
-numRuns = 10
+numRuns = 100
 maxNumTrainingIterations = 20
 numRealIterations = 20
 
@@ -258,7 +258,10 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 			playerBridge.setBaseLearningRate(x, random.gauss(0.5, 0.05))
 
 			playerBridge.getPlayerStatesDataFrame(x).gridTrimAlg.considerStateResidue(True)
-
+		
+		if r > 0:
+			adaptation.configsGenAlg.reset()
+		
 		executionPhase(False, playerBridge, numRealIterations, firstRealI, r, adaptation)
 
 
@@ -280,10 +283,10 @@ evolutionaryConfigsAlg = EvolutionaryConfigsGenDEAP(
 	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
 	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5),
 	initialPopulationSize = 1000, 
-	numberOfEvolutionsPerIteration = 1,
-	probOfCross = 0.8, 
-	probOfMutation = 0.7, 
-	numFitSurvivors = 500
+	numberOfEvolutionsPerIteration = 1, 
+	probOfCross = 0.7, 
+	probOfMutation = 0.8, 
+	numFitSurvivors = 100
 )
 adaptationEvl.init(
 	playerModelBridge = playerBridge, 

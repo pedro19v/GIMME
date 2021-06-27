@@ -1,4 +1,4 @@
 WID=`xdotool search --class gwenview`
 xdotool windowactivate $WID
 
-watch -n 5 'Rscript plotGeneratorEvl.r; xdotool key F5'
+watch -n 2 'Rscript plotGeneratorEvl.r; xdotool key F5'
