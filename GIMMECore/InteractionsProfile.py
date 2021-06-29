@@ -14,7 +14,7 @@ class InteractionsProfile(object):
 		# 	self.dimensions = {}
 
 		self.dimensions = {} if dimensions == None else dimensions
-		self.normalize()
+		# self.normalize()
 
 	def reset(self):
 		for key in self.dimensions:
@@ -22,7 +22,7 @@ class InteractionsProfile(object):
 		return self
 
 	def init(self):
-		return self.reset().normalize()
+		return self.reset()#.normalize()
 
 	def generateCopy(self):
 		keys = list(self.dimensions.keys())
@@ -64,7 +64,7 @@ class InteractionsProfile(object):
 		profile.reset()
 		for key in profile.dimensions:
 			profile.dimensions[key] = random.uniform(0.0, 1.0)
-		profile.normalize()
+		# profile.normalize()
 		return profile
 
 

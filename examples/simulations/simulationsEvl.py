@@ -283,7 +283,7 @@ evolutionaryConfigsAlg = EvolutionaryConfigsGenDEAP(
 	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
 	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5),
 	initialPopulationSize = 200, 
-	numberOfEvolutionsPerIteration = 100, 
+	numberOfEvolutionsPerIteration = 50, 
 	
 	probOfCross = 0.7, 
 	probOfMutation = 1.0,
@@ -293,6 +293,23 @@ evolutionaryConfigsAlg = EvolutionaryConfigsGenDEAP(
 	
 	numFitSurvivors = 10
 )
+# evolutionaryConfigsAlg = EvolutionaryConfigsGenDEAP(
+# 	playerModelBridge = playerBridge, 
+# 	interactionsProfileTemplate = intProfTemplate.generateCopy(), 
+# 	regAlg = regAlg, 
+# 	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
+# 	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5),
+# 	initialPopulationSize = 200, 
+# 	numberOfEvolutionsPerIteration = 100, 
+	
+# 	probOfCross = 0.7, 
+# 	probOfMutation = 1.0,
+
+# 	probOfMutationConfig = 0.05, 
+# 	probOfMutationGIPs = 0.05, 
+	
+# 	numFitSurvivors = 10
+# )
 adaptationEvl.init(
 	playerModelBridge = playerBridge, 
 	taskModelBridge = taskBridge,
