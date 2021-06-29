@@ -722,7 +722,11 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		initialPopulationSize = None, 
 		numberOfEvolutionsPerIteration = None,  
 		probOfCross = None, 
-		probOfMutation = None, 
+
+		probOfMutation = None,
+		probOfMutationConfig = None, 
+		probOfMutationGIPs = None, 
+
 		numFitSurvivors = None):
 
 		super().__init__(
@@ -737,8 +741,13 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 
 
 		self.numberOfEvolutionsPerIteration = 500 if numberOfEvolutionsPerIteration == None else numberOfEvolutionsPerIteration
-		self.probOfCross = 0.7 if probOfCross == None else probOfCross
+		
 		self.probOfMutation = 0.2 if probOfMutation == None else probOfMutation
+		self.probOfCross = 0.7 if probOfCross == None else probOfCross
+		
+		self.probOfMutationConfig = 0.2 if probOfMutationConfig == None else probOfMutationConfig
+		self.probOfMutationGIPs = 0.2 if probOfMutationGIPs == None else probOfMutationGIPs
+		
 		self.numFitSurvivors = 10 if numFitSurvivors == None else numFitSurvivors
 
 		if(regAlg==None):
@@ -750,8 +759,11 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		self.minNumGroups = math.ceil(len(self.playerIds) / self.maxNumberOfPlayersPerGroup)
 		self.maxNumGroups = math.floor(len(self.playerIds) / self.minNumberOfPlayersPerGroup)
 
+		# creator.create("FitnessMax", base.Fitness, weights=(1.0,))
+		# creator.create("Individual", list, fitness=creator.FitnessMax)
+
 		creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
-		creator.create("Individual", list, typecode='i', fitness=creator.FitnessMin)
+		creator.create("Individual", list, fitness=creator.FitnessMin)
 
 		self.toolbox = base.Toolbox()
 
@@ -762,9 +774,13 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		self.toolbox.register("population", tools.initRepeat, list, self.toolbox.individual)
 
 		self.toolbox.register("mate", self.cxGIMME)
-		self.toolbox.register("mutate", self.mutGIMME, indpb=self.probOfMutation)
+		self.toolbox.register("mutate", self.mutGIMME, pGIPs=self.probOfMutationGIPs, pConfig=self.probOfMutationConfig)
+
+		# self.toolbox.register("select", tools.selRoulette)
 		self.toolbox.register("select", tools.selTournament, tournsize=self.numFitSurvivors)
-		self.toolbox.register("evaluate", self.calcFitness)
+
+		self.toolbox.register("evaluate", self.calcFitness_convergenceTest)
+		# self.toolbox.register("evaluate", self.calcFitness)
 
 		self.resetGenAlg()
 
@@ -825,7 +841,7 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 			parent1 = minLenConfig[i]
 			parent2 = maxLenConfig[i]
 
-			cxpoint = 2 #random.randint(1,minLen - 1)
+			cxpoint = random.randint(0,minLen)
 			cxpoints.append(cxpoint) 
 
 			clist1.extend(parent1)
@@ -866,11 +882,13 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 
 
 
-		# profiles are maintained
-		# prof1 = ind1[1]
-		# prof2 = ind2[1]
+		# profiles are blended
+		prof1 = ind1[1]
+		prof2 = ind2[1]
 
-		# newProfiles = tools.cxBlend(prof1, prof2, 0.5)
+		breakpoint()
+
+		newProfiles = tools.cxBlend(prof1, prof2, 0.5)
 
 		#the inds become children
 		ind1[0] = newConfig1
@@ -881,33 +899,76 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 
 		return (ind1, ind2)
 
-	def mutGIMME(self, individual, indpb):
+	def mutGIMME_GIPsOnly(self, individual, pGIPs):
 		
-		# mutation prob
-		if random.randrange(1) < indpb:
-			
-			# mutate config
-			indCpy = copy.copy(individual)
-			indCpy[0] = self.randomConfigGenerator(self.playerIds, self.minNumGroups, self.maxNumGroups)
-			# indCpy[1] = [self.randomProfileGenerator() for i in range(len(indCpy[0]))]
-			del indCpy.fitness.values
-
-			individual = self.cxGIMME(individual, indCpy)[0]
-
-			#mutate GIPs
-			profs = individual[1]
-			for i in range(len(profs)):
-				# if random.randrange(1) < indpb:
-			 	profs[i] = self.randomProfileGenerator()
-			individual[1] = profs
-		
-			del individual.fitness.values
+		#mutate GIPs
+		profs = individual[1]
+		for i in range(len(profs)):
+			if random.randrange(1) < indpb:
+		 		profs[i] = self.randomProfileGenerator()
+		individual[1] = profs
+	
+		del individual.fitness.values
 
 		return individual,
+
+	def mutGIMME(self, individual, pGIPs, pConfig):
+		
+		# mutate config
+		if random.uniform(0, 1) < pConfig:
+			indCpy = copy.copy(individual)
+			indCpy[0] = self.randomConfigGenerator(self.playerIds, self.minNumGroups, self.maxNumGroups)
+			individual[0] = self.cxGIMME(individual, indCpy)[0][0]
+			
+
+		#mutate GIPs
+		profs = individual[1]
+		keys = list(profs[0].dimensions.keys())
+		for i in range(len(profs)):
+			if random.uniform(0, 1) < pGIPs:
+				for key in keys:
+					if random.uniform(0, 1) < 0.33:
+						profs[i].dimensions[key] += random.uniform(0, min(0.25,1.0-profs[i].dimensions[key])) 
+					elif random.uniform(0, 1) < 0.66:
+						profs[i].dimensions[key] -= random.uniform(0, min(0.25,profs[i].dimensions[key])) 
+					else:
+						profs[i].randomize()
+
+		individual[1] = profs
+		
+		del individual.fitness.values
+		return individual,
+
 
 	def reset(self):
 		super().reset()
 		self.resetGenAlg()
+
+	def calcFitness_convergenceTest(self, individual):
+		config = individual[0]
+		profiles = individual[1]
+
+		totalFitness = 0.0
+
+		targetConfig = [[0,1,2,3], [4,5,6,7], [8,9,10,11], [12,13,14,15], [16,17,18,19], [20,21,22,23]]
+
+		lenConfig = len(config)
+		for groupI in range(lenConfig):
+			
+			group = config[groupI]
+			profile = profiles[groupI]
+			
+			totalFitness += profile.sqrDistanceBetween(InteractionsProfile(dimensions = {'dim_0': 0.54, 'dim_1': 0.72}))
+
+			# for playerI in range(len(group)):
+			# 	totalFitness += abs(config[groupI][playerI] - targetConfig[groupI][playerI])
+		
+		print(totalFitness)
+		totalFitness = totalFitness + 1.0 #helps selection (otherwise Pchoice would always be 0)
+		# individual.fitness.values = totalFitness,
+		return totalFitness, #must return a tuple
+
+
 
 	def calcFitness(self, individual):
 		config = individual[0]
@@ -915,7 +976,8 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 
 		totalFitness = 0.0
 		# breakpoint()
-		for groupI in range(len(config)):
+		lenConfig = len(config)
+		for groupI in range(lenConfig):
 			
 			group = config[groupI]
 			profile = profiles[groupI]
@@ -924,16 +986,14 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 				predictedIncreases = self.regAlg.predict(profile, playerId)
 				totalFitness += (self.qualityWeights.ability* predictedIncreases.characteristics.ability + \
 								self.qualityWeights.engagement* predictedIncreases.characteristics.engagement)
-
-		totalFitness = -totalFitness
+		
+		totalFitness = totalFitness + 1.0 #helps selection (otherwise Pchoice would always be 0)
 		# individual.fitness.values = totalFitness,
-		# print(totalFitness)
 		return totalFitness, #must return a tuple
 
 
 
 	def organize(self):
-
 		# stats = tools.Statistics(lambda ind: ind.fitness.values)
 		# stats.register("avg", numpy.mean)
 		# stats.register("min", numpy.min)
@@ -944,6 +1004,9 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		bestGroups = self.hof[0][0]
 		bestConfigProfiles = self.hof[0][1]
 
+		print(bestGroups)
+		print(bestConfigProfiles[0].dimensions)
+		breakpoint()
 
 		avgCharacteristicsArray = []
 		for group in bestGroups:
@@ -956,6 +1019,9 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 			avgCharacteristicsArray.append(avgCharacteristics)
 
 		return {"groups": bestGroups, "profiles": bestConfigProfiles, "avgCharacteristics": avgCharacteristicsArray}
+
+
+
 
 
 

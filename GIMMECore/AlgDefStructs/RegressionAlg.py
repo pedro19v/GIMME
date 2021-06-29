@@ -32,7 +32,7 @@ class KNNRegression(RegressionAlg):
 	def predict(self, profile, playerId):
 		# import time
 		# startTime = time.time()
-
+		
 		pastModelIncs = self.playerModelBridge.getPlayerStatesDataFrame(playerId).getAllStates().copy()
 		pastModelIncsSize = len(pastModelIncs)
 

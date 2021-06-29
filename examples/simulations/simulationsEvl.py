@@ -38,7 +38,7 @@ print("------------------------------------------")
 random.seed(time.perf_counter())
 simsID = seed = random.randrange(sys.maxsize)
 
-numRuns = 5
+numRuns = 25
 maxNumTrainingIterations = 20
 numRealIterations = 20
 
@@ -48,7 +48,7 @@ numberOfConfigChoices = 100
 numTestedPlayerProfilesInEst = 500
 
 playerWindow = 10
-numPlayers = 23
+numPlayers = 24
 
 numTasks = 1
 
@@ -282,11 +282,16 @@ evolutionaryConfigsAlg = EvolutionaryConfigsGenDEAP(
 	regAlg = regAlg, 
 	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
 	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5),
-	initialPopulationSize = 1000, 
-	numberOfEvolutionsPerIteration = 5, 
-	probOfCross = 0.5, 
-	probOfMutation = 0.8, 
-	numFitSurvivors = 100
+	initialPopulationSize = 200, 
+	numberOfEvolutionsPerIteration = 100, 
+	
+	probOfCross = 0.7, 
+	probOfMutation = 1.0,
+
+	probOfMutationConfig = 0.05, 
+	probOfMutationGIPs = 0.05, 
+	
+	numFitSurvivors = 10
 )
 adaptationEvl.init(
 	playerModelBridge = playerBridge, 
@@ -338,13 +343,13 @@ adaptationEvl.name = "GIMME_Evl"
 executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, 
 	playerBridge, taskBridge, adaptationEvl, 2)
 
-adaptationGIMME.name = "GIMME"
-executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, 
-	playerBridge, taskBridge, adaptationGIMME, 2)
+# adaptationGIMME.name = "GIMME"
+# executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, 
+# 	playerBridge, taskBridge, adaptationGIMME, 2)
 
-adaptationRandom.name = "Random"
-executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations,
-	playerBridge, taskBridge, adaptationRandom, 2)
+# adaptationRandom.name = "Random"
+# executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations,
+# 	playerBridge, taskBridge, adaptationRandom, 2)
 
 
 
