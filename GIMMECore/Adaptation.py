@@ -28,6 +28,10 @@ class Adaptation(object):
 		self.configsGenAlg.init()	
 
 
+	# instrumentation
+	def getConfigsGenAlgCompPerc(self):
+		return self.configsGenAlg.getCompPercentage()
+
 	def iterate(self):
 		if not self.initialized:
 			raise AssertionError('Adaptation not Initialized! Core not executed.') 

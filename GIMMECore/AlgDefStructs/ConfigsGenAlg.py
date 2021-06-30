@@ -38,6 +38,9 @@ class ConfigsGenAlg(ABC):
 		self.interactionsProfileTemplate = interactionsProfileTemplate
 
 
+		self.completionPerc = 0.0
+
+
 	def init(self):
 		self.groupSizeFreqs = {}
 		self.configSizeFreqs = {}
@@ -127,6 +130,10 @@ class ConfigsGenAlg(ABC):
 				self.configSizeFreqs[len(group)]=1
 
 
+	def getCompPercentage(self):
+		return self.completionPerc
+
+
 
 class RandomConfigsGen(ConfigsGenAlg):
 
@@ -176,6 +183,8 @@ class RandomConfigsGen(ConfigsGenAlg):
 				currAvgCharacteristics.engagement += currState.characteristics.engagement / groupSize
 			# currAvgCharacteristics.profile = profile
 			newAvgCharacteristics.append(currAvgCharacteristics)
+
+			self.completionPerc = groupI/newConfigSize
 
 		self.updateMetrics(newGroups)
 		return {"groups": newGroups, "profiles": newConfigProfiles, "avgCharacteristics": newAvgCharacteristics}
@@ -291,6 +300,8 @@ class SimulatedAnnealingConfigsGen(ConfigsGenAlg):
 				currMaxQuality = currQuality
 
 
+			self.completionPerc = i/self.numberOfConfigChoices
+
 		if(self.temperature > 0.0):
 			self.temperature -= self.temperatureDecay
 		else:
@@ -395,6 +406,9 @@ class StochasticHillclimberConfigsGen(ConfigsGenAlg):
 				bestAvgCharacteristics = newAvgCharacteristics
 				currMaxQuality = currQuality
 
+
+			self.completionPerc = i/self.numberOfConfigChoices
+
 		self.updateMetrics(bestGroups)
 		return {"groups": bestGroups, "profiles": bestConfigProfiles, "avgCharacteristics": bestAvgCharacteristics}
 
@@ -496,6 +510,9 @@ class SimpleConfigsGenVer2(ConfigsGenAlg):
 				bestAvgCharacteristics = newAvgCharacteristics
 				currMaxQuality = currQuality
 
+
+			self.completionPerc = i/self.numberOfConfigChoices
+
 		self.updateMetrics(bestGroups)
 		return {"groups": bestGroups, "profiles": bestConfigProfiles, "avgCharacteristics": bestAvgCharacteristics}
 
@@ -592,6 +609,8 @@ class SimpleConfigsGenVer1(ConfigsGenAlg):
 				bestConfigProfiles = newConfigProfiles
 				bestAvgCharacteristics = newAvgCharacteristics
 				currMaxQuality = currQuality
+
+			self.completionPerc = i/self.numberOfConfigChoices
 
 		self.updateMetrics(bestGroups)
 		return {"groups": bestGroups, "profiles": bestConfigProfiles, "avgCharacteristics": bestAvgCharacteristics}
@@ -700,6 +719,9 @@ class AccurateConfigsGen(ConfigsGenAlg):
 				bestConfigProfiles = newConfigProfiles
 				bestAvgCharacteristics = newAvgCharacteristics
 				currMaxQuality = currQuality
+
+			self.completionPerc = i/self.numberOfConfigChoices
+
 
 		self.updateMetrics(bestGroups)
 		return {"groups": bestGroups, "profiles": bestConfigProfiles, "avgCharacteristics": bestAvgCharacteristics}
@@ -993,6 +1015,9 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		algorithms.eaSimple(self.pop, self.toolbox, cxpb=self.probOfCross, mutpb=self.probOfMutation, 
 							ngen=self.numberOfEvolutionsPerIteration, halloffame = self.hof, verbose=False)
 
+
+		self.completionPerc = len(tools.Logbook())/ self.numberOfEvolutionsPerIteration
+
 		bestGroups = self.hof[0][0]
 		bestConfigProfiles = self.hof[0][1]
 
@@ -1012,172 +1037,3 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 
 		return {"groups": bestGroups, "profiles": bestConfigProfiles, "avgCharacteristics": avgCharacteristicsArray}
 
-
-
-
-
-
-
-class EvolutionaryConfigsGenLegacy(ConfigsGenAlg):
-	def __init__(self, 
-		playerModelBridge, 
-		interactionsProfileTemplate, 
-		regAlg = None, 
-		numberOfConfigChoices = None, 
-		preferredNumberOfPlayersPerGroup = None, 
-		minNumberOfPlayersPerGroup = None, 
-		maxNumberOfPlayersPerGroup = None, 
-		fitnessWeights = None, 
-		numMutations = None, 
-		probOfMutation = None, 
-		numFitSurvivors = None):
-
-		super().__init__(
-			playerModelBridge = playerModelBridge,
-			interactionsProfileTemplate = interactionsProfileTemplate, 
-			preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
-			minNumberOfPlayersPerGroup = minNumberOfPlayersPerGroup, 
-			maxNumberOfPlayersPerGroup = maxNumberOfPlayersPerGroup)
-
-		self.regAlg = regAlg
-		self.numberOfConfigChoices = 100 if numberOfConfigChoices == None else numberOfConfigChoices 
-
-		self.populationInited = False
-		self.numMutations = 4 if numMutations == None else numMutations
-		self.numFitSurvivors = 10 if numFitSurvivors == None else numFitSurvivors
-		self.probOfMutation = 0.1 if probOfMutation == None else probOfMutation
-
-		if(regAlg==None):
-			regAlg = KNNRegression(playerModelBridge, 5)
-
-		self.fitnessWeights = PlayerCharacteristics(ability = 0.5, engagement = 0.5) if qualityWeights == None else qualityWeights
-
-	def reset(self):
-		super().reset()
-		self.currPopulation = []
-		self.currProfiles = []
-		self.populationInited = False
-
-
-	def fitnessSort(self, elem):
-		return elem[0]["fitness"]
-
-	def updatePopulation(self, playerIds, numPlayers, maxNumGroups, numberOfConfigChoices):
-		# represented as simple genotypes
-		self.currPopulation = [ {'config': [], 'fitness': 0.0}  for y in range(numberOfConfigChoices)]
-		for individual in self.currPopulation:
-			individual["config"] = [[playerIds[x], random.randint(0, maxNumGroups-1)] for x in range(numPlayers)]
-
-		self.currProfiles = [ {'config': [], 'fitness': 0.0} for y in range(numberOfConfigChoices)]
-		for individual in self.currProfiles:
-			individual["config"] = [InteractionsProfile(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1)) for x in range(maxNumGroups)]
-
-	def organize(self):
-		playerIds = self.playerModelBridge.getAllPlayerIds() 
-
-		if(self.numFitSurvivors == None):
-			self.numFitSurvivors = math.ceil(self.numberOfConfigChoices/2)
-		
-		numPlayers = len(playerIds)
-		if(numPlayers < self.minNumberOfPlayersPerGroup):
-			return bestConfig
-		minNumGroups = math.ceil(numPlayers / self.maxNumberOfPlayersPerGroup)
-		maxNumGroups = math.floor(numPlayers / self.minNumberOfPlayersPerGroup)
-
-		currMaxQuality = -float("inf")
-
-		#build first population
-		if(self.populationInited == False):
-			self.updatePopulation(playerIds, numPlayers, maxNumGroups, self.numberOfConfigChoices)
-			self.populationInited = True
-		
-		for config in range(self.numberOfConfigChoices):
-			if(random.uniform(0.0,1.0) < self.probOfMutation):
-				#mutation (exploration)
-				for i in range(self.numMutations):
-					# alter random individual's group
-					self.currPopulation[config]["config"][random.randint(0, numPlayers-1)][1] = random.randint(0, maxNumGroups-1)
-					
-					# alter random group's GIP
-					for profile in range(maxNumGroups):
-						randomGroup = random.randint(0, maxNumGroups-1)
-						intProfileToChange = self.currProfiles[config]["config"][randomGroup]
-
-						randomNum = random.randint(0, 3)
-						if(randomNum==0):
-							intProfileToChange.K_cp = random.uniform(0, 1)
-						elif(randomNum==1):
-							intProfileToChange.K_pa = random.uniform(0, 1)
-						elif(randomNum==2):
-							intProfileToChange.K_mh = random.uniform(0, 1)
-						elif(randomNum==3):
-							intProfileToChange.K_i = random.uniform(0, 1)
-						
-						self.currProfiles[config]["config"][randomGroup] = intProfileToChange
-			else:
-				#crossover (exploitation)
-				# 2 different crossovers - config and GIP 
-
-				# determine mate
-				mate = random.randint(0, self.numberOfConfigChoices-1)
-
-				# config crossovers
-				crossoverPoint = random.randint(0, numPlayers-1)
-
-				parentConfig = config
-				tempConfig = self.currPopulation[parentConfig]["config"][:crossoverPoint]+self.currPopulation[mate]["config"][crossoverPoint:]
-				self.currPopulation[mate]["config"] = self.currPopulation[mate]["config"][:crossoverPoint]+self.currPopulation[parentConfig]["config"][crossoverPoint:]
-				self.currPopulation[config]["config"] = tempConfig
-
-				# GIP or inside of GIP crossover
-				# crossoverPoint = random.randint(0, numPlayers-1)
-				tempConfig = (self.currProfiles[config]["config"][:crossoverPoint] + self.currProfiles[mate]["config"][crossoverPoint:])
-				self.currProfiles[mate]["config"] = (self.currProfiles[mate]["config"][:crossoverPoint] + self.currProfiles[config]["config"][crossoverPoint:])
-				self.currProfiles[config]["config"] = tempConfig
-				
-		#calc fitness after KNN for regression
-		for c in range(self.numberOfConfigChoices):
-			totalFitness = 0
-			config = self.currPopulation[c]["config"]
-			for p in config:
-				group = p[1]
-				playerId = p[0]
-				profile = self.currProfiles[c]["config"][group]
-				
-				predictedIncreases = self.regAlg.predict(profile, playerId)
-				self.currPopulation[c]["fitness"] += self.fitnessWeights.ability*predictedIncreases.characteristics.ability + self.fitnessWeights.engagement*predictedIncreases.characteristics.engagement
-
-			self.currProfiles[c]["fitness"] = self.currPopulation[c]["fitness"]
-
-		self.currPopulation, self.currProfiles = zip(*sorted(zip(self.currPopulation, self.currProfiles), key=self.fitnessSort))
-		self.currPopulation = [a for a in self.currPopulation] #sort by column 1 which is the actual fitness
-		self.currProfiles = [a for a in self.currProfiles] #sort by column 1 which is the actual fitness
-		
-		#selection by elitition
-		fitSurvivorsPop = self.currPopulation[self.numFitSurvivors:]
-		self.currPopulation = fitSurvivorsPop + fitSurvivorsPop
-
-		fitSurvivorsProf = self.currProfiles[self.numFitSurvivors:]
-		self.currProfiles = fitSurvivorsProf + fitSurvivorsProf
-
-		for c in range(self.numberOfConfigChoices):
-			self.currPopulation[c]["fitness"] = 0.0
-			self.currProfiles[c]["fitness"] = 0.0
-
-		# calc Genotype->Phenotype of best config(coalition) and return
-		bestGroups = [[] for i in range(maxNumGroups)]
-		bestConfigProfiles = [0 for i in range(maxNumGroups)]
-
-		bestConfigGenotype = self.currPopulation[-1]["config"]
-		bestProfilesGenotype = self.currProfiles[-1]["config"]
-
-		for gene in bestConfigGenotype:
-			bestGroups[gene[1]].append(gene[0])
-			bestConfigProfiles[gene[1]] = bestProfilesGenotype[gene[1]]
-
-		while(True):
-			if [] in bestGroups:  bestGroups.remove([])
-			elif 0 in bestConfigProfiles: bestConfigProfiles.remove(0)
-			else: break
-
-		return {"groups": bestGroups, "profiles": bestConfigProfiles, "avgCharacteristics": [PlayerCharacteristics() for i in range(maxNumGroups)]}

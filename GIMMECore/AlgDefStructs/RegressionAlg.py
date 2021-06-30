@@ -11,9 +11,16 @@ class RegressionAlg(ABC):
 	def __init__(self, playerModelBridge):
 		self.playerModelBridge = playerModelBridge
 
+		self.completionPerc = 0.0
+
 	@abstractmethod
 	def predict(self, profile, playerId):
 		pass
+
+
+	# instrumentation
+	def getCompPercentage(self):
+		return self.completionPerc
 
 
 # ---------------------- KNNRegression ---------------------------
@@ -32,7 +39,7 @@ class KNNRegression(RegressionAlg):
 	def predict(self, profile, playerId):
 		# import time
 		# startTime = time.time()
-		
+
 		pastModelIncs = self.playerModelBridge.getPlayerStatesDataFrame(playerId).getAllStates().copy()
 		pastModelIncsSize = len(pastModelIncs)
 
@@ -48,6 +55,9 @@ class KNNRegression(RegressionAlg):
 
 		triangularNumberOfIt = sum(range(numberOfIterations + 1))
 		for i in range(numberOfIterations):
+
+			self.completionPerc = i/ numberOfIterations
+
 			currState = pastModelIncs[i]
 			pastCharacteristics = currState.characteristics
 			ratio = (numberOfIterations - i)/triangularNumberOfIt
@@ -97,6 +107,8 @@ class KNNRegressionSKLearn(RegressionAlg):
 		predState = PlayerState(profile = profile, characteristics = PlayerCharacteristics(ability = predAbilityInc, engagement = predEngagement))
 		
 
+		self.completionPerc = 1.0
+
 		# executionTime = (time.time() - startTime)
 		# print('Execution time in seconds: ' + str(executionTime))
 
@@ -127,6 +139,9 @@ class LinearRegressionSKLearn(RegressionAlg):
 		predEngagement = regr.predict([profData])[0]
 
 		predState = PlayerState(profile = profile, characteristics = PlayerCharacteristics(ability = predAbilityInc, engagement = predEngagement))
+		
+		self.completionPerc = 1.0
+
 		return predState
 
 # ---------------------- SVMRegressionSKLearn ---------------------------
@@ -154,6 +169,9 @@ class SVMRegressionSKLearn(RegressionAlg):
 		predEngagement = regr.predict([profData])[0]
 
 		predState = PlayerState(profile = profile, characteristics = PlayerCharacteristics(ability = predAbility, engagement = predEngagement))
+		
+		self.completionPerc = 1.0
+
 		return predState
 
 # ---------------------- DecisionTreesRegression ---------------------------
