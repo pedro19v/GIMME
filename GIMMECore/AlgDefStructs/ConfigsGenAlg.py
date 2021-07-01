@@ -999,7 +999,7 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 				predictedIncreases = self.regAlg.predict(profile, playerId)
 				totalFitness += (self.qualityWeights.ability* predictedIncreases.characteristics.ability + \
 								self.qualityWeights.engagement* predictedIncreases.characteristics.engagement)
-		# print(totalFitness)
+		
 		totalFitness = totalFitness + 1.0 #helps selection (otherwise Pchoice would always be 0)
 		# individual.fitness.values = totalFitness,
 		return totalFitness, #must return a tuple
@@ -1008,10 +1008,6 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 
 	def organize(self):
 		self.resetGenAlg()
-		# stats = tools.Statistics(lambda ind: ind.fitness.values)
-		# stats.register("avg", numpy.mean)
-		# stats.register("min", numpy.min)
-		# stats.register("max", numpy.max)
 		algorithms.eaSimple(self.pop, self.toolbox, cxpb=self.probOfCross, mutpb=self.probOfMutation, 
 							ngen=self.numberOfEvolutionsPerIteration, halloffame = self.hof, verbose=False)
 

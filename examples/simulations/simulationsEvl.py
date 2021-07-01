@@ -8,6 +8,7 @@ import sys
 import datetime
 import numpy
 
+
 import matplotlib.pyplot as plt
 from numpy import array
 import matplotlib.collections as collections
@@ -35,10 +36,10 @@ print("NOTE: This example tests several group organization algorithms types.")
 print("For more details, consult the source code.")
 print("------------------------------------------")
 
-random.seed(time.perf_counter())
-simsID = seed = random.randrange(sys.maxsize)
 
-numRuns = 25
+numRuns = 200
+numThreads = 8
+
 maxNumTrainingIterations = 20
 numRealIterations = 20
 
@@ -128,7 +129,7 @@ def calcReaction(isBootstrap, playerBridge, state, playerId, currIteration):
 	newState.characteristics.ability = newState.characteristics.ability + abilityIncreaseSim
 	return newState
 
-def executionPhase(isBootstrap, playerBridge, maxNumIterations, startingI, currRun, adaptation):
+def executionPhase(numRuns, isBootstrap, playerBridge, maxNumIterations, startingI, currRun, adaptation):
 	if(maxNumIterations <= 0):
 		return
 
@@ -138,7 +139,8 @@ def executionPhase(isBootstrap, playerBridge, maxNumIterations, startingI, currR
 		if adaptation.name == "accurate":
 			adaptation.configsGenAlg.updateCurrIteration(i)
 		
-		print("Performing step (" +str(i - startingI)+ " of "+str(maxNumIterations)+") of run ("+str(currRun+1)+" of "+str(numRuns)+") of algorithm \""+str(adaptation.name)+"\"...                                                             ", end="\r")
+		simsID = str(os.getpid())
+		print("Process ["+simsID+"] performing step (" +str(i - startingI)+ " of "+str(maxNumIterations)+") of run ("+str(currRun+1)+" of "+str(numRuns)+") of algorithm \""+str(adaptation.name)+"\"...                                                             ")#, end="\r")
 		adaptation.iterate()
 
 		for x in range(numPlayers):
@@ -157,7 +159,7 @@ def executionPhase(isBootstrap, playerBridge, maxNumIterations, startingI, currR
 		i+=1
 
 
-def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations,firstRealI,\
+def executeSimulations(numRuns, maxNumTrainingIterations,firstTrainingI,numRealIterations,firstRealI,\
 	playerBridge, taskBridge, adaptation, numInteractionDimensions, estimatorsAccuracy = None, considerExtremePersonalityValues = None):
 
 	estimatorsAccuracy = 0.1 if estimatorsAccuracy == None else estimatorsAccuracy
@@ -262,7 +264,7 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 		if r > 0:
 			adaptation.configsGenAlg.reset()
 
-		executionPhase(False, playerBridge, numRealIterations, firstRealI, r, adaptation)
+		executionPhase(numRuns, False, playerBridge, numRealIterations, firstRealI, r, adaptation)
 
 
 
@@ -293,23 +295,6 @@ evolutionaryConfigsAlg = EvolutionaryConfigsGenDEAP(
 	
 	numFitSurvivors = 10
 )
-# evolutionaryConfigsAlg = EvolutionaryConfigsGenDEAP(
-# 	playerModelBridge = playerBridge, 
-# 	interactionsProfileTemplate = intProfTemplate.generateCopy(), 
-# 	regAlg = regAlg, 
-# 	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
-# 	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5),
-# 	initialPopulationSize = 200, 
-# 	numberOfEvolutionsPerIteration = 100, 
-	
-# 	probOfCross = 0.7, 
-# 	probOfMutation = 1.0,
-
-# 	probOfMutationConfig = 0.05, 
-# 	probOfMutationGIPs = 0.05, 
-	
-# 	numFitSurvivors = 10
-# )
 adaptationEvl.init(
 	playerModelBridge = playerBridge, 
 	taskModelBridge = taskBridge,
@@ -352,21 +337,29 @@ adaptationRandom.init(
 )
 
 
+from concurrent.futures import ProcessPoolExecutor
+
 # ----------------------- [Execute Algorithms] ----------------------------
 input("<<< All ready! Press any key to start. >>>")
 
+partialNumRuns = math.ceil(numRuns / numThreads)
 
 adaptationEvl.name = "GIMME_Evl"
-executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, 
-	playerBridge, taskBridge, adaptationEvl, 2)
+adaptationGIMME.name = "GIMME"
+adaptationRandom.name = "Random"
 
-# adaptationGIMME.name = "GIMME"
-# executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, 
-# 	playerBridge, taskBridge, adaptationGIMME, 2)
+with ProcessPoolExecutor(max_workers=numThreads) as executor:
 
-# adaptationRandom.name = "Random"
-# executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations,
-# 	playerBridge, taskBridge, adaptationRandom, 2)
+	for i in range(numThreads):
+		executor.submit(executeSimulations, partialNumRuns, 0, 0, numRealIterations, maxNumTrainingIterations, 
+			playerBridge, taskBridge, adaptationEvl, 2)
+
+		executor.submit(executeSimulations, partialNumRuns, 0, 0, numRealIterations, maxNumTrainingIterations, 
+			playerBridge, taskBridge, adaptationGIMME, 2)
+
+		executor.submit(executeSimulations, partialNumRuns, 0, 0, numRealIterations, maxNumTrainingIterations,
+			playerBridge, taskBridge, adaptationRandom, 2)
+
 
 
 
