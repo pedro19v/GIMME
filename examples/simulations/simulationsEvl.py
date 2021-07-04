@@ -21,24 +21,7 @@ from ModelMocks import *
 from LogManager import *
 
 
-
-print("------------------------------------------")
-print("-----                                -----")
-print("-----       GIMME API EXAMPLE        -----")
-print("-----                                -----")
-print("-----      (SIMULATING A CLASS)      -----")
-print("-----                                -----")
-print("------------------------------------------")
-
-
-print("------------------------------------------")
-print("NOTE: This example tests several group organization algorithms types.")
-print("For more details, consult the source code.")
-print("------------------------------------------")
-
-
-numRuns = 200
-numThreads = 8
+numRuns = 20
 
 maxNumTrainingIterations = 20
 numRealIterations = 20
@@ -52,6 +35,7 @@ playerWindow = 10
 numPlayers = 24
 
 numTasks = 1
+
 
 startTime = str(datetime.datetime.now())
 newpath = "./simulationResults/latestResults/"
@@ -74,10 +58,16 @@ playerBridge = CustomPlayerModelBridge(players)
 
 taskBridge = CustomTaskModelBridge(tasks)
 
+
 # ----------------------- [Init Adaptations] --------------------------------
-adaptationGIMME = Adaptation()
+adaptationSH = Adaptation()
 adaptationEvl = Adaptation()
 
+adaptationEvl1D = Adaptation()
+adaptationEvl3D = Adaptation()
+adaptationEvl4D = Adaptation()
+adaptationEvl5D = Adaptation()
+adaptationEvl6D = Adaptation()
 
 adaptationRandom = Adaptation()
 adaptationAccurate = Adaptation()
@@ -91,6 +81,212 @@ print("Initing .csv log manager...")
 # logManager = MongoDBLogManager("mongodb+srv://studyAC1:studyAC1@cluster0-\
 # nfksn.mongodb.net/test?retryWrites=true&w=majority")
 logManager = CSVLogManager(newpath)
+
+
+
+# ----------------------- [Init Algorithms] --------------------------------
+print("Initing algorithms...")
+
+regAlg = KNNRegression(playerModelBridge = playerBridge, numberOfNNs = 5)
+
+# - - - - - 
+intProfTemplate2D = InteractionsProfile({"dim_0": 0, "dim_1": 0})
+
+evolutionaryConfigsAlg = EvolutionaryConfigsGenDEAP(
+	playerModelBridge = playerBridge, 
+	interactionsProfileTemplate = intProfTemplate2D.generateCopy(), 
+	regAlg = regAlg, 
+	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
+	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5),
+	initialPopulationSize = 200, 
+	numberOfEvolutionsPerIteration = 50, 
+	 
+	probOfCross = 0.7, 
+	probOfMutation = 1.0,
+
+	probOfMutationConfig = 0.05, 
+	probOfMutationGIPs = 0.05, 
+	
+	numFitSurvivors = 10
+)
+adaptationEvl.init(
+	playerModelBridge = playerBridge, 
+	taskModelBridge = taskBridge,
+	configsGenAlg = evolutionaryConfigsAlg, 
+	name="GIMME_Evl"
+)
+
+simpleConfigsAlg = StochasticHillclimberConfigsGen(
+	playerModelBridge = playerBridge, 
+	interactionsProfileTemplate = intProfTemplate2D.generateCopy(), 
+	regAlg = regAlg, 
+	persEstAlg = ExplorationPersonalityEstAlg(
+		playerModelBridge = playerBridge, 
+		interactionsProfileTemplate = intProfTemplate2D.generateCopy(), 
+		regAlg = regAlg,
+		numTestedPlayerProfiles = numTestedPlayerProfilesInEst, 
+		qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)), 
+	numberOfConfigChoices = numberOfConfigChoices, 
+	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
+	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)
+)
+adaptationSH.init(
+	playerModelBridge = playerBridge, 
+	taskModelBridge = taskBridge,
+	configsGenAlg = simpleConfigsAlg, 
+	name="GIMME_SH"
+)
+
+
+randomConfigsAlg = RandomConfigsGen(
+	playerModelBridge = playerBridge, 
+	interactionsProfileTemplate = intProfTemplate2D.generateCopy(), 
+	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup
+)
+adaptationRandom.init(
+	playerModelBridge = playerBridge, 
+	taskModelBridge = taskBridge,
+	configsGenAlg = randomConfigsAlg, 
+	name="Random"
+)
+
+
+
+
+# - - - - -
+intProfTemplate1D = InteractionsProfile({"dim_0": 0})
+evolutionaryConfigsAlg1D = EvolutionaryConfigsGenDEAP(
+	playerModelBridge = playerBridge, 
+	interactionsProfileTemplate = intProfTemplate1D.generateCopy(), 
+	regAlg = regAlg, 
+	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
+	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5),
+	initialPopulationSize = 200, 
+	numberOfEvolutionsPerIteration = 50, 
+	
+	probOfCross = 0.7, 
+	probOfMutation = 1.0,
+
+	probOfMutationConfig = 0.05, 
+	probOfMutationGIPs = 0.05, 
+	
+	numFitSurvivors = 10
+)
+adaptationEvl1D.init(
+	playerModelBridge = playerBridge, 
+	taskModelBridge = taskBridge, 
+	configsGenAlg = evolutionaryConfigsAlg1D, 
+	name="GIMME_Evl1D"
+)
+
+
+# GIMME is the same as GIMME 2D 
+
+intProfTemplate3D = InteractionsProfile({"dim_0": 0, "dim_1": 0, "dim_2": 0})
+evolutionaryConfigsAlg3D = EvolutionaryConfigsGenDEAP(
+	playerModelBridge = playerBridge, 
+	interactionsProfileTemplate = intProfTemplate3D.generateCopy(), 
+	regAlg = regAlg, 
+	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
+	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5),
+	initialPopulationSize = 200, 
+	numberOfEvolutionsPerIteration = 50, 
+	
+	probOfCross = 0.7, 
+	probOfMutation = 1.0,
+
+	probOfMutationConfig = 0.05, 
+	probOfMutationGIPs = 0.05, 
+	
+	numFitSurvivors = 10
+)
+adaptationEvl3D.init(
+	playerModelBridge = playerBridge, 
+	taskModelBridge = taskBridge, 
+	configsGenAlg = evolutionaryConfigsAlg3D, 
+	name="GIMME_Evl3D"
+)
+
+
+intProfTemplate4D = InteractionsProfile({"dim_0": 0, "dim_1": 0, "dim_2": 0, "dim_3": 0})
+evolutionaryConfigsAlg4D = EvolutionaryConfigsGenDEAP(
+	playerModelBridge = playerBridge, 
+	interactionsProfileTemplate = intProfTemplate4D.generateCopy(), 
+	regAlg = regAlg, 
+	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
+	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5),
+	initialPopulationSize = 200, 
+	numberOfEvolutionsPerIteration = 50, 
+	
+	probOfCross = 0.7, 
+	probOfMutation = 1.0,
+
+	probOfMutationConfig = 0.05, 
+	probOfMutationGIPs = 0.05, 
+	
+	numFitSurvivors = 10
+)
+adaptationEvl4D.init(
+	playerModelBridge = playerBridge, 
+	taskModelBridge = taskBridge, 
+	configsGenAlg = evolutionaryConfigsAlg4D, 
+	name="GIMME_Evl4D"
+)
+
+
+
+
+intProfTemplate5D = InteractionsProfile({"dim_0": 0, "dim_1": 0, "dim_2": 0, "dim_3": 0, "dim_4": 0})
+evolutionaryConfigsAlg5D = EvolutionaryConfigsGenDEAP(
+	playerModelBridge = playerBridge, 
+	interactionsProfileTemplate = intProfTemplate5D.generateCopy(), 
+	regAlg = regAlg, 
+	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
+	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5),
+	initialPopulationSize = 200, 
+	numberOfEvolutionsPerIteration = 50, 
+	
+	probOfCross = 0.7, 
+	probOfMutation = 1.0,
+
+	probOfMutationConfig = 0.05, 
+	probOfMutationGIPs = 0.05, 
+	
+	numFitSurvivors = 10
+)
+adaptationEvl5D.init(
+	playerModelBridge = playerBridge, 
+	taskModelBridge = taskBridge, 
+	configsGenAlg = evolutionaryConfigsAlg5D, 
+	name="GIMME_Evl5D"
+)
+
+
+
+intProfTemplate6D = InteractionsProfile({"dim_0": 0, "dim_1": 0, "dim_2": 0, "dim_3": 0, "dim_4": 0, "dim_5": 0})
+evolutionaryConfigsAlg6D = EvolutionaryConfigsGenDEAP(
+	playerModelBridge = playerBridge, 
+	interactionsProfileTemplate = intProfTemplate6D.generateCopy(), 
+	regAlg = regAlg, 
+	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
+	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5),
+	initialPopulationSize = 200, 
+	numberOfEvolutionsPerIteration = 50, 
+	
+	probOfCross = 0.7, 
+	probOfMutation = 1.0,
+
+	probOfMutationConfig = 0.05, 
+	probOfMutationGIPs = 0.05, 
+	
+	numFitSurvivors = 10
+)
+adaptationEvl6D.init(
+	playerModelBridge = playerBridge, 
+	taskModelBridge = taskBridge, 
+	configsGenAlg = evolutionaryConfigsAlg6D, 
+	name="GIMME_Evl6D"
+)
 
 
 
@@ -140,7 +336,7 @@ def executionPhase(numRuns, isBootstrap, playerBridge, maxNumIterations, startin
 			adaptation.configsGenAlg.updateCurrIteration(i)
 		
 		simsID = str(os.getpid())
-		print("Process ["+simsID+"] performing step (" +str(i - startingI)+ " of "+str(maxNumIterations)+") of run ("+str(currRun+1)+" of "+str(numRuns)+") of algorithm \""+str(adaptation.name)+"\"...                                                             ")#, end="\r")
+		print("Process ["+simsID+"] performing step (" +str(i - startingI)+ " of "+str(maxNumIterations)+") of run ("+str(currRun+1)+" of "+str(numRuns)+") of algorithm \""+str(adaptation.name)+"\"...                                                             ", end="\r")
 		adaptation.iterate()
 
 		for x in range(numPlayers):
@@ -159,18 +355,15 @@ def executionPhase(numRuns, isBootstrap, playerBridge, maxNumIterations, startin
 		i+=1
 
 
-def executeSimulations(numRuns, maxNumTrainingIterations,firstTrainingI,numRealIterations,firstRealI,\
-	playerBridge, taskBridge, adaptation, numInteractionDimensions, estimatorsAccuracy = None, considerExtremePersonalityValues = None):
+def executeSimulations(numRuns, profileTemplate, maxNumTrainingIterations, firstTrainingI, numRealIterations, firstRealI,\
+	playerBridge, taskBridge, adaptation, estimatorsAccuracy = None, considerExtremePersonalityValues = None):
 
 	estimatorsAccuracy = 0.1 if estimatorsAccuracy == None else estimatorsAccuracy
 	considerExtremePersonalityValues = False if considerExtremePersonalityValues == None else considerExtremePersonalityValues
 
 	adaptationName = adaptation.name
 
-	profileTemplate = InteractionsProfile()
-	for d in range(numInteractionDimensions):
-		profileTemplate.dimensions["dim_"+str(d)] = 0.0
-
+	numInteractionDimensions = len(profileTemplate.dimensions.keys())
 
 	# create players and tasks
 	for x in range(numPlayers):
@@ -187,6 +380,7 @@ def executeSimulations(numRuns, maxNumTrainingIterations,firstTrainingI,numRealI
 					)
 				), 
 			currModelIncreases = PlayerCharacteristics(), personalityEst = profileTemplate.generateCopy().reset(), realPersonality = profileTemplate.generateCopy().reset())
+	
 	for x in range(numTasks):
 		taskBridge.registerNewTask(
 			taskId = int(x), 
@@ -270,100 +464,77 @@ def executeSimulations(numRuns, maxNumTrainingIterations,firstTrainingI,numRealI
 
 
 
-# ----------------------- [Init Algorithms] --------------------------------
-print("Initing algorithms...")
 
-regAlg = KNNRegression(playerModelBridge = playerBridge, numberOfNNs = 5)
+# ----------------------- [Simulation] --------------------------------
+if __name__ == '__main__':
 
-# - - - - - 
-intProfTemplate = InteractionsProfile({"dim_0": 0, "dim_1": 0})
-
-evolutionaryConfigsAlg = EvolutionaryConfigsGenDEAP(
-	playerModelBridge = playerBridge, 
-	interactionsProfileTemplate = intProfTemplate.generateCopy(), 
-	regAlg = regAlg, 
-	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
-	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5),
-	initialPopulationSize = 200, 
-	numberOfEvolutionsPerIteration = 50, 
-	
-	probOfCross = 0.7, 
-	probOfMutation = 1.0,
-
-	probOfMutationConfig = 0.05, 
-	probOfMutationGIPs = 0.05, 
-	
-	numFitSurvivors = 10
-)
-adaptationEvl.init(
-	playerModelBridge = playerBridge, 
-	taskModelBridge = taskBridge,
-	configsGenAlg = evolutionaryConfigsAlg, 
-	name="GIMME"
-)
-
-simpleConfigsAlg = StochasticHillclimberConfigsGen(
-	playerModelBridge = playerBridge, 
-	interactionsProfileTemplate = intProfTemplate.generateCopy(), 
-	regAlg = regAlg, 
-	persEstAlg = ExplorationPersonalityEstAlg(
-		playerModelBridge = playerBridge, 
-		interactionsProfileTemplate = intProfTemplate.generateCopy(), 
-		regAlg = regAlg,
-		numTestedPlayerProfiles = numTestedPlayerProfilesInEst, 
-		qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)), 
-	numberOfConfigChoices = numberOfConfigChoices, 
-	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
-	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)
-)
-adaptationGIMME.init(
-	playerModelBridge = playerBridge, 
-	taskModelBridge = taskBridge,
-	configsGenAlg = simpleConfigsAlg, 
-	name="GIMME"
-)
+	print("------------------------------------------")
+	print("-----                                -----")
+	print("-----       GIMME API EXAMPLE        -----")
+	print("-----                                -----")
+	print("-----      (SIMULATING A CLASS)      -----")
+	print("-----                                -----")
+	print("------------------------------------------")
 
 
-randomConfigsAlg = RandomConfigsGen(
-	playerModelBridge = playerBridge, 
-	interactionsProfileTemplate = intProfTemplate.generateCopy(), 
-	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup
-)
-adaptationRandom.init(
-	playerModelBridge = playerBridge, 
-	taskModelBridge = taskBridge,
-	configsGenAlg = randomConfigsAlg, 
-	name="random"
-)
+	print("------------------------------------------")
+	print("NOTE: This example tests several group organization algorithms types.")
+	print("For more details, consult the source code.")
+	print("------------------------------------------")
 
 
-from concurrent.futures import ProcessPoolExecutor
+	# ----------------------- [Execute Algorithms] ----------------------------
 
-# ----------------------- [Execute Algorithms] ----------------------------
-input("<<< All ready! Press any key to start. >>>")
+	input("<<< All ready! Press any key to start. >>>")
 
-partialNumRuns = math.ceil(numRuns / numThreads)
 
-adaptationEvl.name = "GIMME_Evl"
-adaptationGIMME.name = "GIMME"
-adaptationRandom.name = "Random"
+	adaptationEvl.name = "GIMME_Evl"
+	executeSimulations(numRuns, intProfTemplate2D, 0, 0, numRealIterations, maxNumTrainingIterations, 
+		playerBridge, taskBridge, adaptationEvl)
 
-with ProcessPoolExecutor(max_workers=numThreads) as executor:
+	executeSimulations(numRuns, intProfTemplate2D, 0, 0, numRealIterations, maxNumTrainingIterations, 
+		playerBridge, taskBridge, adaptationSH)
 
-	for i in range(numThreads):
-		executor.submit(executeSimulations, partialNumRuns, 0, 0, numRealIterations, maxNumTrainingIterations, 
-			playerBridge, taskBridge, adaptationEvl, 2)
+	executeSimulations(numRuns, intProfTemplate2D, 0, 0, numRealIterations, maxNumTrainingIterations,
+		playerBridge, taskBridge, adaptationRandom)
 
-		executor.submit(executeSimulations, partialNumRuns, 0, 0, numRealIterations, maxNumTrainingIterations, 
-			playerBridge, taskBridge, adaptationGIMME, 2)
 
-		executor.submit(executeSimulations, partialNumRuns, 0, 0, numRealIterations, maxNumTrainingIterations,
-			playerBridge, taskBridge, adaptationRandom, 2)
+	adaptationEvl.name = "GIMME_Evl_Bootstrap"
+	executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
+					playerBridge, taskBridge, adaptationEvl, estimatorsAccuracy = 0.1)
+
+	adaptationEvl.name = "GIMME_Evl_Bootstrap_HighAcc"
+	executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
+					playerBridge, taskBridge, adaptationEvl, estimatorsAccuracy = 0.05)
+
+	adaptationEvl.name = "GIMME_Evl_Bootstrap_LowAcc"
+	executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
+					playerBridge, taskBridge, adaptationEvl, estimatorsAccuracy = 0.2)
+
+
+	executeSimulations(numRuns, intProfTemplate1D, 0, 0, numRealIterations, maxNumTrainingIterations, 
+		playerBridge, taskBridge, adaptationEvl1D)
+
+	executeSimulations(numRuns, intProfTemplate3D, 0, 0, numRealIterations, maxNumTrainingIterations, 
+		playerBridge, taskBridge, adaptationEvl3D)
+
+	executeSimulations(numRuns, intProfTemplate4D, 0, 0, numRealIterations, maxNumTrainingIterations, 
+		playerBridge, taskBridge, adaptationEvl4D)
+
+	executeSimulations(numRuns, intProfTemplate5D, 0, 0, numRealIterations, maxNumTrainingIterations, 
+		playerBridge, taskBridge, adaptationEvl5D)
+
+	executeSimulations(numRuns, intProfTemplate6D, 0, 0, numRealIterations, maxNumTrainingIterations, 
+		playerBridge, taskBridge, adaptationEvl6D)
 
 
 
+	adaptationEvl.name = "GIMME_Evl_EP"
+	executeSimulations(numRuns, intProfTemplate2D, 0, 0, numRealIterations, maxNumTrainingIterations, 
+		playerBridge, taskBridge, adaptationEvl, considerExtremePersonalityValues = True)
 
-print("Done!                        ", end="\r")
+
+	print("Done!                        ", end="\r")
 
 
 		

@@ -781,8 +781,17 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		self.minNumGroups = math.ceil(len(self.playerIds) / self.maxNumberOfPlayersPerGroup)
 		self.maxNumGroups = math.floor(len(self.playerIds) / self.minNumberOfPlayersPerGroup)
 
-		creator.create("FitnessMax", base.Fitness, weights=(1.0,))
-		creator.create("Individual", list, fitness=creator.FitnessMax)
+		self.searchID = str(id(self)) 
+
+		fitnessFuncId = "FitnessMax"+self.searchID
+		individualId = "Individual"+self.searchID
+
+		creator.create(fitnessFuncId, base.Fitness, weights=(1.0,))
+		creator.create(individualId, list, fitness=getattr(creator, fitnessFuncId))
+
+		# print("Individual"+self.searchID+" created!")
+		# print(dir(creator))
+
 
 		# conv test
 		# creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
@@ -793,7 +802,7 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		self.toolbox.register("indices", self.randomIndividualGenerator, self.playerIds, self.minNumGroups, self.maxNumGroups)
 		# toolbox.register("indices", [toolbox.group, toolbox.profile])
 
-		self.toolbox.register("individual", tools.initIterate, creator.Individual, self.toolbox.indices)
+		self.toolbox.register("individual", tools.initIterate, getattr(creator, individualId), self.toolbox.indices)
 		self.toolbox.register("population", tools.initRepeat, list, self.toolbox.individual)
 
 		self.toolbox.register("mate", self.cxGIMME)
@@ -917,8 +926,8 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 			newProfiles = tools.cxBlend(prof1, prof2, 0.5)
 			
 			#the inds become children
-			ind1[1][i] = InteractionsProfile(dimensions={'dim_0': 0, 'dim_1': 0}).unflatten(newProfiles[0])
-			ind2[1][i] = InteractionsProfile(dimensions={'dim_0': 0, 'dim_1': 0}).unflatten(newProfiles[1])
+			ind1[1][i] = self.interactionsProfileTemplate.unflatten(newProfiles[0])
+			ind2[1][i] = self.interactionsProfileTemplate.unflatten(newProfiles[1])
 
 		del ind1.fitness.values
 		del ind2.fitness.values
@@ -995,6 +1004,7 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 			group = config[groupI]
 			profile = profiles[groupI]
 
+			# breakpoint()
 			for playerId in group:
 				predictedIncreases = self.regAlg.predict(profile, playerId)
 				totalFitness += (self.qualityWeights.ability* predictedIncreases.characteristics.ability + \

@@ -73,8 +73,7 @@ class InteractionsProfile(object):
 		cost.reset()
 
 		if(len(cost.dimensions) != len(profileToTest.dimensions)):
-			print("[ERROR] Could not compute distance between profiles in different sized spaces. Execution aborted.")
-			quit()
+			raise Exception("[ERROR] Could not compute distance between profiles in different sized spaces. Execution aborted.")
 
 		for key in cost.dimensions:
 			cost.dimensions[key] = abs(self.dimensions[key] - profileToTest.dimensions[key])
