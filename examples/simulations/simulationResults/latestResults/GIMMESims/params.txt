@@ -1,0 +1,35 @@
+resultsEvl - 1.csv:
+
+numRuns = 10
+
+maxNumTrainingIterations = 20
+numRealIterations = 20
+
+preferredNumberOfPlayersPerGroup = 4
+numberOfConfigChoices = 100
+
+numTestedPlayerProfilesInEst = 500
+
+playerWindow = 10
+numPlayers = 23
+
+numTasks = 1
+
+
+# ----------------------- [Init GA] --------------------------------
+initialPopulationSize = 200 
+numberOfEvolutionsPerIteration = 20
+ 
+probOfCross = 0.7
+probOfMutation = 1.0
+
+probOfMutationConfig = 0.05 
+probOfMutationGIPs = 0.05 
+
+numFitSurvivors = 10
+
+
+Notes:
+Faster than when numberOfEvolutionsPerIteration = 50, but underperforming in relation to LS approach. 
+There is the impression that 50 generations per organize are really needed.
+Bootstrap error overlaps the error of the algorithm

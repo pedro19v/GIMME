@@ -84,28 +84,31 @@ class ConfigsGenAlg(ABC):
 		
 		# append the rest
 		playersWithoutGroupSize = len(playersWithoutGroup)
-		while playersWithoutGroupSize > 0:
-			currPlayerIndex = 0;
-			if (playersWithoutGroupSize > 1):
-				currPlayerIndex = random.randint(0, playersWithoutGroupSize - 1)
-			else:
-				currPlayerIndex = 0
-			currPlayerID = playersWithoutGroup[currPlayerIndex]
+		if (playersWithoutGroupSize < (math.ceil(self.maxNumberOfPlayersPerGroup) / 2.0)):
+			while playersWithoutGroupSize > 0:
+				currPlayerIndex = 0;
+				if (playersWithoutGroupSize > 1):
+					currPlayerIndex = random.randint(0, playersWithoutGroupSize - 1)
+				else:
+					currPlayerIndex = 0
+				currPlayerID = playersWithoutGroup[currPlayerIndex]
 
-			groupsSize = len(returnedConfig)
+				groupsSize = len(returnedConfig)
 
-			availableGroups = returnedConfig.copy()
-			while (len(currGroup) > (self.maxNumberOfPlayersPerGroup - 1)):
-				if(len(availableGroups) < 1):
-					currGroup = random.choice(returnedConfig)
-					break
-				currGroup = random.choice(availableGroups)
-				availableGroups.remove(currGroup)
+				availableGroups = returnedConfig.copy()
+				while (len(currGroup) > (self.maxNumberOfPlayersPerGroup - 1)):
+					if(len(availableGroups) < 1):
+						currGroup = random.choice(returnedConfig)
+						break
+					currGroup = random.choice(availableGroups)
+					availableGroups.remove(currGroup)
 
-			currGroup.append(currPlayerID)
+				currGroup.append(currPlayerID)
 
-			del playersWithoutGroup[currPlayerIndex]
-			playersWithoutGroupSize = len(playersWithoutGroup)
+				del playersWithoutGroup[currPlayerIndex]
+				playersWithoutGroupSize = len(playersWithoutGroup)
+		else:
+			returnedConfig.append(playersWithoutGroup)
 
 		return returnedConfig
 
@@ -789,18 +792,14 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		creator.create(fitnessFuncId, base.Fitness, weights=(1.0,))
 		creator.create(individualId, list, fitness=getattr(creator, fitnessFuncId))
 
-		# print("Individual"+self.searchID+" created!")
-		# print(dir(creator))
+		# # conv test
+		# creator.create(fitnessFuncId, base.Fitness, weights=(-1.0,))
+		# creator.create(individualId, list, fitness=getattr(creator, fitnessFuncId))
 
-
-		# conv test
-		# creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
-		# creator.create("Individual", list, fitness=creator.FitnessMin)
-
+		
 		self.toolbox = base.Toolbox()
 
 		self.toolbox.register("indices", self.randomIndividualGenerator, self.playerIds, self.minNumGroups, self.maxNumGroups)
-		# toolbox.register("indices", [toolbox.group, toolbox.profile])
 
 		self.toolbox.register("individual", tools.initIterate, getattr(creator, individualId), self.toolbox.indices)
 		self.toolbox.register("population", tools.initRepeat, list, self.toolbox.individual)
@@ -980,10 +979,10 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 			group = config[groupI]
 			profile = profiles[groupI]
 			
-			totalFitness += profile.sqrDistanceBetween(InteractionsProfile(dimensions = {'dim_0': 0.98, 'dim_1': 0.005}))
+			# totalFitness += profile.sqrDistanceBetween(InteractionsProfile(dimensions = {'dim_0': 0.98, 'dim_1': 0.005}))
 
-			# for playerI in range(len(group)):
-			# 	totalFitness += abs(config[groupI][playerI] - targetConfig[groupI][playerI])
+			for playerI in range(len(group)):
+				totalFitness += abs(config[groupI][playerI] - targetConfig[groupI][playerI])
 		
 		print(totalFitness)
 		totalFitness = totalFitness + 1.0 #helps selection (otherwise Pchoice would always be 0)

@@ -72,35 +72,34 @@ buildAbIncPlots <- function(logAvg, logSDev, plotName, colors = NULL){
 
 
 
-# cmp average ability increase of sim anneal, hillclimb, pure random and accurate
+# cmp average ability increase 
 currAvg = 	avg[
-				avg$algorithm=="GIMME" | 
+				avg$algorithm=="GIMME_SH" | 
 				avg$algorithm=="GIMME_Evl" |
+				avg$algorithm=="GIMME_Evl_50it" |
 				avg$algorithm=="GIMME_Evl_Bootstrap" |
 				avg$algorithm=="Random"
 				,]
 
 currSdev = sdev[
-				sdev$algorithm=="GIMME" | 
+				sdev$algorithm=="GIMME_SH" | 
 				sdev$algorithm=="GIMME_Evl" |
+				sdev$algorithm=="GIMME_Evl_50it" |
 				sdev$algorithm=="GIMME_Evl_Bootstrap" |
 				sdev$algorithm=="Random"
 				,]
 
 
-currAvg$algorithm[currAvg$algorithm == "GIMME"] <- "GIMME" 
+currAvg$algorithm[currAvg$algorithm == "GIMME_SH"] <- "GIMME LS" 
 currAvg$algorithm[currAvg$algorithm == "GIMME_Evl"] <- "GIMME GA" 
 # currAvg$algorithm[currAvg$algorithm == "Random"] <- "Random" 
 
 currAvg$linetype <- "solid" 
 # currAvg$linetype[currAvg$algorithm == "Perf. Info."] <- "dashed" 
 
-buildAbIncPlots(currAvg, currSdev, "simulationsResultsAbilityInc", c("#5e3c99", "dodgerblue","#75a352"))
+buildAbIncPlots(currAvg, currSdev, "simulationsResultsAbilityInc", c("#5e3c99", "dodgerblue","#75a352","#75a3e2", "#d7191c"))
 
-
-
-
-
+q()
 
 # cmp average ability increase of GIMME n-D
 currAvg = avg[
@@ -109,8 +108,7 @@ currAvg = avg[
 				avg$algorithm=="GIMME_Evl3D" | 
 				avg$algorithm=="GIMME_Evl4D" | 
 				avg$algorithm=="GIMME_Evl5D" | 
-				avg$algorithm=="GIMME_Evl6D" |
-				avg$algorithm=="Random"
+				avg$algorithm=="GIMME_Evl6D" 
 			,]
 		
 currSdev = sdev[
@@ -119,8 +117,7 @@ currSdev = sdev[
 				sdev$algorithm=="GIMME_Evl3D" | 
 				sdev$algorithm=="GIMME_Evl4D" | 
 				sdev$algorithm=="GIMME_Evl5D" | 
-				sdev$algorithm=="GIMME_Evl6D" |
-				sdev$algorithm=="Random"
+				sdev$algorithm=="GIMME_Evl6D" 
 			,]
 
 
@@ -133,7 +130,7 @@ currAvg$algorithm[currAvg$algorithm == "GIMME_Evl4D"] <- "GIMME 4D"
 # currAvg$algorithm[currAvg$algorithm == "Random"] <- "Random" 
 
 currAvg$linetype <- "solid"
-currAvg$linetype[currAvg$algorithm == "Random"] <- "dashed" 
+# currAvg$linetype[currAvg$algorithm == "Random"] <- "dashed" 
 
 currAvg$algorithm <- factor(currAvg$algorithm, levels=c(sort(unique(currAvg[,"algorithm"]))))
 buildAbIncPlots(currAvg, currSdev, "simulationsResultsAbilityGIPDims")
@@ -170,9 +167,9 @@ currSdev = sdev[
 			  ,]
 
 currAvg$linetype <- "solid" 
-currAvg$algorithm[currAvg$algorithm == "GIMME"] <- "GIMME-Bootstrap\n (\u03B3 = 0.1)" 
-currAvg$algorithm[currAvg$algorithm == "GIMME_LowAccuracyEst"] <- "GIMME-Bootstrap\n (\u03B3 = 0.2)" 
-currAvg$algorithm[currAvg$algorithm == "GIMME_HighAccuracyEst"] <- "GIMME-Bootstrap\n (\u03B3 = 0.05)"  
+currAvg$algorithm[currAvg$algorithm == "GIMME_Evl_Bootstrap"] <- "GIMME-Bootstrap\n (\u03B3 = 0.1)" 
+currAvg$algorithm[currAvg$algorithm == "GIMME_Evl_Bootstrap_LowAcc"] <- "GIMME-Bootstrap\n (\u03B3 = 0.2)" 
+currAvg$algorithm[currAvg$algorithm == "GIMME_Evl_Bootstrap_HighAcc"] <- "GIMME-Bootstrap\n (\u03B3 = 0.05)"  
 currAvg$algorithm <- factor(currAvg$algorithm, levels=sort(unique(currAvg[,"algorithm"]), decreasing=TRUE))
 buildAbIncPlots(currAvg, currSdev, "simulationsResultsAccuracyComp", c("skyblue", "dodgerblue", "navy"))
 

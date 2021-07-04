@@ -21,7 +21,7 @@ from ModelMocks import *
 from LogManager import *
 
 
-numRuns = 20
+numRuns = 10
 
 maxNumTrainingIterations = 20
 numRealIterations = 20
@@ -32,9 +32,24 @@ numberOfConfigChoices = 100
 numTestedPlayerProfilesInEst = 500
 
 playerWindow = 10
-numPlayers = 24
+numPlayers = 23
 
 numTasks = 1
+
+
+# ----------------------- [Init GA] --------------------------------
+initialPopulationSize = 200 
+numberOfEvolutionsPerIteration = 50
+ 
+probOfCross = 0.7
+probOfMutation = 1.0
+
+probOfMutationConfig = 0.05 
+probOfMutationGIPs = 0.05 
+
+numFitSurvivors = 10
+
+
 
 
 startTime = str(datetime.datetime.now())
@@ -98,16 +113,16 @@ evolutionaryConfigsAlg = EvolutionaryConfigsGenDEAP(
 	regAlg = regAlg, 
 	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
 	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5),
-	initialPopulationSize = 200, 
-	numberOfEvolutionsPerIteration = 50, 
-	 
-	probOfCross = 0.7, 
-	probOfMutation = 1.0,
-
-	probOfMutationConfig = 0.05, 
-	probOfMutationGIPs = 0.05, 
+	initialPopulationSize = initialPopulationSize, 
+	numberOfEvolutionsPerIteration = numberOfEvolutionsPerIteration, 
 	
-	numFitSurvivors = 10
+	probOfCross = probOfCross, 
+	probOfMutation = probOfMutation,
+
+	probOfMutationConfig = probOfMutationConfig, 
+	probOfMutationGIPs = probOfMutationGIPs, 
+	
+	numFitSurvivors = numFitSurvivors
 )
 adaptationEvl.init(
 	playerModelBridge = playerBridge, 
@@ -161,16 +176,16 @@ evolutionaryConfigsAlg1D = EvolutionaryConfigsGenDEAP(
 	regAlg = regAlg, 
 	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
 	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5),
-	initialPopulationSize = 200, 
-	numberOfEvolutionsPerIteration = 50, 
+	initialPopulationSize = initialPopulationSize, 
+	numberOfEvolutionsPerIteration = numberOfEvolutionsPerIteration, 
 	
-	probOfCross = 0.7, 
-	probOfMutation = 1.0,
+	probOfCross = probOfCross, 
+	probOfMutation = probOfMutation,
 
-	probOfMutationConfig = 0.05, 
-	probOfMutationGIPs = 0.05, 
+	probOfMutationConfig = probOfMutationConfig, 
+	probOfMutationGIPs = probOfMutationGIPs, 
 	
-	numFitSurvivors = 10
+	numFitSurvivors = numFitSurvivors
 )
 adaptationEvl1D.init(
 	playerModelBridge = playerBridge, 
@@ -189,16 +204,16 @@ evolutionaryConfigsAlg3D = EvolutionaryConfigsGenDEAP(
 	regAlg = regAlg, 
 	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
 	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5),
-	initialPopulationSize = 200, 
-	numberOfEvolutionsPerIteration = 50, 
+	initialPopulationSize = initialPopulationSize, 
+	numberOfEvolutionsPerIteration = numberOfEvolutionsPerIteration, 
 	
-	probOfCross = 0.7, 
-	probOfMutation = 1.0,
+	probOfCross = probOfCross, 
+	probOfMutation = probOfMutation,
 
-	probOfMutationConfig = 0.05, 
-	probOfMutationGIPs = 0.05, 
+	probOfMutationConfig = probOfMutationConfig, 
+	probOfMutationGIPs = probOfMutationGIPs, 
 	
-	numFitSurvivors = 10
+	numFitSurvivors = numFitSurvivors
 )
 adaptationEvl3D.init(
 	playerModelBridge = playerBridge, 
@@ -215,16 +230,16 @@ evolutionaryConfigsAlg4D = EvolutionaryConfigsGenDEAP(
 	regAlg = regAlg, 
 	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
 	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5),
-	initialPopulationSize = 200, 
-	numberOfEvolutionsPerIteration = 50, 
+	initialPopulationSize = initialPopulationSize, 
+	numberOfEvolutionsPerIteration = numberOfEvolutionsPerIteration, 
 	
-	probOfCross = 0.7, 
-	probOfMutation = 1.0,
+	probOfCross = probOfCross, 
+	probOfMutation = probOfMutation,
 
-	probOfMutationConfig = 0.05, 
-	probOfMutationGIPs = 0.05, 
+	probOfMutationConfig = probOfMutationConfig, 
+	probOfMutationGIPs = probOfMutationGIPs, 
 	
-	numFitSurvivors = 10
+	numFitSurvivors = numFitSurvivors
 )
 adaptationEvl4D.init(
 	playerModelBridge = playerBridge, 
@@ -243,16 +258,16 @@ evolutionaryConfigsAlg5D = EvolutionaryConfigsGenDEAP(
 	regAlg = regAlg, 
 	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
 	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5),
-	initialPopulationSize = 200, 
-	numberOfEvolutionsPerIteration = 50, 
+	initialPopulationSize = initialPopulationSize, 
+	numberOfEvolutionsPerIteration = numberOfEvolutionsPerIteration, 
 	
-	probOfCross = 0.7, 
-	probOfMutation = 1.0,
+	probOfCross = probOfCross, 
+	probOfMutation = probOfMutation,
 
-	probOfMutationConfig = 0.05, 
-	probOfMutationGIPs = 0.05, 
+	probOfMutationConfig = probOfMutationConfig, 
+	probOfMutationGIPs = probOfMutationGIPs, 
 	
-	numFitSurvivors = 10
+	numFitSurvivors = numFitSurvivors
 )
 adaptationEvl5D.init(
 	playerModelBridge = playerBridge, 
@@ -270,16 +285,16 @@ evolutionaryConfigsAlg6D = EvolutionaryConfigsGenDEAP(
 	regAlg = regAlg, 
 	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
 	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5),
-	initialPopulationSize = 200, 
-	numberOfEvolutionsPerIteration = 50, 
+	initialPopulationSize = initialPopulationSize, 
+	numberOfEvolutionsPerIteration = numberOfEvolutionsPerIteration, 
 	
-	probOfCross = 0.7, 
-	probOfMutation = 1.0,
+	probOfCross = probOfCross, 
+	probOfMutation = probOfMutation,
 
-	probOfMutationConfig = 0.05, 
-	probOfMutationGIPs = 0.05, 
+	probOfMutationConfig = probOfMutationConfig, 
+	probOfMutationGIPs = probOfMutationGIPs, 
 	
-	numFitSurvivors = 10
+	numFitSurvivors = numFitSurvivors
 )
 adaptationEvl6D.init(
 	playerModelBridge = playerBridge, 
@@ -487,54 +502,58 @@ if __name__ == '__main__':
 
 	input("<<< All ready! Press any key to start. >>>")
 
+	# import time
+	# startTime = time.time()
 
 	adaptationEvl.name = "GIMME_Evl"
 	executeSimulations(numRuns, intProfTemplate2D, 0, 0, numRealIterations, maxNumTrainingIterations, 
 		playerBridge, taskBridge, adaptationEvl)
 
-	executeSimulations(numRuns, intProfTemplate2D, 0, 0, numRealIterations, maxNumTrainingIterations, 
-		playerBridge, taskBridge, adaptationSH)
+	# executeSimulations(numRuns, intProfTemplate2D, 0, 0, numRealIterations, maxNumTrainingIterations, 
+	# 	playerBridge, taskBridge, adaptationSH)
 
-	executeSimulations(numRuns, intProfTemplate2D, 0, 0, numRealIterations, maxNumTrainingIterations,
-		playerBridge, taskBridge, adaptationRandom)
-
-
-	adaptationEvl.name = "GIMME_Evl_Bootstrap"
-	executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
-					playerBridge, taskBridge, adaptationEvl, estimatorsAccuracy = 0.1)
-
-	adaptationEvl.name = "GIMME_Evl_Bootstrap_HighAcc"
-	executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
-					playerBridge, taskBridge, adaptationEvl, estimatorsAccuracy = 0.05)
-
-	adaptationEvl.name = "GIMME_Evl_Bootstrap_LowAcc"
-	executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
-					playerBridge, taskBridge, adaptationEvl, estimatorsAccuracy = 0.2)
+	# executeSimulations(numRuns, intProfTemplate2D, 0, 0, numRealIterations, maxNumTrainingIterations,
+	# 	playerBridge, taskBridge, adaptationRandom)
 
 
-	executeSimulations(numRuns, intProfTemplate1D, 0, 0, numRealIterations, maxNumTrainingIterations, 
-		playerBridge, taskBridge, adaptationEvl1D)
+	# adaptationEvl.name = "GIMME_Evl_Bootstrap"
+	# executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
+	# 				playerBridge, taskBridge, adaptationEvl, estimatorsAccuracy = 0.1)
 
-	executeSimulations(numRuns, intProfTemplate3D, 0, 0, numRealIterations, maxNumTrainingIterations, 
-		playerBridge, taskBridge, adaptationEvl3D)
+	# adaptationEvl.name = "GIMME_Evl_Bootstrap_HighAcc"
+	# executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
+	# 				playerBridge, taskBridge, adaptationEvl, estimatorsAccuracy = 0.05)
 
-	executeSimulations(numRuns, intProfTemplate4D, 0, 0, numRealIterations, maxNumTrainingIterations, 
-		playerBridge, taskBridge, adaptationEvl4D)
-
-	executeSimulations(numRuns, intProfTemplate5D, 0, 0, numRealIterations, maxNumTrainingIterations, 
-		playerBridge, taskBridge, adaptationEvl5D)
-
-	executeSimulations(numRuns, intProfTemplate6D, 0, 0, numRealIterations, maxNumTrainingIterations, 
-		playerBridge, taskBridge, adaptationEvl6D)
+	# adaptationEvl.name = "GIMME_Evl_Bootstrap_LowAcc"
+	# executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
+	# 				playerBridge, taskBridge, adaptationEvl, estimatorsAccuracy = 0.2)
 
 
+	# executeSimulations(numRuns, intProfTemplate1D, 0, 0, numRealIterations, maxNumTrainingIterations, 
+	# 	playerBridge, taskBridge, adaptationEvl1D)
 
-	adaptationEvl.name = "GIMME_Evl_EP"
-	executeSimulations(numRuns, intProfTemplate2D, 0, 0, numRealIterations, maxNumTrainingIterations, 
-		playerBridge, taskBridge, adaptationEvl, considerExtremePersonalityValues = True)
+	# executeSimulations(numRuns, intProfTemplate3D, 0, 0, numRealIterations, maxNumTrainingIterations, 
+	# 	playerBridge, taskBridge, adaptationEvl3D)
+
+	# executeSimulations(numRuns, intProfTemplate4D, 0, 0, numRealIterations, maxNumTrainingIterations, 
+	# 	playerBridge, taskBridge, adaptationEvl4D)
+
+	# executeSimulations(numRuns, intProfTemplate5D, 0, 0, numRealIterations, maxNumTrainingIterations, 
+	# 	playerBridge, taskBridge, adaptationEvl5D)
+
+	# executeSimulations(numRuns, intProfTemplate6D, 0, 0, numRealIterations, maxNumTrainingIterations, 
+	# 	playerBridge, taskBridge, adaptationEvl6D)
 
 
-	print("Done!                        ", end="\r")
+
+	# adaptationEvl.name = "GIMME_Evl_EP"
+	# executeSimulations(numRuns, intProfTemplate2D, 0, 0, numRealIterations, maxNumTrainingIterations, 
+	# 	playerBridge, taskBridge, adaptationEvl, considerExtremePersonalityValues = True)
+
+	# executionTime = (time.time() - startTime)
+	# print('Execution time in seconds: ' + str(executionTime)+"                                                                                    ", end="\r")
+
+	print("Done!                        ")
 
 
 		
