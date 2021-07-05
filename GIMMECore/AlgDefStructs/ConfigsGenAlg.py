@@ -925,8 +925,8 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 			newProfiles = tools.cxBlend(prof1, prof2, 0.5)
 			
 			#the inds become children
-			ind1[1][i] = self.interactionsProfileTemplate.unflatten(newProfiles[0])
-			ind2[1][i] = self.interactionsProfileTemplate.unflatten(newProfiles[1])
+			ind1[1][i] = self.interactionsProfileTemplate.unflattened(newProfiles[0])
+			ind2[1][i] = self.interactionsProfileTemplate.unflattened(newProfiles[1])
 
 		del ind1.fitness.values
 		del ind2.fitness.values
@@ -937,23 +937,42 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 	def mutGIMME(self, individual, pGIPs, pConfig):
 		
 		# mutate config
-		if random.uniform(0, 1) < pConfig:
+		if random.uniform(0, 1) <= pConfig:
+			# breakpoint()
 			indCpy = copy.copy(individual)
-			indCpy[0] = self.randomConfigGenerator(self.playerIds, self.minNumGroups, self.maxNumGroups)
-			individual[0] = self.cxGIMME(individual, indCpy)[0][0]
+			
+			randI1 = random.randint(0, len(indCpy[0]) - 1)
+			innerRandI1 = random.randint(0, len(indCpy[0][randI1]) - 1)
+
+			randI2 = innerRandI2 = -1
+			while(randI2 < 0 or randI1 == randI2):
+				randI2 = random.randint(0, len(indCpy[0]) - 1)
+			while(innerRandI2 < 0 or innerRandI1 == innerRandI2):
+				innerRandI2 = random.randint(0, len(indCpy[0][randI2]) - 1)
+
+
+			elem1 = indCpy[0][randI1][innerRandI1]
+			elem2 = indCpy[0][randI2][innerRandI2]
+
+
+			indCpy[0][randI1][innerRandI1] = elem2
+			indCpy[0][randI2][innerRandI2] = elem1
+
+			individual[0] = indCpy[0]
+			# breakpoint()
 			
 
 		#mutate GIPs
 		profs = individual[1]
 		keys = list(profs[0].dimensions.keys())
 		for i in range(len(profs)):
-			if random.uniform(0, 1) < pGIPs:
+			if random.uniform(0, 1) <= pGIPs:
 				# profs[i].randomize()
 				for key in keys:
-					if random.uniform(0, 1) < 0.5:
-						profs[i].dimensions[key] += random.uniform(0, min(0.1,1.0-profs[i].dimensions[key])) 
+					if random.uniform(0, 1) <= 0.5:
+						profs[i].dimensions[key] += random.uniform(0, min(0.1, 1.0 - profs[i].dimensions[key])) 
 					else:
-						profs[i].dimensions[key] -= random.uniform(0, min(0.1,profs[i].dimensions[key])) 
+						profs[i].dimensions[key] -= random.uniform(0, min(0.1, profs[i].dimensions[key])) 
 
 		individual[1] = profs
 		
@@ -979,14 +998,13 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 			group = config[groupI]
 			profile = profiles[groupI]
 			
-			# totalFitness += profile.sqrDistanceBetween(InteractionsProfile(dimensions = {'dim_0': 0.98, 'dim_1': 0.005}))
-
 			for playerI in range(len(group)):
+				totalFitness += profile.sqrDistanceBetween(InteractionsProfile(dimensions = {'dim_0': 0.98, 'dim_1': 0.005}))
 				totalFitness += abs(config[groupI][playerI] - targetConfig[groupI][playerI])
 		
 		print(totalFitness)
 		totalFitness = totalFitness + 1.0 #helps selection (otherwise Pchoice would always be 0)
-		# individual.fitness.values = totalFitness,
+		individual.fitness.values = totalFitness,
 		return totalFitness, #must return a tuple
 
 
@@ -996,7 +1014,7 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		profiles = individual[1]
 
 		totalFitness = 0.0
-		# breakpoint()
+
 		lenConfig = len(config)
 		for groupI in range(lenConfig):
 			
@@ -1010,7 +1028,8 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 								self.qualityWeights.engagement* predictedIncreases.characteristics.engagement)
 		
 		totalFitness = totalFitness + 1.0 #helps selection (otherwise Pchoice would always be 0)
-		# individual.fitness.values = totalFitness,
+		individual.fitness.values = totalFitness,
+
 		return totalFitness, #must return a tuple
 
 

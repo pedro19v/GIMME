@@ -39,15 +39,15 @@ numTasks = 1
 
 # ----------------------- [Init GA] --------------------------------
 initialPopulationSize = 200 
-numberOfEvolutionsPerIteration = 50
+numberOfEvolutionsPerIteration = 30
  
 probOfCross = 0.7
 probOfMutation = 1.0
 
-probOfMutationConfig = 0.05 
-probOfMutationGIPs = 0.05 
+probOfMutationConfig = 0.35 
+probOfMutationGIPs = 0.35 
 
-numFitSurvivors = 10
+numFitSurvivors = 15
 
 
 
@@ -509,11 +509,11 @@ if __name__ == '__main__':
 	executeSimulations(numRuns, intProfTemplate2D, 0, 0, numRealIterations, maxNumTrainingIterations, 
 		playerBridge, taskBridge, adaptationEvl)
 
-	# executeSimulations(numRuns, intProfTemplate2D, 0, 0, numRealIterations, maxNumTrainingIterations, 
-	# 	playerBridge, taskBridge, adaptationSH)
+	executeSimulations(numRuns, intProfTemplate2D, 0, 0, numRealIterations, maxNumTrainingIterations, 
+		playerBridge, taskBridge, adaptationSH)
 
-	# executeSimulations(numRuns, intProfTemplate2D, 0, 0, numRealIterations, maxNumTrainingIterations,
-	# 	playerBridge, taskBridge, adaptationRandom)
+	executeSimulations(numRuns, intProfTemplate2D, 0, 0, numRealIterations, maxNumTrainingIterations,
+		playerBridge, taskBridge, adaptationRandom)
 
 
 	# adaptationEvl.name = "GIMME_Evl_Bootstrap"
