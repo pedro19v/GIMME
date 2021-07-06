@@ -60,8 +60,8 @@ class CSVLogManager(LogManager):
 		self.filePath = filePath
 		self.wroteHeader = False
 
-		if os.path.exists("/home/samgomes/Documents/doutoramento/reps/GIMME/GIMME/examples/simulations/simulationResults/latestResults/GIMMESims/resultsEvl.csv"):
-			os.remove("/home/samgomes/Documents/doutoramento/reps/GIMME/GIMME/examples/simulations/simulationResults/latestResults/GIMMESims/resultsEvl.csv") 
+		# if os.path.exists("/home/samgomes/Documents/doutoramento/reps/GIMME/GIMME/examples/simulations/simulationResults/latestResults/GIMMESims/resultsEvl.csv"):
+		# 	os.remove("/home/samgomes/Documents/doutoramento/reps/GIMME/GIMME/examples/simulations/simulationResults/latestResults/GIMMESims/resultsEvl.csv") 
 
 	def writeToLog(self, database, table, argsNValues):
 		newFilePath = self.filePath + database +"/"

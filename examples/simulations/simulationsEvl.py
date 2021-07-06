@@ -27,9 +27,7 @@ maxNumTrainingIterations = 20
 numRealIterations = 20
 
 preferredNumberOfPlayersPerGroup = 4
-numberOfConfigChoices = 100
 
-numTestedPlayerProfilesInEst = 500
 
 playerWindow = 10
 numPlayers = 23
@@ -37,17 +35,36 @@ numPlayers = 23
 numTasks = 1
 
 
+# ----------------------- [Init SH] --------------------------------
+numberOfConfigChoices = 100
+numTestedPlayerProfilesInEst = 500
+
+
 # ----------------------- [Init GA] --------------------------------
-initialPopulationSize = 200 
-numberOfEvolutionsPerIteration = 30
+initialPopulationSize = 100 
+numberOfEvolutionsPerIteration = 40
  
-probOfCross = 0.7
+probOfCross = 0.8
 probOfMutation = 1.0
 
-probOfMutationConfig = 0.35 
-probOfMutationGIPs = 0.35 
+probOfMutationConfig = 0.1 
+probOfMutationGIPs = 0.2
 
-numFitSurvivors = 15
+numFitSurvivors = 10
+
+
+# # ----------------------- [Init GA] --------------------------------
+# initialPopulationSize = 100 
+# numberOfEvolutionsPerIteration = 100
+ 
+# probOfCross = 0.7
+# probOfMutation = 1.0
+
+# probOfMutationConfig = 0.05 
+# probOfMutationGIPs = 0.1
+
+# numFitSurvivors = 10
+
 
 
 

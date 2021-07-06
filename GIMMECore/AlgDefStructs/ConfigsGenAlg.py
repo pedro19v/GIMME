@@ -918,15 +918,15 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		# breakpoint()
 
 		# profiles are blended
-		for i in range(minLen):
-			prof1 = ind1[1][i].flattened()
-			prof2 = ind2[1][i].flattened()
+		# for i in range(minLen):
+		# 	prof1 = ind1[1][i].flattened()
+		# 	prof2 = ind2[1][i].flattened()
 
-			newProfiles = tools.cxBlend(prof1, prof2, 0.5)
+		# 	newProfiles = tools.cxBlend(prof1, prof2, 0.5)
 			
-			#the inds become children
-			ind1[1][i] = self.interactionsProfileTemplate.unflattened(newProfiles[0])
-			ind2[1][i] = self.interactionsProfileTemplate.unflattened(newProfiles[1])
+		# 	#the inds become children
+		# 	ind1[1][i] = self.interactionsProfileTemplate.unflattened(newProfiles[0])
+		# 	ind2[1][i] = self.interactionsProfileTemplate.unflattened(newProfiles[1])
 
 		del ind1.fitness.values
 		del ind2.fitness.values
@@ -938,6 +938,7 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		
 		# mutate config
 		if random.uniform(0, 1) <= pConfig:
+			
 			# breakpoint()
 			indCpy = copy.copy(individual)
 			
@@ -970,9 +971,9 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 				# profs[i].randomize()
 				for key in keys:
 					if random.uniform(0, 1) <= 0.5:
-						profs[i].dimensions[key] += random.uniform(0, min(0.1, 1.0 - profs[i].dimensions[key])) 
+						profs[i].dimensions[key] += random.uniform(0, min(0.15, 1.0 - profs[i].dimensions[key])) 
 					else:
-						profs[i].dimensions[key] -= random.uniform(0, min(0.1, profs[i].dimensions[key])) 
+						profs[i].dimensions[key] -= random.uniform(0, min(0.15, profs[i].dimensions[key])) 
 
 		individual[1] = profs
 		
