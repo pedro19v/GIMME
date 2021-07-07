@@ -837,7 +837,7 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		return self.interactionsProfileTemplate.randomized()
 
 
-	def cxGIMME(self, ind1, ind2):
+	def cxGIMME_C1(self, ind1, ind2):
 
 		# configs
 		config1 = ind1[0]
@@ -917,16 +917,117 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 
 		# breakpoint()
 
-		# profiles are blended
-		# for i in range(minLen):
-		# 	prof1 = ind1[1][i].flattened()
-		# 	prof2 = ind2[1][i].flattened()
+		# profiles are crossed with one point
+		for i in range(minLen):
+			prof1 = ind1[1][i].flattened()
+			prof2 = ind2[1][i].flattened()
 
-		# 	newProfiles = tools.cxBlend(prof1, prof2, 0.5)
+			newProfiles = tools.cxUniform(prof1, prof2, 0.5)
 			
-		# 	#the inds become children
-		# 	ind1[1][i] = self.interactionsProfileTemplate.unflattened(newProfiles[0])
-		# 	ind2[1][i] = self.interactionsProfileTemplate.unflattened(newProfiles[1])
+			#the inds become children
+			ind1[1][i] = self.interactionsProfileTemplate.unflattened(newProfiles[0])
+			ind2[1][i] = self.interactionsProfileTemplate.unflattened(newProfiles[1])
+
+			# breakpoint()
+
+		del ind1.fitness.values
+		del ind2.fitness.values
+
+		return (ind1, ind2)
+
+
+def cxGIMME(self, ind1, ind2):
+
+		# configs
+		config1 = ind1[0]
+		config2 = ind2[0]
+
+		newConfig1 = []
+		newConfig2 = []
+
+		l1 = len(config1)
+		l2 = len(config2)
+
+		if (l1 > l2):
+			maxLenConfig = config1
+			maxLen = l1
+			minLenConfig = config2
+			minLen = l2
+		else:
+			maxLenConfig = config2
+			maxLen = l2
+			minLenConfig = config1
+			minLen = l1
+
+		cxpoints = [] 
+		
+		clist1 = []
+		clist2 = []
+
+		remainder1 = []
+		remainder2 = []
+		for i in range(minLen):
+			parent1 = minLenConfig[i]
+			parent2 = maxLenConfig[i]
+
+			cxpoint = random.randint(0,minLen)
+			cxpoints.append(cxpoint) 
+
+			clist1.extend(parent1)
+			clist2.extend(parent2)
+
+			remainder1.extend(parent1[cxpoint:])
+			remainder2.extend(parent2[cxpoint:])
+
+
+		d1 = {k:v for v,k in enumerate(clist1)}
+		d2 = {k:v for v,k in enumerate(clist2)}
+
+		remainder1.sort(key=d2.get)
+		remainder2.sort(key=d1.get)
+
+		for i in range(minLen):
+			parent1 = minLenConfig[i]
+			parent2 = maxLenConfig[i]
+
+			cxpoint = cxpoints[i] 
+
+			#C1 Implementation
+			# maintain left part
+			child1, child2 = parent1[:cxpoint], parent2[:cxpoint]
+
+
+			# reorder right part
+			missingLen1 = len(parent1) - len(child1)
+			child1.extend(remainder1[:missingLen1])
+			remainder1 = remainder1[missingLen1:]
+
+			missingLen2 = len(parent2) - len(child2)
+			child2.extend(remainder2[:missingLen2])
+			remainder2 = remainder2[missingLen2:]
+
+			newConfig1.append(child1)
+			newConfig2.append(child2)
+
+
+		#the inds become children
+		ind1[0] = newConfig1
+		ind2[0] = newConfig2
+
+		# breakpoint()
+
+		# profiles are crossed with one point
+		for i in range(minLen):
+			prof1 = ind1[1][i].flattened()
+			prof2 = ind2[1][i].flattened()
+
+			newProfiles = tools.cxUniform(prof1, prof2, 0.5)
+			
+			#the inds become children
+			ind1[1][i] = self.interactionsProfileTemplate.unflattened(newProfiles[0])
+			ind2[1][i] = self.interactionsProfileTemplate.unflattened(newProfiles[1])
+
+			# breakpoint()
 
 		del ind1.fitness.values
 		del ind2.fitness.values

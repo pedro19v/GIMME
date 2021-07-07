@@ -98,10 +98,10 @@ class InteractionsProfile(object):
 
 	def unflattenFunc(self, profile, array):
 		i = 0
-		for key in self.dimensions.keys():
-			self.dimensions[key] = array[i]
+		for key in profile.dimensions.keys():
+			profile.dimensions[key] = array[i]
 			i += 1
-		return self
+		return profile
 
 
 	def unflatten(self, array):
