@@ -804,7 +804,8 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		self.toolbox.register("individual", tools.initIterate, getattr(creator, individualId), self.toolbox.indices)
 		self.toolbox.register("population", tools.initRepeat, list, self.toolbox.individual)
 
-		self.toolbox.register("mate", self.cxGIMME)
+		# self.toolbox.register("mate", self.cxGIMME_Order)
+		self.toolbox.register("mate", self.cxGIMME_Original)
 		self.toolbox.register("mutate", self.mutGIMME, pGIPs=self.probOfMutationGIPs, pConfig=self.probOfMutationConfig)
 
 		# self.toolbox.register("select", tools.selRoulette)
@@ -837,7 +838,7 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		return self.interactionsProfileTemplate.randomized()
 
 
-	def cxGIMME_C1(self, ind1, ind2):
+	def cxGIMME_Order(self, ind1, ind2):
 
 		# configs
 		config1 = ind1[0]
@@ -871,7 +872,7 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 			parent1 = minLenConfig[i]
 			parent2 = maxLenConfig[i]
 
-			cxpoint = random.randint(0,minLen)
+			cxpoint = random.randint(0,len(minLenConfig[i]))
 			cxpoints.append(cxpoint) 
 
 			clist1.extend(parent1)
@@ -936,7 +937,7 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		return (ind1, ind2)
 
 
-def cxGIMME(self, ind1, ind2):
+	def cxGIMME_Original(self, ind1, ind2):
 
 		# configs
 		config1 = ind1[0]
@@ -967,67 +968,38 @@ def cxGIMME(self, ind1, ind2):
 		remainder1 = []
 		remainder2 = []
 		for i in range(minLen):
-			parent1 = minLenConfig[i]
-			parent2 = maxLenConfig[i]
+		
+			parent1 = [None, None]
+			parent2 = [None, None]
 
-			cxpoint = random.randint(0,minLen)
-			cxpoints.append(cxpoint) 
+			parent1[0] = minLenConfig[i]
+			parent1[1] = ind1[1][i].flattened()
+			parent2[0] = maxLenConfig[i]
+			parent2[1] = ind2[1][i].flattened()
 
-			clist1.extend(parent1)
-			clist2.extend(parent2)
-
-			remainder1.extend(parent1[cxpoint:])
-			remainder2.extend(parent2[cxpoint:])
-
-
-		d1 = {k:v for v,k in enumerate(clist1)}
-		d2 = {k:v for v,k in enumerate(clist2)}
-
-		remainder1.sort(key=d2.get)
-		remainder2.sort(key=d1.get)
-
-		for i in range(minLen):
-			parent1 = minLenConfig[i]
-			parent2 = maxLenConfig[i]
-
-			cxpoint = cxpoints[i] 
-
-			#C1 Implementation
-			# maintain left part
-			child1, child2 = parent1[:cxpoint], parent2[:cxpoint]
+			clist1.append(parent1)
+			clist2.append(parent2)
 
 
-			# reorder right part
-			missingLen1 = len(parent1) - len(child1)
-			child1.extend(remainder1[:missingLen1])
-			remainder1 = remainder1[missingLen1:]
+		breakpoint()
 
-			missingLen2 = len(parent2) - len(child2)
-			child2.extend(remainder2[:missingLen2])
-			remainder2 = remainder2[missingLen2:]
-
-			newConfig1.append(child1)
-			newConfig2.append(child2)
-
-
-		#the inds become children
-		ind1[0] = newConfig1
-		ind2[0] = newConfig2
-
-		# breakpoint()
-
-		# profiles are crossed with one point
-		for i in range(minLen):
-			prof1 = ind1[1][i].flattened()
-			prof2 = ind2[1][i].flattened()
-
-			newProfiles = tools.cxUniform(prof1, prof2, 0.5)
+		for ind in [ind1,ind2]:
+			randI1 = random.randint(0, len(clist1) - 1)
+			randI2 = random.randint(0, len(clist1) - 1)
 			
-			#the inds become children
-			ind1[1][i] = self.interactionsProfileTemplate.unflattened(newProfiles[0])
-			ind2[1][i] = self.interactionsProfileTemplate.unflattened(newProfiles[1])
 
-			# breakpoint()
+			newProfilesConfig = tools.cxOnePoint(ind1 = clist1[randI1][0], ind2 = clist1[randI2][0])
+			newProfilesGIP = tools.cxUniform(ind1 = clist1[randI1][1], ind2 = clist1[randI2][1], indpb = 0.5)
+			
+			ind[0][randI1] = newProfilesConfig[0]
+			ind[1][randI1] = self.interactionsProfileTemplate.unflattened(newProfilesGIP[0])
+
+			ind[0][randI2] = newProfilesConfig[1]
+			ind[1][randI2] = self.interactionsProfileTemplate.unflattened(newProfilesGIP[1])
+
+		breakpoint()
+
+
 
 		del ind1.fitness.values
 		del ind2.fitness.values
