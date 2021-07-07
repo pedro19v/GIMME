@@ -56,8 +56,9 @@ import os
 
 class CSVLogManager(LogManager):
 
-	def __init__(self, filePath):
+	def __init__(self, filePath, simsId):
 		self.filePath = filePath
+		self.simsId = simsId
 		self.wroteHeader = False
 
 		# if os.path.exists("/home/samgomes/Documents/doutoramento/reps/GIMME/GIMME/examples/simulations/simulationResults/latestResults/GIMMESims/resultsEvl.csv"):
@@ -67,7 +68,7 @@ class CSVLogManager(LogManager):
 		newFilePath = self.filePath + database +"/"
 		if not os.path.exists(newFilePath):
 			os.makedirs(newFilePath)
-		newFilePath = newFilePath + table + ".csv"
+		newFilePath = newFilePath + table + self.simsId + ".csv"
 
 		with open(newFilePath, "a", newline='') as csvfile:
 			fieldnames = list(argsNValues.keys())

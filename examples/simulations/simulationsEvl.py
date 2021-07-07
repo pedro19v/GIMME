@@ -68,6 +68,7 @@ numFitSurvivors = 10
 
 
 
+simsID = str(os.getpid())
 
 startTime = str(datetime.datetime.now())
 newpath = "./simulationResults/latestResults/"
@@ -112,7 +113,7 @@ questionnairePersonalities = []
 print("Initing .csv log manager...")
 # logManager = MongoDBLogManager("mongodb+srv://studyAC1:studyAC1@cluster0-\
 # nfksn.mongodb.net/test?retryWrites=true&w=majority")
-logManager = CSVLogManager(newpath)
+logManager = CSVLogManager(newpath, simsID)
 
 
 
@@ -367,7 +368,6 @@ def executionPhase(numRuns, isBootstrap, playerBridge, maxNumIterations, startin
 		if adaptation.name == "accurate":
 			adaptation.configsGenAlg.updateCurrIteration(i)
 		
-		simsID = str(os.getpid())
 		print("Process ["+simsID+"] performing step (" +str(i - startingI)+ " of "+str(maxNumIterations)+") of run ("+str(currRun+1)+" of "+str(numRuns)+") of algorithm \""+str(adaptation.name)+"\"...                                                             ", end="\r")
 		adaptation.iterate()
 
@@ -429,7 +429,7 @@ def executeSimulations(numRuns, profileTemplate, maxNumTrainingIterations, first
 		realPersonalities = []
 		questionnairePersonalities = []
 
-		EPdimensions = [{"dim_0":1,"dim_1":0,},{"dim_0":0,"dim_1":1}]		
+		EPdimensions = [{"dim_0":1,"dim_1":0}, {"dim_0":0,"dim_1":1}]		
 		EPdimensionsAux = EPdimensions.copy()	
 		
 		playersDimsStr = "players: [\n"	
@@ -446,7 +446,7 @@ def executeSimulations(numRuns, profileTemplate, maxNumTrainingIterations, first
 				for d in range(numInteractionDimensions):
 					profile.dimensions["dim_"+str(d)] = random.uniform(0, 1)
 			realPersonalities.append(profile)
-			realPersonalities[x].normalize()
+			# realPersonalities[x].normalize()
 
 
 			profile = profileTemplate.generateCopy().reset()
@@ -454,7 +454,7 @@ def executeSimulations(numRuns, profileTemplate, maxNumTrainingIterations, first
 			for d in range(numInteractionDimensions):
 				profile.dimensions["dim_"+str(d)] = numpy.clip(random.gauss(currRealPersonality.dimensions["dim_"+str(d)], estimatorsAccuracy), 0, 1)
 			questionnairePersonalities.append(profile)
-			questionnairePersonalities[x].normalize()
+			# questionnairePersonalities[x].normalize()
 		
 
 			# init players including predicted personality
@@ -471,7 +471,6 @@ def executeSimulations(numRuns, profileTemplate, maxNumTrainingIterations, first
 			playerBridge.getPlayerStatesDataFrame(x).gridTrimAlg.considerStateResidue(False)
 
 		playersDimsStr += "],\n"
-		# print(playersDimsStr)
 
 
 		if(maxNumTrainingIterations > 0):		

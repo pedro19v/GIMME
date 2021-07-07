@@ -274,7 +274,7 @@ class SimulatedAnnealingConfigsGen(ConfigsGenAlg):
 						personality = self.playerModelBridge.getPlayerPersonalityEst(currPlayer)
 						for dim in profile.dimensions:
 							profile.dimensions[dim] += personality.dimensions[dim] / groupSize
-					profile.normalize()
+					# profile.normalize()
 				else:
 					profile = self.interactionsProfileTemplate.generateCopy().randomize()
 
@@ -383,7 +383,7 @@ class StochasticHillclimberConfigsGen(ConfigsGenAlg):
 						profile.dimensions[dim] += (personality.dimensions[dim] / groupSize)
 
 				# print("profile in-configGen: "+str(profile.dimensions)+";groupSize: "+str(groupSize))
-				profile.normalize()
+				# profile.normalize()
 				newConfigProfiles.append(profile)
 
 
@@ -689,7 +689,7 @@ class AccurateConfigsGen(ConfigsGenAlg):
 					personality = self.playerModelBridge.getPlayerRealPersonality(currPlayer)
 					for dim in profile.dimensions:
 						profile.dimensions[dim] += personality.dimensions[dim] / groupSize
-				profile.normalize()
+				# profile.normalize()
 				newConfigProfiles.append(profile)
 
 

@@ -12,16 +12,20 @@ print("GeneratingPlots...")
 
 # do.call(file.remove, list(list.files("./plots/", full.names = TRUE)))
 
-resultsLog <- read.csv(file="GIMMESims/resultsEvl.csv", header=TRUE, sep=",")
+filenames <- dir("GIMMESims/", pattern = ".csv")
+filenames <- paste("GIMMESims/", filenames, sep="")
+
+resultsLog <- do.call(rbind, lapply(filenames, read.csv, header=TRUE, sep=",")) #(file="GIMMESims/resultsEvl.csv", header=TRUE, sep=",")
 resultsLog <- resultsLog[resultsLog$iteration > 19,]
 resultsLog <- resultsLog[complete.cases(resultsLog),]
 
 print(sprintf("nRuns: %d", nrow(unique(resultsLog[c("simsID","run")]))))
+# print(resultsLog)
 
 # plot strategies
-avg <- aggregate(abilityInc ~ iteration*algorithm , resultsLog, mean)
-avgPerRun <- aggregate(abilityInc ~ iteration*algorithm*run*simsID , resultsLog , mean)
-sdev <- aggregate(abilityInc ~ iteration*algorithm , avgPerRun , sd)
+avg <- aggregate(abilityInc ~ iteration*algorithm, resultsLog, mean)
+avgPerRun <- aggregate(abilityInc ~ iteration*algorithm*run*simsID, resultsLog , mean)
+sdev <- aggregate(abilityInc ~ iteration*algorithm, avgPerRun , sd)
 
 # sdev <- aggregate(abilityInc ~ iteration*algorithm , resultsLog , sd) 
 # does not make sense, because it would be influenced by the learning rate of the students. 
@@ -42,7 +46,7 @@ sdev <- aggregate(abilityInc ~ iteration*algorithm , avgPerRun , sd)
 
 buildAbIncPlots <- function(logAvg, logSDev, plotName, colors = NULL){
 
-	plot <- ggplot(logAvg, aes(x = iteration, y=abilityInc, group=algorithm, color=algorithm, alpha = 0.8))
+	plot <- ggplot(logAvg, aes(x = iteration, y=abilityInc, group=algorithm, color=algorithm, alpha = 0.8)) 
 
 	plot <- plot + geom_errorbar(width=.1, aes(ymin=logAvg$abilityInc-logSDev$abilityInc, 
 		ymax=logAvg$abilityInc+logSDev$abilityInc), size = 0.8)
@@ -61,7 +65,6 @@ buildAbIncPlots <- function(logAvg, logSDev, plotName, colors = NULL){
 					panel.grid.major = element_blank(), 
 					panel.grid.minor = element_blank(),
 					panel.border = element_rect(colour = "black", fill=NA, size=2.0))
-
 	plot <- plot + scale_x_continuous(labels = 1:20, breaks = 20:39) + scale_alpha(guide=FALSE)
 	if(!is.null(colors)){
 		plot <- plot + scale_color_manual(values = colors)
@@ -71,12 +74,11 @@ buildAbIncPlots <- function(logAvg, logSDev, plotName, colors = NULL){
 
 
 
-
+# ----------------------------------------------------------------------------------
 # cmp average ability increase 
 currAvg = 	avg[
 				avg$algorithm=="GIMME_SH" | 
 				avg$algorithm=="GIMME_Evl" |
-				avg$algorithm=="GIMME_Evl_50it" |
 				avg$algorithm=="GIMME_Evl_Bootstrap" |
 				avg$algorithm=="Random"
 				,]
@@ -84,7 +86,6 @@ currAvg = 	avg[
 currSdev = sdev[
 				sdev$algorithm=="GIMME_SH" | 
 				sdev$algorithm=="GIMME_Evl" |
-				sdev$algorithm=="GIMME_Evl_50it" |
 				sdev$algorithm=="GIMME_Evl_Bootstrap" |
 				sdev$algorithm=="Random"
 				,]
@@ -99,8 +100,34 @@ currAvg$linetype <- "solid"
 
 buildAbIncPlots(currAvg, currSdev, "simulationsResultsAbilityInc", c("#5e3c99", "dodgerblue","#75a352","#75a3e2", "#d7191c"))
 
-q()
 
+# ----------------------------------------------------------------------------------
+# cmp average ability increase of GIMME with different accuracy est
+currAvg = avg[
+			  avg$algorithm=="GIMME_Evl_Bootstrap" | 
+			  avg$algorithm=="GIMME_Evl_Bootstrap_LowAcc" | 
+			  avg$algorithm=="GIMME_Evl_Bootstrap_HighAcc"
+			  ,]
+
+currSdev = sdev[ 
+			  sdev$algorithm=="GIMME_Evl_Bootstrap" | 
+			  sdev$algorithm=="GIMME_Evl_Bootstrap_LowAcc" | 
+			  sdev$algorithm=="GIMME_Evl_Bootstrap_HighAcc"
+			  ,]
+
+currAvg$linetype <- "solid" 
+currAvg$algorithm[currAvg$algorithm == "GIMME_Evl_Bootstrap"] <- "GIMME-Bootstrap\n (\u03B3 = 0.1)" 
+currAvg$algorithm[currAvg$algorithm == "GIMME_Evl_Bootstrap_LowAcc"] <- "GIMME-Bootstrap\n (\u03B3 = 0.2)" 
+currAvg$algorithm[currAvg$algorithm == "GIMME_Evl_Bootstrap_HighAcc"] <- "GIMME-Bootstrap\n (\u03B3 = 0.05)"  
+currAvg$algorithm <- factor(currAvg$algorithm, levels=sort(unique(currAvg[,"algorithm"]), decreasing=TRUE))
+buildAbIncPlots(currAvg, currSdev, "simulationsResultsAccuracyComp", c("skyblue", "dodgerblue", "navy"))
+
+
+
+
+
+
+# ----------------------------------------------------------------------------------
 # cmp average ability increase of GIMME n-D
 currAvg = avg[
 				avg$algorithm=="GIMME_Evl1D" | 
@@ -138,6 +165,7 @@ buildAbIncPlots(currAvg, currSdev, "simulationsResultsAbilityGIPDims")
 
 
 
+# ----------------------------------------------------------------------------------
 # cmp average ability increase of GIMME and GIMME EP
 currAvg = avg[avg$algorithm=="GIMME_Evl" | 
 			  avg$algorithm=="GIMME_Evl_EP",]
@@ -151,26 +179,5 @@ currAvg$algorithm[currAvg$algorithm == "GIMME_Evl_EP"] <- "GIMME (extr. prfs)"
 buildAbIncPlots(currAvg, currSdev, "simulationsResultsAbilityEP", c("dodgerblue", "#d7191c"))
 
 
-
-
-# cmp average ability increase of GIMME with different accuracy est
-currAvg = avg[
-			  avg$algorithm=="GIMME_Evl_Bootstrap" | 
-			  avg$algorithm=="GIMME_Evl_Bootstrap_LowAcc" | 
-			  avg$algorithm=="GIMME_Evl_Bootstrap_HighAcc"
-			  ,]
-
-currSdev = sdev[ 
-			  sdev$algorithm=="GIMME_Evl_Bootstrap" | 
-			  sdev$algorithm=="GIMME_Evl_Bootstrap_LowAcc" | 
-			  sdev$algorithm=="GIMME_Evl_Bootstrap_HighAcc"
-			  ,]
-
-currAvg$linetype <- "solid" 
-currAvg$algorithm[currAvg$algorithm == "GIMME_Evl_Bootstrap"] <- "GIMME-Bootstrap\n (\u03B3 = 0.1)" 
-currAvg$algorithm[currAvg$algorithm == "GIMME_Evl_Bootstrap_LowAcc"] <- "GIMME-Bootstrap\n (\u03B3 = 0.2)" 
-currAvg$algorithm[currAvg$algorithm == "GIMME_Evl_Bootstrap_HighAcc"] <- "GIMME-Bootstrap\n (\u03B3 = 0.05)"  
-currAvg$algorithm <- factor(currAvg$algorithm, levels=sort(unique(currAvg[,"algorithm"]), decreasing=TRUE))
-buildAbIncPlots(currAvg, currSdev, "simulationsResultsAccuracyComp", c("skyblue", "dodgerblue", "navy"))
-
+q()
 
