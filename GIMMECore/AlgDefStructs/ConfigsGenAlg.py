@@ -983,19 +983,25 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 
 		breakpoint()
 
-		for ind in [ind1,ind2]:
+		for ind,clist in zip([ind1,ind2], [clist1,clist2]):
+			# print("-----------[Before]-----------")
+			# print(json.dumps(ind[1], default=lambda o: o.__dict__))
+
 			randI1 = random.randint(0, len(clist1) - 1)
 			randI2 = random.randint(0, len(clist1) - 1)
 			
 
-			newProfilesConfig = tools.cxOnePoint(ind1 = clist1[randI1][0], ind2 = clist1[randI2][0])
-			newProfilesGIP = tools.cxUniform(ind1 = clist1[randI1][1], ind2 = clist1[randI2][1], indpb = 0.5)
+			newProfilesConfig = tools.cxOnePoint(ind1 = clist[randI1][0], ind2 = clist[randI2][0])
+			newProfilesGIP = tools.cxUniform(ind1 = clist[randI1][1], ind2 = clist[randI2][1], indpb = 0.5)
 			
 			ind[0][randI1] = newProfilesConfig[0]
 			ind[1][randI1] = self.interactionsProfileTemplate.unflattened(newProfilesGIP[0])
 
 			ind[0][randI2] = newProfilesConfig[1]
 			ind[1][randI2] = self.interactionsProfileTemplate.unflattened(newProfilesGIP[1])
+
+			# print("-----------[After]-----------")
+			# print(json.dumps(ind[1], default=lambda o: o.__dict__))
 
 		breakpoint()
 
