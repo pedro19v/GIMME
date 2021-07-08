@@ -45,6 +45,8 @@ class Adaptation(object):
 			return
 		
 
+		# print(json.dumps(self.playerModelBridge.getPlayerStatesDataFrame(0).states, default=lambda o: [o.__dict__["quality"],o.__dict__["stateType"]], sort_keys=True))
+
 		adaptedConfig = self.configsGenAlg.organize()
 
 		adaptedGroups = adaptedConfig["groups"]
@@ -83,17 +85,17 @@ class Adaptation(object):
 
 
 
-		totalFitness = 0.0
-		for groupI in range(len(adaptedGroups)):
-			group = adaptedGroups[groupI]
-			profile = adaptedProfiles[groupI]
-			for playerId in group:
-				predictedIncreases = self.configsGenAlg.regAlg.predict(profile, playerId)
-				totalFitness += (0.5* predictedIncreases.characteristics.ability + \
-								0.5* predictedIncreases.characteristics.engagement)
+		# totalFitness = 0.0
+		# for groupI in range(len(adaptedGroups)):
+		# 	group = adaptedGroups[groupI]
+		# 	profile = adaptedProfiles[groupI]
+		# 	for playerId in group:
+		# 		predictedIncreases = self.configsGenAlg.regAlg.predict(profile, playerId)
+		# 		totalFitness += (0.5* predictedIncreases.characteristics.ability + \
+		# 						0.5* predictedIncreases.characteristics.engagement)
 		
-		totalFitness = totalFitness + 1.0 #helps selection (otherwise Pchoice would always be 0)
-		print(totalFitness, end="\n")
+		# totalFitness = totalFitness + 1.0 #helps selection (otherwise Pchoice would always be 0)
+		# print(totalFitness, end="\n")
 
 
 

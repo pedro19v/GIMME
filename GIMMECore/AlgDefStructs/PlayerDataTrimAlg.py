@@ -31,7 +31,6 @@ class AgeSortPlayerDataTrimAlg(PlayerDataTrimAlg):
 		pastModelIncsSorted = sorted(pastModelIncs, key=self.creationTimeSort)
 		removedI = pastModelIncs.index(pastModelIncsSorted[self.maxNumModelElements - 1])
 		pastModelIncs.pop(removedI)
-		# return [pastModelIncs[-self.maxNumModelElements:], pastModelIncs[:-self.maxNumModelElements]]
 		return [pastModelIncs, [removedI]]
 
 
@@ -54,8 +53,6 @@ class QualitySortPlayerDataTrimAlg(PlayerDataTrimAlg):
 
 	def calcQuality(self, state):
 		total = self.qualityWeights.ability*state.characteristics.ability + self.qualityWeights.engagement*state.characteristics.engagement
-		if(self.accStateResidue):
-			total += state.stateType
 		return total
 
 	def trimmedList(self, pastModelIncs):
@@ -63,15 +60,16 @@ class QualitySortPlayerDataTrimAlg(PlayerDataTrimAlg):
 		for modelInc in pastModelIncs:
 			if(modelInc.quality == -1):
 				modelInc.quality = self.calcQuality(modelInc)
+				if(self.accStateResidue):
+					modelInc.quality += modelInc.stateType
 
 
-		if(len(pastModelIncs) < self.maxNumModelElements):
+		if(len(pastModelIncs) <= self.maxNumModelElements):
 			return [pastModelIncs, []]
 
 		pastModelIncsSorted = sorted(pastModelIncs, key=self.qSort)
-		removedI = pastModelIncs.index(pastModelIncsSorted[self.maxNumModelElements - 1])
+		removedI = pastModelIncs.index(pastModelIncsSorted[0])
 		pastModelIncs.pop(removedI)
-		# return [pastModelIncs[-self.maxNumModelElements:], pastModelIncs[:-self.maxNumModelElements]]
 		return [pastModelIncs, [removedI]]
 
 

@@ -752,7 +752,9 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		probOfMutationConfig = None, 
 		probOfMutationGIPs = None, 
 
-		numFitSurvivors = None):
+		numFitSurvivors = None,
+
+		cxOp = None):
 
 		super().__init__(
 			playerModelBridge = playerModelBridge,
@@ -804,8 +806,12 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		self.toolbox.register("individual", tools.initIterate, getattr(creator, individualId), self.toolbox.indices)
 		self.toolbox.register("population", tools.initRepeat, list, self.toolbox.individual)
 
-		# self.toolbox.register("mate", self.cxGIMME_Order)
-		self.toolbox.register("mate", self.cxGIMME_Original)
+		self.cxOp = "order" if cxOp == None else cxOp
+		if self.cxOp == "order":
+			self.toolbox.register("mate", self.cxGIMME_Order)
+		else:
+			self.toolbox.register("mate", self.cxGIMME_Simple)
+
 		self.toolbox.register("mutate", self.mutGIMME, pGIPs=self.probOfMutationGIPs, pConfig=self.probOfMutationConfig)
 
 		# self.toolbox.register("select", tools.selRoulette)
@@ -816,7 +822,7 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 
 		self.resetGenAlg()
 
-	
+
 	def resetGenAlg(self):
 
 		if hasattr(self, "pop"):
@@ -923,7 +929,7 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 			prof1 = ind1[1][i].flattened()
 			prof2 = ind2[1][i].flattened()
 
-			newProfiles = tools.cxUniform(prof1, prof2, 0.5)
+			newProfiles = tools.cxOnePoint(prof1, prof2)
 			
 			#the inds become children
 			ind1[1][i] = self.interactionsProfileTemplate.unflattened(newProfiles[0])
@@ -937,7 +943,7 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		return (ind1, ind2)
 
 
-	def cxGIMME_Original(self, ind1, ind2):
+	def cxGIMME_Simple(self, ind1, ind2):
 
 		# configs
 		config1 = ind1[0]
@@ -981,9 +987,11 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 			clist2.append(parent2)
 
 
-		breakpoint()
+		# breakpoint()
 
 		for ind,clist in zip([ind1,ind2], [clist1,clist2]):
+
+
 			# print("-----------[Before]-----------")
 			# print(json.dumps(ind[1], default=lambda o: o.__dict__))
 
@@ -992,7 +1000,7 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 			
 
 			newProfilesConfig = tools.cxOnePoint(ind1 = clist[randI1][0], ind2 = clist[randI2][0])
-			newProfilesGIP = tools.cxUniform(ind1 = clist[randI1][1], ind2 = clist[randI2][1], indpb = 0.5)
+			newProfilesGIP = tools.cxOnePoint(ind1 = clist[randI1][1], ind2 = clist[randI2][1])
 			
 			ind[0][randI1] = newProfilesConfig[0]
 			ind[1][randI1] = self.interactionsProfileTemplate.unflattened(newProfilesGIP[0])
@@ -1003,7 +1011,7 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 			# print("-----------[After]-----------")
 			# print(json.dumps(ind[1], default=lambda o: o.__dict__))
 
-		breakpoint()
+		# breakpoint()
 
 
 
@@ -1018,43 +1026,47 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		# mutate config
 		if random.uniform(0, 1) <= pConfig:
 			
-			# breakpoint()
-			indCpy = copy.copy(individual)
-			
-			randI1 = random.randint(0, len(indCpy[0]) - 1)
-			innerRandI1 = random.randint(0, len(indCpy[0][randI1]) - 1)
+			numberOfMutations = 1
+			for i in range(numberOfMutations):
+				# breakpoint()
+				indCpy = copy.copy(individual)
+				
+				randI1 = random.randint(0, len(indCpy[0]) - 1)
+				innerRandI1 = random.randint(0, len(indCpy[0][randI1]) - 1)
 
-			randI2 = innerRandI2 = -1
-			while(randI2 < 0 or randI1 == randI2):
-				randI2 = random.randint(0, len(indCpy[0]) - 1)
-			while(innerRandI2 < 0 or innerRandI1 == innerRandI2):
-				innerRandI2 = random.randint(0, len(indCpy[0][randI2]) - 1)
-
-
-			elem1 = indCpy[0][randI1][innerRandI1]
-			elem2 = indCpy[0][randI2][innerRandI2]
+				randI2 = innerRandI2 = -1
+				while(randI2 < 0 or randI1 == randI2):
+					randI2 = random.randint(0, len(indCpy[0]) - 1)
+				while(innerRandI2 < 0 or innerRandI1 == innerRandI2):
+					innerRandI2 = random.randint(0, len(indCpy[0][randI2]) - 1)
 
 
-			indCpy[0][randI1][innerRandI1] = elem2
-			indCpy[0][randI2][innerRandI2] = elem1
+				elem1 = indCpy[0][randI1][innerRandI1]
+				elem2 = indCpy[0][randI2][innerRandI2]
 
-			individual[0] = indCpy[0]
-			# breakpoint()
+
+				indCpy[0][randI1][innerRandI1] = elem2
+				indCpy[0][randI2][innerRandI2] = elem1
+
+				individual[0] = indCpy[0]
+				# breakpoint()
 			
 
 		#mutate GIPs
-		profs = individual[1]
-		keys = list(profs[0].dimensions.keys())
-		for i in range(len(profs)):
-			if random.uniform(0, 1) <= pGIPs:
-				# profs[i].randomize()
-				for key in keys:
-					if random.uniform(0, 1) <= 0.5:
-						profs[i].dimensions[key] += random.uniform(0, min(0.15, 1.0 - profs[i].dimensions[key])) 
-					else:
-						profs[i].dimensions[key] -= random.uniform(0, min(0.15, profs[i].dimensions[key])) 
+		numberOfMutations = 1
+		for i in range(numberOfMutations):
+			profs = individual[1]
+			keys = list(profs[0].dimensions.keys())
+			for i in range(len(profs)):
+				if random.uniform(0, 1) <= pGIPs:
+					# profs[i].randomize()
+					for key in keys:
+						if random.uniform(0, 1) <= 0.5:
+							profs[i].dimensions[key] += random.uniform(0, min(0.2, 1.0 - profs[i].dimensions[key])) 
+						else:
+							profs[i].dimensions[key] -= random.uniform(0, min(0.2, profs[i].dimensions[key])) 
 
-		individual[1] = profs
+			individual[1] = profs
 		
 		del individual.fitness.values
 		return individual,

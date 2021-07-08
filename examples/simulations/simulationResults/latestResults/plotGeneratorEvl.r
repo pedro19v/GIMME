@@ -78,21 +78,24 @@ buildAbIncPlots <- function(logAvg, logSDev, plotName, colors = NULL){
 # cmp average ability increase 
 currAvg = 	avg[
 				avg$algorithm=="GIMME_SH" | 
-				avg$algorithm=="GIMME_Evl" |
+				avg$algorithm=="GIMME_Evl_scx" |
+				avg$algorithm=="GIMME_Evl_ocx" |
 				avg$algorithm=="GIMME_Evl_Bootstrap" |
 				avg$algorithm=="Random"
 				,]
 
 currSdev = sdev[
 				sdev$algorithm=="GIMME_SH" | 
-				sdev$algorithm=="GIMME_Evl" |
+				sdev$algorithm=="GIMME_Evl_scx" |
+				sdev$algorithm=="GIMME_Evl_ocx" |
 				sdev$algorithm=="GIMME_Evl_Bootstrap" |
 				sdev$algorithm=="Random"
 				,]
 
 
 currAvg$algorithm[currAvg$algorithm == "GIMME_SH"] <- "GIMME LS" 
-currAvg$algorithm[currAvg$algorithm == "GIMME_Evl"] <- "GIMME GA" 
+currAvg$algorithm[currAvg$algorithm == "GIMME_Evl_scx"] <- "GIMME GA (Simpler CX)" 
+currAvg$algorithm[currAvg$algorithm == "GIMME_Evl_ocx"] <- "GIMME GA (Order CX)" 
 # currAvg$algorithm[currAvg$algorithm == "Random"] <- "Random" 
 
 currAvg$linetype <- "solid" 
@@ -100,6 +103,7 @@ currAvg$linetype <- "solid"
 
 buildAbIncPlots(currAvg, currSdev, "simulationsResultsAbilityInc", c("#5e3c99", "dodgerblue","#75a352","#75a3e2", "#d7191c"))
 
+q()
 
 # ----------------------------------------------------------------------------------
 # cmp average ability increase of GIMME with different accuracy est
