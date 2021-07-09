@@ -444,10 +444,9 @@ def executeSimulations(numRuns, profileTemplate, maxNumTrainingIterations, first
 			currState = PlayerState(profile = profileTemplate.generateCopy().reset()), 
 			pastModelIncreasesGrid = PlayerStatesDataFrame(
 				interactionsProfileTemplate = profileTemplate.generateCopy().reset(), 
-				# gridTrimAlg = QualitySortPlayerDataTrimAlg(
-				gridTrimAlg = AgeSortPlayerDataTrimAlg(
+				gridTrimAlg = ProximitySortPlayerDataTrimAlg(
 					maxNumModelElements = playerWindow, 
-					# qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)
+					epsilon = 0.005
 					)
 				), 
 			currModelIncreases = PlayerCharacteristics(), personalityEst = profileTemplate.generateCopy().reset(), realPersonality = profileTemplate.generateCopy().reset())
@@ -507,7 +506,7 @@ def executeSimulations(numRuns, profileTemplate, maxNumTrainingIterations, first
 			playerBridge.setPlayerRealPersonality(x, questionnairePersonality)
 			playerBridge.setBaseLearningRate(x, 0.5)
 
-			# playerBridge.getPlayerStatesDataFrame(x).gridTrimAlg.considerStateResidue(False)
+			playerBridge.getPlayerStatesDataFrame(x).gridTrimAlg.considerStateResidue(False)
 
 		playersDimsStr += "],\n"
 
@@ -523,7 +522,7 @@ def executeSimulations(numRuns, profileTemplate, maxNumTrainingIterations, first
 			playerBridge.setPlayerRealPersonality(x, realPersonality)
 			playerBridge.setBaseLearningRate(x, random.gauss(0.5, 0.05))
 
-			# playerBridge.getPlayerStatesDataFrame(x).gridTrimAlg.considerStateResidue(True)
+			playerBridge.getPlayerStatesDataFrame(x).gridTrimAlg.considerStateResidue(True)
 		
 		if r > 0:
 			adaptation.configsGenAlg.reset()
@@ -564,9 +563,9 @@ if __name__ == '__main__':
 	executeSimulations(numRuns, intProfTemplate2D, 0, 0, numRealIterations, maxNumTrainingIterations, 
 		playerBridge, taskBridge, adaptationEvl_ocx)
 
-	adaptationEvl_scx.name = "GIMME_Evl_scx"
-	executeSimulations(numRuns, intProfTemplate2D, 0, 0, numRealIterations, maxNumTrainingIterations, 
-		playerBridge, taskBridge, adaptationEvl_scx)
+	# adaptationEvl_scx.name = "GIMME_Evl_scx"
+	# executeSimulations(numRuns, intProfTemplate2D, 0, 0, numRealIterations, maxNumTrainingIterations, 
+	# 	playerBridge, taskBridge, adaptationEvl_scx)
 
 	executeSimulations(numRuns, intProfTemplate2D, 0, 0, numRealIterations, maxNumTrainingIterations, 
 		playerBridge, taskBridge, adaptationSH)
@@ -576,9 +575,9 @@ if __name__ == '__main__':
 
 
 
-	# adaptationEvl_ocx.name = "GIMME_Evl_Bootstrap"
-	# executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
-	# 				playerBridge, taskBridge, adaptationEvl_ocx, estimatorsAccuracy = 0.1)
+	adaptationEvl_ocx.name = "GIMME_Evl_Bootstrap"
+	executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
+					playerBridge, taskBridge, adaptationEvl_ocx, estimatorsAccuracy = 0.1)
 
 	# adaptationEvl_ocx.name = "GIMME_Evl_Bootstrap_HighAcc"
 	# executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
