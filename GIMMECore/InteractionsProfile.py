@@ -14,6 +14,7 @@ class InteractionsProfile(object):
 		# 	self.dimensions = {}
 
 		self.dimensions = {} if dimensions == None else dimensions
+		self.dimensionality = len(self.dimensions)
 		# self.normalize()
 
 	def reset(self):

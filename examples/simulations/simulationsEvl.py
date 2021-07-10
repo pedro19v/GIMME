@@ -467,8 +467,7 @@ def executeSimulations(numRuns, profileTemplate, maxNumTrainingIterations, first
 		realPersonalities = []
 		questionnairePersonalities = []
 
-		EPdimensions = [{"dim_0":1,"dim_1":0}, {"dim_0":0,"dim_1":1}]		
-		EPdimensionsAux = EPdimensions.copy()	
+		EPdimensions = [{"dim_0":1,"dim_1":0}, {"dim_0":0,"dim_1":1}]	
 		
 		playersDimsStr = "players: [\n"	
 
@@ -476,9 +475,7 @@ def executeSimulations(numRuns, profileTemplate, maxNumTrainingIterations, first
 		for x in range(numPlayers):
 			profile = profileTemplate.generateCopy().reset()
 			if(considerExtremePersonalityValues):
-				if(len(EPdimensionsAux) == 0):
-					EPdimensionsAux = EPdimensions.copy()
-				profile.dimensions = EPdimensionsAux.pop()
+				profile.dimensions = random.choice(EPdimensions)
 				playersDimsStr += "{"+str(profile.dimensions)+"},\n"
 			else:
 				for d in range(numInteractionDimensions):
@@ -510,6 +507,7 @@ def executeSimulations(numRuns, profileTemplate, maxNumTrainingIterations, first
 
 		playersDimsStr += "],\n"
 
+		# print(playersDimsStr)
 
 		if(maxNumTrainingIterations > 0):		
 			adaptation.bootstrap(maxNumTrainingIterations)
@@ -559,25 +557,27 @@ if __name__ == '__main__':
 	# import time
 	# startTime = time.time()
 
-	adaptationEvl_ocx.name = "GIMME_Evl_ocx"
-	executeSimulations(numRuns, intProfTemplate2D, 0, 0, numRealIterations, maxNumTrainingIterations, 
-		playerBridge, taskBridge, adaptationEvl_ocx)
-
 	# adaptationEvl_scx.name = "GIMME_Evl_scx"
 	# executeSimulations(numRuns, intProfTemplate2D, 0, 0, numRealIterations, maxNumTrainingIterations, 
 	# 	playerBridge, taskBridge, adaptationEvl_scx)
 
-	executeSimulations(numRuns, intProfTemplate2D, 0, 0, numRealIterations, maxNumTrainingIterations, 
-		playerBridge, taskBridge, adaptationSH)
 
-	executeSimulations(numRuns, intProfTemplate2D, 0, 0, numRealIterations, maxNumTrainingIterations,
-		playerBridge, taskBridge, adaptationRandom)
-
+	# adaptationEvl_ocx.name = "GIMME_Evl_ocx"
+	# executeSimulations(numRuns, intProfTemplate2D, 0, 0, numRealIterations, maxNumTrainingIterations, 
+	# 	playerBridge, taskBridge, adaptationEvl_ocx)
 
 
-	adaptationEvl_ocx.name = "GIMME_Evl_Bootstrap"
-	executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
-					playerBridge, taskBridge, adaptationEvl_ocx, estimatorsAccuracy = 0.1)
+	# executeSimulations(numRuns, intProfTemplate2D, 0, 0, numRealIterations, maxNumTrainingIterations, 
+	# 	playerBridge, taskBridge, adaptationSH)
+
+	# executeSimulations(numRuns, intProfTemplate2D, 0, 0, numRealIterations, maxNumTrainingIterations,
+	# 	playerBridge, taskBridge, adaptationRandom)
+
+
+
+	# adaptationEvl_ocx.name = "GIMME_Evl_Bootstrap"
+	# executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
+	# 				playerBridge, taskBridge, adaptationEvl_ocx, estimatorsAccuracy = 0.1)
 
 	# adaptationEvl_ocx.name = "GIMME_Evl_Bootstrap_HighAcc"
 	# executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
@@ -586,6 +586,19 @@ if __name__ == '__main__':
 	# adaptationEvl_ocx.name = "GIMME_Evl_Bootstrap_LowAcc"
 	# executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
 	# 				playerBridge, taskBridge, adaptationEvl_ocx, estimatorsAccuracy = 0.2)
+
+
+	# adaptationSH.name = "GIMME_Bootstrap"
+	# executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
+	# 				playerBridge, taskBridge, adaptationSH, estimatorsAccuracy = 0.1)
+
+	# adaptationSH.name = "GIMME_Bootstrap_HighAcc"
+	# executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
+	# 				playerBridge, taskBridge, adaptationSH, estimatorsAccuracy = 0.05)
+
+	# adaptationSH.name = "GIMME_Bootstrap_LowAcc"
+	# executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
+	# 				playerBridge, taskBridge, adaptationSH, estimatorsAccuracy = 0.2)
 
 
 	# executeSimulations(numRuns, intProfTemplate1D, 0, 0, numRealIterations, maxNumTrainingIterations, 
@@ -605,9 +618,9 @@ if __name__ == '__main__':
 
 
 
-	# adaptationEvl.name = "GIMME_Evl_EP"
-	# executeSimulations(numRuns, intProfTemplate2D, 0, 0, numRealIterations, maxNumTrainingIterations, 
-	# 	playerBridge, taskBridge, adaptationEvl, considerExtremePersonalityValues = True)
+	adaptationEvl_ocx.name = "GIMME_Evl_EP"
+	executeSimulations(numRuns, intProfTemplate2D, 0, 0, numRealIterations, maxNumTrainingIterations, 
+		playerBridge, taskBridge, adaptationEvl_ocx, considerExtremePersonalityValues = True)
 
 	# executionTime = (time.time() - startTime)
 	# print('Execution time in seconds: ' + str(executionTime)+"                                                                                    ", end="\r")
