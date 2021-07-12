@@ -43,9 +43,9 @@ class PlayerState(object):
 
 
 class PlayerStatesDataFrame(object):
-	def __init__(self, interactionsProfileTemplate, gridTrimAlg, states = None):
+	def __init__(self, interactionsProfileTemplate, trimAlg, states = None):
 		self.interactionsProfileTemplate = interactionsProfileTemplate
-		self.gridTrimAlg = gridTrimAlg
+		self.trimAlg = trimAlg
 
 		self.states = [] if states == None else states
 
@@ -78,7 +78,7 @@ class PlayerStatesDataFrame(object):
 		# print(self.flatAbilities)
 		# print(self.flatEngagements)
 
-		trimmedListAndRemainder = self.gridTrimAlg.trimmedList(self.states)
+		trimmedListAndRemainder = self.trimAlg.trimmedList(self.states)
 		trimmedList = trimmedListAndRemainder[0]
 		remainderIndexes = trimmedListAndRemainder[1]
 

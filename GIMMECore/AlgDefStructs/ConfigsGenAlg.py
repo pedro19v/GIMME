@@ -248,7 +248,7 @@ class SimulatedAnnealingConfigsGen(ConfigsGenAlg):
 		bestAvgCharacteristics = []
 
 
-		# estimate personalities
+		# estimate preferences
 		self.persEstAlg.updateEstimates()
 
 		# generate several random groups, calculate their fitness and select the best one
@@ -266,14 +266,14 @@ class SimulatedAnnealingConfigsGen(ConfigsGenAlg):
 				group = newGroups[groupI]
 				groupSize = len(group)
 
-				# generate group profile as random or average of the personalities estimates
+				# generate group profile as random or average of the preferences estimates
 				profile = self.interactionsProfileTemplate.generateCopy().reset()
 
 				if(random.uniform(0.0, 1.0) > self.temperature):
 					for currPlayer in group:
-						personality = self.playerModelBridge.getPlayerPersonalityEst(currPlayer)
+						preferences = self.playerModelBridge.getPlayerPreferencesEst(currPlayer)
 						for dim in profile.dimensions:
-							profile.dimensions[dim] += personality.dimensions[dim] / groupSize
+							profile.dimensions[dim] += preferences.dimensions[dim] / groupSize
 					# profile.normalize()
 				else:
 					profile = self.interactionsProfileTemplate.generateCopy().randomize()
@@ -356,7 +356,7 @@ class StochasticHillclimberConfigsGen(ConfigsGenAlg):
 		bestAvgCharacteristics = []
 
 
-		# estimate personalities
+		# estimate preferences
 		self.persEstAlg.updateEstimates()
 
 		# generate several random groups, calculate their fitness and select the best one
@@ -374,13 +374,13 @@ class StochasticHillclimberConfigsGen(ConfigsGenAlg):
 				group = newGroups[groupI]
 				groupSize = len(group)
 
-				# generate profile as average of the personalities estimates
+				# generate profile as average of the preferences estimates
 				profile = self.interactionsProfileTemplate.generateCopy().reset()
 
 				for currPlayer in group:
-					personality = self.playerModelBridge.getPlayerPersonalityEst(currPlayer)
+					preferences = self.playerModelBridge.getPlayerPreferencesEst(currPlayer)
 					for dim in profile.dimensions:
-						profile.dimensions[dim] += (personality.dimensions[dim] / groupSize)
+						profile.dimensions[dim] += (preferences.dimensions[dim] / groupSize)
 
 				# print("profile in-configGen: "+str(profile.dimensions)+";groupSize: "+str(groupSize))
 				# profile.normalize()
@@ -683,12 +683,12 @@ class AccurateConfigsGen(ConfigsGenAlg):
 				group = newGroups[groupI]
 				groupSize = len(group)
 
-				# generate profile as average of the personalities estimates
+				# generate profile as average of the preferences estimates
 				profile = self.interactionsProfileTemplate.generateCopy().reset()
 				for currPlayer in group:
-					personality = self.playerModelBridge.getPlayerRealPersonality(currPlayer)
+					preferences = self.playerModelBridge.getPlayerRealPreferences(currPlayer)
 					for dim in profile.dimensions:
-						profile.dimensions[dim] += personality.dimensions[dim] / groupSize
+						profile.dimensions[dim] += preferences.dimensions[dim] / groupSize
 				# profile.normalize()
 				newConfigProfiles.append(profile)
 

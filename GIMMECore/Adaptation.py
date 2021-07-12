@@ -1,7 +1,7 @@
 import math
 from .AlgDefStructs.RegressionAlg import *
 from .AlgDefStructs.ConfigsGenAlg import *
-from .AlgDefStructs.PersonalityEstAlg import *
+from .AlgDefStructs.PreferencesEstAlg import *
 
 from .ModelBridge.PlayerModelBridge import PlayerModelBridge 
 from .ModelBridge.TaskModelBridge import TaskModelBridge 
@@ -74,7 +74,7 @@ class Adaptation(object):
 				self.playerModelBridge.setPlayerProfile(playerId, currState.profile)
 				self.playerModelBridge.setPlayerGroup(playerId, currGroup)
 
-				groupStr += str(self.playerModelBridge.getPlayerPersonalityEst(playerId).dimensions.values())+",\n"
+				groupStr += str(self.playerModelBridge.getPlayerPreferencesEst(playerId).dimensions.values())+",\n"
 
 			adaptedConfig["tasks"].append(adaptedTaskId)
 
@@ -138,8 +138,8 @@ class Adaptation(object):
 		return increases
 
 	def calcReaction(self, state, playerId):
-		personality = self.playerModelBridge.getPlayerRealPersonality(playerId)
-		numDims = len(personality.dimensions)
+		preferences = self.playerModelBridge.getPlayerRealPreferences(playerId)
+		numDims = len(preferences.dimensions)
 		newState = PlayerState(
 			stateType = 0, 
 			characteristics = PlayerCharacteristics(
@@ -147,7 +147,7 @@ class Adaptation(object):
 				engagement=state.characteristics.engagement
 				), 
 			profile=state.profile)
-		newState.characteristics.engagement = 1 - (personality.distanceBetween(state.profile) / math.sqrt(numDims))  #between 0 and 1
+		newState.characteristics.engagement = 1 - (preferences.distanceBetween(state.profile) / math.sqrt(numDims))  #between 0 and 1
 		if newState.characteristics.engagement>1:
 			raise ValueError('Something went wrong. Engagement is > 1.') 
 		abilityIncreaseSim = (newState.characteristics.engagement*self.playerModelBridge.getBaseLearningRate(playerId))

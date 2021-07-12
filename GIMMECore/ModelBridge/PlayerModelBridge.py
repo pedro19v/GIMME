@@ -29,11 +29,11 @@ class PlayerModelBridge(ABC):
 		pass
 
 	@abstractmethod
-	def getPlayerPersonalityEst(self, playerId):
+	def getPlayerPreferencesEst(self, playerId):
 		pass
 
 	@abstractmethod
-	def setPlayerPersonalityEst(self, playerId, personality):
+	def setPlayerPreferencesEst(self, playerId, preferences):
 		pass
 
 	@abstractmethod
