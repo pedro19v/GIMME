@@ -8,12 +8,39 @@ from .InteractionsProfile import InteractionsProfile
 
 class PlayerCharacteristics(object):
 	def __init__(self, ability = None, engagement = None):
-		self.ability = 0 if ability==None else ability
+		self.ability  = 0 if ability==None else ability
 		self.engagement = 0 if engagement==None else engagement
+
+		# self._ability  = 0 if ability==None else min(ability, 20.0)
+		# self._engagement = 0 if engagement==None else min(engagement, 1.0)
+
 	def reset(self):
 		self.ability = 0
 		self.engagement = 0
 		return self
+
+	# #constraints enforced via properties
+	# @property
+	# def ability(self):
+	# 	return self._ability
+
+	# @property
+	# def engagement(self):
+	# 	return self._engagement
+
+	# @ability.setter
+	# def ability(self, newValue):
+	# 	# print(newValue)
+	# 	self._ability = min(newValue, 20.0)
+	# 	# self._ability = newValue
+	# 	return self._ability
+	
+	# @engagement.setter
+	# def engagement(self, newValue):
+	# 	self._engagement = min(newValue, 1.0)
+	# 	# self._engagement = newValue
+	# 	return self._engagement
+
 
 class PlayerState(object):
 	def __init__(self, stateType = None, profile = None, characteristics = None, dist = None, quality = None, group = None, tasks = None):
