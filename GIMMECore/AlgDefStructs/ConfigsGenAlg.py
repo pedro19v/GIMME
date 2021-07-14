@@ -926,18 +926,19 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 
 		# profiles are crossed with one point (no need for that when profiles are 1D)
 		# breakpoint()
-		if self.interactionsProfileTemplate.dimensionality > 1:
-			for i in range(minLen):
-				prof1 = ind1[1][i].flattened()
-				prof2 = ind2[1][i].flattened()
+		# if self.interactionsProfileTemplate.dimensionality > 1:
+		for i in range(minLen):
+			prof1 = ind1[1][i].flattened()
+			prof2 = ind2[1][i].flattened()
 
-				newProfiles = tools.cxOnePoint(prof1, prof2)
-				
-				#the inds become children
-				ind1[1][i] = self.interactionsProfileTemplate.unflattened(newProfiles[0])
-				ind2[1][i] = self.interactionsProfileTemplate.unflattened(newProfiles[1])
+			newProfiles = tools.cxUniform(prof1, prof2, 0.5)
+			# newProfiles = tools.cxOnePoint(prof1, prof2)
+			
+			#the inds become children
+			ind1[1][i] = self.interactionsProfileTemplate.unflattened(newProfiles[0])
+			ind2[1][i] = self.interactionsProfileTemplate.unflattened(newProfiles[1])
 
-				# breakpoint()
+			# breakpoint()
 
 		del ind1.fitness.values
 		del ind2.fitness.values

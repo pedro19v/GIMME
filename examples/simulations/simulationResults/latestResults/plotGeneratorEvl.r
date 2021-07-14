@@ -21,7 +21,7 @@ resultsLog <- do.call(rbind, lapply(filenames, read.csv, header=TRUE, sep=",")) 
 resultsLog <- resultsLog[resultsLog$iteration > 19,]
 resultsLog <- resultsLog[complete.cases(resultsLog),]
 
-print(sprintf("nRuns: %d", nrow(unique(resultsLog[c("simsID","run")]))))
+print(sprintf("nRuns: %f", (nrow(unique(resultsLog[c("simsID", "run", "algorithm")])) / nrow(unique(resultsLog[c("algorithm")]))) ))
 # print(resultsLog)
 
 # plot strategies
@@ -46,7 +46,7 @@ sdev <- aggregate(abilityInc ~ iteration*algorithm, avgPerRun , sd)
 
 
 
-buildAbIncPlots <- function(logAvg, logSDev, plotName, colors = NULL){
+buildAbIncPlots <- function(logAvg, logSDev, colors = NULL){
 
 	plot <- ggplot(logAvg, aes(x = iteration, y=abilityInc, group=algorithm, color=algorithm, alpha = 0.8)) 
 
@@ -71,7 +71,6 @@ buildAbIncPlots <- function(logAvg, logSDev, plotName, colors = NULL){
 	if(!is.null(colors)){
 		plot <- plot + scale_color_manual(values = colors)
 	}
-	suppressMessages(ggsave(sprintf("plots/%s.png", plotName), height=7, width=15, units="in", dpi=500))
 
 	return(plot)
 }
@@ -81,32 +80,33 @@ buildAbIncPlots <- function(logAvg, logSDev, plotName, colors = NULL){
 # ----------------------------------------------------------------------------------
 # cmp average ability increase 
 currAvg = 	avg[
-				avg$algorithm=="GIMME_SH" | 
-				avg$algorithm=="GIMME_Evl_scx" |
-				avg$algorithm=="GIMME_Evl_ocx" |
-				avg$algorithm=="GIMME_Evl_Bootstrap" |
+				avg$algorithm=="GIMME_LS" | 
+				# avg$algorithm=="GIMME_GA_scx" |
+				avg$algorithm=="GIMME_GA_ocx" |
+				avg$algorithm=="GIMME_GA_Bootstrap" |
 				avg$algorithm=="Random"
 				,]
 
 currSdev = sdev[
-				sdev$algorithm=="GIMME_SH" | 
-				sdev$algorithm=="GIMME_Evl_scx" |
-				sdev$algorithm=="GIMME_Evl_ocx" |
-				sdev$algorithm=="GIMME_Evl_Bootstrap" |
+				sdev$algorithm=="GIMME_LS" | 
+				# sdev$algorithm=="GIMME_GA_scx" |
+				sdev$algorithm=="GIMME_GA_ocx" |
+				sdev$algorithm=="GIMME_GA_Bootstrap" |
 				sdev$algorithm=="Random"
 				,]
 
 
-currAvg$algorithm[currAvg$algorithm == "GIMME_SH"] <- "GIMME LS" 
-currAvg$algorithm[currAvg$algorithm == "GIMME_Evl_scx"] <- "GIMME GA (Simpler CX)" 
-currAvg$algorithm[currAvg$algorithm == "GIMME_Evl_ocx"] <- "GIMME GA" 
-currAvg$algorithm[currAvg$algorithm == "GIMME_Evl_Bootstrap"] <- "GIMME GA w/ Bootstrap" 
+currAvg$algorithm[currAvg$algorithm == "GIMME_LS"] <- "GIMME-LS" 
+# currAvg$algorithm[currAvg$algorithm == "GIMME_GA_scx"] <- "GIMME GA (Simpler CX)" 
+currAvg$algorithm[currAvg$algorithm == "GIMME_GA_ocx"] <- "GIMME-GA" 
+currAvg$algorithm[currAvg$algorithm == "GIMME_GA_Bootstrap"] <- "GIMME-GA-Bootstrap" 
 # currAvg$algorithm[currAvg$algorithm == "Random"] <- "Random" 
 
 currAvg$linetype <- "solid" 
 # currAvg$linetype[currAvg$algorithm == "Perf. Info."] <- "dashed" 
 
-buildAbIncPlots(currAvg, currSdev, "simulationsResultsAbilityInc", c("#5e3c99", "dodgerblue","#75a352","#75a3e2", "#d7191c"))
+buildAbIncPlots(currAvg, currSdev, c("#5e3c99", "dodgerblue","#75a352","#75a3e2", "#d7191c"))
+suppressMessages(ggsave(sprintf("plots/%s.png", "simulationsResultsAbilityInc"), height=7, width=15, units="in", dpi=500))
 
 
 
@@ -114,103 +114,118 @@ buildAbIncPlots(currAvg, currSdev, "simulationsResultsAbilityInc", c("#5e3c99", 
 # ----------------------------------------------------------------------------------
 # cmp average ability increase of GIMME with different accuracy est
 currAvg = avg[
-			  avg$algorithm=="GIMME_Evl_Bootstrap" | 
-			  avg$algorithm=="GIMME_Evl_Bootstrap_LowAcc" | 
-			  avg$algorithm=="GIMME_Evl_Bootstrap_HighAcc"
+			  avg$algorithm=="GIMME_GA_Bootstrap" | 
+			  avg$algorithm=="GIMME_GA_Bootstrap_LowAcc" | 
+			  avg$algorithm=="GIMME_GA_Bootstrap_HighAcc"
 			  ,]
 
 currSdev = sdev[ 
-			  sdev$algorithm=="GIMME_Evl_Bootstrap" | 
-			  sdev$algorithm=="GIMME_Evl_Bootstrap_LowAcc" | 
-			  sdev$algorithm=="GIMME_Evl_Bootstrap_HighAcc"
+			  sdev$algorithm=="GIMME_GA_Bootstrap" | 
+			  sdev$algorithm=="GIMME_GA_Bootstrap_LowAcc" | 
+			  sdev$algorithm=="GIMME_GA_Bootstrap_HighAcc"
 			  ,]
 
 currAvg$linetype <- "solid" 
-currAvg$algorithm[currAvg$algorithm == "GIMME_Evl_Bootstrap"] <- "GIMME GA w/ Bootstrap\n (\u03B3 = 0.1)" 
-currAvg$algorithm[currAvg$algorithm == "GIMME_Evl_Bootstrap_LowAcc"] <- "GIMME GA w/ Bootstrap\n (\u03B3 = 0.2)" 
-currAvg$algorithm[currAvg$algorithm == "GIMME_Evl_Bootstrap_HighAcc"] <- "GIMME GA w/ Bootstrap\n (\u03B3 = 0.05)"  
+currAvg$algorithm[currAvg$algorithm == "GIMME_GA_Bootstrap"] <- "GIMME-GA-Bootstrapp\n (\u03B3 = 0.1)" 
+currAvg$algorithm[currAvg$algorithm == "GIMME_GA_Bootstrap_LowAcc"] <- "GIMME-GA-Bootstrap\n (\u03B3 = 0.2)" 
+currAvg$algorithm[currAvg$algorithm == "GIMME_GA_Bootstrap_HighAcc"] <- "GIMME-GA-Bootstrap\n (\u03B3 = 0.05)"  
 currAvg$algorithm <- factor(currAvg$algorithm, levels=sort(unique(currAvg[,"algorithm"]), decreasing=TRUE))
-ggp1 <- buildAbIncPlots(currAvg, currSdev, "simulationsResultsAccuracyComp_GA", c("skyblue", "dodgerblue", "navy"))
+ggp1 <- buildAbIncPlots(currAvg, currSdev, c("skyblue", "dodgerblue", "navy"))
 
 
 # ----------------------------------------------------------------------------------
 # cmp average ability increase of GIMME with different accuracy est
 currAvg = avg[
-			  avg$algorithm=="GIMME_Bootstrap" | 
-			  avg$algorithm=="GIMME_Bootstrap_LowAcc" | 
-			  avg$algorithm=="GIMME_Bootstrap_HighAcc"
+			  avg$algorithm=="GIMME_LS_Bootstrap" | 
+			  avg$algorithm=="GIMME_LS_Bootstrap_LowAcc" | 
+			  avg$algorithm=="GIMME_LS_Bootstrap_HighAcc"
 			  ,]
 
 currSdev = sdev[ 
-			  sdev$algorithm=="GIMME_Bootstrap" | 
-			  sdev$algorithm=="GIMME_Bootstrap_LowAcc" | 
-			  sdev$algorithm=="GIMME_Bootstrap_HighAcc"
+			  sdev$algorithm=="GIMME_LS_Bootstrap" | 
+			  sdev$algorithm=="GIMME_LS_Bootstrap_LowAcc" | 
+			  sdev$algorithm=="GIMME_LS_Bootstrap_HighAcc"
 			  ,]
 
 currAvg$linetype <- "solid" 
-currAvg$algorithm[currAvg$algorithm == "GIMME_Bootstrap"] <- "GIMME LS w/ Bootstrap\n (\u03B3 = 0.1)" 
-currAvg$algorithm[currAvg$algorithm == "GIMME_Bootstrap_LowAcc"] <- "GIMME LS w/ Bootstrap\n (\u03B3 = 0.2)" 
-currAvg$algorithm[currAvg$algorithm == "GIMME_Bootstrap_HighAcc"] <- "GIMME LS w/ Bootstrap\n (\u03B3 = 0.05)"  
+currAvg$algorithm[currAvg$algorithm == "GIMME_LS_Bootstrap"] <- "GIMME-LS-Bootstrap\n (\u03B3 = 0.1)" 
+currAvg$algorithm[currAvg$algorithm == "GIMME_LS_Bootstrap_LowAcc"] <- "GIMME-LS-Bootstrapp\n (\u03B3 = 0.2)" 
+currAvg$algorithm[currAvg$algorithm == "GIMME_LS_Bootstrap_HighAcc"] <- "GIMME-LS-Bootstrap\n (\u03B3 = 0.05)"  
 currAvg$algorithm <- factor(currAvg$algorithm, levels=sort(unique(currAvg[,"algorithm"]), decreasing=TRUE))
-ggp2 <- buildAbIncPlots(currAvg, currSdev, "simulationsResultsAccuracyComp_LS", c("skyblue", "dodgerblue", "navy"))
+ggp2 <- buildAbIncPlots(currAvg, currSdev, c("skyblue", "dodgerblue", "navy"))
 
 ggp1 <- ggp1 + theme(plot.margin = margin(2,2,2,2, "cm"))
 ggp2 <- ggp2 + theme(plot.margin = margin(2,2,2,2, "cm"))
 suppressMessages(ggsave(sprintf("plots/%s.png", "simulationsResultsAccuracyComp"), height=7, width=25, units="in", dpi=500, arrangeGrob(ggp1, ggp2, ncol=2)))
-q()
 
 
 # ----------------------------------------------------------------------------------
 # cmp average ability increase of GIMME n-D
 currAvg = avg[
-				avg$algorithm=="GIMME_Evl1D" | 
-				avg$algorithm=="GIMME_Evl_ocx" | 
-				avg$algorithm=="GIMME_Evl3D" | 
-				avg$algorithm=="GIMME_Evl4D" | 
-				avg$algorithm=="GIMME_Evl5D" | 
-				avg$algorithm=="GIMME_Evl6D" 
+				avg$algorithm=="GIMME_GA1D" | 
+				avg$algorithm=="GIMME_GA_ocx" | 
+				avg$algorithm=="GIMME_GA3D" | 
+				avg$algorithm=="GIMME_GA4D" | 
+				avg$algorithm=="GIMME_GA5D" | 
+				avg$algorithm=="GIMME_GA6D" 
 			,]
 		
 currSdev = sdev[
-				sdev$algorithm=="GIMME_Evl1D" | 
-				sdev$algorithm=="GIMME_Evl_ocx" | 
-				sdev$algorithm=="GIMME_Evl3D" | 
-				sdev$algorithm=="GIMME_Evl4D" | 
-				sdev$algorithm=="GIMME_Evl5D" | 
-				sdev$algorithm=="GIMME_Evl6D" 
+				sdev$algorithm=="GIMME_GA1D" | 
+				sdev$algorithm=="GIMME_GA_ocx" | 
+				sdev$algorithm=="GIMME_GA3D" | 
+				sdev$algorithm=="GIMME_GA4D" | 
+				sdev$algorithm=="GIMME_GA5D" | 
+				sdev$algorithm=="GIMME_GA6D" 
 			,]
 
 
-currAvg$algorithm[currAvg$algorithm == "GIMME_Evl1D"] <- "GIMME GA (1D)" 
-currAvg$algorithm[currAvg$algorithm == "GIMME_Evl_ocx"] <- "GIMME GA (2D)" 
-currAvg$algorithm[currAvg$algorithm == "GIMME_Evl5D"] <- "GIMME GA (5D)" 
-currAvg$algorithm[currAvg$algorithm == "GIMME_Evl6D"] <- "GIMME GA (6D)" 
-currAvg$algorithm[currAvg$algorithm == "GIMME_Evl3D"] <- "GIMME GA (3D)" 
-currAvg$algorithm[currAvg$algorithm == "GIMME_Evl4D"] <- "GIMME GA (4D)"
+currAvg$algorithm[currAvg$algorithm == "GIMME_GA1D"] <- "GIMME-GA (1D)" 
+currAvg$algorithm[currAvg$algorithm == "GIMME_GA_ocx"] <- "GIMME-GA (2D)" 
+currAvg$algorithm[currAvg$algorithm == "GIMME_GA5D"] <- "GIMME-GA (5D)" 
+currAvg$algorithm[currAvg$algorithm == "GIMME_GA6D"] <- "GIMME-GA (6D)" 
+currAvg$algorithm[currAvg$algorithm == "GIMME_GA3D"] <- "GIMME-GA (3D)" 
+currAvg$algorithm[currAvg$algorithm == "GIMME_GA4D"] <- "GIMME-GA (4D)"
 # currAvg$algorithm[currAvg$algorithm == "Random"] <- "Random" 
 
 currAvg$linetype <- "solid"
 # currAvg$linetype[currAvg$algorithm == "Random"] <- "dashed" 
 
 currAvg$algorithm <- factor(currAvg$algorithm, levels=c(sort(unique(currAvg[,"algorithm"]))))
-buildAbIncPlots(currAvg, currSdev, "simulationsResultsAbilityGIPDims")
-
+buildAbIncPlots(currAvg, currSdev)
+suppressMessages(ggsave(sprintf("plots/%s.png", "simulationsResultsAbilityGIPDims"), height=7, width=15, units="in", dpi=500))
 
 
 
 # ----------------------------------------------------------------------------------
 # cmp average ability increase of GIMME and GIMME EP
-currAvg = avg[avg$algorithm=="GIMME_Evl_ocx" | 
-			  avg$algorithm=="GIMME_Evl_EP",]
+currAvg = avg[avg$algorithm=="GIMME_GA_ocx" | 
+			  avg$algorithm=="GIMME_GA_EP",]
 
-currSdev = sdev[sdev$algorithm=="GIMME_Evl_ocx" |  
-			    sdev$algorithm=="GIMME_Evl_EP",]
+currSdev = sdev[sdev$algorithm=="GIMME_GA_ocx" |  
+			    sdev$algorithm=="GIMME_GA_EP",]
 
 currAvg$linetype <- "solid" 
-currAvg$algorithm[currAvg$algorithm == "GIMME_Evl_ocx"] <- "GIMME GA" 
-currAvg$algorithm[currAvg$algorithm == "GIMME_Evl_EP"] <- "GIMME GA (extr. prfs)" 			  
-buildAbIncPlots(currAvg, currSdev, "simulationsResultsAbilityEP", c("dodgerblue", "#d7191c"))
+currAvg$algorithm[currAvg$algorithm == "GIMME_GA_ocx"] <- "GIMME-GA" 
+currAvg$algorithm[currAvg$algorithm == "GIMME_GA_EP"] <- "GIMME-GA (extr. prfs)" 			  
+ggp1 <- buildAbIncPlots(currAvg, currSdev, c("dodgerblue", "#d7191c"))
 
 
-q()
+# ----------------------------------------------------------------------------------
+# cmp average ability increase of GIMME and GIMME EP
+currAvg = avg[avg$algorithm=="GIMME_LS" | 
+			  avg$algorithm=="GIMME_LS_EP",]
+
+currSdev = sdev[sdev$algorithm=="GIMME_LS" |  
+			    sdev$algorithm=="GIMME_LS_EP",]
+
+currAvg$linetype <- "solid" 
+currAvg$algorithm[currAvg$algorithm == "GIMME_LS"] <- "GIMME-LS" 
+currAvg$algorithm[currAvg$algorithm == "GIMME_LS_EP"] <- "GIMME-LS (extr. prfs)" 			  
+ggp2 <- buildAbIncPlots(currAvg, currSdev, c("dodgerblue", "#d7191c"))
+
+
+ggp1 <- ggp1 + theme(plot.margin = margin(2,2,2,2, "cm"))
+ggp2 <- ggp2 + theme(plot.margin = margin(2,2,2,2, "cm"))
+suppressMessages(ggsave(sprintf("plots/%s.png", "simulationsResultsAbilityEP"), height=7, width=25, units="in", dpi=500, arrangeGrob(ggp1, ggp2, ncol=2)))
 
