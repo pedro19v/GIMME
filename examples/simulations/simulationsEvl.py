@@ -82,7 +82,7 @@ taskBridge = CustomTaskModelBridge(tasks)
 
 
 # ----------------------- [Init Adaptations] --------------------------------
-adaptationSH = Adaptation()
+adaptationLS = Adaptation()
 adaptationGA_scx = Adaptation()
 adaptationGA = Adaptation()
 
@@ -185,7 +185,7 @@ simpleConfigsAlg = StochasticHillclimberConfigsGen(
 	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
 	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)
 )
-adaptationSH.init(
+adaptationLS.init(
 	playerModelBridge = playerBridge, 
 	taskModelBridge = taskBridge,
 	configsGenAlg = simpleConfigsAlg, 
@@ -550,43 +550,43 @@ if __name__ == '__main__':
 	# 	playerBridge, taskBridge, adaptationGA_scx)
 
 
-	# adaptationGA.name = "GIMME_GA_ocx"
-	# executeSimulations(numRuns, intProfTemplate2D, 0, 0, numRealIterations, maxNumTrainingIterations, 
-	# 	playerBridge, taskBridge, adaptationGA)
+	adaptationGA.name = "GIMME_GA_ocx"
+	executeSimulations(numRuns, intProfTemplate2D, 0, 0, numRealIterations, maxNumTrainingIterations, 
+		playerBridge, taskBridge, adaptationGA)
 
 
 	executeSimulations(numRuns, intProfTemplate2D, 0, 0, numRealIterations, maxNumTrainingIterations, 
-		playerBridge, taskBridge, adaptationSH)
+		playerBridge, taskBridge, adaptationLS)
 
 	executeSimulations(numRuns, intProfTemplate2D, 0, 0, numRealIterations, maxNumTrainingIterations,
 		playerBridge, taskBridge, adaptationRandom)
 
 
 
-	adaptationGA.name = "GIMME_GA_Bootstrap"
-	executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
-					playerBridge, taskBridge, adaptationGA, estimatorsAccuracy = 0.1)
+	# adaptationGA.name = "GIMME_GA_Bootstrap"
+	# executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
+	# 				playerBridge, taskBridge, adaptationGA, estimatorsAccuracy = 0.1)
 
-	adaptationGA.name = "GIMME_GA_Bootstrap_HighAcc"
-	executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
-					playerBridge, taskBridge, adaptationGA, estimatorsAccuracy = 0.05)
+	# adaptationGA.name = "GIMME_GA_Bootstrap_HighAcc"
+	# executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
+	# 				playerBridge, taskBridge, adaptationGA, estimatorsAccuracy = 0.05)
 
-	adaptationGA.name = "GIMME_GA_Bootstrap_LowAcc"
-	executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
-					playerBridge, taskBridge, adaptationGA, estimatorsAccuracy = 0.2)
+	# adaptationGA.name = "GIMME_GA_Bootstrap_LowAcc"
+	# executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
+	# 				playerBridge, taskBridge, adaptationGA, estimatorsAccuracy = 0.2)
 
 
-	adaptationSH.name = "GIMME_LS_Bootstrap"
-	executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
-					playerBridge, taskBridge, adaptationSH, estimatorsAccuracy = 0.1)
+	# adaptationLS.name = "GIMME_LS_Bootstrap"
+	# executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
+	# 				playerBridge, taskBridge, adaptationLS, estimatorsAccuracy = 0.1)
 
-	adaptationSH.name = "GIMME_LS_Bootstrap_HighAcc"
-	executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
-					playerBridge, taskBridge, adaptationSH, estimatorsAccuracy = 0.05)
+	# adaptationLS.name = "GIMME_LS_Bootstrap_HighAcc"
+	# executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
+	# 				playerBridge, taskBridge, adaptationLS, estimatorsAccuracy = 0.05)
 
-	adaptationSH.name = "GIMME_LS_Bootstrap_LowAcc"
-	executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
-					playerBridge, taskBridge, adaptationSH, estimatorsAccuracy = 0.2)
+	# adaptationLS.name = "GIMME_LS_Bootstrap_LowAcc"
+	# executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
+	# 				playerBridge, taskBridge, adaptationLS, estimatorsAccuracy = 0.2)
 
 
 
@@ -612,9 +612,9 @@ if __name__ == '__main__':
 	# 	playerBridge, taskBridge, adaptationGA, considerExtremePersonalityValues = True)
 
 
-	# adaptationSH.name = "GIMME_LS_EP"
+	# adaptationLS.name = "GIMME_LS_EP"
 	# executeSimulations(numRuns, intProfTemplate2D, 0, 0, numRealIterations, maxNumTrainingIterations, 
-	# 	playerBridge, taskBridge, adaptationSH, considerExtremePersonalityValues = True)
+	# 	playerBridge, taskBridge, adaptationLS, considerExtremePersonalityValues = True)
 
 
 
