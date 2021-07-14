@@ -2,14 +2,14 @@ from GIMMECore import TaskModelBridge
 from GIMMECore import PlayerModelBridge
 
 class PlayerModelMock(object):
-	def __init__(self, id, name, currState, pastModelIncreasesGrid, currModelIncreases, personalityEst, realPersonality):
+	def __init__(self, id, name, currState, pastModelIncreasesGrid, currModelIncreases, preferencesEst, realPreferences):
 		self.currState = currState
 		self.id = id
 		self.name = name
 		self.pastModelIncreasesGrid = pastModelIncreasesGrid
 
-		# self.personalityEst = personalityEst.normalized()
-		# self.realPersonality = realPersonality.normalized()
+		# self.preferencesEst = preferencesEst.normalized()
+		# self.realPreferences = realPreferences.normalized()
 		self.baseLearningRate = None
 
 class TaskModelMock(object):
@@ -53,8 +53,8 @@ class CustomPlayerModelBridge(PlayerModelBridge):
 		self.numPlayers = len(players)
 
 
-	def registerNewPlayer(self, playerId, name, currState, pastModelIncreasesGrid, currModelIncreases, personalityEst, realPersonality):
-		self.players[int(playerId)] = PlayerModelMock(playerId, name, currState, pastModelIncreasesGrid, currModelIncreases,  personalityEst, realPersonality)	
+	def registerNewPlayer(self, playerId, name, currState, pastModelIncreasesGrid, currModelIncreases, preferencesEst, realPreferences):
+		self.players[int(playerId)] = PlayerModelMock(playerId, name, currState, pastModelIncreasesGrid, currModelIncreases,  preferencesEst, realPreferences)	
 	def resetPlayer(self, playerId):
 		self.players[int(playerId)].currState.reset()
 		self.players[int(playerId)].pastModelIncreasesGrid.reset()
@@ -82,11 +82,11 @@ class CustomPlayerModelBridge(PlayerModelBridge):
 		return self.players[int(playerId)].pastModelIncreasesGrid
 	def getPlayerCurrCharacteristics(self, playerId):
 		return self.players[int(playerId)].currState.characteristics
-	def getPlayerPersonalityEst(self, playerId):
-		return self.players[int(playerId)].personalityEst
+	def getPlayerPreferencesEst(self, playerId):
+		return self.players[int(playerId)].preferencesEst
 
-	def setPlayerPersonalityEst(self, playerId, personalityEst):
-		self.players[int(playerId)].personalityEst = personalityEst
+	def setPlayerPreferencesEst(self, playerId, preferencesEst):
+		self.players[int(playerId)].preferencesEst = preferencesEst
 
 	def setPlayerCharacteristics(self, playerId, characteristics):
 		self.players[int(playerId)].currState.characteristics = characteristics
@@ -99,7 +99,7 @@ class CustomPlayerModelBridge(PlayerModelBridge):
 	def setPlayerTasks(self, playerId, tasks):
 		self.players[int(playerId)].currState.tasks = tasks
 
-	def setPlayerRealPersonality(self, playerId, realPersonality):
-		self.players[int(playerId)].realPersonality = realPersonality
-	def getPlayerRealPersonality(self, playerId):
-		return self.players[int(playerId)].realPersonality
+	def setPlayerRealPreferences(self, playerId, realPreferences):
+		self.players[int(playerId)].realPreferences = realPreferences
+	def getPlayerRealPreferences(self, playerId):
+		return self.players[int(playerId)].realPreferences

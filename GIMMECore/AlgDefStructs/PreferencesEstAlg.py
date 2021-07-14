@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from ..PlayerStructs import *
 import json
 
-class PersonalityEstAlg(ABC):
+class PreferencesEstAlg(ABC):
 
 	def __init__(self, playerModelBridge):
 		self.playerModelBridge = playerModelBridge
@@ -13,7 +13,7 @@ class PersonalityEstAlg(ABC):
 
 
 
-class ExploitationPersonalityEstAlg(PersonalityEstAlg):
+class ExploitationPreferencesEstAlg(PreferencesEstAlg):
 	def __init__(self, 
 		playerModelBridge, 
 		interactionsProfileTemplate, 
@@ -36,18 +36,18 @@ class ExploitationPersonalityEstAlg(PersonalityEstAlg):
 	def updateEstimates(self):
 		playerIds = self.playerModelBridge.getAllPlayerIds()
 		for playerId in playerIds:
-			currPersonalityEst = self.playerModelBridge.getPlayerPersonalityEst(playerId)
-			currPersonalityQuality = self.bestQualities.get(playerId, 0.0)
+			currPreferencesEst = self.playerModelBridge.getPlayerPreferencesEst(playerId)
+			currPreferencesQuality = self.bestQualities.get(playerId, 0.0)
 			lastDataPoint = self.playerModelBridge.getPlayerCurrState(playerId)
 			quality = self.calcQuality(lastDataPoint)
-			if quality > currPersonalityQuality:
-				self.bestQualities[playerId] = currPersonalityQuality
-				self.playerModelBridge.setPlayerPersonalityEst(playerId, lastDataPoint.profile)
+			if quality > currPreferencesQuality:
+				self.bestQualities[playerId] = currPreferencesQuality
+				self.playerModelBridge.setPlayerPreferencesEst(playerId, lastDataPoint.profile)
 
 
 
 
-class ExplorationPersonalityEstAlg(PersonalityEstAlg):
+class ExplorationPreferencesEstAlg(PreferencesEstAlg):
 	def __init__(self, 
 		playerModelBridge, 
 		interactionsProfileTemplate, 
@@ -72,10 +72,10 @@ class ExplorationPersonalityEstAlg(PersonalityEstAlg):
 		playerIds = self.playerModelBridge.getAllPlayerIds()
 		for playerId in playerIds:
 			
-			currPersonalityEst = self.playerModelBridge.getPlayerPersonalityEst(playerId)
-			newPersonalityEst = currPersonalityEst
-			if(currPersonalityEst != None):
-				bestQuality = self.calcQuality(self.regAlg.predict(currPersonalityEst, playerId))
+			currPreferencesEst = self.playerModelBridge.getPlayerPreferencesEst(playerId)
+			newPreferencesEst = currPreferencesEst
+			if(currPreferencesEst != None):
+				bestQuality = self.calcQuality(self.regAlg.predict(currPreferencesEst, playerId))
 			else:
 				bestQuality = -1
 			
@@ -84,6 +84,6 @@ class ExplorationPersonalityEstAlg(PersonalityEstAlg):
 				currQuality = self.calcQuality(self.regAlg.predict(profile, playerId))
 				if currQuality >= bestQuality:
 					bestQuality = currQuality
-					newPersonalityEst = profile
+					newPreferencesEst = profile
 
-			self.playerModelBridge.setPlayerPersonalityEst(playerId, newPersonalityEst)
+			self.playerModelBridge.setPlayerPreferencesEst(playerId, newPreferencesEst)

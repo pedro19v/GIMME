@@ -248,7 +248,7 @@ class SimulatedAnnealingConfigsGen(ConfigsGenAlg):
 		bestAvgCharacteristics = []
 
 
-		# estimate personalities
+		# estimate preferences
 		self.persEstAlg.updateEstimates()
 
 		# generate several random groups, calculate their fitness and select the best one
@@ -266,14 +266,14 @@ class SimulatedAnnealingConfigsGen(ConfigsGenAlg):
 				group = newGroups[groupI]
 				groupSize = len(group)
 
-				# generate group profile as random or average of the personalities estimates
+				# generate group profile as random or average of the preferences estimates
 				profile = self.interactionsProfileTemplate.generateCopy().reset()
 
 				if(random.uniform(0.0, 1.0) > self.temperature):
 					for currPlayer in group:
-						personality = self.playerModelBridge.getPlayerPersonalityEst(currPlayer)
+						preferences = self.playerModelBridge.getPlayerPreferencesEst(currPlayer)
 						for dim in profile.dimensions:
-							profile.dimensions[dim] += personality.dimensions[dim] / groupSize
+							profile.dimensions[dim] += preferences.dimensions[dim] / groupSize
 					# profile.normalize()
 				else:
 					profile = self.interactionsProfileTemplate.generateCopy().randomize()
@@ -356,7 +356,7 @@ class StochasticHillclimberConfigsGen(ConfigsGenAlg):
 		bestAvgCharacteristics = []
 
 
-		# estimate personalities
+		# estimate preferences
 		self.persEstAlg.updateEstimates()
 
 		# generate several random groups, calculate their fitness and select the best one
@@ -374,13 +374,13 @@ class StochasticHillclimberConfigsGen(ConfigsGenAlg):
 				group = newGroups[groupI]
 				groupSize = len(group)
 
-				# generate profile as average of the personalities estimates
+				# generate profile as average of the preferences estimates
 				profile = self.interactionsProfileTemplate.generateCopy().reset()
 
 				for currPlayer in group:
-					personality = self.playerModelBridge.getPlayerPersonalityEst(currPlayer)
+					preferences = self.playerModelBridge.getPlayerPreferencesEst(currPlayer)
 					for dim in profile.dimensions:
-						profile.dimensions[dim] += (personality.dimensions[dim] / groupSize)
+						profile.dimensions[dim] += (preferences.dimensions[dim] / groupSize)
 
 				# print("profile in-configGen: "+str(profile.dimensions)+";groupSize: "+str(groupSize))
 				# profile.normalize()
@@ -683,12 +683,12 @@ class AccurateConfigsGen(ConfigsGenAlg):
 				group = newGroups[groupI]
 				groupSize = len(group)
 
-				# generate profile as average of the personalities estimates
+				# generate profile as average of the preferences estimates
 				profile = self.interactionsProfileTemplate.generateCopy().reset()
 				for currPlayer in group:
-					personality = self.playerModelBridge.getPlayerRealPersonality(currPlayer)
+					preferences = self.playerModelBridge.getPlayerRealPreferences(currPlayer)
 					for dim in profile.dimensions:
-						profile.dimensions[dim] += personality.dimensions[dim] / groupSize
+						profile.dimensions[dim] += preferences.dimensions[dim] / groupSize
 				# profile.normalize()
 				newConfigProfiles.append(profile)
 
@@ -752,7 +752,8 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		probOfMutationConfig = None, 
 		probOfMutationGIPs = None, 
 
-		numFitSurvivors = None,
+		numChildrenPerIteration = None,
+		numSurvivors = None,
 
 		cxOp = None):
 
@@ -775,7 +776,9 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		self.probOfMutationConfig = 0.2 if probOfMutationConfig == None else probOfMutationConfig
 		self.probOfMutationGIPs = 0.2 if probOfMutationGIPs == None else probOfMutationGIPs
 		
-		self.numFitSurvivors = 10 if numFitSurvivors == None else numFitSurvivors
+
+		self.numChildrenPerIteration = 5 if numChildrenPerIteration == None else numChildrenPerIteration 
+		self.numSurvivors = 5 if numSurvivors == None else numSurvivors 
 
 		if(regAlg==None):
 			regAlg = KNNRegression(playerModelBridge, 5)
@@ -815,7 +818,8 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		self.toolbox.register("mutate", self.mutGIMME, pGIPs=self.probOfMutationGIPs, pConfig=self.probOfMutationConfig)
 
 		# self.toolbox.register("select", tools.selRoulette)
-		self.toolbox.register("select", tools.selTournament, tournsize=self.numFitSurvivors)
+		# self.toolbox.register("select", tools.selBest, k=self.numFitSurvivors)
+		self.toolbox.register("select", tools.selBest)
 
 		# self.toolbox.register("evaluate", self.calcFitness_convergenceTest)
 		self.toolbox.register("evaluate", self.calcFitness)
@@ -1131,8 +1135,21 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 
 	def organize(self):
 		self.resetGenAlg()
-		algorithms.eaSimple(self.pop, self.toolbox, cxpb=self.probOfCross, mutpb=self.probOfMutation, 
-							ngen=self.numberOfEvolutionsPerIteration, halloffame = self.hof, verbose=False)
+		algorithms.eaMuCommaLambda(
+			population = self.pop, 
+			toolbox = self.toolbox, 
+
+			lambda_ = self.numChildrenPerIteration, 
+			mu = self.numSurvivors, 
+			
+			cxpb = self.probOfCross, 
+			mutpb = self.probOfMutation, 
+			
+			ngen = self.numberOfEvolutionsPerIteration, 
+			
+			halloffame = self.hof, 
+			verbose = False
+		)
 
 
 		self.completionPerc = len(tools.Logbook())/ self.numberOfEvolutionsPerIteration

@@ -89,8 +89,8 @@ adaptationRandomOld = Adaptation()
 adaptationAccurate = Adaptation()
 
 
-realPersonalities = []
-questionnairePersonalities = []
+allRealPreferences = []
+allQuestionnairePreferences = []
 
 # ----------------------- [Init Log Manager] --------------------------------
 print("Initing .csv log manager...")
@@ -118,8 +118,8 @@ def simulateReaction(isBootstrap, playerBridge, currIteration, playerId):
 	return increases
 
 def calcReaction(isBootstrap, playerBridge, state, playerId, currIteration):
-	personality = playerBridge.getPlayerRealPersonality(playerId)
-	numDims = len(personality.dimensions)
+	preferences = playerBridge.getPlayerRealPreferences(playerId)
+	numDims = len(preferences.dimensions)
 	newStateType = 0 if isBootstrap else 1
 	newState = PlayerState(
 		stateType = newStateType, 
@@ -128,7 +128,7 @@ def calcReaction(isBootstrap, playerBridge, state, playerId, currIteration):
 			engagement=state.characteristics.engagement
 			), 
 		profile=state.profile)
-	newState.characteristics.engagement = 1 - (personality.distanceBetween(state.profile) / math.sqrt(numDims))  #between 0 and 1
+	newState.characteristics.engagement = 1 - (preferences.distanceBetween(state.profile) / math.sqrt(numDims))  #between 0 and 1
 	if newState.characteristics.engagement>1:
 		breakpoint()
 	abilityIncreaseSim = (newState.characteristics.engagement*playerBridge.getBaseLearningRate(playerId))
@@ -159,16 +159,16 @@ def executionPhase(isBootstrap, playerBridge, maxNumIterations, startingI, currR
 					"playerID": str(x),
 					"abilityInc": str(increases.characteristics.ability),
 					"engagementInc": str(increases.characteristics.engagement),
-					"profDiff": str(playerBridge.getPlayerRealPersonality(x).distanceBetween(playerBridge.getPlayerCurrProfile(x)))
+					"profDiff": str(playerBridge.getPlayerRealPreferences(x).distanceBetween(playerBridge.getPlayerCurrProfile(x)))
 				})		
 		i+=1
 
 
 def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations,firstRealI,\
-	playerBridge, taskBridge, adaptation, numInteractionDimensions, estimatorsAccuracy = None, considerExtremePersonalityValues = None):
+	playerBridge, taskBridge, adaptation, numInteractionDimensions, estimatorsAccuracy = None, considerExtremePreferencesValues = None):
 
 	estimatorsAccuracy = 0.1 if estimatorsAccuracy == None else estimatorsAccuracy
-	considerExtremePersonalityValues = False if considerExtremePersonalityValues == None else considerExtremePersonalityValues
+	considerExtremePreferencesValues = False if considerExtremePreferencesValues == None else considerExtremePreferencesValues
 
 	adaptationName = adaptation.name
 
@@ -191,7 +191,7 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 					qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)
 					)
 				), 
-			currModelIncreases = PlayerCharacteristics(), personalityEst = profileTemplate.generateCopy().reset(), realPersonality = profileTemplate.generateCopy().reset())
+			currModelIncreases = PlayerCharacteristics(), preferencesEst = profileTemplate.generateCopy().reset(), realPreferences = profileTemplate.generateCopy().reset())
 	for x in range(numTasks):
 		taskBridge.registerNewTask(
 			taskId = int(x), 
@@ -205,8 +205,8 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 
 
 	for r in range(numRuns):
-		realPersonalities = []
-		questionnairePersonalities = []
+		allRealPreferences = []
+		allQuestionnairePreferences = []
 
 		# EPdimensions = [{"dim_0":1,"dim_1":0,"dim_2":0},{"dim_0":0,"dim_1":1,"dim_2":0},{"dim_0":0,"dim_1":0,"dim_2":1}]		
 		EPdimensions = [{"dim_0":1,"dim_1":0,"dim_2":0,"dim_3":0},{"dim_0":0,"dim_1":1,"dim_2":0,"dim_3":0},{"dim_0":0,"dim_1":0,"dim_2":1,"dim_3":0},{"dim_0":0,"dim_1":0,"dim_2":0,"dim_3":1}]		
@@ -217,7 +217,7 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 
 		for x in range(numPlayers):
 			profile = profileTemplate.generateCopy().reset()
-			if(considerExtremePersonalityValues):
+			if(considerExtremePreferencesValues):
 				if(len(EPdimensionsAux) == 0):
 					EPdimensionsAux = EPdimensions.copy()
 				profile.dimensions = EPdimensionsAux.pop()
@@ -225,27 +225,27 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 			else:
 				for d in range(numInteractionDimensions):
 					profile.dimensions["dim_"+str(d)] = random.uniform(0, 1)
-			realPersonalities.append(profile)
-			realPersonalities[x].normalize()
+			allRealPreferences.append(profile)
+			allRealPreferences[x].normalize()
 
 
 			profile = profileTemplate.generateCopy().reset()
-			currRealPersonality = realPersonalities[x]
+			currRealPreferences = allRealPreferences[x]
 			for d in range(numInteractionDimensions):
-				profile.dimensions["dim_"+str(d)] = numpy.clip(random.gauss(currRealPersonality.dimensions["dim_"+str(d)], estimatorsAccuracy), 0, 1)
-			questionnairePersonalities.append(profile)
-			questionnairePersonalities[x].normalize()
+				profile.dimensions["dim_"+str(d)] = numpy.clip(random.gauss(currRealPreferences.dimensions["dim_"+str(d)], estimatorsAccuracy), 0, 1)
+			allQuestionnairePreferences.append(profile)
+			allQuestionnairePreferences[x].normalize()
 		
 
-			# init players including predicted personality
+			# init players including predicted preferences
 			playerBridge.resetPlayer(x)
 
-			playerBridge.setPlayerPersonalityEst(x, profileTemplate.generateCopy().init())
-			# realPersonality = realPersonalities[x]
-			# playerBridge.setPlayerRealPersonality(x, realPersonality)
+			playerBridge.setPlayerPreferencesEst(x, profileTemplate.generateCopy().init())
+			# realPreferences = allRealPreferences[x]
+			# playerBridge.setPlayerRealPreferences(x, realPreferences)
 
-			questionnairePersonality = questionnairePersonalities[x]
-			playerBridge.setPlayerRealPersonality(x, questionnairePersonality)
+			questionnairePreferences = allQuestionnairePreferences[x]
+			playerBridge.setPlayerRealPreferences(x, questionnairePreferences)
 			playerBridge.setBaseLearningRate(x, 0.5)
 
 			playerBridge.getPlayerStatesDataFrame(x).gridTrimAlg.considerStateResidue(False)
@@ -257,12 +257,12 @@ def executeSimulations(maxNumTrainingIterations,firstTrainingI,numRealIterations
 		if(maxNumTrainingIterations > 0):		
 			adaptation.bootstrap(maxNumTrainingIterations)
 
-		# change for "real" personality from which the predictions supposidely are based on...
+		# change for "real" preferences from which the predictions supposidely are based on...
 		for x in range(numPlayers):
 			playerBridge.resetState(x)
 
-			realPersonality = realPersonalities[x]
-			playerBridge.setPlayerRealPersonality(x, realPersonality)
+			realPreferences = allRealPreferences[x]
+			playerBridge.setPlayerRealPreferences(x, realPreferences)
 			playerBridge.setBaseLearningRate(x, random.gauss(0.5, 0.05))
 
 			playerBridge.getPlayerStatesDataFrame(x).gridTrimAlg.considerStateResidue(True)
@@ -285,7 +285,7 @@ simpleConfigsAlgOld = StochasticHillclimberConfigsGen(
 	playerModelBridge = playerBridge, 
 	interactionsProfileTemplate = intProfTemplate.generateCopy(), 
 	regAlg = regAlg, 
-	persEstAlg = ExplorationPersonalityEstAlg(
+	persEstAlg = ExplorationPreferencesEstAlg(
 		playerModelBridge = playerBridge, 
 		interactionsProfileTemplate = intProfTemplate.generateCopy(), 
 		regAlg = regAlg,
@@ -330,7 +330,7 @@ simpleConfigsAlg = StochasticHillclimberConfigsGen(
 	playerModelBridge = playerBridge, 
 	interactionsProfileTemplate = intProfTemplate.generateCopy(), 
 	regAlg = regAlg, 
-	persEstAlg = ExplorationPersonalityEstAlg(
+	persEstAlg = ExplorationPreferencesEstAlg(
 		playerModelBridge = playerBridge, 
 		interactionsProfileTemplate = intProfTemplate.generateCopy(), 
 		regAlg = regAlg,
@@ -352,7 +352,7 @@ simpleConfigsAlgSA = SimulatedAnnealingConfigsGen(
 	playerModelBridge = playerBridge, 
 	interactionsProfileTemplate = intProfTemplate.generateCopy(), 
 	regAlg = regAlg, 
-	persEstAlg = ExplorationPersonalityEstAlg(
+	persEstAlg = ExplorationPreferencesEstAlg(
 		playerModelBridge = playerBridge, 
 		interactionsProfileTemplate = intProfTemplate.generateCopy(), 
 		regAlg = regAlg,
@@ -405,7 +405,7 @@ simpleConfigsAlg1D = StochasticHillclimberConfigsGen(
 	playerModelBridge = playerBridge, 
 	interactionsProfileTemplate = intProfTemplate.generateCopy(), 
 	regAlg = regAlg, 
-	persEstAlg = ExplorationPersonalityEstAlg(
+	persEstAlg = ExplorationPreferencesEstAlg(
 		playerModelBridge = playerBridge, 
 		interactionsProfileTemplate = intProfTemplate.generateCopy(), 
 		regAlg = regAlg,
@@ -429,7 +429,7 @@ simpleConfigsAlg2D = StochasticHillclimberConfigsGen(
 	playerModelBridge = playerBridge, 
 	interactionsProfileTemplate = intProfTemplate.generateCopy(), 
 	regAlg = regAlg, 
-	persEstAlg = ExplorationPersonalityEstAlg(
+	persEstAlg = ExplorationPreferencesEstAlg(
 		playerModelBridge = playerBridge, 
 		interactionsProfileTemplate = intProfTemplate.generateCopy(), 
 		regAlg = regAlg,
@@ -453,7 +453,7 @@ simpleConfigsAlg5D = StochasticHillclimberConfigsGen(
 	playerModelBridge = playerBridge, 
 	interactionsProfileTemplate = intProfTemplate.generateCopy(), 
 	regAlg = regAlg, 
-	persEstAlg = ExplorationPersonalityEstAlg(
+	persEstAlg = ExplorationPreferencesEstAlg(
 		playerModelBridge = playerBridge, 
 		interactionsProfileTemplate = intProfTemplate.generateCopy(), 
 		regAlg = regAlg,
@@ -477,7 +477,7 @@ simpleConfigsAlg6D = StochasticHillclimberConfigsGen(
 	playerModelBridge = playerBridge, 
 	interactionsProfileTemplate = intProfTemplate.generateCopy(), 
 	regAlg = regAlg, 
-	persEstAlg = ExplorationPersonalityEstAlg(
+	persEstAlg = ExplorationPreferencesEstAlg(
 		playerModelBridge = playerBridge, 
 		interactionsProfileTemplate = intProfTemplate.generateCopy(), 
 		regAlg = regAlg,
@@ -527,10 +527,10 @@ executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBrid
 
 
 
-# Extreme personalities
+# Extreme preferences
 adaptationGIMME.name = "GIMMEEP"
 executeSimulations(0, 0, numRealIterations, maxNumTrainingIterations, playerBridge, 
-	taskBridge, adaptationGIMME, 4, considerExtremePersonalityValues = True)
+	taskBridge, adaptationGIMME, 4, considerExtremePreferencesValues = True)
 
 
 

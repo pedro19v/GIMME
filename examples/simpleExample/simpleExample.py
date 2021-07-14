@@ -50,19 +50,19 @@ for x in range(numPlayers):
 				)
 			), 
 		currModelIncreases = PlayerCharacteristics(), 
-		personalityEst = profileTemplate.generateCopy().reset(), 
-		realPersonality = profileTemplate.generateCopy().reset())
+		preferencesEst = profileTemplate.generateCopy().reset(), 
+		realPreferences = profileTemplate.generateCopy().reset())
 	playerBridge.resetState(x)
 	playerBridge.getPlayerStatesDataFrame(x).gridTrimAlg.considerStateResidue(True)
 
-	# init players including predicted personality
+	# init players including predicted preferences
 	playerBridge.resetPlayer(x)
 
-	playerBridge.setPlayerPersonalityEst(x, profileTemplate.generateCopy().init())
-	# realPersonality = realPersonalities[x]
-	# playerBridge.setPlayerRealPersonality(x, realPersonality)
+	playerBridge.setPlayerPreferencesEst(x, profileTemplate.generateCopy().init())
+	# realPreferences = realPersonalities[x]
+	# playerBridge.setPlayerRealPreferences(x, realPreferences)
 
-	playerBridge.setPlayerRealPersonality(x, profileTemplate.randomized())
+	playerBridge.setPlayerRealPreferences(x, profileTemplate.randomized())
 	playerBridge.setBaseLearningRate(x, 0.5)
 
 	playerBridge.getPlayerStatesDataFrame(x).gridTrimAlg.considerStateResidue(False)
@@ -107,8 +107,8 @@ def simulateReaction(isBootstrap, playerBridge, playerId):
 	return increases
 
 def calcReaction(isBootstrap, playerBridge, state, playerId):
-	personality = playerBridge.getPlayerRealPersonality(playerId)
-	numDims = len(personality.dimensions)
+	preferences = playerBridge.getPlayerRealPreferences(playerId)
+	numDims = len(preferences.dimensions)
 	newStateType = 0 if isBootstrap else 1
 	newState = PlayerState(
 		stateType = newStateType, 
@@ -117,7 +117,7 @@ def calcReaction(isBootstrap, playerBridge, state, playerId):
 			engagement=state.characteristics.engagement
 			), 
 		profile=state.profile)
-	newState.characteristics.engagement = 1 - (personality.distanceBetween(state.profile) / math.sqrt(numDims))  #between 0 and 1
+	newState.characteristics.engagement = 1 - (preferences.distanceBetween(state.profile) / math.sqrt(numDims))  #between 0 and 1
 	if newState.characteristics.engagement>1:
 		breakpoint()
 	abilityIncreaseSim = (newState.characteristics.engagement*playerBridge.getBaseLearningRate(playerId))
@@ -146,7 +146,7 @@ simpleConfigsAlg = StochasticHillclimberConfigsGen(
 	playerModelBridge = playerBridge, 
 	interactionsProfileTemplate = profileTemplate.generateCopy(), 
 	regAlg = regAlg, 
-	persEstAlg = ExplorationPersonalityEstAlg(
+	persEstAlg = ExplorationPreferencesEstAlg(
 		playerModelBridge = playerBridge, 
 		interactionsProfileTemplate = profileTemplate.generateCopy(), 
 		regAlg = regAlg,
