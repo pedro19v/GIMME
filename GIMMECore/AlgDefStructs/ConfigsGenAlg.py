@@ -752,7 +752,8 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		probOfMutationConfig = None, 
 		probOfMutationGIPs = None, 
 
-		numFitSurvivors = None,
+		numChildrenPerIteration = None,
+		numSurvivors = None,
 
 		cxOp = None):
 
@@ -775,7 +776,9 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		self.probOfMutationConfig = 0.2 if probOfMutationConfig == None else probOfMutationConfig
 		self.probOfMutationGIPs = 0.2 if probOfMutationGIPs == None else probOfMutationGIPs
 		
-		self.numFitSurvivors = 10 if numFitSurvivors == None else numFitSurvivors
+
+		self.numChildrenPerIteration = 5 if numChildrenPerIteration == None else numChildrenPerIteration 
+		self.numSurvivors = 5 if numSurvivors == None else numSurvivors 
 
 		if(regAlg==None):
 			regAlg = KNNRegression(playerModelBridge, 5)
@@ -815,7 +818,8 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		self.toolbox.register("mutate", self.mutGIMME, pGIPs=self.probOfMutationGIPs, pConfig=self.probOfMutationConfig)
 
 		# self.toolbox.register("select", tools.selRoulette)
-		self.toolbox.register("select", tools.selTournament, tournsize=self.numFitSurvivors)
+		# self.toolbox.register("select", tools.selBest, k=self.numFitSurvivors)
+		self.toolbox.register("select", tools.selBest)
 
 		# self.toolbox.register("evaluate", self.calcFitness_convergenceTest)
 		self.toolbox.register("evaluate", self.calcFitness)
@@ -1130,8 +1134,21 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 
 	def organize(self):
 		self.resetGenAlg()
-		algorithms.eaSimple(self.pop, self.toolbox, cxpb=self.probOfCross, mutpb=self.probOfMutation, 
-							ngen=self.numberOfEvolutionsPerIteration, halloffame = self.hof, verbose=False)
+		algorithms.eaMuCommaLambda(
+			population = self.pop, 
+			toolbox = self.toolbox, 
+
+			lambda_ = self.numChildrenPerIteration, 
+			mu = self.numSurvivors, 
+			
+			cxpb = self.probOfCross, 
+			mutpb = self.probOfMutation, 
+			
+			ngen = self.numberOfEvolutionsPerIteration, 
+			
+			halloffame = self.hof, 
+			verbose = False
+		)
 
 
 		self.completionPerc = len(tools.Logbook())/ self.numberOfEvolutionsPerIteration

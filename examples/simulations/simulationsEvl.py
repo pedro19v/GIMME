@@ -21,7 +21,7 @@ from ModelMocks import *
 from LogManager import *
 
 
-numRuns = 1
+numRuns = 10
 
 maxNumTrainingIterations = 20
 numRealIterations = 20
@@ -35,46 +35,25 @@ numPlayers = 23
 numTasks = 1
 
 
-# ----------------------- [Init SH] --------------------------------
+# ----------------------- [Init LS] --------------------------------
 numberOfConfigChoices = 100
 numTestedPlayerProfilesInEst = 500
 
 
-# # ----------------------- [Init GA (order cx)] --------------------------------
-# initialPopulationSize = 100 
-# numberOfEvolutionsPerIteration = 40
- 
-# probOfCross = 0.8
-# probOfMutation = 1.0
-
-# probOfMutationConfig = 0.1 
-# probOfMutationGIPs = 0.2
-
-# numFitSurvivors = 10
-
-# initialPopulationSize = 100 
-# numberOfEvolutionsPerIteration = 30
- 
-# probOfCross = 0.8
-# probOfMutation = 1.0
-
-# probOfMutationConfig = 0.2 
-# probOfMutationGIPs = 0.3
-
-# numFitSurvivors = 10
-
-
-# ----------------------- [Init GA (original cx)] --------------------------------
+# ----------------------- [Init GA] --------------------------------
 initialPopulationSize = 100 
-numberOfEvolutionsPerIteration = 30
+numberOfEvolutionsPerIteration = 50
  
-probOfCross = 0.8
-probOfMutation = 1.0
+probOfCross = 0.65
+probOfMutation = 0.15
+# probReproduction = 1 - (probOfCross + probOfMutation) = 0.15
 
-probOfMutationConfig = 0.2 
-probOfMutationGIPs = 0.3
+probOfMutationConfig = 0.8
+probOfMutationGIPs = 0.4
 
-numFitSurvivors = 10
+numSurvivors = 10
+numChildrenPerIteration = 100
+
 
 
 
@@ -151,7 +130,8 @@ evolutionaryConfigsAlg = EvolutionaryConfigsGenDEAP(
 	probOfMutationConfig = probOfMutationConfig, 
 	probOfMutationGIPs = probOfMutationGIPs, 
 	
-	numFitSurvivors = numFitSurvivors,
+	numChildrenPerIteration = numChildrenPerIteration,
+	numSurvivors = numSurvivors,
 
 	cxOp = "simple"
 )
@@ -177,7 +157,8 @@ evolutionaryConfigsAlg = EvolutionaryConfigsGenDEAP(
 	probOfMutationConfig = probOfMutationConfig, 
 	probOfMutationGIPs = probOfMutationGIPs, 
 	
-	numFitSurvivors = numFitSurvivors,
+	numChildrenPerIteration = numChildrenPerIteration,
+	numSurvivors = numSurvivors,
 
 	cxOp = "order"
 )
@@ -244,7 +225,8 @@ evolutionaryConfigsAlg1D = EvolutionaryConfigsGenDEAP(
 	probOfMutationConfig = probOfMutationConfig, 
 	probOfMutationGIPs = probOfMutationGIPs, 
 	
-	numFitSurvivors = numFitSurvivors
+	numChildrenPerIteration = numChildrenPerIteration,
+	numSurvivors = numSurvivors
 )
 adaptationEvl1D.init(
 	playerModelBridge = playerBridge, 
@@ -272,7 +254,8 @@ evolutionaryConfigsAlg3D = EvolutionaryConfigsGenDEAP(
 	probOfMutationConfig = probOfMutationConfig, 
 	probOfMutationGIPs = probOfMutationGIPs, 
 	
-	numFitSurvivors = numFitSurvivors
+	numChildrenPerIteration = numChildrenPerIteration,
+	numSurvivors = numSurvivors
 )
 adaptationEvl3D.init(
 	playerModelBridge = playerBridge, 
@@ -298,7 +281,8 @@ evolutionaryConfigsAlg4D = EvolutionaryConfigsGenDEAP(
 	probOfMutationConfig = probOfMutationConfig, 
 	probOfMutationGIPs = probOfMutationGIPs, 
 	
-	numFitSurvivors = numFitSurvivors
+	numChildrenPerIteration = numChildrenPerIteration,
+	numSurvivors = numSurvivors
 )
 adaptationEvl4D.init(
 	playerModelBridge = playerBridge, 
@@ -326,7 +310,8 @@ evolutionaryConfigsAlg5D = EvolutionaryConfigsGenDEAP(
 	probOfMutationConfig = probOfMutationConfig, 
 	probOfMutationGIPs = probOfMutationGIPs, 
 	
-	numFitSurvivors = numFitSurvivors
+	numChildrenPerIteration = numChildrenPerIteration,
+	numSurvivors = numSurvivors
 )
 adaptationEvl5D.init(
 	playerModelBridge = playerBridge, 
@@ -353,7 +338,8 @@ evolutionaryConfigsAlg6D = EvolutionaryConfigsGenDEAP(
 	probOfMutationConfig = probOfMutationConfig, 
 	probOfMutationGIPs = probOfMutationGIPs, 
 	
-	numFitSurvivors = numFitSurvivors
+	numChildrenPerIteration = numChildrenPerIteration,
+	numSurvivors = numSurvivors
 )
 adaptationEvl6D.init(
 	playerModelBridge = playerBridge, 
