@@ -418,7 +418,7 @@ class PureRandomSearchConfigsGen(ConfigsGenAlg):
 
 
 
-class AccurateConfigsGen(ConfigsGenAlg):
+class AccuratePRSConfigsGen(ConfigsGenAlg):
 
 	def __init__(self, 
 		playerModelBridge, 
