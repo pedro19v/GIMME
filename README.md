@@ -7,7 +7,7 @@
 
 GIMME (Group Interactions Management for Multiplayer sErious games) is a research tool which focuses on the management of 
 interactions in groups so that the collective ability improves. 
-More specifically, what sets the method appart is that the interactions between players are explicity considered when forming group configurations (also commonly named coalition structures).
+More specifically, what distinguishes the method is that the interactions between players are explicity considered when forming group configurations (also commonly named coalition structures).
 This repository contains the core of the application (written in Python), as well as some examples. 
 Over time, we aim to improve the core functionalities as well as to provide more examples for the GIMME API.
 
