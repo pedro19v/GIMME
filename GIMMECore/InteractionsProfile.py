@@ -5,8 +5,17 @@ import random
 class InteractionsProfile(object):
 
 	def __init__(self, dimensions = None):
+		# if(dimensions != None):
+		# 	if(type(dimensions)== dict):
+		# 		self.dimensions = dimensions
+		# 	elif(type(dimensions)== list):
+		# 		self.unflatten(dimensions)
+		# else:
+		# 	self.dimensions = {}
+
 		self.dimensions = {} if dimensions == None else dimensions
-		self.normalize()
+		self.dimensionality = len(self.dimensions)
+		# self.normalize()
 
 	def reset(self):
 		for key in self.dimensions:
@@ -14,7 +23,7 @@ class InteractionsProfile(object):
 		return self
 
 	def init(self):
-		return self.reset().normalize()
+		return self.reset()#.normalize()
 
 	def generateCopy(self):
 		keys = list(self.dimensions.keys())
@@ -56,7 +65,7 @@ class InteractionsProfile(object):
 		profile.reset()
 		for key in profile.dimensions:
 			profile.dimensions[key] = random.uniform(0.0, 1.0)
-		profile.normalize()
+		# profile.normalize()
 		return profile
 
 
@@ -65,8 +74,7 @@ class InteractionsProfile(object):
 		cost.reset()
 
 		if(len(cost.dimensions) != len(profileToTest.dimensions)):
-			print("[ERROR] Could not compute distance between profiles in different sized spaces. Execution aborted.")
-			quit()
+			raise Exception("[ERROR] Could not compute distance between profiles in different sized spaces. Execution aborted.")
 
 		for key in cost.dimensions:
 			cost.dimensions[key] = abs(self.dimensions[key] - profileToTest.dimensions[key])
@@ -82,3 +90,24 @@ class InteractionsProfile(object):
 	def distanceBetween(self, profileToTest):
 		numDims = len(profileToTest.dimensions)
 		return self.sqrDistanceBetween(profileToTest)**(1/float(numDims)) 
+
+
+	def flattened(self):
+		return [dim for dim in self.dimensions.values()]
+
+
+
+	def unflattenFunc(self, profile, array):
+		i = 0
+		for key in profile.dimensions.keys():
+			profile.dimensions[key] = array[i]
+			i += 1
+		return profile
+
+
+	def unflatten(self, array):
+		return self.unflattenFunc(self, array)
+
+	def unflattened(self, array):
+		clone = self.generateCopy() 
+		return self.unflattenFunc(clone, array)

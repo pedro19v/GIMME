@@ -25,15 +25,15 @@ class PlayerModelBridge(ABC):
 		
 
 	@abstractmethod
-	def getPlayerStateGrid(self, playerId):
+	def getPlayerStatesDataFrame(self, playerId):
 		pass
 
 	@abstractmethod
-	def getPlayerPersonalityEst(self, playerId):
+	def getPlayerPreferencesEst(self, playerId):
 		pass
 
 	@abstractmethod
-	def setPlayerPersonalityEst(self, playerId, personality):
+	def setPlayerPreferencesEst(self, playerId, preferences):
 		pass
 
 	@abstractmethod
@@ -43,6 +43,14 @@ class PlayerModelBridge(ABC):
 	
 	@abstractmethod
 	def setPlayerCharacteristics(self, playerId, characteristics):
+		pass
+
+	@abstractmethod		
+	def setPlayerGroup(self, playerId, group):
+		pass
+
+	@abstractmethod		
+	def setPlayerTasks(self, playerId, tasks):
 		pass
 
 	@abstractmethod		

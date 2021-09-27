@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="GIMMECore",
-    version="1.2.0",
+    version="1.3.0",
     license = "CC BY 4.0",
     author="Samuel Gomes",
     author_email = "samuel.gomes@tecnico.ulisboa.pt",
@@ -17,13 +17,10 @@ setup(
     'Topic :: Scientific/Engineering :: Adaptation'
     ],
     install_requires=[
-      'os',
-      'sys',
-      'random',
-      'time',
-      'math',
-      'datetime',
-      'numpy'
+      'numpy',
+      'scikit-learn',
+      'deap', 
+      'pymongo'
     ]
 
 )

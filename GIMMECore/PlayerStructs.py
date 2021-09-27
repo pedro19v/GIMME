@@ -8,15 +8,42 @@ from .InteractionsProfile import InteractionsProfile
 
 class PlayerCharacteristics(object):
 	def __init__(self, ability = None, engagement = None):
-		self.ability = 0 if ability==None else ability
+		self.ability  = 0 if ability==None else ability
 		self.engagement = 0 if engagement==None else engagement
+
+		# self._ability  = 0 if ability==None else min(ability, 20.0)
+		# self._engagement = 0 if engagement==None else min(engagement, 1.0)
+
 	def reset(self):
 		self.ability = 0
 		self.engagement = 0
 		return self
 
+	# #constraints enforced via properties
+	# @property
+	# def ability(self):
+	# 	return self._ability
+
+	# @property
+	# def engagement(self):
+	# 	return self._engagement
+
+	# @ability.setter
+	# def ability(self, newValue):
+	# 	# print(newValue)
+	# 	self._ability = min(newValue, 20.0)
+	# 	# self._ability = newValue
+	# 	return self._ability
+	
+	# @engagement.setter
+	# def engagement(self, newValue):
+	# 	self._engagement = min(newValue, 1.0)
+	# 	# self._engagement = newValue
+	# 	return self._engagement
+
+
 class PlayerState(object):
-	def __init__(self, stateType = None, profile = None, characteristics = None, dist = None, quality = None):
+	def __init__(self, stateType = None, profile = None, characteristics = None, dist = None, quality = None, group = None, tasks = None):
 		self.creationTime = time.time()
 		
 		self.stateType = 1 if stateType == None else stateType
@@ -25,8 +52,9 @@ class PlayerState(object):
 		self.dist = -1 if dist == None else dist
 		self.quality = -1 if quality == None else quality
 
-		self.groupId = -1
-		self.adaptedTaskId = -1
+		self.group = [] if group == None else group
+		self.tasks = [] if tasks == None else tasks
+
 
 	def reset(self):
 		self.characteristics.reset()
@@ -35,85 +63,70 @@ class PlayerState(object):
 		self.stateType = 1
 		self.quality = -1
 		self.dist = -1
-		self.groupId = -1
-		self.adaptedTaskId = -1
+		
+		self.group = []
+		self.tasks = []
 		return self
 
 
-class PlayerStateGrid(object):
-	def __init__(self, interactionsProfileTemplate, gridTrimAlg, numCells = None, cells = None):
+class PlayerStatesDataFrame(object):
+	def __init__(self, interactionsProfileTemplate, trimAlg, states = None):
 		self.interactionsProfileTemplate = interactionsProfileTemplate
-		self.gridTrimAlg = gridTrimAlg
+		self.trimAlg = trimAlg
 
-		numCells = 1 if numCells == None else numCells
-		self.dimSpan = math.ceil(numCells**(1.0/float(4))) #floor of root 4
-		self.numCells = self.dimSpan**4
+		self.states = [] if states == None else states
 
-		self.numCellStates = 0
-
-		self.initialCells = cells
-		if(self.initialCells == None):
-			self.cells = [[] for i in range(self.numCells)]
-			self.serializedCells = []
-			self.numCellStates = 0
-		else:
-			self.cells = cells
-			self.serializedCells = []
-			self.numCellStates = 0
-			for cell in self.cells:
-				for state in cell:
-					self.serializedCells.append(state) 
-					self.numCellStates = self.numCellStates + 1
+		#auxiliary stuff
+		self.flatProfiles = []
+		self.flatAbilities = []
+		self.flatEngagements = []
 
 	def reset(self):
-		self.numCellStates = 0
-		if(self.initialCells == None):
-			self.cells = [[] for i in range(self.numCells)]
-			self.serializedCells = []
-			self.numCellStates = 0
-		else:
-			self.cells = cells
-			self.serializedCells = []
-			self.numCellStates = 0
-			for cell in self.cells:
-				for state in cell:
-					self.serializedCells.append(state) 
-					self.numCellStates = self.numCellStates + 1
+		self.states = []
+		
+		#auxiliary stuff
+		self.flatProfiles = []
+		self.flatAbilities = []
+		self.flatEngagements = []
+
 		return self
 
-	def pushToGrid(self, playerState):
-		padding = self.interactionsProfileTemplate.generateCopy()
-		padding.reset()
-		currCellInd = 0
-		paddingKeys = list(padding.dimensions.keys())
-		for key in padding.dimensions:
-			currDim = padding.dimensions[key]
-			currDim = math.ceil(playerState.profile.dimensions[key] * self.dimSpan) - 1
-			if(currDim < 0):
-				currDim=0
-			currCellInd += (self.dimSpan**paddingKeys.index(key))*currDim
-			padding.dimensions[key] = currDim
+	def pushToDataFrame(self, playerState):
+		self.states.append(playerState)
 
-		if(currCellInd==1):
-			breakpoint()
+		#update tuple representation		
+		self.flatProfiles.append(playerState.profile.flattened())
+		self.flatAbilities.append(playerState.characteristics.ability)
+		self.flatEngagements.append(playerState.characteristics.engagement)
 
-		currCell = self.cells[currCellInd]
-		
-		self.serializedCells = list(set(self.serializedCells) - set(currCell))
-		self.numCellStates = self.numCellStates - len(currCell)
-		
-		currCell.append(playerState)
-		currCell = self.gridTrimAlg.trimmedList(currCell)
+		# print(json.dumps(self.states, default=lambda o: o.__dict__, sort_keys=True, indent=2))
+		# print("---------")
+		# print(self.flatProfiles)
+		# print(self.flatAbilities)
+		# print(self.flatEngagements)
 
-		self.serializedCells.extend(currCell)
-		self.numCellStates = self.numCellStates + len(currCell)
+		trimmedListAndRemainder = self.trimAlg.trimmedList(self.states)
+		trimmedList = trimmedListAndRemainder[0]
+		remainderIndexes = trimmedListAndRemainder[1]
+
+		# print(remainderIndexes)
 		
-		self.cells[currCellInd] = currCell
-		# print([elem.quality for elem in currCell])
+
+		self.states = trimmedList
+
+		#update tuple representation 
+		for i in remainderIndexes:
+			self.flatProfiles.pop(i)
+			self.flatAbilities.pop(i)
+			self.flatEngagements.pop(i)
+
 
 	def getAllStates(self):
-		# serialize multi into single dimensional array
-		return self.serializedCells
+		return self.states
+
+
+	def getAllStatesFlatten(self):
+		return {'profiles': self.flatProfiles, 'abilities': self.flatAbilities, 'engagements': self.flatEngagements}
 
 	def getNumStates(self):
-		return self.numCellStates
+		return len(self.states)

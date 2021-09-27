@@ -26,3 +26,11 @@ class TaskModelBridge(ABC):
 	@abstractmethod
 	def getTaskProfileWeight(self, taskId):
 		pass
+
+	@abstractmethod
+	def getTaskInitDate(self, taskId):
+		pass
+
+	@abstractmethod
+	def getTaskFinalDate(self, taskId):
+		pass
