@@ -42,9 +42,9 @@ for x in range(numPlayers):
 		playerId = int(x), 
 		name = "name", 
 		currState = PlayerState(profile = profileTemplate.generateCopy().reset()), 
-		pastModelIncreasesGrid = PlayerStatesDataFrame(
+		pastModelIncreasesDataFrame = PlayerStatesDataFrame(
 			interactionsProfileTemplate = profileTemplate.generateCopy().reset(), 
-			gridTrimAlg = QualitySortPlayerDataTrimAlg(
+			trimAlg = QualitySortPlayerDataTrimAlg(
 				maxNumModelElements = 30, 
 				qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)
 				)
@@ -53,7 +53,7 @@ for x in range(numPlayers):
 		preferencesEst = profileTemplate.generateCopy().reset(), 
 		realPreferences = profileTemplate.generateCopy().reset())
 	playerBridge.resetState(x)
-	playerBridge.getPlayerStatesDataFrame(x).gridTrimAlg.considerStateResidue(True)
+	playerBridge.getPlayerStatesDataFrame(x).trimAlg.considerStateResidue(True)
 
 	# init players including predicted preferences
 	playerBridge.resetPlayer(x)
@@ -65,7 +65,7 @@ for x in range(numPlayers):
 	playerBridge.setPlayerRealPreferences(x, profileTemplate.randomized())
 	playerBridge.setBaseLearningRate(x, 0.5)
 
-	playerBridge.getPlayerStatesDataFrame(x).gridTrimAlg.considerStateResidue(False)
+	playerBridge.getPlayerStatesDataFrame(x).trimAlg.considerStateResidue(False)
 
 print("Players created.")
 
@@ -103,7 +103,7 @@ def simulateReaction(isBootstrap, playerBridge, playerId):
 	increases = PlayerState(stateType = newState.stateType)
 	increases.profile = currState.profile
 	increases.characteristics = PlayerCharacteristics(ability=(newState.characteristics.ability - currState.characteristics.ability), engagement=newState.characteristics.engagement)
-	playerBridge.setAndSavePlayerStateToGrid(playerId, increases, newState)	
+	playerBridge.setAndSavePlayerStateToDataFrame(playerId, increases, newState)	
 	return increases
 
 def calcReaction(isBootstrap, playerBridge, state, playerId):
@@ -133,29 +133,57 @@ numberOfConfigChoices = 100
 numTestedPlayerProfilesInEst = 500
 regAlg = KNNRegression(playerBridge, 5)
 
+
+# ----------------------- [Init GA] --------------------------------
+initialPopulationSize = 100 
+numberOfEvolutionsPerIteration = 50
+ 
+probOfCross = 0.65
+probOfMutation = 0.15
+# probReproduction = 1 - (probOfCross + probOfMutation) = 0.15
+
+probOfMutationConfig = 0.8
+probOfMutationGIPs = 0.4
+
+numSurvivors = 10
+numChildrenPerIteration = 100
+
+
 GAConfigsAlg = EvolutionaryConfigsGenDEAP(
 	playerModelBridge = playerBridge, 
 	interactionsProfileTemplate = profileTemplate.generateCopy(), 
 	regAlg = regAlg, 
-	numberOfConfigChoices = numberOfConfigChoices, 
 	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
-	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)
+	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5),
+	initialPopulationSize = initialPopulationSize, 
+	numberOfEvolutionsPerIteration = numberOfEvolutionsPerIteration, 
+	
+	probOfCross = probOfCross, 
+	probOfMutation = probOfMutation,
+
+	probOfMutationConfig = probOfMutationConfig, 
+	probOfMutationGIPs = probOfMutationGIPs, 
+	
+	numChildrenPerIteration = numChildrenPerIteration,
+	numSurvivors = numSurvivors,
+
+	cxOp = "order"
 )
 
-simpleConfigsAlg = StochasticHillclimberConfigsGen(
-	playerModelBridge = playerBridge, 
-	interactionsProfileTemplate = profileTemplate.generateCopy(), 
-	regAlg = regAlg, 
-	persEstAlg = ExplorationPreferencesEstAlg(
-		playerModelBridge = playerBridge, 
-		interactionsProfileTemplate = profileTemplate.generateCopy(), 
-		regAlg = regAlg,
-		numTestedPlayerProfiles = numTestedPlayerProfilesInEst, 
-		qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)), 
-	numberOfConfigChoices = numberOfConfigChoices, 
-	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
-	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)
-)
+# PRSConfigsAlg = PureRandomSearchConfigsGen(
+# 	playerModelBridge = playerBridge, 
+# 	interactionsProfileTemplate = profileTemplate.generateCopy(), 
+# 	regAlg = regAlg, 
+# 	persEstAlg = ExplorationPreferencesEstAlg(
+# 		playerModelBridge = playerBridge, 
+# 		interactionsProfileTemplate = profileTemplate.generateCopy(), 
+# 		regAlg = regAlg,
+# 		numTestedPlayerProfiles = numTestedPlayerProfilesInEst, 
+# 		qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)), 
+# 	numberOfConfigChoices = numberOfConfigChoices, 
+# 	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup, 
+# 	qualityWeights = PlayerCharacteristics(ability=0.5, engagement=0.5)
+# )
 adaptationGIMME.init(
 	playerModelBridge = playerBridge, 
 	taskModelBridge = taskBridge,
@@ -164,18 +192,6 @@ adaptationGIMME.init(
 )
 
 
-
-# randomConfigsAlg = RandomConfigsGen(
-# 	playerModelBridge = playerBridge, 
-# 	interactionsProfileTemplate = profileTemplate.generateCopy(), 
-# 	preferredNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup
-# )
-# adaptationGIMME.init(
-# 	playerModelBridge = playerBridge, 
-# 	taskModelBridge = taskBridge,
-# 	configsGenAlg = randomConfigsAlg, 
-# 	name="Test Adaptation"
-# )
 
 
 ready = True

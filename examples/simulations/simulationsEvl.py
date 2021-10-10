@@ -462,16 +462,30 @@ def executeSimulations(numRuns, profileTemplate, maxNumTrainingIterations, first
 		allRealPreferences = []
 		allQuestionnairePreferences = []
 
-		EPdimensions = [{"dim_0":1,"dim_1":0}, {"dim_0":0,"dim_1":1}]	
-		
-		playersDimsStr = "players: [\n"	
+		EPdimensions = [{"dim_0":1,"dim_1":0}, {"dim_0":0,"dim_1":1}, {"dim_0":0,"dim_1":0}, {"dim_0":1,"dim_1":1}]	
+		EPi = 0
 
+		EPAux = []
+		while ((numPlayers - len(EPAux)) / preferredNumberOfPlayersPerGroup) > 1.0:
+			elem = EPdimensions[EPi]
+			EPAux.extend([elem for _ in range(preferredNumberOfPlayersPerGroup)])
+			EPi = (EPi + 1) % 4
+
+		randElem = EPdimensions[random.randint(0, len(EPdimensions) - 1)]
+		EPAux.extend([randElem for _ in range(numPlayers - len(EPAux))])
+
+		# print(randElem)
+
+
+		EPi = 0
+		playersDimsStr = "players: [\n"	
 
 		for x in range(numPlayers):
 			profile = profileTemplate.generateCopy().reset()
 			if(considerExtremePreferencesValues):
-				profile.dimensions = random.choice(EPdimensions)
+				profile.dimensions = EPAux[EPi]
 				playersDimsStr += "{"+str(profile.dimensions)+"},\n"
+				EPi += 1
 			else:
 				for d in range(numInteractionDimensions):
 					profile.dimensions["dim_"+str(d)] = random.uniform(0, 1)
@@ -503,6 +517,7 @@ def executeSimulations(numRuns, profileTemplate, maxNumTrainingIterations, first
 		playersDimsStr += "],\n"
 
 		# print(playersDimsStr)
+		# exit()
 
 		if(maxNumTrainingIterations > 0):		
 			adaptation.bootstrap(maxNumTrainingIterations)
@@ -565,47 +580,47 @@ if __name__ == '__main__':
 
 
 
-	adaptationGA.name = "GIMME_GA_Bootstrap"
-	executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
-					playerBridge, taskBridge, adaptationGA, estimatorsAccuracy = 0.1)
+	# adaptationGA.name = "GIMME_GA_Bootstrap"
+	# executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
+	# 				playerBridge, taskBridge, adaptationGA, estimatorsAccuracy = 0.1)
 
-	adaptationGA.name = "GIMME_GA_Bootstrap_HighAcc"
-	executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
-					playerBridge, taskBridge, adaptationGA, estimatorsAccuracy = 0.05)
+	# adaptationGA.name = "GIMME_GA_Bootstrap_HighAcc"
+	# executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
+	# 				playerBridge, taskBridge, adaptationGA, estimatorsAccuracy = 0.05)
 
-	adaptationGA.name = "GIMME_GA_Bootstrap_LowAcc"
-	executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
-					playerBridge, taskBridge, adaptationGA, estimatorsAccuracy = 0.2)
-
-
-	adaptationPRS.name = "GIMME_PRS_Bootstrap"
-	executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
-					playerBridge, taskBridge, adaptationPRS, estimatorsAccuracy = 0.1)
-
-	adaptationPRS.name = "GIMME_PRS_Bootstrap_HighAcc"
-	executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
-					playerBridge, taskBridge, adaptationPRS, estimatorsAccuracy = 0.05)
-
-	adaptationPRS.name = "GIMME_PRS_Bootstrap_LowAcc"
-	executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
-					playerBridge, taskBridge, adaptationPRS, estimatorsAccuracy = 0.2)
+	# adaptationGA.name = "GIMME_GA_Bootstrap_LowAcc"
+	# executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
+	# 				playerBridge, taskBridge, adaptationGA, estimatorsAccuracy = 0.2)
 
 
+	# adaptationPRS.name = "GIMME_PRS_Bootstrap"
+	# executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
+	# 				playerBridge, taskBridge, adaptationPRS, estimatorsAccuracy = 0.1)
 
-	# executeSimulations(numRuns, intProfTemplate1D, 0, 0, numRealIterations, maxNumTrainingIterations, 
-	# 	playerBridge, taskBridge, adaptationEvl1D)
+	# adaptationPRS.name = "GIMME_PRS_Bootstrap_HighAcc"
+	# executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
+	# 				playerBridge, taskBridge, adaptationPRS, estimatorsAccuracy = 0.05)
 
-	# executeSimulations(numRuns, intProfTemplate3D, 0, 0, numRealIterations, maxNumTrainingIterations, 
-	# 	playerBridge, taskBridge, adaptationEvl3D)
+	# adaptationPRS.name = "GIMME_PRS_Bootstrap_LowAcc"
+	# executeSimulations(numRuns, intProfTemplate2D, maxNumTrainingIterations, 0, numRealIterations, maxNumTrainingIterations, 
+	# 				playerBridge, taskBridge, adaptationPRS, estimatorsAccuracy = 0.2)
 
-	# executeSimulations(numRuns, intProfTemplate4D, 0, 0, numRealIterations, maxNumTrainingIterations, 
-	# 	playerBridge, taskBridge, adaptationEvl4D)
 
-	# executeSimulations(numRuns, intProfTemplate5D, 0, 0, numRealIterations, maxNumTrainingIterations, 
-	# 	playerBridge, taskBridge, adaptationEvl5D)
 
-	# executeSimulations(numRuns, intProfTemplate6D, 0, 0, numRealIterations, maxNumTrainingIterations, 
-	# 	playerBridge, taskBridge, adaptationEvl6D)
+	executeSimulations(numRuns, intProfTemplate1D, 0, 0, numRealIterations, maxNumTrainingIterations, 
+		playerBridge, taskBridge, adaptationEvl1D)
+
+	executeSimulations(numRuns, intProfTemplate3D, 0, 0, numRealIterations, maxNumTrainingIterations, 
+		playerBridge, taskBridge, adaptationEvl3D)
+
+	executeSimulations(numRuns, intProfTemplate4D, 0, 0, numRealIterations, maxNumTrainingIterations, 
+		playerBridge, taskBridge, adaptationEvl4D)
+
+	executeSimulations(numRuns, intProfTemplate5D, 0, 0, numRealIterations, maxNumTrainingIterations, 
+		playerBridge, taskBridge, adaptationEvl5D)
+
+	executeSimulations(numRuns, intProfTemplate6D, 0, 0, numRealIterations, maxNumTrainingIterations, 
+		playerBridge, taskBridge, adaptationEvl6D)
 
 
 
