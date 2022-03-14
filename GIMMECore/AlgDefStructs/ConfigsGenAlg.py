@@ -1,8 +1,13 @@
+from itertools import combinations
+from locale import currency
 import random
 import math
 import copy
 import numpy
 from abc import ABC, abstractmethod
+
+from pkg_resources import evaluate_marker
+
 from ..InteractionsProfile import InteractionsProfile 
 from ..PlayerStructs import *
 from ..AlgDefStructs.RegressionAlg import *
@@ -535,6 +540,7 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 		playerModelBridge, 
 		interactionsProfileTemplate, 
 		regAlg = None, 
+		numberOfConfigChoices = 0,
 		preferredNumberOfPlayersPerGroup = None, 
 		minNumberOfPlayersPerGroup = None, 
 		maxNumberOfPlayersPerGroup = None, 
@@ -969,3 +975,401 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 
 		return {"groups": bestGroups, "profiles": bestConfigProfiles, "avgCharacteristics": avgCharacteristicsArray}
 
+
+# new algorithms
+class ODPIP(ConfigsGenAlg):
+	def __init__(self, 
+		playerModelBridge, 
+		interactionsProfileTemplate, 
+		regAlg,
+		persEstAlg,
+		preferredNumberOfPlayersPerGroup = None, 
+		minNumberOfPlayersPerGroup = None, 
+		maxNumberOfPlayersPerGroup = None,
+		qualityWeights = None):
+
+		super().__init__(playerModelBridge, 
+		interactionsProfileTemplate, 
+		preferredNumberOfPlayersPerGroup, 
+		minNumberOfPlayersPerGroup, 
+		maxNumberOfPlayersPerGroup)
+
+		self.regAlg = regAlg
+		self.persEstAlg = persEstAlg
+
+		self.qualityWeights = PlayerCharacteristics(ability = 0.5, engagement = 0.5) if qualityWeights == None else qualityWeights 
+
+		self.coalitionsProfiles = []
+		self.coalitionsAvgCharacteristics = []
+		self.coalitionsValues = []
+		self.f = []
+		self.maxF = []
+
+		self.playerIds = []
+		self.idsToByteFormat = {}
+		self.pascalMatrix = []
+
+	def calcQuality(self, state):
+		return self.qualityWeights.ability*state.characteristics.ability + self.qualityWeights.engagement*state.characteristics.engagement
+
+	
+	def convertCoalitionFromByteToBitFormat(self, coalitionInByteFormat, coalitionSize):
+		coalitionInBitFormat = 0
+
+		for i in range(coalitionSize):
+			coalitionInBitFormat += 1 << (self.idsToByteFormat[coalitionInByteFormat[i]])
+
+		return coalitionInBitFormat
+
+	# convert group in bit format to group with the player ids
+	def getGroupFromBitFormat(self, coalition):
+		group = []
+		tempCoalition = coalition
+		playerNumber = 0
+		while tempCoalition != 0:
+			if tempCoalition & 1:
+				group.append(playerNumber + 1)
+
+			playerNumber += 1
+			tempCoalition >>= 1
+
+		
+		return group
+
+	def convertFromByteToIds(self, coalition):
+		group = []
+
+		for agent in coalition:
+			group.append(self.playerIds[agent - 1])
+
+		return group
+
+	def getSizeOfCombinationInBitFormat(self, combinationInBitFormat):
+		return bin(combinationInBitFormat).count("1")
+
+
+	def convertSetOfCombinationsFromBitFormat(self, setOfCombinationsInBitFormat):
+		setOfCombinationsInByteFormat = numpy.empty(len(setOfCombinationsInBitFormat), dtype=list)
+		for i in range(len(setOfCombinationsInBitFormat)):
+
+			setOfCombinationsInByteFormat[i] = self.getGroupFromBitFormat(setOfCombinationsInBitFormat[i])
+
+		return setOfCombinationsInByteFormat
+
+	def getBestHalf(self, coalitionInBitFormat, numPlayers):
+		valueOfBestSplit = self.f[coalitionInBitFormat]
+		bestFirstHalfInBitFormat = coalitionInBitFormat
+
+		bit = numpy.zeros(numPlayers + 1, dtype=int)
+		for i in range(numPlayers):
+			bit[i+1] = 1 << i
+
+		coalitionInByteFormat = self.getGroupFromBitFormat(coalitionInBitFormat)
+		coalitionSize = len(coalitionInByteFormat)
+
+		#print(coalitionInByteFormat)
+		#input()
+
+		for sizeOfFirstHalf in range(math.ceil(coalitionSize / 2.0), coalitionSize):
+			sizeOfSecondHalf = coalitionSize - sizeOfFirstHalf
+
+			if (sizeOfFirstHalf > self.maxNumberOfPlayersPerGroup or sizeOfFirstHalf < self.minNumberOfPlayersPerGroup) and \
+				(sizeOfSecondHalf > self.maxNumberOfPlayersPerGroup or sizeOfSecondHalf < self.minNumberOfPlayersPerGroup):
+				continue
+
+			numOfPossibilities = 0
+			if (coalitionSize % 2) == 0 and sizeOfFirstHalf == sizeOfSecondHalf:
+				numOfPossibilities = (int)(math.comb(coalitionSize, sizeOfFirstHalf) / 2)
+			
+			else:
+				numOfPossibilities = math.comb(coalitionSize, sizeOfFirstHalf)
+
+			indicesOfMembersOfFirstHalf = numpy.zeros(sizeOfFirstHalf, dtype=int)
+			for i in range(sizeOfFirstHalf):
+				indicesOfMembersOfFirstHalf[i] = i + 1
+
+			firstHalfInBitFormat = 0
+			for i in range(sizeOfFirstHalf):
+				firstHalfInBitFormat += bit[coalitionInByteFormat[indicesOfMembersOfFirstHalf[i] - 1]]
+
+			secondHalfInBitFormat = coalitionInBitFormat - firstHalfInBitFormat
+
+			curValue = self.f[firstHalfInBitFormat] + self.f[secondHalfInBitFormat]
+
+			if curValue > valueOfBestSplit:
+				bestFirstHalfInBitFormat = firstHalfInBitFormat
+				valueOfBestSplit = curValue
+
+			elif curValue == valueOfBestSplit:
+				sizeOfBestFirstHalf = self.getSizeOfCombinationInBitFormat(bestFirstHalfInBitFormat)
+				if sizeOfBestFirstHalf > self.maxNumberOfPlayersPerGroup or sizeOfBestFirstHalf < self.minNumberOfPlayersPerGroup:
+					if sizeOfFirstHalf <= self.maxNumberOfPlayersPerGroup and sizeOfFirstHalf >= self.minNumberOfPlayersPerGroup:
+						bestFirstHalfInBitFormat = firstHalfInBitFormat
+						valueOfBestSplit = curValue
+				
+					elif sizeOfSecondHalf <= self.maxNumberOfPlayersPerGroup and sizeOfSecondHalf >= self.minNumberOfPlayersPerGroup:
+						bestFirstHalfInBitFormat = secondHalfInBitFormat
+						valueOfBestSplit = curValue
+		
+			for j in range(1, numOfPossibilities):
+				self.getPreviousCombination(coalitionSize, sizeOfFirstHalf, indicesOfMembersOfFirstHalf)
+
+				firstHalfInBitFormat = 0
+				for i in range(sizeOfFirstHalf):
+					firstHalfInBitFormat += bit[coalitionInByteFormat[indicesOfMembersOfFirstHalf[i]-1]]
+
+				secondHalfInBitFormat = coalitionInBitFormat - firstHalfInBitFormat
+
+				curValue = self.f[firstHalfInBitFormat] + self.f[secondHalfInBitFormat]
+
+				if curValue > valueOfBestSplit:
+					bestFirstHalfInBitFormat = firstHalfInBitFormat
+					valueOfBestSplit = curValue
+
+				elif curValue == valueOfBestSplit:
+					sizeOfBestFirstHalf = self.getSizeOfCombinationInBitFormat(bestFirstHalfInBitFormat)
+					if sizeOfBestFirstHalf > self.maxNumberOfPlayersPerGroup or sizeOfBestFirstHalf < self.minNumberOfPlayersPerGroup:
+						if sizeOfFirstHalf <= self.maxNumberOfPlayersPerGroup and sizeOfFirstHalf >= self.minNumberOfPlayersPerGroup:
+							bestFirstHalfInBitFormat = firstHalfInBitFormat
+							valueOfBestSplit = curValue
+					
+						elif sizeOfSecondHalf <= self.maxNumberOfPlayersPerGroup and sizeOfSecondHalf >= self.minNumberOfPlayersPerGroup:
+							bestFirstHalfInBitFormat = secondHalfInBitFormat
+							valueOfBestSplit = curValue
+
+		return bestFirstHalfInBitFormat
+
+	def computeAllCoalitionsValues(self):
+		numOfAgents = len(self.playerIds)
+		numOfCoalitions = 1 << (numOfAgents)
+
+		# initialize all coalitions
+		for coalition in range(numOfCoalitions-1, 0, -1):
+			group = self.getGroupFromBitFormat(coalition)
+			groupInIds = self.convertFromByteToIds(group)
+
+			currQuality = 0.0
+			groupSize = len(group)
+
+			# calculate the profile and characteristics only for groups in the range defined
+			if groupSize <= self.maxNumberOfPlayersPerGroup:	
+				# generate profile as average of the preferences estimates
+				profile = self.interactionsProfileTemplate.generateCopy().reset()
+
+				for currPlayer in groupInIds:
+					preferences = self.playerModelBridge.getPlayerPreferencesEst(currPlayer)
+					for dim in profile.dimensions:
+						profile.dimensions[dim] += (preferences.dimensions[dim] / groupSize)
+
+				# calculate fitness and average state
+				currAvgCharacteristics = PlayerCharacteristics()
+				currAvgCharacteristics.reset()
+				for currPlayer in groupInIds:
+
+					currState = self.playerModelBridge.getPlayerCurrState(currPlayer)
+					currState.profile = profile
+
+					currAvgCharacteristics.ability += currState.characteristics.ability / groupSize
+					currAvgCharacteristics.engagement += currState.characteristics.engagement / groupSize
+				
+					predictedIncreases = self.regAlg.predict(profile, currPlayer)
+					currQuality += self.calcQuality(predictedIncreases)
+
+				self.coalitionsAvgCharacteristics[coalition] = currAvgCharacteristics
+				self.coalitionsProfiles[coalition] = profile
+			
+			self.coalitionsValues[coalition] = currQuality
+			self.f[coalition] = currQuality
+
+
+	def evaluateSplits(self, coalition, coalitionSize):
+		curValue = -1
+
+		coalitionInBitFormat = self.convertCoalitionFromByteToBitFormat(coalition, coalitionSize)
+		
+		bestValue = self.f[coalitionInBitFormat]
+		firstHalfInBitFormat = coalitionInBitFormat - 1 & coalitionInBitFormat
+
+		while True:
+			secondHalfInBitFormat = coalitionInBitFormat^firstHalfInBitFormat
+			
+			curValue = self.f[firstHalfInBitFormat] + self.f[secondHalfInBitFormat]
+			
+			if bestValue <= curValue:
+				bestValue = curValue
+
+			if firstHalfInBitFormat & (firstHalfInBitFormat - 1) == 0:
+				break
+
+			firstHalfInBitFormat = firstHalfInBitFormat - 1 & coalitionInBitFormat
+		
+		self.f[coalition] = bestValue
+
+	def evaluateSplitsOfGrandCoalition(self, numPlayers):
+		curValue = -1
+		bestValue = -1
+		bestHalfOfGrandCoalition = -1
+		numCoalitions = 1 << numPlayers
+		grandCoalition = (1 << numPlayers) - 1
+
+		for firstHalfOfGrandCoalition in range((int)(numCoalitions/2 - 1), numCoalitions):
+
+			curSize = self.getSizeOfCombinationInBitFormat(firstHalfOfGrandCoalition)
+
+			if curSize > self.maxNumberOfPlayersPerGroup or curSize < self.minNumberOfPlayersPerGroup:
+				continue
+			
+			secondHalfOfGrandCoalition = numCoalitions - 1 - firstHalfOfGrandCoalition
+			curValue = self.f[firstHalfOfGrandCoalition] + self.f[secondHalfOfGrandCoalition]
+
+			if curValue > bestValue:
+				bestValue = curValue
+				bestHalfOfGrandCoalition = firstHalfOfGrandCoalition
+
+		curValue = self.f[grandCoalition]
+		if curValue > bestValue:
+			bestValue = curValue
+			bestHalfOfGrandCoalition = grandCoalition
+
+		return bestHalfOfGrandCoalition
+
+	def getOptimalSplit(self, coalitionInBitFormat, bestHalfOfCoalition, numPlayers):
+		optimalSplit = []
+		if (bestHalfOfCoalition == coalitionInBitFormat):
+			optimalSplit.append(coalitionInBitFormat)
+
+		else:
+			arrayOfBestHalf = numpy.empty(2, dtype=int)
+			arrayOfOptimalSplit = numpy.empty(2, dtype=list)
+			arrayOfCoalitionInBitFormat = numpy.empty(2, dtype=int)
+
+			arrayOfCoalitionInBitFormat[0] = bestHalfOfCoalition
+			arrayOfCoalitionInBitFormat[1] = coalitionInBitFormat - bestHalfOfCoalition
+
+			for i in range(2):
+				arrayOfBestHalf[i] = self.getBestHalf(arrayOfCoalitionInBitFormat[i], numPlayers)
+
+				arrayOfOptimalSplit[i] = self.getOptimalSplit(arrayOfCoalitionInBitFormat[i], arrayOfBestHalf[i], numPlayers)
+
+			optimalSplit = numpy.empty(len(arrayOfOptimalSplit[0]) + len(arrayOfOptimalSplit[1]), dtype=int)
+			k = 0
+			for i in range(2):
+				lenOfOptimalSplit = len(arrayOfOptimalSplit[i])
+				for j in range(lenOfOptimalSplit):
+					optimalSplit[k] = arrayOfOptimalSplit[i][j]
+					k += 1
+
+		return optimalSplit
+
+
+	def initPascalMatrix(self, numOfLines, numOfColumns):
+		
+		if self.pascalMatrix == [] or numOfLines > len(self.pascalMatrix):
+			
+			if self.pascalMatrix == []:
+				self.pascalMatrix = numpy.ones((numOfLines, numOfColumns))
+				for j in range(1, numOfColumns):
+					self.pascalMatrix[0][j] = j + 1
+
+				for i in range(1, numOfLines):
+					for j in range(1, numOfColumns):
+						self.pascalMatrix[i][j] = self.pascalMatrix[i-1][j] + self.pascalMatrix[i][j-1]
+
+
+	def getCombinationAtGivenIndex(self, size, index, numPlayers):
+		index += 1
+		self.initPascalMatrix(numPlayers + 1, numPlayers + 1)
+		M = numpy.zeros(size, dtype=int)
+
+		j = 1
+		s1 = size
+
+		while True:
+			x = 1
+			while self.pascalMatrix[s1-1][x-1] < index:
+				x += 1
+			
+			M[j-1] = (int)((numPlayers - s1 + 1) - x + 1)
+
+			if self.pascalMatrix[s1-1][x-1] == index:
+				for k in range(j, size):
+					M[k] = (int)(M[k-1] + 1)
+				break
+
+			else:
+				j += 1
+				index -= self.pascalMatrix[s1-1][x-2]
+				s1 -= 1
+		
+		return M
+
+	
+	def getPreviousCombination(self, numPlayers, size, coalition):
+
+		maxPossibleValueForFirstAgent = numPlayers - size + 1
+		for i in range(size-1, -1, -1):
+			if coalition[i] < maxPossibleValueForFirstAgent+i:
+				coalition[i] += 1
+				for j in range(i+1, size):
+					coalition[j] = coalition[j-1] + 1
+				break
+
+
+	def organize(self):
+		start = time.time()
+		prevTime = time.time()
+		self.playerIds = sorted(self.playerModelBridge.getAllPlayerIds())
+		numPlayers = len(self.playerIds)
+		minNumGroups = math.ceil(numPlayers / self.maxNumberOfPlayersPerGroup)
+		maxNumGroups = math.floor(numPlayers / self.minNumberOfPlayersPerGroup)
+		bestHalfOfGrandCoalition = -1
+		grandCoalition = (1 << numPlayers) - 1
+
+		for i in range(len(self.playerIds)):
+			self.idsToByteFormat[self.playerIds[i] + 1] = i
+
+		self.coalitionsProfiles = numpy.empty(1 << numPlayers, dtype=InteractionsProfile)
+		self.coalitionsAvgCharacteristics = numpy.empty(1 << numPlayers, dtype=PlayerCharacteristics)
+		self.coalitionsValues = numpy.empty(1 << numPlayers)
+		self.f = numpy.empty(1 << numPlayers)
+		self.maxF = numpy.empty(numPlayers)
+
+		# estimate preferences
+		self.persEstAlg.updateEstimates()
+
+		# initialization(compute the value for every coalition between min and max number of players)
+		self.computeAllCoalitionsValues()
+		
+		# evaluate the possible splits of every coalition of size 2, 3, ...
+		for curSize in range(2, numPlayers+1):
+			if math.floor(2 * numPlayers / 3.0) < curSize and curSize < numPlayers: 
+				continue
+
+			if curSize < numPlayers:
+				numOfCoalitionsOfCurSize = math.comb(numPlayers, curSize)
+
+				curCoalition = self.getCombinationAtGivenIndex(curSize, numOfCoalitionsOfCurSize - 1, numPlayers)
+				self.evaluateSplits(curCoalition, curSize)
+
+				for i in range(1, numOfCoalitionsOfCurSize):
+					self.getPreviousCombination(numPlayers, curSize, curCoalition)
+					self.evaluateSplits(curCoalition, curSize)
+			
+			else:
+				bestHalfOfGrandCoalition = self.evaluateSplitsOfGrandCoalition(numPlayers)
+
+			if curSize < numPlayers:
+				bestHalfOfGrandCoalition = self.evaluateSplitsOfGrandCoalition(numPlayers)
+				bestCSFoundSoFar = self.getOptimalSplit(grandCoalition, bestHalfOfGrandCoalition, numPlayers)
+				print(bestCSFoundSoFar)
+				bestCSFoundSoFar_byteFormat = self.convertSetOfCombinationsFromBitFormat(bestCSFoundSoFar)
+
+
+			print("size", curSize, "took: ", time.time() - prevTime)
+			print("Best coalition found so far", bestCSFoundSoFar_byteFormat)
+			prevTime = time.time()
+
+		print(time.time() - start)
+		print(self.coalitionsValues)
+
+		return 
