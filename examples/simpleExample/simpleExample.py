@@ -211,8 +211,7 @@ while(True):
 
 	print("----------------------")
 	print("Iteration Summary:\n\n\n")
-#	print(json.dumps(adaptationGIMME.iterate(), default=lambda o: o.__dict__, sort_keys=True))
-	adaptationGIMME.iterate()
+	print(json.dumps(adaptationGIMME.iterate(), default=lambda o: o.__dict__, sort_keys=True))
 	print("----------------------\n\n\n")
 	print("Player States:\n\n\n")
 	for x in range(numPlayers):

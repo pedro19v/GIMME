@@ -1006,8 +1006,9 @@ class ODPIP(ConfigsGenAlg):
 		self.maxF = []
 
 		self.playerIds = []
-		self.idsToByteFormat = {}
 		self.pascalMatrix = []
+
+		self.tooManyPlayers = False
 
 	def calcQuality(self, state):
 		return self.qualityWeights.ability*state.characteristics.ability + self.qualityWeights.engagement*state.characteristics.engagement
@@ -1017,7 +1018,7 @@ class ODPIP(ConfigsGenAlg):
 		coalitionInBitFormat = 0
 
 		for i in range(coalitionSize):
-			coalitionInBitFormat += 1 << (self.idsToByteFormat[coalitionInByteFormat[i]])
+			coalitionInBitFormat += 1 << (coalitionInByteFormat[i] - 1)
 
 		return coalitionInBitFormat
 
@@ -1152,7 +1153,7 @@ class ODPIP(ConfigsGenAlg):
 			groupSize = len(group)
 
 			# calculate the profile and characteristics only for groups in the range defined
-			if groupSize <= self.maxNumberOfPlayersPerGroup:	
+			if groupSize <= self.maxNumberOfPlayersPerGroup + self.tooManyPlayers:	
 				# generate profile as average of the preferences estimates
 				profile = self.interactionsProfileTemplate.generateCopy().reset()
 
@@ -1314,19 +1315,61 @@ class ODPIP(ConfigsGenAlg):
 					coalition[j] = coalition[j-1] + 1
 				break
 
+	def distributeRemainingPlayers(self, coalitionStructure):
+		remainingPlayers = []
+		for i in range(len(coalitionStructure)):
+			if len(coalitionStructure[i]) < self.minNumberOfPlayersPerGroup:
+				remainingPlayers = coalitionStructure[i]
+				coalitionStructure = numpy.delete(coalitionStructure, [i])
+				break
+
+		for player in remainingPlayers:
+			bestImprovement = -1
+			bestCoalition = []
+			bestIndex = -1
+			tempCoalition = []
+
+			for i in range(len(coalitionStructure)):
+				if len(coalitionStructure[i]) <= self.maxNumberOfPlayersPerGroup:
+
+					tempCoalition = coalitionStructure[i][:]
+					tempCoalition.append(player)
+					tempCoalition.sort()
+					value = self.f[self.convertCoalitionFromByteToBitFormat(tempCoalition, len(tempCoalition))]
+					if value > bestImprovement:
+						bestImprovement = value
+						bestCoalition = tempCoalition[:]
+						bestIndex = i
+
+			coalitionStructure[bestIndex] = bestCoalition[:]
+		
+		return coalitionStructure
+
+	def results(self, cSInByteFormat):
+		bestGroups = []
+		bestGroupsInBitFormat = []
+		bestConfigProfiles = []
+		avgCharacteristicsArray = []
+		for coalition in cSInByteFormat:
+			bestGroups.append(self.convertFromByteToIds(coalition))
+			bestGroupsInBitFormat.append(self.convertCoalitionFromByteToBitFormat(coalition, len(coalition)))
+
+		for group in bestGroupsInBitFormat:
+			bestConfigProfiles.append(self.coalitionsProfiles[group])
+			avgCharacteristicsArray.append(self.coalitionsAvgCharacteristics[group])
+
+		return {"groups": bestGroups, "profiles": bestConfigProfiles, "avgCharacteristics": avgCharacteristicsArray}
 
 	def organize(self):
 		start = time.time()
 		prevTime = time.time()
 		self.playerIds = sorted(self.playerModelBridge.getAllPlayerIds())
 		numPlayers = len(self.playerIds)
-		minNumGroups = math.ceil(numPlayers / self.maxNumberOfPlayersPerGroup)
-		maxNumGroups = math.floor(numPlayers / self.minNumberOfPlayersPerGroup)
+
 		bestHalfOfGrandCoalition = -1
 		grandCoalition = (1 << numPlayers) - 1
 
-		for i in range(len(self.playerIds)):
-			self.idsToByteFormat[self.playerIds[i] + 1] = i
+		self.tooManyPlayers = (numPlayers % self.maxNumberOfPlayersPerGroup != 0)
 
 		self.coalitionsProfiles = numpy.empty(1 << numPlayers, dtype=InteractionsProfile)
 		self.coalitionsAvgCharacteristics = numpy.empty(1 << numPlayers, dtype=PlayerCharacteristics)
@@ -1370,6 +1413,12 @@ class ODPIP(ConfigsGenAlg):
 			prevTime = time.time()
 
 		print(time.time() - start)
-		print(self.coalitionsValues)
 
-		return 
+		bestCSFound = self.getOptimalSplit(grandCoalition, bestHalfOfGrandCoalition, numPlayers)
+		bestCSFound_byteFormat = self.convertSetOfCombinationsFromBitFormat(bestCSFound)
+		if self.tooManyPlayers:
+			bestCSFound_byteFormat = self.distributeRemainingPlayers(bestCSFound_byteFormat)
+		
+		print(bestCSFound_byteFormat)
+
+		return self.results(bestCSFound_byteFormat)
