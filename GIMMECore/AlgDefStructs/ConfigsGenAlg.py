@@ -1,12 +1,19 @@
-from itertools import combinations
-from locale import currency
 import random
 import math
 import copy
 import numpy
 from abc import ABC, abstractmethod
 
-from pkg_resources import evaluate_marker
+from GIMMECore.ElementOfMultiset import ElementOfMultiset
+
+from GIMMECore.IntegerPartition import IntegerPartition
+from GIMMECore.IntegerPartitionGraph import IntegerPartitionGraph
+from GIMMECore.Node import Node
+from GIMMECore.Subspace import Subspace
+from GIMMECore.SubstsOfMultiset import SubsetsOfMultiset
+
+import GIMMESolver as gs
+from ctypes import *
 
 from ..InteractionsProfile import InteractionsProfile 
 from ..PlayerStructs import *
@@ -975,7 +982,6 @@ class EvolutionaryConfigsGenDEAP(ConfigsGenAlg):
 
 		return {"groups": bestGroups, "profiles": bestConfigProfiles, "avgCharacteristics": avgCharacteristicsArray}
 
-
 # new algorithms
 class ODPIP(ConfigsGenAlg):
 	def __init__(self, 
@@ -999,6 +1005,23 @@ class ODPIP(ConfigsGenAlg):
 
 		self.qualityWeights = PlayerCharacteristics(ability = 0.5, engagement = 0.5) if qualityWeights == None else qualityWeights 
 
+		# IP variables
+		self.ipNumOfExpansions = 0
+		self.ipValueOfBestCSFound = -1
+		self.ipBestCSFound = None
+		self.totalNumOfExapnsions = 0
+		self.ipIntegerPartitionGraph = None
+		self.ipUpperBoundOnOptimalValue = 0
+		self.ipLowerBoundOnOptimalValue = 0
+
+		# DP variables
+		self.dpValueOfBestCSFound = -1
+		self.dpBestCSFound = None
+		self.odpMaxSizeComputedSoFar = 0
+		self.odpHasFinished = False
+
+		self.feasibleCoalitions = []
+
 		self.coalitionsProfiles = []
 		self.coalitionsAvgCharacteristics = []
 		self.coalitionsValues = []
@@ -1010,10 +1033,24 @@ class ODPIP(ConfigsGenAlg):
 
 		self.tooManyPlayers = False
 
+	
+
 	def calcQuality(self, state):
 		return self.qualityWeights.ability*state.characteristics.ability + self.qualityWeights.engagement*state.characteristics.engagement
 
-	
+	def getCoalitionInByteFormatValue(self, coalitionInByteFormat):
+		coalitionInBitFormat = self.convertCoalitionFromByteToBitFormat(coalitionInByteFormat, len(coalitionInByteFormat))
+		return self.f[coalitionInBitFormat]
+
+
+	def getCoalitionStructureInByteFormatValue(self, coalitionStructure):
+		valueOfCS = 0
+		for i in range(len(coalitionStructure)):
+			valueOfCS += self.getCoalitionInByteFormatValue(coalitionStructure[i])
+		
+		return valueOfCS
+
+
 	def convertCoalitionFromByteToBitFormat(self, coalitionInByteFormat, coalitionSize):
 		coalitionInBitFormat = 0
 
@@ -1057,12 +1094,434 @@ class ODPIP(ConfigsGenAlg):
 
 		return setOfCombinationsInByteFormat
 
-	def getBestHalf(self, coalitionInBitFormat, numPlayers):
+
+	def copyMultiset(multiset):
+		if multiset == None:
+			return None
+
+		copy = numpy.empty(len(multiset))
+		for i in range(len(multiset)):
+			copy[i] = ElementOfMultiset(multiset[i].element, multiset[i].repetition)
+
+		return copy
+
+	
+	def getCardinalityOfMultiset(multiset):
+		if multiset == None:
+			return 0
+
+		counter = 0
+		for i in range(len(multiset)):
+			counter += multiset[i].repetition
+
+		return counter
+
+	#IP functions
+	def updateIPSolution(self, CS, value):
+		if self.ipValueOfBestCSFound <= value:
+			self.ipValueOfBestCSFound = value
+			self.ipBestCSFound = CS[:]
+
+	def updateNumOfSearchedAndRemainingCoalitionsAndCoalitionStructures(self):
+		for size1 in range(1, math.floor(self.numPlayers/2)+1):
+			size2 = self.numPlayers - size1
+
+			numOfCombinationsOfSize1 = int(math.comb(self.numPlayers, size1))
+
+			temp = 0
+			if size1 != size2:
+				temp = numOfCombinationsOfSize1
+			else:
+				temp = int(numOfCombinationsOfSize1/2)
+
+			self.ipNumOfExpansions += 2*temp
+
+	def searchFirstAndLastLevel(self):
+		CS1IsFeasible = True
+		CS2IsFeasible = True
+
+		CS1 = numpy.empty((self.numPlayers, 1), dtype=int)
+		for i in range(self.numPlayers):
+			CS1[i][0] = i + 1
+
+		CS2 = numpy.empty((1, self.numPlayers), dtype=int)
+		for i in range(self.numPlayers):
+			CS2[0][i] = i + 1
+
+		if self.feasibleCoalitions != []:
+			for i in range(len(CS1)):
+				curCoalitionInBitFormat = self.convertCoalitionFromByteToBitFormat(CS1[i])
+				if curCoalitionInBitFormat not in self.feasibleCoalitions:
+					CS1IsFeasible = False
+					break
+			
+			for i in range(len(CS2)):
+				curCoalitionInBitFormat = self.convertCoalitionFromByteToBitFormat(CS2[i])
+				if curCoalitionInBitFormat not in self.feasibleCoalitions:
+					CS2IsFeasible = False
+					break
+		
+		valueOfCS1 = self.getCoalitionStructureInByteFormatValue(CS1)
+		valueOfCS2 = self.getCoalitionStructureInByteFormatValue(CS2)
+
+		if ((CS1IsFeasible) and (CS2IsFeasible == False)) or (CS1IsFeasible and CS2IsFeasible and valueOfCS1 >= valueOfCS2):
+			self.updateIPSolution(CS1, valueOfCS1)
+
+		if ((CS2IsFeasible) and (CS1IsFeasible == False)) or (CS2IsFeasible and CS1IsFeasible and valueOfCS2 >= valueOfCS1):
+			self.updateIPSolution(CS2, valueOfCS2)
+
+	def computeAvgForEachSize(self):
+		totalNumOfCoalitions = 2 ** self.numPlayers
+		bestValue = self.ipValueOfBestCSFound
+		bestCoalition1 = 0
+		bestCoalition2 = 0
+		sumOfValues = numpy.zeros(self.numPlayers)
+
+		coalition1IsFeasible = True
+		coalition2IsFeasible = True
+		constraintsExist = False
+
+		if self.feasibleCoalitions != []:
+			constraintsExist = True
+
+		for coalition1 in range((int)(totalNumOfCoalitions/2), totalNumOfCoalitions-1):
+			sizeOfCoalition1 = self.getSizeOfCombinationInBitFormat(coalition1)
+
+			coalition2 = totalNumOfCoalitions - 1 - coalition1
+			sizeOfCoalition2 = self.numPlayers - sizeOfCoalition1
+
+			sumOfValues[sizeOfCoalition1 - 1] += self.f[coalition1]
+			sumOfValues[sizeOfCoalition2 - 1] += self.f[coalition2]
+
+			if constraintsExist:
+				coalition1IsFeasible = coalition1 in self.feasibleCoalitions
+				coalition2IsFeasible = coalition2 in self.feasibleCoalitions
+
+			value = 0
+			if (constraintsExist == False) or (coalition1IsFeasible and coalition2IsFeasible):
+				value = self.f[coalition1] + self.f[coalition2]
+
+			if bestValue < value:
+				bestCoalition1 = coalition1
+				bestCoalition2 = coalition2
+				bestValue = value
+
+		if bestValue > self.ipValueOfBestCSFound:
+			bestCS = numpy.empty(2, dtype=list)
+			bestCS[0] = self.getGroupFromBitFormat(bestCoalition1)
+			bestCS[1] = self.getGroupFromBitFormat(bestCoalition2)
+			self.updateIPSolution(bestCS, bestValue)
+
+		avgValueForEachSize = numpy.zeros(self.numPlayers)
+		for size in range(1, self.numPlayers + 1):
+			avgValueForEachSize[size-1] = (sumOfValues[size-1] / math.comb(self.numPlayers, size))
+
+		self.updateNumOfSearchedAndRemainingCoalitionsAndCoalitionStructures()
+
+		return avgValueForEachSize
+
+	def setMaxValueForEachSize(self):
+		numOfRequiredMaxValues = numpy.empty(self.numPlayers, dtype=int)
+		numOfCoalitions = numpy.empty(self.numPlayers, dtype=numpy.int64)
+		maxValue = numpy.empty(self.numPlayers, dtype=list)
+
+		for size in range(1, self.numPlayers + 1):
+			numOfRequiredMaxValues[size-1] = math.floor(self.numPlayers/size)
+			numOfCoalitions[size-1] = math.comb(self.numPlayers, size)
+			maxValue[size-1] = numpy.zeros(numOfRequiredMaxValues[size-1])
+
+		constraintsExist = False
+		if self.feasibleCoalitions != []:
+			constraintsExist = True
+
+		for coalitionInBitFormat in range((2**self.numPlayers) - 1, 0, -1):
+			if constraintsExist == False or coalitionInBitFormat in self.feasibleCoalitions:
+				size = self.getSizeOfCombinationInBitFormat(coalitionInBitFormat)
+				curMaxValue = maxValue[size-1]
+				j = numOfRequiredMaxValues[size-1]-1
+				if self.f[coalitionInBitFormat] > curMaxValue[j]:
+					while j > 0 and self.f[coalitionInBitFormat] > curMaxValue[j-1]:
+						curMaxValue[j] = curMaxValue[j-1]
+						j -= 1
+					curMaxValue[j] = self.f[coalitionInBitFormat]
+
+		return maxValue
+
+	def initSubspaces(self, avgValueForEachSize, maxValueForEachSize):
+		integers = IntegerPartition.getIntegerPartitions(self.numPlayers)
+		
+		subspaces = [[] for _ in range(len(integers))]
+		for level in range(self.numPlayers):
+			subspaces[level] = numpy.empty(len(integers[level]), dtype=Subspace)
+		
+			for i in range(len(integers[level])):
+				subspaces[level][i] = Subspace(integers[level][i], avgValueForEachSize, maxValueForEachSize, self.numPlayers)
+		
+		return subspaces
+
+	def computeTotalNumOfExpansions(self):
+		totalNumOfExpansions = 0
+		nodes = self.ipIntegerPartitionGraph.nodes
+		for level in range(len(nodes)):
+			for i in range(len(nodes[level])):
+				curSubspace = nodes[level][i].subspace
+				totalNumOfExpansions += curSubspace.totalNumOfExpansionsInSubspace
+
+		return totalNumOfExpansions
+
+	def disableSubspacesThatWereSearchedInTheBeginning(self):
+		nodes = self.ipIntegerPartitionGraph.nodes
+		numOfSubspacesThatThisMethodHasDisabled = 0
+		for level in range(len(nodes)):
+			for i in range(len(nodes[level])):
+				curSubspace = nodes[level][i].subspace
+				if level == 0 or level == 1 or level == self.numPlayers-1:
+					if curSubspace.enabled:
+						curSubspace.enabled = False
+						numOfSubspacesThatThisMethodHasDisabled += 1
+
+		return numOfSubspacesThatThisMethodHasDisabled
+
+	def setUpperAndLowerBoundsOnOptimalValue(self):
+		self.ipUpperBoundOnOptimalValue = self.ipValueOfBestCSFound
+		self.ipLowerBoundOnOptimalValue = self.ipValueOfBestCSFound
+
+		nodes = self.ipIntegerPartitionGraph.nodes
+		for level in range(len(nodes)):
+			for i in range(len(nodes[level])):
+				curSubspace = nodes[level][i].subspace
+				if curSubspace.enabled:
+					if self.ipUpperBoundOnOptimalValue < curSubspace.UB:
+						self.ipUpperBoundOnOptimalValue = curSubspace.UB
+
+					if self.ipLowerBoundOnOptimalValue < curSubspace.LB:
+						self.ipLowerBoundOnOptimalValue = curSubspace.LB
+
+
+	def disableSubspacesWithUBLowerThanTheHighestLB(self):
+		nodes = self.ipIntegerPartitionGraph.nodes
+
+		numOfSubspacesThatThisMethodHasDisabled = 0
+
+		for level in range(len(nodes)):
+			for i in range(len(nodes[level])):
+				curSubspace = nodes[level][i].subspace
+				if curSubspace.enabled:
+					if curSubspace.UB - self.ipLowerBoundOnOptimalValue < -0.00000000005:
+						curSubspace.enabled = False
+						numOfSubspacesThatThisMethodHasDisabled += 1
+
+		return numOfSubspacesThatThisMethodHasDisabled
+
+	def disableSubspacesReachableFromBottomNode(self):
+		bottomNode = self.ipIntegerPartitionGraph.nodes[0][0]
+
+		reachableNodes = self.ipIntegerPartitionGraph.getReachableNodes(bottomNode)
+
+		numOfDisabledNodes = 0
+		if reachableNodes is not None:
+			for i in range(len(reachableNodes)):
+				if reachableNodes[i].subspace.enabled:
+					reachableNodes[i].subspace.enabled = False
+					numOfDisabledNodes += 1
+		
+		return numOfDisabledNodes
+
+	def getListOfSortedNodes(self, subspaces):
+		nodes = self.ipIntegerPartitionGraph.nodes
+
+		for level in range(len(nodes)):
+			for i in range(len(nodes[level])):
+				curSubspace = nodes[level][i].subspace
+				curSubspace.priority = curSubspace.UB
+
+		sortedNodes = numpy.empty(IntegerPartition.getNumOfIntegerPartitions(self.numPlayers), dtype=Node)
+		k = 0
+		for level in range(len(nodes)):
+			for i in range(len(nodes[level])):
+				sortedNodes[k] = nodes[level][i]
+				k += 1
+
+		for i in range(len(sortedNodes)-1, -1, -1):
+			indexOfSmallestElement = i
+			for j in range(i, -1, -1):
+				if sortedNodes[j].subspace.priority < sortedNodes[indexOfSmallestElement].subspace.priority or \
+					(sortedNodes[j].subspace.priority == sortedNodes[indexOfSmallestElement].subspace.priority 
+						and sortedNodes[j].subspace.UB < sortedNodes[indexOfSmallestElement].subspace.UB):
+					indexOfSmallestElement = j
+
+			temp = sortedNodes[i]
+			sortedNodes[i] = sortedNodes[indexOfSmallestElement]
+			sortedNodes[indexOfSmallestElement] = temp
+		
+		return sortedNodes
+
+	def getFirstEnabledNode(self, sortedNodes):
+		#breakpoint()
+		for i in range(len(sortedNodes)):
+			if sortedNodes[i].subspace.enabled:
+				return sortedNodes[i]
+
+		return None
+
+	def getRelevantNodes(self, node, numOfIntegersToSplitAtTheEnd):
+		numOfIntegersInNode = len(node.integerPartition.partsSortedAscendingly)
+
+		reachableNodes = self.ipIntegerPartitionGraph.getReachableNodes(node)
+
+		if reachableNodes == None:
+			node.subspace.relevantNodes = None
+			return None
+
+		subsetIterators = numpy.empty(numOfIntegersToSplitAtTheEnd)
+		for s in range(numOfIntegersToSplitAtTheEnd):
+			subsetIterators[s] = SubsetsOfMultiset(node.integerPartition.sortedMultiset, numOfIntegersInNode - s + 1, False)
+
+		bestSubset = None
+		bestSavings = 0
+		bestNumOfRelevantNodes = 0
+
+		for s in range(numOfIntegersToSplitAtTheEnd):
+			subset = subsetIterators[s].getNextSubset()
+			while subset != None:
+				savings = 0
+				numOfRelevantSubspaces = 0
+
+				for i in range(len(reachableNodes)):
+					if reachableNodes[i].integerPartition.contains(subset) and reachableNodes[i].subspace.enabled:
+						savings += reachableNodes[i].subspace.totalNumOfExpansionsInSubspace
+						numOfRelevantSubspaces += 1
+
+				if bestSavings < savings:
+					bestSavings = savings
+					bestSubset = ODPIP.copyMultiset(subset)
+					bestNumOfRelevantNodes = numOfRelevantSubspaces
+
+				subset = subsetIterators[s].getNextSubset()
+
+		index = 0
+		if bestNumOfRelevantNodes == 0:
+			node.subspace.relevantNodes = None
+			return None
+
+		else:
+			node.subspace.relevantNodes = numpy.empty(bestNumOfRelevantNodes)
+			for i in range(len(reachableNodes)):
+				if reachableNodes[i].integerPartition.contains(bestSubset) and reachableNodes[i].subspace.enabled:
+					node.subspace.relevantNodes[index] = reachableNodes[i]
+					index += 1
+
+			return bestSubset
+
+
+	def putSubsetAtTheBeginning(self, node, subset):
+		if subset == None:
+			return
+		
+		remainingIntegers_multiset = ODPIP.copyMultiset(node.integerPartition.sortedMultiset)
+		for i in range(len(subset)):
+			for j in range(len(remainingIntegers_multiset)):
+				if remainingIntegers_multiset[j].element == subset[i].element:
+					remainingIntegers_multiset[j].repetition -= subset[i].repetition
+					break
+
+			counter = 0
+			for i in range(len(remainingIntegers_multiset)):
+				counter += remainingIntegers_multiset[i].repetition
+
+			remainingIntegers_array = numpy.empty(counter)
+			index = 0
+			for i in range(len(remainingIntegers_multiset)):
+				for j in range(remainingIntegers_multiset[i].repetition):
+					remainingIntegers_array[index] = remainingIntegers_multiset[i].element
+					index += 1
+
+			newIntegers = numpy.empty(len(node.subspace.integers))
+			index1 = 0
+			index2 = len(newIntegers) - counter
+			for i in range(len(node.subspace.integers)):
+				found = False
+				for j in range(len(remainingIntegers_array)):
+					if remainingIntegers_array[j] == node.subspace.integers[i]:
+						newIntegers[index2] = node.subspace.integers[i]
+						index2 += 1
+						remainingIntegers_array[j] = -1
+						found = True
+						break
+				
+				if found == False:
+					newIntegers[index1] = node.subspace.integers[i]
+					index1 += 1
+
+			node.subspace.integers = newIntegers
+
+
+	def computeSumOfMax_splitNoIntegers(self, integers, maxValueForEachSize):
+		sumOfMax = numpy.empty(len(integers) + 1)
+
+		sumOfMax[len(integers)] = maxValueForEachSize[integers[-1] - 1][0]
+
+		j = 0
+		for i in range(len(integers) - 1, 0, -1):
+			if integers[i - 1] == integers[i]:
+				j += 1
+			
+			else:
+				j = 0
+
+			sumOfMax[i] = sumOfMax[i+1] + maxValueForEachSize[integers[i-1] - 1][j]
+
+		return sumOfMax
+
+	
+	def computeSumOfMax_splitOneInteger(self, node, maxValueForEachSize):
+		if node.subspace.relevantNodes == None:
+			return self.computeSumOfMax_splitNoIntegers(node.subspace.integers, maxValueForEachSize)
+
+		integers = node.subspace.integers
+		sumOfMax = numpy.empty(len(integers) + 1)
+
+		maxUB = node.subspace.UB
+		for i in range(len(node.subspace.relevantNodes)):
+			if maxUB < node.subspace.relevantNodes[i].subspace.UB:
+				maxUB = node.subspace.relevantNodes[i].subspace.UB
+
+		sumOfMax[len(integers)] = maxValueForEachSize[integers[-1] -1][0] + maxUB - node.subspace.UB
+		max_f = self.maxF[integers[-1] -1]
+		if max_f != 0 and sumOfMax[len(integers)] > max_f:
+			sumOfMax[len(integers)] = max_f
+
+		sumOfMax[len(integers) - 1] = sumOfMax[len(integers)] + maxValueForEachSize[integers[-2] - 1][0]
+		k = 2
+
+		x = len(integers) - k
+		j = 0
+		for i in range(x, 0, -1):
+			if integers[i-1] == integers[i]:
+				j += 1
+			else:
+				j = 0
+
+			sumOfMax[i] = sumOfMax[i + 1] + maxValueForEachSize[integers[i-1] - 1][j]
+			k += 1
+
+		return sumOfMax 
+
+
+	# ODP functions
+	def updateDPSolution(self, CS, value):
+		print(self.dpValueOfBestCSFound)
+		print(value)
+		if self.dpValueOfBestCSFound <= value:
+			self.dpValueOfBestCSFound = value
+			self.dpBestCSFound = CS[:]
+
+	def getBestHalf(self, coalitionInBitFormat):
 		valueOfBestSplit = self.f[coalitionInBitFormat]
 		bestFirstHalfInBitFormat = coalitionInBitFormat
 
-		bit = numpy.zeros(numPlayers + 1, dtype=int)
-		for i in range(numPlayers):
+		bit = numpy.zeros(self.numPlayers + 1, dtype=int)
+		for i in range(self.numPlayers):
 			bit[i+1] = 1 << i
 
 		coalitionInByteFormat = self.getGroupFromBitFormat(coalitionInBitFormat)
@@ -1153,7 +1612,7 @@ class ODPIP(ConfigsGenAlg):
 			groupSize = len(group)
 
 			# calculate the profile and characteristics only for groups in the range defined
-			if groupSize <= self.maxNumberOfPlayersPerGroup + self.tooManyPlayers:	
+			if groupSize <= self.maxNumberOfPlayersPerGroup + 1:	
 				# generate profile as average of the preferences estimates
 				profile = self.interactionsProfileTemplate.generateCopy().reset()
 
@@ -1190,28 +1649,47 @@ class ODPIP(ConfigsGenAlg):
 		
 		bestValue = self.f[coalitionInBitFormat]
 		firstHalfInBitFormat = coalitionInBitFormat - 1 & coalitionInBitFormat
-
+		secondHalfInBitFormat = 0
+		start = 0
+		end = 0
 		while True:
+			#start = time.time()
 			secondHalfInBitFormat = coalitionInBitFormat^firstHalfInBitFormat
-			
+			#end = time.time()
+			#print("1st: ", end - start)
+
+			#start = time.time()
 			curValue = self.f[firstHalfInBitFormat] + self.f[secondHalfInBitFormat]
+			#end = time.time()
+			#print("2nd: ", end - start)
 			
 			if bestValue <= curValue:
+				#start = time.time()
 				bestValue = curValue
-
+				#end = time.time()
+				#print("3rd: ", end - start)
+			
+			#start = time.time()
 			if firstHalfInBitFormat & (firstHalfInBitFormat - 1) == 0:
+				#end = time.time()
+				#print("4th: ", end - start)
 				break
+			#end = time.time()
+			#print("4th: ", end - start)
 
+			#start = time.time()
 			firstHalfInBitFormat = firstHalfInBitFormat - 1 & coalitionInBitFormat
-		
-		self.f[coalition] = bestValue
+			#end = time.time()
+			#print("5th: ", end - start)
 
-	def evaluateSplitsOfGrandCoalition(self, numPlayers):
+		self.f[coalitionInBitFormat] = bestValue
+
+	def evaluateSplitsOfGrandCoalition(self):
 		curValue = -1
 		bestValue = -1
 		bestHalfOfGrandCoalition = -1
-		numCoalitions = 1 << numPlayers
-		grandCoalition = (1 << numPlayers) - 1
+		numCoalitions = 1 << self.numPlayers
+		grandCoalition = (1 << self.numPlayers) - 1
 
 		for firstHalfOfGrandCoalition in range((int)(numCoalitions/2 - 1), numCoalitions):
 
@@ -1234,7 +1712,7 @@ class ODPIP(ConfigsGenAlg):
 
 		return bestHalfOfGrandCoalition
 
-	def getOptimalSplit(self, coalitionInBitFormat, bestHalfOfCoalition, numPlayers):
+	def getOptimalSplit(self, coalitionInBitFormat, bestHalfOfCoalition):
 		optimalSplit = []
 		if (bestHalfOfCoalition == coalitionInBitFormat):
 			optimalSplit.append(coalitionInBitFormat)
@@ -1248,9 +1726,9 @@ class ODPIP(ConfigsGenAlg):
 			arrayOfCoalitionInBitFormat[1] = coalitionInBitFormat - bestHalfOfCoalition
 
 			for i in range(2):
-				arrayOfBestHalf[i] = self.getBestHalf(arrayOfCoalitionInBitFormat[i], numPlayers)
+				arrayOfBestHalf[i] = self.getBestHalf(arrayOfCoalitionInBitFormat[i])
 
-				arrayOfOptimalSplit[i] = self.getOptimalSplit(arrayOfCoalitionInBitFormat[i], arrayOfBestHalf[i], numPlayers)
+				arrayOfOptimalSplit[i] = self.getOptimalSplit(arrayOfCoalitionInBitFormat[i], arrayOfBestHalf[i])
 
 			optimalSplit = numpy.empty(len(arrayOfOptimalSplit[0]) + len(arrayOfOptimalSplit[1]), dtype=int)
 			k = 0
@@ -1262,13 +1740,32 @@ class ODPIP(ConfigsGenAlg):
 
 		return optimalSplit
 
+	def getOptimalSplitFromCS(self, CS):
+		optimalSplit = [[] for _ in range(len(CS))]
+		numOfCoalitionsInFinalResult = 0
+
+		for i in range(len(CS)):
+			coalitionInBitFormat = self.convertCoalitionFromByteToBitFormat(CS[i], len(CS[i]))
+			bestHalfOfCoalitionInBitFormat = self.getBestHalf(coalitionInBitFormat)
+			optimalSplit[i] = self.getOptimalSplit(coalitionInBitFormat, bestHalfOfCoalitionInBitFormat)
+			numOfCoalitionsInFinalResult += len(optimalSplit[i])
+
+		finalResult = [[] for _ in range(numOfCoalitionsInFinalResult)]
+		k = 0
+		for i in range(len(CS)):
+			for j in range(len(optimalSplit[i])):
+				finalResult[k] = self.getGroupFromBitFormat(optimalSplit)
+				k += 1
+
+		return finalResult
+
 
 	def initPascalMatrix(self, numOfLines, numOfColumns):
 		
 		if self.pascalMatrix == [] or numOfLines > len(self.pascalMatrix):
 			
 			if self.pascalMatrix == []:
-				self.pascalMatrix = numpy.ones((numOfLines, numOfColumns))
+				self.pascalMatrix = numpy.ones((numOfLines, numOfColumns), dtype=numpy.int64)
 				for j in range(1, numOfColumns):
 					self.pascalMatrix[0][j] = j + 1
 
@@ -1276,10 +1773,12 @@ class ODPIP(ConfigsGenAlg):
 					for j in range(1, numOfColumns):
 						self.pascalMatrix[i][j] = self.pascalMatrix[i-1][j] + self.pascalMatrix[i][j-1]
 
+		return self.pascalMatrix
 
-	def getCombinationAtGivenIndex(self, size, index, numPlayers):
+
+	def getCombinationAtGivenIndex(self, size, index):
 		index += 1
-		self.initPascalMatrix(numPlayers + 1, numPlayers + 1)
+		self.initPascalMatrix(self.numPlayers + 1, self.numPlayers + 1)
 		M = numpy.zeros(size, dtype=int)
 
 		j = 1
@@ -1290,7 +1789,7 @@ class ODPIP(ConfigsGenAlg):
 			while self.pascalMatrix[s1-1][x-1] < index:
 				x += 1
 			
-			M[j-1] = (int)((numPlayers - s1 + 1) - x + 1)
+			M[j-1] = (int)((self.numPlayers - s1 + 1) - x + 1)
 
 			if self.pascalMatrix[s1-1][x-1] == index:
 				for k in range(j, size):
@@ -1345,6 +1844,12 @@ class ODPIP(ConfigsGenAlg):
 		
 		return coalitionStructure
 
+	def finalize(self):
+		if self.dpBestCSFound is not None:
+			self.updateIPSolution(self.dpBestCSFound, self.dpValueOfBestCSFound)
+
+		return self.ipBestCSFound
+
 	def results(self, cSInByteFormat):
 		bestGroups = []
 		bestGroupsInBitFormat = []
@@ -1360,65 +1865,150 @@ class ODPIP(ConfigsGenAlg):
 
 		return {"groups": bestGroups, "profiles": bestConfigProfiles, "avgCharacteristics": avgCharacteristicsArray}
 
+	def IP(self):
+		self.searchFirstAndLastLevel()
+
+		avgValueForEachSize = self.computeAvgForEachSize()
+
+		maxValueForEachSize = self.setMaxValueForEachSize()
+
+		subspaces = self.initSubspaces(avgValueForEachSize, maxValueForEachSize)
+		self.ipIntegerPartitionGraph = IntegerPartitionGraph(subspaces, self.numPlayers, 1)
+
+		self.totalNumOfExapnsions = self.computeTotalNumOfExpansions()
+
+		numOfRemainingSubspaces = IntegerPartition.getNumOfIntegerPartitions(self.numPlayers)
+		print("Num of remaining subspaces: ", numOfRemainingSubspaces)
+
+		#breakpoint()
+
+		numOfRemainingSubspaces -= self.disableSubspacesThatWereSearchedInTheBeginning()
+
+		self.setUpperAndLowerBoundsOnOptimalValue()
+		print("Num of remaining subspaces: ", numOfRemainingSubspaces)
+
+		numOfRemainingSubspaces -= self.disableSubspacesWithUBLowerThanTheHighestLB()
+		
+		print("Num of remaining subspaces: ", numOfRemainingSubspaces)
+		print("Best CS Found: ", self.ipBestCSFound, " with value: ", self.ipValueOfBestCSFound)
+
+		if numOfRemainingSubspaces == 0:
+			return
+
+		self.ODP()
+		acceptableValue = self.ipUpperBoundOnOptimalValue
+		sortedNodes = self.getListOfSortedNodes(subspaces)
+
+		print(acceptableValue)
+
+		while self.ipLowerBoundOnOptimalValue < acceptableValue:
+
+
+			self.ipIntegerPartitionGraph.updateEdges(self.numPlayers, self.odpMaxSizeComputedSoFar)
+
+			numOfRemainingSubspaces -= self.disableSubspacesReachableFromBottomNode()
+
+			#breakpoint()
+			nodeToBeSearched = self.getFirstEnabledNode(sortedNodes)
+			if nodeToBeSearched == None:
+				break
+
+			subsetToBePutAtTheBeginning = self.getRelevantNodes(nodeToBeSearched, 1)
+
+			self.putSubsetAtTheBeginning(nodeToBeSearched, subsetToBePutAtTheBeginning)
+
+			sumOfMax = self.computeSumOfMax_splitOneInteger(nodeToBeSearched, maxValueForEachSize)
+
+			numOfIntegersToSplit = 0
+			if subsetToBePutAtTheBeginning != None:
+				numOfIntegersToSplit = len(nodeToBeSearched.subspace.integers) - ODPIP.getCardinalityOfMultiset(subsetToBePutAtTheBeginning)
+			numOfRemainingSubspaces -= nodeToBeSearched.subspace.search(self, self.odpHasFinished, acceptableValue, sumOfMax, numOfIntegersToSplit)
+
+			self.setUpperAndLowerBoundsOnOptimalValue()
+			acceptableValue = self.ipUpperBoundOnOptimalValue
+
+			if self.ipLowerBoundOnOptimalValue < self.ipValueOfBestCSFound:
+				self.ipLowerBoundOnOptimalValue = self.ipValueOfBestCSFound
+				numOfRemainingSubspaces -= self.disableSubspacesWithUBLowerThanTheHighestLB()
+
+			if numOfRemainingSubspaces == 0:
+				break
+
+		
+		print("Done")
+		return self.finalize()
+
+
 	def organize(self):
-		start = time.time()
-		prevTime = time.time()
 		self.playerIds = sorted(self.playerModelBridge.getAllPlayerIds())
-		numPlayers = len(self.playerIds)
+		self.numPlayers = len(self.playerIds)
 
-		bestHalfOfGrandCoalition = -1
-		grandCoalition = (1 << numPlayers) - 1
+		self.tooManyPlayers = (self.numPlayers % self.maxNumberOfPlayersPerGroup != 0)
 
-		self.tooManyPlayers = (numPlayers % self.maxNumberOfPlayersPerGroup != 0)
+		self.coalitionsProfiles = numpy.empty(1 << self.numPlayers, dtype=InteractionsProfile)
+		self.coalitionsAvgCharacteristics = numpy.empty(1 << self.numPlayers, dtype=PlayerCharacteristics)
+		self.coalitionsValues = numpy.empty(1 << self.numPlayers)
+		self.f = numpy.empty(1 << self.numPlayers)
+		self.maxF = numpy.empty(self.numPlayers)
 
-		self.coalitionsProfiles = numpy.empty(1 << numPlayers, dtype=InteractionsProfile)
-		self.coalitionsAvgCharacteristics = numpy.empty(1 << numPlayers, dtype=PlayerCharacteristics)
-		self.coalitionsValues = numpy.empty(1 << numPlayers)
-		self.f = numpy.empty(1 << numPlayers)
-		self.maxF = numpy.empty(numPlayers)
+		self.dpMaxSizeComputedSoFar = 0
 
 		# estimate preferences
 		self.persEstAlg.updateEstimates()
 
 		# initialization(compute the value for every coalition between min and max number of players)
 		self.computeAllCoalitionsValues()
-		
+
+		print("Starting ODPIP...")
+		bestCSFound_bitFormat = (gs.odpip(self.numPlayers, self.minNumberOfPlayersPerGroup, self.maxNumberOfPlayersPerGroup, self.coalitionsValues.tolist()))
+		#bestCSFound_byteFormat = self.IP()
+		bestCSFound_byteFormat = self.convertSetOfCombinationsFromBitFormat(bestCSFound_bitFormat)
+		return self.results(bestCSFound_byteFormat)
+
+	def ODP(self):
+		prevTime = time.time()
+		grandCoalition = (1 << self.numPlayers) - 1
+		bestHalfOfGrandCoalition = -1
+
+		self.dpMaxSizeComputedSoFar += 1
 		# evaluate the possible splits of every coalition of size 2, 3, ...
-		for curSize in range(2, numPlayers+1):
-			if math.floor(2 * numPlayers / 3.0) < curSize and curSize < numPlayers: 
+		for curSize in range(2, self.numPlayers+1):
+			if math.floor(2 * self.numPlayers / 5.0) < curSize and curSize < self.numPlayers: 
 				continue
+				
+			if curSize < self.numPlayers:
+				numOfCoalitionsOfCurSize = math.comb(self.numPlayers, curSize)
 
-			if curSize < numPlayers:
-				numOfCoalitionsOfCurSize = math.comb(numPlayers, curSize)
-
-				curCoalition = self.getCombinationAtGivenIndex(curSize, numOfCoalitionsOfCurSize - 1, numPlayers)
+				curCoalition = self.getCombinationAtGivenIndex(curSize, numOfCoalitionsOfCurSize - 1)
 				self.evaluateSplits(curCoalition, curSize)
 
-				for i in range(1, numOfCoalitionsOfCurSize):
-					self.getPreviousCombination(numPlayers, curSize, curCoalition)
+				for _ in range(1, numOfCoalitionsOfCurSize):
+					self.getPreviousCombination(self.numPlayers, curSize, curCoalition)
 					self.evaluateSplits(curCoalition, curSize)
-			
-			else:
-				bestHalfOfGrandCoalition = self.evaluateSplitsOfGrandCoalition(numPlayers)
 
-			if curSize < numPlayers:
-				bestHalfOfGrandCoalition = self.evaluateSplitsOfGrandCoalition(numPlayers)
-				bestCSFoundSoFar = self.getOptimalSplit(grandCoalition, bestHalfOfGrandCoalition, numPlayers)
-				print(bestCSFoundSoFar)
+
+			else:
+				bestHalfOfGrandCoalition = self.evaluateSplitsOfGrandCoalition()
+
+			if curSize < self.numPlayers:
+				bestHalfOfGrandCoalition = self.evaluateSplitsOfGrandCoalition()
+				bestCSFoundSoFar = self.getOptimalSplit(grandCoalition, bestHalfOfGrandCoalition)
+				#print(bestCSFoundSoFar)
 				bestCSFoundSoFar_byteFormat = self.convertSetOfCombinationsFromBitFormat(bestCSFoundSoFar)
+				self.updateDPSolution(bestCSFoundSoFar_byteFormat, self.getCoalitionStructureInByteFormatValue(bestCSFoundSoFar_byteFormat))
+				self.updateIPSolution(bestCSFoundSoFar_byteFormat, self.getCoalitionStructureInByteFormatValue(bestCSFoundSoFar_byteFormat))
 
 
 			print("size", curSize, "took: ", time.time() - prevTime)
-			print("Best coalition found so far", bestCSFoundSoFar_byteFormat)
+					#print("Best coalition found so far", bestCSFoundSoFar_byteFormat)
 			prevTime = time.time()
 
-		print(time.time() - start)
+		#print(time.time() - start)
 
-		bestCSFound = self.getOptimalSplit(grandCoalition, bestHalfOfGrandCoalition, numPlayers)
+		bestCSFound = self.getOptimalSplit(grandCoalition, bestHalfOfGrandCoalition)
 		bestCSFound_byteFormat = self.convertSetOfCombinationsFromBitFormat(bestCSFound)
 		if self.tooManyPlayers:
 			bestCSFound_byteFormat = self.distributeRemainingPlayers(bestCSFound_byteFormat)
-		
+			
 		print(bestCSFound_byteFormat)
-
-		return self.results(bestCSFound_byteFormat)
+		return bestCSFound_byteFormat

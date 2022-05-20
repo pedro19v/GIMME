@@ -1,0 +1,9 @@
+LICENSE.md
+README.md
+setup.py
+solver.egg-info/PKG-INFO
+solver.egg-info/SOURCES.txt
+solver.egg-info/dependency_links.txt
+solver.egg-info/top_level.txt
+solverModules/GIMME_solver_modules/module.cpp
+solverModules/solver/module.cpp
