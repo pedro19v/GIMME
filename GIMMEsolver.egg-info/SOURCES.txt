@@ -9,6 +9,7 @@ GIMMEsolver.egg-info/PKG-INFO
 GIMMEsolver.egg-info/SOURCES.txt
 GIMMEsolver.egg-info/dependency_links.txt
 GIMMEsolver.egg-info/top_level.txt
+solverModules/GIMME_solver_modules/CLink.cpp
 solverModules/GIMME_solver_modules/Edge.cpp
 solverModules/GIMME_solver_modules/ElementOfMultiset.cpp
 solverModules/GIMME_solver_modules/General.cpp
@@ -20,6 +21,7 @@ solverModules/GIMME_solver_modules/SubsetOfMultiset.cpp
 solverModules/GIMME_solver_modules/Subspace.cpp
 solverModules/GIMME_solver_modules/main.cpp
 solverModules/GIMME_solver_modules/module.cpp
+solverModules/GIMME_solver_modules/CLink.cpp
 solverModules/GIMME_solver_modules/Edge.cpp
 solverModules/GIMME_solver_modules/ElementOfMultiset.cpp
 solverModules/GIMME_solver_modules/General.cpp
