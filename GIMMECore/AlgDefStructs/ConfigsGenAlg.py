@@ -24,8 +24,9 @@ import matplotlib.pyplot as plt
 class ConfigsGenAlg(ABC):
 
 	def __init__(self, 
-		playerModelBridge, 
+		playerModelBridge,
 		interactionsProfileTemplate, 
+		taskModelBridge = None, 
 		preferredNumberOfPlayersPerGroup = None, 
 		minNumberOfPlayersPerGroup = None, 
 		maxNumberOfPlayersPerGroup = None):
@@ -47,6 +48,7 @@ class ConfigsGenAlg(ABC):
 			self.minNumberOfPlayersPerGroup = preferredNumberOfPlayersPerGroup
 
 		self.playerModelBridge = playerModelBridge
+		self.taskModelBridge = taskModelBridge
 		self.interactionsProfileTemplate = interactionsProfileTemplate
 
 
@@ -989,6 +991,7 @@ class ODPIP(ConfigsGenAlg):
 		interactionsProfileTemplate, 
 		regAlg,
 		persEstAlg,
+		taskModelBridge = None,
 		preferredNumberOfPlayersPerGroup = None, 
 		minNumberOfPlayersPerGroup = None, 
 		maxNumberOfPlayersPerGroup = None,
@@ -996,6 +999,7 @@ class ODPIP(ConfigsGenAlg):
 
 		super().__init__(playerModelBridge, 
 		interactionsProfileTemplate, 
+		taskModelBridge,
 		preferredNumberOfPlayersPerGroup, 
 		minNumberOfPlayersPerGroup, 
 		maxNumberOfPlayersPerGroup)
@@ -1087,6 +1091,10 @@ class ODPIP(ConfigsGenAlg):
 				# generate profile as average of the preferences estimates
 				profile = self.interactionsProfileTemplate.generateCopy().reset()
 
+				# if (self.regAlg.isTabular()):
+				# 	profile = self.findBestProfileForGroup(groupInIds)
+
+				# else:
 				for currPlayer in groupInIds:
 					preferences = self.playerModelBridge.getPlayerPreferencesEst(currPlayer)
 					for dim in profile.dimensions:
@@ -1095,22 +1103,27 @@ class ODPIP(ConfigsGenAlg):
 				# calculate fitness and average state
 				currAvgCharacteristics = PlayerCharacteristics()
 				currAvgCharacteristics.reset()
-				for currPlayer in groupInIds:
+				for i in range(groupSize):
 
-					currState = self.playerModelBridge.getPlayerCurrState(currPlayer)
+					currState = self.playerModelBridge.getPlayerCurrState(groupInIds[i])
 					currState.profile = profile
 
 					currAvgCharacteristics.ability += currState.characteristics.ability / groupSize
 					currAvgCharacteristics.engagement += currState.characteristics.engagement / groupSize
 				
-					predictedIncreases = self.regAlg.predict(profile, currPlayer)
-					currQuality += self.calcQuality(predictedIncreases)
+					if (self.regAlg.isTabular()):
+						firstPlayerPreferences = self.playerModelBridge.getPlayerPreferencesEst(groupInIds[i])
+						for j in range(i+1, groupSize):
+							currQuality += self.regAlg.predict(firstPlayerPreferences, groupInIds[j]) / math.comb(groupSize, 2)
+
+					else:
+						predictedIncreases = self.regAlg.predict(profile, groupInIds[i])
+						currQuality += self.calcQuality(predictedIncreases)
 
 				self.coalitionsAvgCharacteristics[coalition] = currAvgCharacteristics
 				self.coalitionsProfiles[coalition] = profile
 			
 			self.coalitionsValues[coalition] = currQuality
-
 
 	def results(self, cSInByteFormat):
 		bestGroups = []
@@ -1127,6 +1140,30 @@ class ODPIP(ConfigsGenAlg):
 
 		return {"groups": bestGroups, "profiles": bestConfigProfiles, "avgCharacteristics": avgCharacteristicsArray}
 
+	# function to compute best profile for group according to each players preferences about the task
+	def findBestProfileForGroup(self, groupInIds):
+		groupSize = len(groupInIds)
+		bestProfile = self.interactionsProfileTemplate.generateCopy().reset()
+
+		tasks = self.taskModelBridge.getAllTasksIds()
+		
+		for playerId in groupInIds:
+			bestQuality = -1
+			bestTaskId = -1
+			
+			for taskId in tasks:
+				currQuality = self.regAlg.predictTasks(taskId, playerId)
+
+				if currQuality > bestQuality:
+					bestQuality = currQuality
+					bestTaskId = taskId
+
+			taskProfile = self.taskModelBridge.getTaskInteractionsProfile(bestTaskId)
+			for dim in bestProfile.dimensions:
+				bestProfile += taskProfile.dimensions[dim] / groupSize
+
+		return bestProfile
+
 	def organize(self):
 		self.playerIds = sorted(self.playerModelBridge.getAllPlayerIds())
 		self.numPlayers = len(self.playerIds)
@@ -1137,12 +1174,22 @@ class ODPIP(ConfigsGenAlg):
 
 		# estimate preferences
 		self.persEstAlg.updateEstimates()
-
+			
 		# initialization(compute the value for every coalition between min and max number of players)
 		self.computeAllCoalitionsValues()
 
+
 		bestCSFound_bitFormat = (gs.odpip(self.numPlayers, self.minNumberOfPlayersPerGroup, self.maxNumberOfPlayersPerGroup, self.coalitionsValues.tolist()))
 		bestCSFound_byteFormat = self.convertSetOfCombinationsFromBitFormat(bestCSFound_bitFormat)
+		for coalition in bestCSFound_byteFormat:
+			print("{", end="")
+			for player in coalition:
+				preferences = self.playerModelBridge.getPlayerRealPreferences(player - 1)
+				print("{" + str(preferences.dimensions["dim_0"]) + ", " + str(preferences.dimensions["dim_1"]) + "},", end="")
+
+			print("}")
+
+		print()
 		return self.results(bestCSFound_byteFormat)
 
 
@@ -1152,6 +1199,7 @@ class CLink(ConfigsGenAlg):
 		interactionsProfileTemplate, 
 		regAlg,
 		persEstAlg,
+		taskModelBridge = None,
 		preferredNumberOfPlayersPerGroup = None, 
 		minNumberOfPlayersPerGroup = None, 
 		maxNumberOfPlayersPerGroup = None,
@@ -1159,6 +1207,7 @@ class CLink(ConfigsGenAlg):
 
 		super().__init__(playerModelBridge, 
 		interactionsProfileTemplate, 
+		taskModelBridge,
 		preferredNumberOfPlayersPerGroup, 
 		minNumberOfPlayersPerGroup, 
 		maxNumberOfPlayersPerGroup)
@@ -1250,24 +1299,35 @@ class CLink(ConfigsGenAlg):
 				# generate profile as average of the preferences estimates
 				profile = self.interactionsProfileTemplate.generateCopy().reset()
 
+				# if (self.regAlg.isTabular()):
+				# 	profile = self.findBestProfileForGroup(groupInIds)
+
+				# else:
 				for currPlayer in groupInIds:
 					preferences = self.playerModelBridge.getPlayerPreferencesEst(currPlayer)
 					for dim in profile.dimensions:
 						profile.dimensions[dim] += (preferences.dimensions[dim] / groupSize)
 
+					
 				# calculate fitness and average state
 				currAvgCharacteristics = PlayerCharacteristics()
 				currAvgCharacteristics.reset()
-				for currPlayer in groupInIds:
+				for i in range(groupSize):
 
-					currState = self.playerModelBridge.getPlayerCurrState(currPlayer)
+					currState = self.playerModelBridge.getPlayerCurrState(groupInIds[i])
 					currState.profile = profile
 
 					currAvgCharacteristics.ability += currState.characteristics.ability / groupSize
 					currAvgCharacteristics.engagement += currState.characteristics.engagement / groupSize
 				
-					predictedIncreases = self.regAlg.predict(profile, currPlayer)
-					currQuality += self.calcQuality(predictedIncreases)
+					if (self.regAlg.isTabular()):
+						firstPlayerPreferences = self.playerModelBridge.getPlayerPreferencesEst(groupInIds[i])
+						for j in range(i+1, groupSize):
+							currQuality += self.regAlg.predict(firstPlayerPreferences, groupInIds[j]) / math.comb(groupSize, 2)
+
+					else:
+						predictedIncreases = self.regAlg.predict(profile, groupInIds[i])
+						currQuality += self.calcQuality(predictedIncreases)
 
 				self.coalitionsAvgCharacteristics[coalition] = currAvgCharacteristics
 				self.coalitionsProfiles[coalition] = profile
@@ -1290,6 +1350,30 @@ class CLink(ConfigsGenAlg):
 
 		return {"groups": bestGroups, "profiles": bestConfigProfiles, "avgCharacteristics": avgCharacteristicsArray}
 
+	# function to compute best profile for group according to each players preferences about the task
+	def findBestProfileForGroup(self, groupInIds):
+		groupSize = len(groupInIds)
+		bestProfile = self.interactionsProfileTemplate.generateCopy().reset()
+
+		tasks = self.taskModelBridge.getAllTasksIds()
+		
+		for playerId in groupInIds:
+			bestQuality = -1
+			bestTaskId = -1
+			
+			for taskId in tasks:
+				currQuality = self.regAlg.predictTasks(taskId, playerId)
+
+				if currQuality > bestQuality:
+					bestQuality = currQuality
+					bestTaskId = taskId
+
+			taskProfile = self.taskModelBridge.getTaskInteractionsProfile(bestTaskId)
+			for dim in bestProfile.dimensions:
+				bestProfile += taskProfile.dimensions[dim] / groupSize
+
+		return bestProfile
+
 	def organize(self):
 		self.playerIds = sorted(self.playerModelBridge.getAllPlayerIds())
 		self.numPlayers = len(self.playerIds)
@@ -1306,4 +1390,16 @@ class CLink(ConfigsGenAlg):
 
 		bestCSFound_bitFormat = (gs.clink(self.numPlayers, self.minNumberOfPlayersPerGroup, self.maxNumberOfPlayersPerGroup, self.coalitionsValues.tolist()))
 		bestCSFound_byteFormat = self.convertSetOfCombinationsFromBitFormat(bestCSFound_bitFormat)
+		for coalition in bestCSFound_byteFormat:
+			print("{", end="")
+			for player in coalition:
+				preferences = self.playerModelBridge.getPlayerRealPreferences(player - 1)
+				print("{" + str(preferences.dimensions["dim_0"]) + ", " + str(preferences.dimensions["dim_1"]) + "},", end="")
+
+			print("}")
+
+		print()
+
+
+
 		return self.results(bestCSFound_byteFormat)

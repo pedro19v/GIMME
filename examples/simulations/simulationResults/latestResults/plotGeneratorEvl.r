@@ -113,6 +113,7 @@ print((m_prs/m_rand - 1)*100)
 currAvg = 	avg[
 				avg$algorithm=="GIMME_CLink" |
 				avg$algorithm=="GIMME_ODPIP" |
+				avg$algorithm=="GIMME_Tabular_ODPIP" |
 				avg$algorithm=="GIMME_PRS" | 
 				avg$algorithm=="GIMME_GA" |
 				avg$algorithm=="GIMME_GA_Bootstrap" |
@@ -122,6 +123,7 @@ currAvg = 	avg[
 currSdev = sdev[
 				sdev$algorithm=="GIMME_CLink" |
 				sdev$algorithm=="GIMME_ODPIP" |
+				sdev$algorithm=="GIMME_Tabular_ODPIP" |
 				sdev$algorithm=="GIMME_PRS" | 
 				sdev$algorithm=="GIMME_GA" |
 				sdev$algorithm=="GIMME_GA_Bootstrap" |
@@ -131,6 +133,7 @@ currSdev = sdev[
 
 currAvg$algorithm[currAvg$algorithm == "GIMME_CLink"] <- "GIMME-CLink" 
 currAvg$algorithm[currAvg$algorithm == "GIMME_ODPIP"] <- "GIMME-ODPIP" 
+currAvg$algorithm[currAvg$algorithm == "GIMME_Tabular_ODPIP"] <- "GIMME_Tabular_ODPIP" 
 currAvg$algorithm[currAvg$algorithm == "GIMME_PRS"] <- "GIMME-PRS" 
 # currAvg$algorithm[currAvg$algorithm == "GIMME_GA_scx"] <- "GIMME GA (Simpler CX)" 
 currAvg$algorithm[currAvg$algorithm == "GIMME_GA"] <- "GIMME-GA" 

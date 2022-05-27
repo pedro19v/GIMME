@@ -1,7 +1,10 @@
 import copy
 import json
+import pandas as pd
 
 from abc import ABC, abstractmethod
+
+from GIMMECore.ModelBridge.TaskModelBridge import TaskModelBridge
 from ..PlayerStructs import *
 
 from sklearn import linear_model, neighbors
@@ -17,6 +20,8 @@ class RegressionAlg(ABC):
 	def predict(self, profile, playerId):
 		pass
 
+	def isTabular(self):
+		return False
 
 	# instrumentation
 	def getCompPercentage(self):
@@ -193,3 +198,76 @@ class NeuralNetworkRegression(RegressionAlg):
 	def predict(self, profile, playerId):
 		pass
 
+
+# ---------------------- Tabular Agent Synergy Method -------------------------------------
+class TabularAgentSynergies(RegressionAlg):
+
+	def __init__(self, playerModelBridge, taskModelBridge):
+		super().__init__(playerModelBridge)
+		
+		self.taskModelBridge = taskModelBridge
+		tempTable = pd.read_csv('synergyTable.txt', sep=",") 
+		self.synergyTable = tempTable.pivot_table(values='synergy', index='agent_1', columns='agent_2') 
+
+		# tempTable = pd.read_csv('taskTable.txt', sep=',')
+		# self.taskTable = tempTable.pivot_table(values='synergy', index='taskId', columns='agent')
+
+
+	def isTabular(self):
+		return True
+
+	def predict(self, profile, playerId):
+		firstPlayerPreferencesInString = '('
+		for dim in profile.dimensions:
+			firstPlayerPreferencesInString += str(round(profile.dimensions[dim]))
+		firstPlayerPreferencesInString += ')'
+
+		secondPlayerPreferences = self.playerModelBridge.getPlayerPreferencesEst(playerId)
+		secondPlayerPreferenceInString = '('
+		for dim in secondPlayerPreferences.dimensions:
+			secondPlayerPreferenceInString += str(round(secondPlayerPreferences.dimensions[dim]))
+		
+		secondPlayerPreferenceInString += ')'
+
+		return self.synergyTable[secondPlayerPreferenceInString][firstPlayerPreferencesInString]
+
+	# either this, or find here the best task
+	def predictTasks(self, taskId, playerId):
+		playerPreferences = self.playerModelBridge.getPlayerPreferencesEst(playerId)
+		playerPreferenceInString = '('
+		for dim in playerPreferences.dimensions:
+			playerPreferenceInString += str(round(playerPreferences.dimensions[dim]))
+		playerPreferenceInString += ')'
+
+		taskProfile = self.taskModelBridge.getTaskInteractionsProfile(taskId)
+		taskProfileInString = '('
+		for dim in taskProfile.dimensions:
+			taskProfileInString += str(round(taskProfile.dimensions[dim]))
+		taskProfileInString += ')'
+
+		return self.taskTable[playerPreferenceInString][taskProfileInString]
+
+
+
+# X = pd.read_csv('synergyTable.txt', sep=",") 
+# >>> X.pivot_table(values='synergy', index='agent1', columns='agent2')
+# agent2  (00)  (01)  (10)  (11)
+# agent1
+# (00)       1     0     0     0
+# (01)       0     1     0     0
+# (10)       0     0     1     0
+# (11)       0     0     0     1
+# >>> dX = X.pivot_table(values='synergy', index='agent1', columns='agent2')
+# >>> dX
+# agent2  (00)  (01)  (10)  (11)
+# agent1
+# (00)       0     0     0     0
+# (01)       0     0     0     0
+# (10)       0     0     0     0
+# (11)       0     0     0     0
+# >>> dX['(00)']
+# agent1
+# (00)    0
+# (01)    0
+# (10)    0
+# (11)    0
